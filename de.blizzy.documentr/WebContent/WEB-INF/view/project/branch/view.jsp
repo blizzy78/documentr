@@ -19,9 +19,9 @@
 	<c:when test="${!empty pagePaths}">
 		<c:forEach var="path" items="${pagePaths}">
 			<c:set var="pathUrl" value="${fn:replace(path, '/', ',')}"/>
-			<a href="<c:url value="/page/${projectName}/${name}/${pathUrl}"/>"
-				<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}">class="shared-page"</c:if>
-				><c:out value="${path}"/></a><br/>
+			<a href="<c:url value="/page/${projectName}/${name}/${pathUrl}"/>"><c:out value="${path}"/></a>
+			<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}"> <span class="shared-page">(shared)</span></c:if>
+			<br/>
 		</c:forEach>
 	</c:when>
 	<c:otherwise>No pages found.</c:otherwise>
