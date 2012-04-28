@@ -9,7 +9,9 @@
 	<li class="active"><spring:message code="title.projectX" arguments="${name}"/></li>
 </ul>
 
-<div class="page-header"><h1><spring:message code="title.branches"/></h1></div>
+<div class="page-header"><h1><spring:message code="title.projectX" arguments="${name}"/></h1></div>
+
+<h2><spring:message code="title.branches"/></h2>
 
 <p>
 <c:set var="branches" value="${d:listProjectBranches(name)}"/>

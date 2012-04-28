@@ -11,7 +11,9 @@
 	<li class="active"><spring:message code="title.branchX" arguments="${name}"/></li>
 </ul>
 
-<div class="page-header"><h1><spring:message code="title.pages"/></h1></div>
+<div class="page-header"><h1><spring:message code="title.branchX" arguments="${name}"/></h1></div>
+
+<h2><spring:message code="title.pages"/></h2>
 
 <p>
 <c:set var="pagePaths" value="${d:listPagePaths(projectName, name)}"/>
