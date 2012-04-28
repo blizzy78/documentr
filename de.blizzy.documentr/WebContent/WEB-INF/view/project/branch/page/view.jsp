@@ -7,9 +7,9 @@
 
 <ul class="breadcrumb">
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/project/${projectName}"/>"><spring:message code="title.projectX" arguments="${projectName}"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/branch/${projectName}/${branchName}"/>"><spring:message code="title.branchX" arguments="${branchName}"/></a> <span class="divider">/</span></li>
-	<li class="active"><spring:message code="title.pageX" arguments="${title}"/></li>
+	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/branch/${projectName}/${branchName}"/>"><c:out value="${branchName}"/></a> <span class="divider">/</span></li>
+	<li class="active"><c:out value="${title}"/></li>
 </ul>
 
 <div class="page-header"><h1><c:out value="${title}"/></h1></div>

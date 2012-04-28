@@ -7,7 +7,7 @@
 
 <ul class="breadcrumb">
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/project/${branchForm.projectName}"/>"><spring:message code="title.projectX" arguments="${branchForm.projectName}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/project/${branchForm.projectName}"/>"><c:out value="${branchForm.projectName}"/></a> <span class="divider">/</span></li>
 	<li class="active"><spring:message code="title.editBranch"/></li>
 </ul>
 

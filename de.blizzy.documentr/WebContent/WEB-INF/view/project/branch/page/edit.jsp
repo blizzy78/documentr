@@ -7,10 +7,10 @@
 
 <ul class="breadcrumb">
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/project/${page.projectName}"/>"><spring:message code="title.projectX" arguments="${page.projectName}"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/branch/${page.projectName}/${page.branchName}"/>"><spring:message code="title.branchX" arguments="${page.branchName}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/project/${page.projectName}"/>"><c:out value="${page.projectName}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/branch/${page.projectName}/${page.branchName}"/>"><c:out value="${page.branchName}"/></a> <span class="divider">/</span></li>
 	<c:if test="${!empty page.path}">
-		<li><a href="<c:url value="/page/${page.projectName}/${page.branchName}/${page.path}"/>"><spring:message code="title.pageX" arguments="${page.title}"/></a> <span class="divider">/</span></li>
+		<li><a href="<c:url value="/page/${page.projectName}/${page.branchName}/${page.path}"/>"><c:out value="${page.title}"/></a> <span class="divider">/</span></li>
 	</c:if>
 	<li class="active"><spring:message code="title.editPage"/></li>
 </ul>
