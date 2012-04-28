@@ -1,0 +1,96 @@
+package de.blizzy.documentr.repository;
+
+import static de.blizzy.documentr.TestUtil.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
+import org.junit.Before;
+import org.junit.Test;
+
+import de.blizzy.documentr.Settings;
+
+public class GlobalRepositoryManagerTest {
+	private static final String PROJECT = "project"; //$NON-NLS-1$
+	
+	private File allReposDir;
+	private GlobalRepositoryManager globalRepoManager;
+	private ProjectRepositoryManager repoManager;
+	private Repository repo;
+
+	@Before
+	public void setUp() {
+		File dataDir = new File("."); //$NON-NLS-1$
+		allReposDir = new File(dataDir, "repositories"); //$NON-NLS-1$
+
+		Settings settings = new Settings();
+		settings.setDocumentrDataDir(dataDir);
+		
+		repoManager = mock(ProjectRepositoryManager.class);
+		
+		ProjectRepositoryManagerFactory repoManagerFactory = mock(ProjectRepositoryManagerFactory.class);
+		when(repoManagerFactory.getManager(allReposDir, PROJECT)).thenReturn(repoManager);
+		
+		globalRepoManager = new GlobalRepositoryManager();
+		globalRepoManager.setSettings(settings);
+		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
+		globalRepoManager.init();
+
+		repo = mock(Repository.class);
+	}
+	
+	@Test
+	public void createProjectCentralRepository() throws IOException, GitAPIException {
+		when(repoManager.createCentralRepository()).thenReturn(repo);
+		assertSame(repo, globalRepoManager.createProjectCentralRepository(PROJECT));
+	}
+	
+	@Test
+	public void getProjectCentralRepository() throws IOException {
+		when(repoManager.getCentralRepository()).thenReturn(repo);
+		assertSame(repo, globalRepoManager.getProjectCentralRepository(PROJECT));
+	}
+	
+	@Test
+	public void createProjectBranchRepositoryWithoutStartingBranch() throws IOException, GitAPIException {
+		when(repoManager.createBranchRepository("branch", null)).thenReturn(repo); //$NON-NLS-1$
+		assertSame(repo, globalRepoManager.createProjectBranchRepository(PROJECT, "branch", null)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void createProjectBranchRepository() throws IOException, GitAPIException {
+		when(repoManager.createBranchRepository("branch", "startingBranch")).thenReturn(repo); //$NON-NLS-1$ //$NON-NLS-2$
+		assertSame(repo, globalRepoManager.createProjectBranchRepository(PROJECT, "branch", "startingBranch")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Test
+	public void listProjectBranches() throws IOException {
+		List<String> branches = Arrays.asList("branch1", "branch2", "branch3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		when(repoManager.listBranches()).thenReturn(branches);
+		assertEquals(branches, globalRepoManager.listProjectBranches(PROJECT));
+	}
+	
+	@Test
+	public void listProjects() throws IOException, GitAPIException {
+		File dataDir = createTempDir();
+		Settings settings = new Settings();
+		settings.setDocumentrDataDir(dataDir);
+		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
+		globalRepoManager.setSettings(settings);
+		globalRepoManager.setRepositoryManagerFactory(new ProjectRepositoryManagerFactory());
+		globalRepoManager.init();
+		globalRepoManager.createProjectCentralRepository("project1"); //$NON-NLS-1$
+		globalRepoManager.createProjectCentralRepository("project2"); //$NON-NLS-1$
+		
+		List<String> projects = globalRepoManager.listProjects();
+		assertEquals(2, projects.size());
+		assertTrue(projects.contains("project1")); //$NON-NLS-1$
+		assertTrue(projects.contains("project2")); //$NON-NLS-1$
+	}
+}

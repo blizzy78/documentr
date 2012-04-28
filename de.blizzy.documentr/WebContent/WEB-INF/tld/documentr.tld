@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>documentr Tag Library</description>
+	<display-name>documentr</display-name>
+	<tlib-version>1.0</tlib-version>
+	<short-name>documentr</short-name>
+	<uri>http://documentr.org/tld/documentr</uri>
+
+	<function>
+		<name>listProjects</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>List listProjects()</function-signature>
+	</function>
+
+	<function>
+		<name>listProjectBranches</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>List listProjectBranches(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>listPagePaths</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>List listPagePaths(java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>isPageSharedWithOtherBranches</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>boolean isPageSharedWithOtherBranches(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+</taglib>
