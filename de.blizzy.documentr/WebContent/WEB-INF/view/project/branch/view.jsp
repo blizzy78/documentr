@@ -20,7 +20,7 @@
 <c:choose>
 	<c:when test="${!empty pagePaths}">
 		<c:forEach var="path" items="${pagePaths}">
-			<c:set var="pathUrl" value="${fn:replace(path, '/', ',')}"/>
+			<c:set var="pathUrl" value="${d:toURLPagePath(path)}"/>
 			<a href="<c:url value="/page/${projectName}/${name}/${pathUrl}"/>"><c:out value="${path}"/></a>
 			<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}"> <span class="shared-page">(<spring:message code="shared"/>)</span></c:if>
 			<br/>

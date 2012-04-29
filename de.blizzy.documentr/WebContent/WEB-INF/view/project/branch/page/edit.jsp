@@ -3,6 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <jsp:include page="/WEB-INF/view/header.jsp"/>
 
 <ul class="breadcrumb">
@@ -10,7 +11,7 @@
 	<li><a href="<c:url value="/project/${page.projectName}"/>"><c:out value="${page.projectName}"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/branch/${page.projectName}/${page.branchName}"/>"><c:out value="${page.branchName}"/></a> <span class="divider">/</span></li>
 	<c:if test="${!empty page.path}">
-		<li><a href="<c:url value="/page/${page.projectName}/${page.branchName}/${page.path}"/>"><c:out value="${page.title}"/></a> <span class="divider">/</span></li>
+		<li><a href="<c:url value="/page/${page.projectName}/${page.branchName}/${d:toURLPagePath(page.path)}"/>"><c:out value="${page.title}"/></a> <span class="divider">/</span></li>
 	</c:if>
 	<li class="active"><spring:message code="title.editPage"/></li>
 </ul>
@@ -40,7 +41,7 @@
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 		<c:choose>
 			<c:when test="${!empty page.path}">
-				<c:set var="pathUrl" value="${fn:replace(page.path, '/', ',')}"/>
+				<c:set var="pathUrl" value="${d:toURLPagePath(page.path)}"/>
 				<a href="<c:url value="/page/${page.projectName}/${page.branchName}/${pathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
 			</c:when>
 			<c:otherwise>

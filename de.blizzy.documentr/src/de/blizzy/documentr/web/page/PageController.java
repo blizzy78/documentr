@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.repository.NotFoundException;
 import de.blizzy.documentr.repository.Page;
 import de.blizzy.documentr.repository.PageStore;
@@ -33,7 +34,7 @@ public class PageController {
 
 		try {
 			model.addAttribute("path", path); //$NON-NLS-1$
-			path = path.replace(',', '/');
+			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
 			model.addAttribute("text", page.getText()); //$NON-NLS-1$
@@ -58,7 +59,7 @@ public class PageController {
 			@PathVariable String path, Model model) throws IOException, GitAPIException {
 		
 		try {
-			path = path.replace(',', '/');
+			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
 			PageForm form = new PageForm(projectName, branchName, path, page.getTitle(), page.getText());
 			model.addAttribute("page", form); //$NON-NLS-1$
@@ -75,7 +76,7 @@ public class PageController {
 		Page page = Page.fromText(form.getTitle(), form.getText());
 		pageStore.savePage(form.getProjectName(), form.getBranchName(), form.getPath(), page);
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			form.getPath().replace('/', ',');
+			Util.toURLPagePath(form.getPath());
 	}
 	
 	@ModelAttribute

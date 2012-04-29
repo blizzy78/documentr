@@ -19,7 +19,7 @@
 </p>
 
 <p>
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${fn:replace(path, '/', ',')}"/>" class="btn"><spring:message code="button.editPage"/></a>
+<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><spring:message code="button.editPage"/></a>
 </p>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>
