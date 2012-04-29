@@ -1,9 +1,10 @@
 package de.blizzy.documentr.web.project;
 
+import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.DocumentrConstants;
@@ -18,7 +19,7 @@ public class ProjectNameBlacklistValidator implements ConstraintValidator<Projec
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
-		return !ArrayUtils.contains(DocumentrConstants.PROJECT_NAMES_BLACKLIST, value);
+
+		return !Pattern.matches("^" + DocumentrConstants.PROJECT_NAMES_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
