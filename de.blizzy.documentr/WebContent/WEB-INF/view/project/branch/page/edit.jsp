@@ -4,6 +4,31 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
+<c:set var="headerJavascript" scope="request">
+
+$(function() {
+	var el = $('#pageForm').find('#path');
+	el.blur(function() {
+		var fieldset = $('#pathFieldset');
+		fieldset.removeClass('warning').removeClass('error');
+		$('#pathExistsWarning').remove();
+
+		var value = el.val();
+		if (value.length > 0) {
+			value = value.replace(/\//g, ',');
+			$.getJSON('<c:url value="/page/exists/${pageForm.projectName}/${pageForm.branchName}/"/>' + value + '/json')
+				.success(function(result) {
+					if (result.exists) {
+						fieldset.addClass('warning');
+						fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
+							'<spring:message code="page.path.exists"/></span>'));
+					}
+				});
+		}
+	});
+});
+
+</c:set>
 <jsp:include page="/WEB-INF/view/header.jsp"/>
 
 <ul class="breadcrumb">
@@ -22,7 +47,7 @@
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well">
 	<c:set var="errorText"><form:errors path="path"/></c:set>
-	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
+	<fieldset id="pathFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
 		<form:label path="path"><spring:message code="label.path"/>:</form:label>
 		<c:set var="disabled"><c:if test="${!empty pageForm.path}">disabled</c:if></c:set>
 		<form:input path="path" cssClass="input-xlarge ${disabled}" disabled="${!empty disabled}"/>

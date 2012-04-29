@@ -9,6 +9,14 @@
 <link rel="stylesheet" href="<c:url value="/css/bootstrap-2.0.3.min.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/bootstrap-responsive-2.0.3.min.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/styles.css"/>" media="all"/>
+<script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
+
+<c:if test="${!empty requestScope.headerJavascript}">
+<script type="text/javascript">
+<c:out value="${requestScope.headerJavascript}" escapeXml="false"/>
+</script>
+</c:if>
+
 </head>
 
 <body id="#top">
