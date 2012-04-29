@@ -8,10 +8,10 @@
 
 <ul class="breadcrumb">
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/project/${page.projectName}"/>"><c:out value="${page.projectName}"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/branch/${page.projectName}/${page.branchName}"/>"><c:out value="${page.branchName}"/></a> <span class="divider">/</span></li>
-	<c:if test="${!empty page.path}">
-		<li><a href="<c:url value="/page/${page.projectName}/${page.branchName}/${d:toURLPagePath(page.path)}"/>"><c:out value="${page.title}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/project/${pageForm.projectName}"/>"><c:out value="${pageForm.projectName}"/></a> <span class="divider">/</span></li>
+	<li><a href="<c:url value="/branch/${pageForm.projectName}/${pageForm.branchName}"/>"><c:out value="${pageForm.branchName}"/></a> <span class="divider">/</span></li>
+	<c:if test="${!empty pageForm.path}">
+		<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(pageForm.path)}"/>"><c:out value="${pageForm.title}"/></a> <span class="divider">/</span></li>
 	</c:if>
 	<li class="active"><spring:message code="title.editPage"/></li>
 </ul>
@@ -19,33 +19,37 @@
 <div class="page-header"><h1><spring:message code="title.editPage"/></h1></div>
 
 <p>
-<c:set var="action"><c:url value="/page/save/${page.projectName}/${page.branchName}"/></c:set>
-<form:form commandName="page" action="${action}" method="POST" cssClass="well">
-	<fieldset>
+<c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
+<form:form commandName="pageForm" action="${action}" method="POST" cssClass="well">
+	<c:set var="errorText"><form:errors path="path"/></c:set>
+	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
 		<form:label path="path"><spring:message code="label.path"/>:</form:label>
-		<c:set var="disabled"><c:if test="${!empty page.path}">disabled</c:if></c:set>
+		<c:set var="disabled"><c:if test="${!empty pageForm.path}">disabled</c:if></c:set>
 		<form:input path="path" cssClass="input-xlarge ${disabled}" disabled="${!empty disabled}"/>
 		<c:if test="${!empty disabled}">
 			<form:hidden path="path"/>
 		</c:if>
+		<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 	</fieldset>
-	<fieldset>
+	<c:set var="errorText"><form:errors path="title"/></c:set>
+	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
 		<form:label path="title"><spring:message code="label.title"/>:</form:label>
 		<form:input path="title" cssClass="input-xlarge"/>
+		<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 	</fieldset>
-	<fieldset>
+	<fieldset class="control-group">
 		<form:label path="text"><spring:message code="label.contents"/>:</form:label>
 		<form:textarea path="text" cssClass="span11" rows="20"/>
 	</fieldset>
-	<fieldset>
+	<fieldset class="control-group">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 		<c:choose>
-			<c:when test="${!empty page.path}">
-				<c:set var="pathUrl" value="${d:toURLPagePath(page.path)}"/>
-				<a href="<c:url value="/page/${page.projectName}/${page.branchName}/${pathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
+			<c:when test="${!empty pageForm.path}">
+				<c:set var="pathUrl" value="${d:toURLPagePath(pageForm.path)}"/>
+				<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${pathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
 			</c:when>
 			<c:otherwise>
-				<a href="<c:url value="/branch/${page.projectName}/${page.branchName}"/>" class="btn"><spring:message code="button.cancel"/></a>
+				<a href="<c:url value="/branch/${pageForm.projectName}/${pageForm.branchName}"/>" class="btn"><spring:message code="button.cancel"/></a>
 			</c:otherwise>
 		</c:choose>
 	</fieldset>

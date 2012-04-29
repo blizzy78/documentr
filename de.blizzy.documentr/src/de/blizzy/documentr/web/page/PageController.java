@@ -2,11 +2,14 @@ package de.blizzy.documentr.web.page;
 
 import java.io.IOException;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.NotFoundException;
 import de.blizzy.documentr.repository.Page;
 import de.blizzy.documentr.repository.PageStore;
@@ -25,9 +29,11 @@ import de.blizzy.documentr.web.ErrorController;
 public class PageController {
 	@Autowired
 	private PageStore pageStore;
+	@Autowired
+	private GlobalRepositoryManager repoManager;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException, GitAPIException {
@@ -48,12 +54,12 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
 	public String createPage(@PathVariable String projectName, @PathVariable String branchName, Model model) {
 		PageForm form = new PageForm(projectName, branchName, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY);
-		model.addAttribute("page", form); //$NON-NLS-1$
+		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
 	
 	@RequestMapping(value="/edit/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException, GitAPIException {
@@ -62,7 +68,7 @@ public class PageController {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
 			PageForm form = new PageForm(projectName, branchName, path, page.getTitle(), page.getText());
-			model.addAttribute("page", form); //$NON-NLS-1$
+			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (NotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -71,10 +77,19 @@ public class PageController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
-	public String savePage(@ModelAttribute PageForm form) throws IOException, GitAPIException {
+	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult)
+			throws IOException, GitAPIException {
 		
+		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
+			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		if (bindingResult.hasErrors()) {
+			return "/project/branch/page/edit"; //$NON-NLS-1$
+		}
+
 		Page page = Page.fromText(form.getTitle(), form.getText());
-		pageStore.savePage(form.getProjectName(), form.getBranchName(), form.getPath(), page);
+		pageStore.savePage(form.getProjectName(), form.getBranchName(), Util.toRealPagePath(form.getPath()), page);
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(form.getPath());
 	}
