@@ -55,6 +55,7 @@ public class ProjectRepositoryManagerTest {
 		try {
 			repo = repoManager.getCentralRepository();
 			assertEquals(gitDir, repo.getDirectory());
+			assertTrue(repo.isBare());
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}

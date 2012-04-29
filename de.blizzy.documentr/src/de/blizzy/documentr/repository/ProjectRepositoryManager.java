@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -37,11 +38,32 @@ class ProjectRepositoryManager {
 			throw new IllegalStateException("repository already exists: " + centralRepoDir.getAbsolutePath()); //$NON-NLS-1$
 		}
 
+		Repository repo = null;
 		File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
-		Repository repo = new RepositoryBuilder().setGitDir(gitDir).build();
-		repo.create();
-		Git.wrap(repo).commit().setMessage("init").call(); //$NON-NLS-1$
-		return repo;
+		try {
+			repo = new RepositoryBuilder().setGitDir(gitDir).setBare().build();
+			repo.create();
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+		
+		File tempGitDir = new File(new File(reposDir, CENTRAL_REPO_NAME + "_temp"), ".git"); //$NON-NLS-1$ //$NON-NLS-2$
+		Repository tempRepo = null;
+		try {
+			tempRepo = Git.cloneRepository()
+				.setURI(gitDir.toURI().toString())
+				.setDirectory(tempGitDir)
+				.call()
+				.getRepository();
+			Git git = Git.wrap(tempRepo);
+			git.commit().setMessage("init").call(); //$NON-NLS-1$
+			git.push().call();
+		} finally {
+			RepositoryUtil.closeQuietly(tempRepo);
+		}
+		FileUtils.forceDelete(tempGitDir.getParentFile());
+
+		return getCentralRepository();
 	}
 	
 	Repository getCentralRepository() throws IOException {
@@ -49,7 +71,7 @@ class ProjectRepositoryManager {
 			throw RepositoryNotFoundException.forCentralRepository(projectName);
 		}
 
-		return new RepositoryBuilder().findGitDir(centralRepoDir).build();
+		return new RepositoryBuilder().findGitDir(centralRepoDir).setBare().build();
 	}
 	
 	Repository createBranchRepository(String branchName, String startingBranch) throws IOException, GitAPIException {
