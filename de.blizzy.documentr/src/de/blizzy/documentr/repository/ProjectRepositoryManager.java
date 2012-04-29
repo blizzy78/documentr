@@ -20,7 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 class ProjectRepositoryManager {
-	private static final String CENTRAL_REPO_NAME = "central"; //$NON-NLS-1$
+	private static final String CENTRAL_REPO_NAME = "_central"; //$NON-NLS-1$
 	
 	private String projectName;
 	private File reposDir;

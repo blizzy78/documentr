@@ -30,8 +30,8 @@ public class ProjectRepositoryManagerTest {
 		}
 
 		try {
-			repo = new RepositoryBuilder().findGitDir(new File(reposDir, "central")).build(); //$NON-NLS-1$
-			assertEquals(new File(new File(reposDir, "central"), ".git"), repo.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
+			repo = new RepositoryBuilder().findGitDir(new File(reposDir, "_central")).build(); //$NON-NLS-1$
+			assertEquals(new File(new File(reposDir, "_central"), ".git"), repo.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
 			assertNotNull(CommitUtils.getCommit(repo, Constants.MASTER));
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
