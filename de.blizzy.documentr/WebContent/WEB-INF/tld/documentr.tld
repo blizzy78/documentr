@@ -45,4 +45,10 @@
 		<function-class>de.blizzy.documentr.Util</function-class>
 		<function-signature>java.lang.String toURLPagePath(java.lang.String)</function-signature>
 	</function>
+
+	<function>
+		<name>markdownToHTML</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String markdownToHTML(java.lang.String)</function-signature>
+	</function>
 </taglib>

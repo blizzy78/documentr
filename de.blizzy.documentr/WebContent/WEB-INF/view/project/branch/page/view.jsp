@@ -12,13 +12,16 @@
 	<li class="active"><c:out value="${title}"/></li>
 </ul>
 
-<div class="page-header"><h1><c:out value="${title}"/></h1></div>
+<div class="page-header"><h1>
+<c:out value="${title}"/>
+<small>
+<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini"><spring:message code="button.editPage"/></a>
+</small>
+</h1></div>
 
-<p>
-<c:out value="${text}" escapeXml="false"/>
-</p>
+<c:out value="${d:markdownToHTML(text)}" escapeXml="false"/>
 
-<p>
+<p class="spacer">
 <a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><spring:message code="button.editPage"/></a>
 </p>
 

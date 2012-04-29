@@ -64,7 +64,7 @@ $(function() {
 	</fieldset>
 	<fieldset class="control-group">
 		<form:label path="text"><spring:message code="label.contents"/>:</form:label>
-		<form:textarea path="text" cssClass="span11" rows="20"/>
+		<form:textarea path="text" cssClass="span11 code" rows="20"/>
 	</fieldset>
 	<fieldset class="control-group">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>

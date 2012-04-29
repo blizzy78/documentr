@@ -5,3 +5,12 @@ body {
 .shared-page {
 	color: gray;
 }
+
+textarea.code {
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+	font-size: 12px;
+}
+
+p.spacer {
+	margin-top: 25pt;
+}

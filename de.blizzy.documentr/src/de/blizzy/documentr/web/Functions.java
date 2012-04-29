@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.pegdown.PegDownProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,5 +55,10 @@ public final class Functions {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static String markdownToHTML(String markdown) {
+		PegDownProcessor proc = new PegDownProcessor();
+		return proc.markdownToHtml(markdown);
 	}
 }
