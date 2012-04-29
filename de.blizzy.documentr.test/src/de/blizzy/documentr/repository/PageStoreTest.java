@@ -1,6 +1,7 @@
 package de.blizzy.documentr.repository;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,9 @@ public class PageStoreTest {
 
 		globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);
-		globalRepoManager.setRepositoryManagerFactory(new ProjectRepositoryManagerFactory());
+		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
+		repoManagerFactory.setLockManager(mock(LockManager.class));
+		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
 		globalRepoManager.init();
 		
 		pageStore = new PageStore();

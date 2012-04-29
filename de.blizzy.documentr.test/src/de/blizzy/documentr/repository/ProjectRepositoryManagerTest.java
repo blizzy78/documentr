@@ -2,6 +2,7 @@ package de.blizzy.documentr.repository;
 
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,21 +15,30 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gitective.core.CommitUtils;
 import org.gitective.core.RepositoryUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ProjectRepositoryManagerTest {
+	private LockManager lockManager;
+
+	@Before
+	public void setUp() {
+		lockManager = mock(LockManager.class);
+	}
+	
 	@Test
 	public void createCentralRepository() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository lockedRepo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			lockedRepo = repoManager.createCentralRepository();
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
-			repo = null;
+			RepositoryUtil.closeQuietly(lockedRepo);
+			lockedRepo = null;
 		}
 
+		Repository repo = null;
 		try {
 			repo = new RepositoryBuilder().findGitDir(new File(reposDir, "_central")).build(); //$NON-NLS-1$
 			assertEquals(new File(new File(reposDir, "_central"), ".git"), repo.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -41,12 +51,12 @@ public class ProjectRepositoryManagerTest {
 	@Test
 	public void getCentralRepository() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		File gitDir;
 		try {
 			repo = repoManager.createCentralRepository();
-			gitDir = repo.getDirectory();
+			gitDir = repo.r().getDirectory();
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -54,8 +64,8 @@ public class ProjectRepositoryManagerTest {
 		
 		try {
 			repo = repoManager.getCentralRepository();
-			assertEquals(gitDir, repo.getDirectory());
-			assertTrue(repo.isBare());
+			assertEquals(gitDir, repo.r().getDirectory());
+			assertTrue(repo.r().isBare());
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -64,8 +74,8 @@ public class ProjectRepositoryManagerTest {
 	@Test
 	public void createBranchRepositoryWithoutStartingBranch() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.createCentralRepository();
 		} finally {
@@ -75,8 +85,8 @@ public class ProjectRepositoryManagerTest {
 
 		try {
 			repo = repoManager.createBranchRepository("branch", null); //$NON-NLS-1$
-			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
-			assertTrue(RepositoryUtils.getBranches(repo).contains("refs/heads/branch")); //$NON-NLS-1$
+			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.r().getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
+			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -84,7 +94,7 @@ public class ProjectRepositoryManagerTest {
 
 		try {
 			repo = repoManager.getCentralRepository();
-			assertTrue(RepositoryUtils.getBranches(repo).contains("refs/heads/branch")); //$NON-NLS-1$
+			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -93,8 +103,8 @@ public class ProjectRepositoryManagerTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void createBranchRepositoryWithoutStartingBranchAndExistingBranch() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.createCentralRepository();
 		} finally {
@@ -120,11 +130,11 @@ public class ProjectRepositoryManagerTest {
 	@Test
 	public void createBranchRepository() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.createCentralRepository();
-			Git.wrap(repo).branchCreate().setName("startingBranch").call(); //$NON-NLS-1$
+			Git.wrap(repo.r()).branchCreate().setName("startingBranch").call(); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -132,8 +142,8 @@ public class ProjectRepositoryManagerTest {
 		
 		try {
 			repo = repoManager.createBranchRepository("branch", "startingBranch"); //$NON-NLS-1$ //$NON-NLS-2$
-			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
-			assertTrue(RepositoryUtils.getBranches(repo).contains("refs/heads/branch")); //$NON-NLS-1$
+			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.r().getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
+			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -141,7 +151,7 @@ public class ProjectRepositoryManagerTest {
 
 		try {
 			repo = repoManager.getCentralRepository();
-			assertTrue(RepositoryUtils.getBranches(repo).contains("refs/heads/branch")); //$NON-NLS-1$
+			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -150,8 +160,8 @@ public class ProjectRepositoryManagerTest {
 	@Test
 	public void getBranchRepository() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.createCentralRepository();
 		} finally {
@@ -168,7 +178,7 @@ public class ProjectRepositoryManagerTest {
 
 		try {
 			repo = repoManager.getBranchRepository("branch"); //$NON-NLS-1$
-			assertTrue(RepositoryUtils.getBranches(repo).contains("refs/heads/branch")); //$NON-NLS-1$
+			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -177,12 +187,12 @@ public class ProjectRepositoryManagerTest {
 	@Test
 	public void listBranches() throws IOException, GitAPIException {
 		File reposDir = createTempDir();
-		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir); //$NON-NLS-1$
-		Repository repo = null;
+		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.createCentralRepository();
-			Git.wrap(repo).branchCreate().setName("branch1").call(); //$NON-NLS-1$
-			Git.wrap(repo).branchCreate().setName("branch2").call(); //$NON-NLS-1$
+			Git.wrap(repo.r()).branchCreate().setName("branch1").call(); //$NON-NLS-1$
+			Git.wrap(repo.r()).branchCreate().setName("branch2").call(); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;

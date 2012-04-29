@@ -25,56 +25,70 @@ class ProjectRepositoryManager {
 	
 	private String projectName;
 	private File reposDir;
+	private LockManager lockManager;
 	private File centralRepoDir;
 
-	ProjectRepositoryManager(String projectName, File reposDir) {
+	ProjectRepositoryManager(String projectName, File reposDir, LockManager lockManager) {
 		this.projectName = projectName;
 		this.reposDir = reposDir;
+		this.lockManager = lockManager;
 		centralRepoDir = new File(reposDir, CENTRAL_REPO_NAME);
 	}
 	
-	Repository createCentralRepository() throws IOException, GitAPIException {
+	ILockedRepository createCentralRepository() throws IOException, GitAPIException {
 		if (centralRepoDir.isDirectory()) {
 			throw new IllegalStateException("repository already exists: " + centralRepoDir.getAbsolutePath()); //$NON-NLS-1$
 		}
 
-		Repository repo = null;
-		File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
+		ILock lock = lockManager.lockAll();
 		try {
-			repo = new RepositoryBuilder().setGitDir(gitDir).setBare().build();
-			repo.create();
+			Repository repo = null;
+			File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
+			try {
+				repo = new RepositoryBuilder().setGitDir(gitDir).setBare().build();
+				repo.create();
+			} finally {
+				RepositoryUtil.closeQuietly(repo);
+			}
+			
+			File tempGitDir = new File(new File(reposDir, CENTRAL_REPO_NAME + "_temp"), ".git"); //$NON-NLS-1$ //$NON-NLS-2$
+			Repository tempRepo = null;
+			try {
+				tempRepo = Git.cloneRepository()
+					.setURI(gitDir.toURI().toString())
+					.setDirectory(tempGitDir)
+					.call()
+					.getRepository();
+				Git git = Git.wrap(tempRepo);
+				git.commit().setMessage("init").call(); //$NON-NLS-1$
+				git.push().call();
+			} finally {
+				RepositoryUtil.closeQuietly(tempRepo);
+			}
+			FileUtils.forceDelete(tempGitDir.getParentFile());
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			lockManager.unlock(lock);
 		}
-		
-		File tempGitDir = new File(new File(reposDir, CENTRAL_REPO_NAME + "_temp"), ".git"); //$NON-NLS-1$ //$NON-NLS-2$
-		Repository tempRepo = null;
-		try {
-			tempRepo = Git.cloneRepository()
-				.setURI(gitDir.toURI().toString())
-				.setDirectory(tempGitDir)
-				.call()
-				.getRepository();
-			Git git = Git.wrap(tempRepo);
-			git.commit().setMessage("init").call(); //$NON-NLS-1$
-			git.push().call();
-		} finally {
-			RepositoryUtil.closeQuietly(tempRepo);
-		}
-		FileUtils.forceDelete(tempGitDir.getParentFile());
 
 		return getCentralRepository();
 	}
 	
-	Repository getCentralRepository() throws IOException {
+	ILockedRepository getCentralRepository() throws IOException {
 		if (!centralRepoDir.isDirectory()) {
 			throw RepositoryNotFoundException.forCentralRepository(projectName);
 		}
 
+		LockedRepository lockedRepo = LockedRepository.lockProjectCentral(projectName, lockManager);
+		Repository repo = getCentralRepositoryInternal();
+		lockedRepo.setRepository(repo);
+		return lockedRepo;
+	}
+
+	private Repository getCentralRepositoryInternal() throws IOException {
 		return new RepositoryBuilder().findGitDir(centralRepoDir).setBare().build();
 	}
 	
-	Repository createBranchRepository(String branchName, String startingBranch) throws IOException, GitAPIException {
+	ILockedRepository createBranchRepository(String branchName, String startingBranch) throws IOException, GitAPIException {
 		Assert.hasLength(branchName);
 		if (startingBranch != null) {
 			Assert.hasLength(startingBranch);
@@ -85,47 +99,64 @@ class ProjectRepositoryManager {
 			throw new IllegalStateException("repository already exists: " + repoDir.getAbsolutePath()); //$NON-NLS-1$
 		}
 
-		if ((startingBranch == null) && !listBranches().isEmpty()) {
+		List<String> branches = listBranches();
+		if (branches.contains(branchName)) {
+			throw new IllegalArgumentException("branch already exists: " + branchName); //$NON-NLS-1$
+		}
+		
+		if ((startingBranch == null) && !branches.isEmpty()) {
 			throw new IllegalArgumentException("must specify a starting branch"); //$NON-NLS-1$
 		}
-		
-		Repository centralRepo = null;
-		File centralRepoGitDir;
+
+		ILock lock = lockManager.lockAll();
 		try {
-			centralRepo = getCentralRepository();
-			centralRepoGitDir = centralRepo.getDirectory();
-		} finally {
-			RepositoryUtil.closeQuietly(centralRepo);
-		}
-		
-		Repository repo = Git.cloneRepository()
-				.setURI(centralRepoGitDir.toURI().toString())
-				.setDirectory(repoDir)
-				.call()
-				.getRepository();
-		
-		try {
-			centralRepo = getCentralRepository();
-			if (!RepositoryUtils.getBranches(centralRepo).contains(branchName)) {
-				CreateBranchCommand createCommand = Git.wrap(centralRepo).branchCreate();
-				if (startingBranch != null) {
-					createCommand.setStartPoint(startingBranch);
+			Repository centralRepo = null;
+			File centralRepoGitDir;
+			try {
+				centralRepo = getCentralRepositoryInternal();
+				centralRepoGitDir = centralRepo.getDirectory();
+			} finally {
+				RepositoryUtil.closeQuietly(centralRepo);
+				centralRepo = null;
+			}
+			
+			Repository repo = null;
+			try {
+				repo = Git.cloneRepository()
+						.setURI(centralRepoGitDir.toURI().toString())
+						.setDirectory(repoDir)
+						.call()
+						.getRepository();
+				
+				try {
+					centralRepo = getCentralRepositoryInternal();
+					if (!RepositoryUtils.getBranches(centralRepo).contains(branchName)) {
+						CreateBranchCommand createBranchCommand = Git.wrap(centralRepo).branchCreate();
+						if (startingBranch != null) {
+							createBranchCommand.setStartPoint(startingBranch);
+						}
+						createBranchCommand.setName(branchName).call();
+					}
+				} finally {
+					RepositoryUtil.closeQuietly(centralRepo);
 				}
-				createCommand.setName(branchName).call();
+				
+				Git git = Git.wrap(repo);
+				RefSpec refSpec = new RefSpec("refs/heads/" + branchName + ":refs/remotes/origin/" + branchName); //$NON-NLS-1$ //$NON-NLS-2$
+				git.fetch().setRemote("origin").setRefSpecs(refSpec).call();  //$NON-NLS-1$
+				git.branchCreate().setName(branchName).setStartPoint("origin/" + branchName).call(); //$NON-NLS-1$
+				git.checkout().setName(branchName).call();
+			} finally {
+				RepositoryUtil.closeQuietly(repo);
 			}
 		} finally {
-			RepositoryUtil.closeQuietly(centralRepo);
+			lockManager.unlock(lock);
 		}
 		
-		Git git = Git.wrap(repo);
-		RefSpec refSpec = new RefSpec("refs/heads/" + branchName + ":refs/remotes/origin/" + branchName); //$NON-NLS-1$ //$NON-NLS-2$
-		git.fetch().setRemote("origin").setRefSpecs(refSpec).call();  //$NON-NLS-1$
-		git.branchCreate().setName(branchName).setStartPoint("origin/" + branchName).call(); //$NON-NLS-1$
-		git.checkout().setName(branchName).call();
-		return repo;
+		return getBranchRepository(branchName);
 	}
 	
-	Repository getBranchRepository(String branchName) throws IOException, GitAPIException {
+	ILockedRepository getBranchRepository(String branchName) throws IOException, GitAPIException {
 		Assert.hasLength(branchName);
 		
 		File repoDir = new File(reposDir, branchName);
@@ -133,16 +164,18 @@ class ProjectRepositoryManager {
 			throw new RepositoryNotFoundException(projectName, branchName);
 		}
 
+		LockedRepository lockedRepo = LockedRepository.lockProjectBranch(projectName, branchName, lockManager);
 		Repository repo = new RepositoryBuilder().findGitDir(repoDir).build();
 		Git.wrap(repo).pull().call();
-		return repo;
+		lockedRepo.setRepository(repo);
+		return lockedRepo;
 	}
 
 	public List<String> listBranches() throws IOException {
-		Repository repo = null;
+		ILockedRepository repo = null;
 		try {
 			repo = getCentralRepository();
-			List<String> result = new ArrayList<>(RepositoryUtils.getBranches(repo));
+			List<String> result = new ArrayList<>(RepositoryUtils.getBranches(repo.r()));
 			final int prefixLen = "refs/heads/".length(); //$NON-NLS-1$
 			Function<String, String> function = new Function<String, String>() {
 				@Override

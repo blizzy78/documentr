@@ -11,7 +11,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,24 +32,24 @@ public class GlobalRepositoryManager {
 		reposDir = new File(settings.getDocumentrDataDir(), "repositories"); //$NON-NLS-1$
 	}
 
-	public Repository createProjectCentralRepository(String projectName) throws IOException, GitAPIException {
+	public ILockedRepository createProjectCentralRepository(String projectName) throws IOException, GitAPIException {
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
 		return repoManager.createCentralRepository();
 	}
 
-	public Repository getProjectCentralRepository(String projectName) throws IOException {
+	public ILockedRepository getProjectCentralRepository(String projectName) throws IOException {
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository();
 	}
 	
-	public Repository createProjectBranchRepository(String projectName, String branchName, String startingBranch)
+	public ILockedRepository createProjectBranchRepository(String projectName, String branchName, String startingBranch)
 			throws IOException, GitAPIException {
 		
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
 		return repoManager.createBranchRepository(branchName, startingBranch);
 	}
 	
-	public Repository getProjectBranchRepository(String projectName, String branchName) throws IOException, GitAPIException {
+	public ILockedRepository getProjectBranchRepository(String projectName, String branchName) throws IOException, GitAPIException {
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getBranchRepository(branchName);
 	}

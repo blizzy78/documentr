@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class GlobalRepositoryManagerTest {
 	private File allReposDir;
 	private GlobalRepositoryManager globalRepoManager;
 	private ProjectRepositoryManager repoManager;
-	private Repository repo;
+	private ILockedRepository repo;
 
 	@Before
 	public void setUp() {
@@ -42,7 +41,7 @@ public class GlobalRepositoryManagerTest {
 		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
 		globalRepoManager.init();
 
-		repo = mock(Repository.class);
+		repo = mock(ILockedRepository.class);
 	}
 	
 	@Test
@@ -83,7 +82,9 @@ public class GlobalRepositoryManagerTest {
 		settings.setDocumentrDataDir(dataDir);
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);
-		globalRepoManager.setRepositoryManagerFactory(new ProjectRepositoryManagerFactory());
+		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
+		repoManagerFactory.setLockManager(mock(LockManager.class));
+		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
 		globalRepoManager.init();
 		globalRepoManager.createProjectCentralRepository("project1"); //$NON-NLS-1$
 		globalRepoManager.createProjectCentralRepository("project2"); //$NON-NLS-1$

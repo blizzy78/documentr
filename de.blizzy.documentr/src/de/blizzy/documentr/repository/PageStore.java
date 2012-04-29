@@ -51,7 +51,7 @@ public class PageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		
-		Repository repo = null;
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
@@ -61,10 +61,10 @@ public class PageStore {
 			pageMap.put(CONTENT_TYPE, page.getContentType());
 			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
 			String json = gson.toJson(pageMap);
-			File workingFile = toWorkingFile(repo, path + PAGE_SUFFIX);
+			File workingFile = toWorkingFile(repo.r(), path + PAGE_SUFFIX);
 			FileUtils.write(workingFile, json, "UTF-8"); //$NON-NLS-1$
 
-			Git git = Git.wrap(repo);
+			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(path + PAGE_SUFFIX).call();
 			git.commit().setMessage(path + PAGE_SUFFIX).call();
 			git.push().call();
@@ -87,10 +87,10 @@ public class PageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 
-		Repository repo = null;
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String json = BlobUtils.getHeadContent(repo, path + PAGE_SUFFIX);
+			String json = BlobUtils.getHeadContent(repo.r(), path + PAGE_SUFFIX);
 			if (json == null) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
@@ -109,10 +109,10 @@ public class PageStore {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 
-		Repository repo = null;
+		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			File workingDir = RepositoryUtil.getWorkingDir(repo);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			List<String> paths = listPagePaths(workingDir);
 			String prefix = workingDir.getAbsolutePath() + File.separator;
 			final int prefixLen = prefix.length();
@@ -162,21 +162,21 @@ public class PageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 
-		Repository centralRepo = null;
+		List<String> allBranches = repoManager.listProjectBranches(projectName);
+		ILockedRepository centralRepo = null;
 		Set<String> branchesWithCommit = Collections.emptySet();
 		try {
-			List<String> allBranches = repoManager.listProjectBranches(projectName);
 			centralRepo = repoManager.getProjectCentralRepository(projectName);
-			RevCommit commit = CommitUtils.getLastCommit(centralRepo, branchName, path + PAGE_SUFFIX);
+			RevCommit commit = CommitUtils.getLastCommit(centralRepo.r(), branchName, path + PAGE_SUFFIX);
 			if (commit != null) {
 				// get all branches where this commit is in their history
-				branchesWithCommit = getBranchesWithCommit(commit, allBranches, centralRepo);
+				branchesWithCommit = getBranchesWithCommit(commit, allBranches, centralRepo.r());
 				if (branchesWithCommit.size() >= 2) {
 					// remove all branches where the previous commit is no longer visible
 					// due to newer commits on those branches
 					for (Iterator<String> iter = branchesWithCommit.iterator(); iter.hasNext();) {
 						String branch = iter.next();
-						RevCommit c = CommitUtils.getLastCommit(centralRepo, branch, path + PAGE_SUFFIX);
+						RevCommit c = CommitUtils.getLastCommit(centralRepo.r(), branch, path + PAGE_SUFFIX);
 						if (!c.equals(commit)) {
 							iter.remove();
 						}

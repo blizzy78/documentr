@@ -13,6 +13,12 @@ public final class RepositoryUtil {
 		}
 	}
 	
+	public static void closeQuietly(ILockedRepository repo) {
+		if (repo != null) {
+			repo.close();
+		}
+	}
+	
 	static File getWorkingDir(Repository repo) {
 		return repo.getDirectory().getParentFile();
 	}
