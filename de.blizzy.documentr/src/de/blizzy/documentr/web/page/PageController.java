@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import de.blizzy.documentr.repository.NotFoundException;
 import de.blizzy.documentr.repository.Page;
 import de.blizzy.documentr.repository.PageStore;
 import de.blizzy.documentr.web.ErrorController;
+import de.blizzy.documentr.web.Functions;
 
 @Controller
 @RequestMapping("/page")
@@ -114,7 +116,7 @@ public class PageController {
 	@RequestMapping(value="/exists/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.GET)
-	public ResponseEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
+	public HttpEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path) throws IOException, GitAPIException {
 
 		boolean pageExists = false;
@@ -128,8 +130,22 @@ public class PageController {
 
 		Map<String, Boolean> result = new HashMap<>();
 		result.put("exists", Boolean.valueOf(pageExists)); //$NON-NLS-1$
+		return createJSONResponse(result);
+	}
+
+	@RequestMapping(value="/markdownToHTML/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
+			method=RequestMethod.POST)
+	public HttpEntity<String> markdownToHTML(@RequestParam String markdown) {
+		
+		Map<String, String> result = new HashMap<>();
+		result.put("html", Functions.markdownToHTML(markdown)); //$NON-NLS-1$
+		return createJSONResponse(result);
+	}
+
+	private HttpEntity<String> createJSONResponse(Object o) {
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-		String json = gson.toJson(result);
+		String json = gson.toJson(o);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json"); //$NON-NLS-1$ //$NON-NLS-2$
 		return new ResponseEntity<>(json, headers, HttpStatus.OK);

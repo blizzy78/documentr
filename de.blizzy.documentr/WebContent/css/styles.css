@@ -14,3 +14,7 @@ textarea.code {
 p.spacer {
 	margin-top: 25pt;
 }
+
+.modal {
+	width: 800px;
+}

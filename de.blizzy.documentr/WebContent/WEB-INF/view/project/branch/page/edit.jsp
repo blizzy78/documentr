@@ -28,6 +28,34 @@ $(function() {
 	});
 });
 
+function showPreview() {
+	var textEl = $('#pageForm').find('#text');
+	$.ajax({
+		url: '<c:url value="/page/markdownToHTML/${pageForm.projectName}/${pageForm.branchName}/json"/>',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			markdown: textEl.val()
+		},
+		success: function(result) {
+			$('#previewText').html(result.html);
+			$('#preview').modal({
+				backdrop: 'static',
+				keyboard: true
+			});
+			$('#preview').position({
+				my: 'center center',
+				at: 'center center',
+				of: window
+			});
+		}
+	});
+}
+
+function hidePreview() {
+	$('#preview').modal('hide');
+}
+
 </c:set>
 <jsp:include page="/WEB-INF/view/header.jsp"/>
 
@@ -65,6 +93,7 @@ $(function() {
 	<fieldset class="control-group">
 		<form:label path="text"><spring:message code="label.contents"/>:</form:label>
 		<form:textarea path="text" cssClass="span11 code" rows="20"/>
+		<a href="javascript:showPreview();"><img src="<c:url value="/img/ico_preview.png"/>" border="0"/></a>
 	</fieldset>
 	<fieldset class="control-group">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
@@ -80,5 +109,16 @@ $(function() {
 	</fieldset>
 </form:form>
 </p>
+
+<div class="modal" id="preview" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="hidePreview();">×</button>
+		<h3><spring:message code="title.pagePreview"/></h3>
+	</div>
+	<div class="modal-body" id="previewText"></div>
+	<div class="modal-footer">
+		<a href="javascript:hidePreview();" class="btn">Close</a>
+	</div>
+</div>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>
