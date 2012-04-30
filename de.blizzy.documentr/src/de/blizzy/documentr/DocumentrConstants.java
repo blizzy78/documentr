@@ -16,7 +16,7 @@ public final class DocumentrConstants {
 	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|_.*)"; //$NON-NLS-1$
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
 			"(?:create|save|" + Constants.MASTER + "|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
-	public static final String PAGE_PATHS_BLACKLIST_PATTERN = "_.*"; //$NON-NLS-1$
+	public static final String PAGE_PATHS_BLACKLIST_PATTERN = "([_\\.].*|.*/[_\\.].*)"; //$NON-NLS-1$
 	
 	private DocumentrConstants() {}
 }
