@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -41,6 +42,29 @@ public class PageStoreTest {
 		
 		pageStore = new PageStore();
 		pageStore.setGlobalRepositoryManager(globalRepoManager);
+	}
+	
+	@Test
+	public void saveAndGetPage() throws IOException, GitAPIException {
+		globalRepoManager.createProjectCentralRepository(PROJECT);
+		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		Page page = saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		assertEquals(page.getTitle(), result.getTitle());
+		assertEquals(page.getText(), result.getText());
+		assertEquals(page.getContentType(), result.getContentType());
+	}
+	
+	@Test
+	public void listPagePaths() throws IOException, GitAPIException {
+		globalRepoManager.createProjectCentralRepository(PROJECT);
+		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		saveRandomPage(BRANCH_1, "test"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		List<String> paths = pageStore.listPagePaths(PROJECT, BRANCH_1);
+		assertEquals(2, paths.size());
+		assertTrue(paths.contains("test")); //$NON-NLS-1$
+		assertTrue(paths.contains("foo/bar/baz")); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -118,9 +142,10 @@ public class PageStoreTest {
 		assertEquals(Sets.newHashSet(expectedBranches), branches);
 	}
 	
-	private void saveRandomPage(String branchName, String path) throws IOException, GitAPIException {
+	private Page saveRandomPage(String branchName, String path) throws IOException, GitAPIException {
 		Page page = createRandomPage();
 		pageStore.savePage(PROJECT, branchName, path, page);
+		return page;
 	}
 	
 	private Page createRandomPage() {

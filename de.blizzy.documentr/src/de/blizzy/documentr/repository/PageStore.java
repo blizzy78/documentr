@@ -40,6 +40,7 @@ public class PageStore {
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 	private static final String DATA = "data"; //$NON-NLS-1$
 	private static final String PAGE_SUFFIX = ".page"; //$NON-NLS-1$
+	private static final String PAGES_DIR_NAME = "pages"; //$NON-NLS-1$
 	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
@@ -61,21 +62,23 @@ public class PageStore {
 			pageMap.put(CONTENT_TYPE, page.getContentType());
 			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
 			String json = gson.toJson(pageMap);
-			File workingFile = toWorkingFile(repo.r(), path + PAGE_SUFFIX);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			File workingFile = toWorkingFile(pagesDir, path + PAGE_SUFFIX);
+			FileUtils.forceMkdir(workingFile.getParentFile());
 			FileUtils.write(workingFile, json, "UTF-8"); //$NON-NLS-1$
 
 			Git git = Git.wrap(repo.r());
-			git.add().addFilepattern(path + PAGE_SUFFIX).call();
-			git.commit().setMessage(path + PAGE_SUFFIX).call();
+			git.add().addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX).call(); //$NON-NLS-1$
+			git.commit().setMessage(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX).call(); //$NON-NLS-1$
 			git.push().call();
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
 	
-	private File toWorkingFile(Repository repo, String path) {
-		File workingDir = RepositoryUtil.getWorkingDir(repo);
-		File result = workingDir;
+	private File toWorkingFile(File baseDir, String path) {
+		File result = baseDir;
 		for (String part : path.split("/")) { //$NON-NLS-1$
 			result = new File(result, part);
 		}
@@ -90,7 +93,7 @@ public class PageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String json = BlobUtils.getHeadContent(repo.r(), path + PAGE_SUFFIX);
+			String json = BlobUtils.getHeadContent(repo.r(), PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
 			if (json == null) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
@@ -113,8 +116,9 @@ public class PageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			List<String> paths = listPagePaths(workingDir);
-			String prefix = workingDir.getAbsolutePath() + File.separator;
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			List<String> paths = listPagePaths(pagesDir);
+			String prefix = pagesDir.getAbsolutePath() + File.separator;
 			final int prefixLen = prefix.length();
 			final int pageSuffixLen = PAGE_SUFFIX.length();
 			Function<String, String> function = new Function<String, String>() {
@@ -167,7 +171,8 @@ public class PageStore {
 		Set<String> branchesWithCommit = Collections.emptySet();
 		try {
 			centralRepo = repoManager.getProjectCentralRepository(projectName);
-			RevCommit commit = CommitUtils.getLastCommit(centralRepo.r(), branchName, path + PAGE_SUFFIX);
+			String repoPath = PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX; //$NON-NLS-1$
+			RevCommit commit = CommitUtils.getLastCommit(centralRepo.r(), branchName, repoPath);
 			if (commit != null) {
 				// get all branches where this commit is in their history
 				branchesWithCommit = getBranchesWithCommit(commit, allBranches, centralRepo.r());
@@ -176,7 +181,7 @@ public class PageStore {
 					// due to newer commits on those branches
 					for (Iterator<String> iter = branchesWithCommit.iterator(); iter.hasNext();) {
 						String branch = iter.next();
-						RevCommit c = CommitUtils.getLastCommit(centralRepo.r(), branch, path + PAGE_SUFFIX);
+						RevCommit c = CommitUtils.getLastCommit(centralRepo.r(), branch, repoPath);
 						if (!c.equals(commit)) {
 							iter.remove();
 						}
