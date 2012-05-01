@@ -25,7 +25,7 @@
 <div class="page-header"><h1>
 <c:out value="${title}"/>
 <small>
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
+<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i></a>
 </small>
 </h1></div>
 
