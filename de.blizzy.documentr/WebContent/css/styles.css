@@ -1,5 +1,6 @@
 body {
 	padding-top: 40px;
+	background-color: white;
 }
 
 .shared-page {
@@ -17,4 +18,9 @@ p.spacer {
 
 .modal {
 	width: 800px;
+}
+
+code {
+	color: inherit;
+	border: 0;
 }
