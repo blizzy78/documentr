@@ -24,3 +24,7 @@ code {
 	color: inherit;
 	border: 0;
 }
+
+table.table-documentr {
+	margin-bottom: 18px;
+}
