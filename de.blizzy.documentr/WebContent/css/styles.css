@@ -12,10 +12,6 @@ textarea.code {
 	font-size: 12px;
 }
 
-p.spacer {
-	margin-top: 25pt;
-}
-
 .modal {
 	width: 800px;
 }
@@ -27,4 +23,8 @@ code {
 
 table.table-documentr {
 	margin-bottom: 18px;
+}
+
+.hero-unit.hero-single {
+	margin-top: 100pt;
 }
