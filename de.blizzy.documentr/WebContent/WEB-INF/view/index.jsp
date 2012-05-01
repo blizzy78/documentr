@@ -25,7 +25,7 @@
 </p>
 
 <p>
-<a href="<c:url value="/project/create"/>" class="btn"><spring:message code="button.createProject"/></a>
+<a href="<c:url value="/project/create"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createProject"/></a>
 </p>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>

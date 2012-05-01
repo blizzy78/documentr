@@ -40,7 +40,7 @@ function showPreview() {
 		success: function(result) {
 			$('#previewText').html(result.html);
 			$('#preview').modal({
-				backdrop: 'static',
+				backdrop: true,
 				keyboard: true
 			});
 			$('#preview').position({
@@ -93,7 +93,7 @@ function hidePreview() {
 	<fieldset class="control-group">
 		<form:label path="text"><spring:message code="label.contents"/>:</form:label>
 		<form:textarea path="text" cssClass="span11 code" rows="20"/>
-		<a href="javascript:showPreview();"><img src="<c:url value="/img/ico_preview.png"/>" border="0"/></a>
+		<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
 	</fieldset>
 	<fieldset class="control-group">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>

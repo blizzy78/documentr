@@ -12,17 +12,27 @@
 	<li class="active"><c:out value="${title}"/></li>
 </ul>
 
+<div class="btn-toolbar">
+	<div class="btn-group">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript:;"><i class="icon-plus"></i> <spring:message code="button.add"/> <span class="caret"></span></a>
+		<ul class="dropdown-menu">
+			<li><a href="javascript:;"><i class="icon-download-alt"></i> <spring:message code="button.attachment"/></a></li>
+			<li><a href="javascript:;"><i class="icon-file"></i> <spring:message code="button.childPage"/></a></li>
+		</ul>
+	</div>
+</div>
+
 <div class="page-header"><h1>
 <c:out value="${title}"/>
 <small>
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini"><spring:message code="button.editPage"/></a>
+<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 </small>
 </h1></div>
 
 <c:out value="${d:markdownToHTML(text)}" escapeXml="false"/>
 
 <p class="spacer">
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><spring:message code="button.editPage"/></a>
+<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 </p>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>

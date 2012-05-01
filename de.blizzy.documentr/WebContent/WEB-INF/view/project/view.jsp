@@ -26,7 +26,7 @@
 </p>
 
 <p>
-<a href="<c:url value="/branch/create/${name}"/>" class="btn"><spring:message code="button.createBranch"/></a>
+<a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
 </p>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>
