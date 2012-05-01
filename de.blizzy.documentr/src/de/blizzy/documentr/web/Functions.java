@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
+import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,9 @@ import de.blizzy.documentr.repository.PageStore;
 
 @Component
 public final class Functions {
+	private static final int PEGDOWN_OPTIONS = Extensions.ALL -
+			Extensions.QUOTES - Extensions.SMARTS - Extensions.SMARTYPANTS;
+
 	private static PageStore pageStore;
 	private static GlobalRepositoryManager repoManager;
 	
@@ -59,8 +63,8 @@ public final class Functions {
 	}
 	
 	public static String markdownToHTML(String markdown) {
-		PegDownProcessor proc = new PegDownProcessor(Extensions.ALL -
-				Extensions.QUOTES - Extensions.SMARTS - Extensions.SMARTYPANTS);
-		return proc.markdownToHtml(markdown);
+		PegDownProcessor proc = new PegDownProcessor(PEGDOWN_OPTIONS);
+		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
+		return new HtmlSerializer().toHtml(rootNode);
 	}
 }
