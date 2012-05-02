@@ -13,17 +13,17 @@
 
 <h2><spring:message code="title.branches"/></h2>
 
-<p>
 <c:set var="branches" value="${d:listProjectBranches(name)}"/>
 <c:choose>
 	<c:when test="${!empty branches}">
+		<ul>
 		<c:forEach var="branch" items="${branches}">
-			<a href="<c:url value="/branch/${name}/${branch}"/>"><c:out value="${branch}"/></a><br/>
+			<li><a href="<c:url value="/branch/${name}/${branch}"/>"><c:out value="${branch}"/></a></li>
 		</c:forEach>
+		</ul>
 	</c:when>
-	<c:otherwise>No branches found.</c:otherwise>
+	<c:otherwise><p>No branches found.</p></c:otherwise>
 </c:choose>
-</p>
 
 <p>
 <a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
