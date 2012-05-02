@@ -37,6 +37,7 @@ $(function() {
 
 <body id="#top">
 
+<nav>
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container">
@@ -46,5 +47,6 @@ $(function() {
 		</div>
 	</div>
 </div>
+</nav>
 
 <div class="container">
