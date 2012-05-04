@@ -26,7 +26,7 @@ public class AttachmentController {
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
+	public String getAttachments(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 
 		model.addAttribute("projectName", projectName); //$NON-NLS-1$
@@ -53,13 +53,13 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @RequestParam MultipartFile file) throws IOException {
+			@PathVariable String pagePath, @RequestParam MultipartFile file, Model model) throws IOException {
 
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		Page attachment = Page.fromData(data, "application/octet-stream"); //$NON-NLS-1$
 		pagePath = Util.toRealPagePath(pagePath);
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment);
 		
-		return null;
+		return getAttachments(projectName, branchName, pagePath, model);
 	}
 }
