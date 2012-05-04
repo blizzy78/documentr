@@ -49,8 +49,8 @@ public class PageController {
 			@PathVariable String path, Model model) throws IOException, GitAPIException {
 
 		try {
-			model.addAttribute("path", path); //$NON-NLS-1$
 			path = Util.toRealPagePath(path);
+			model.addAttribute("path", path); //$NON-NLS-1$
 			Page page = pageStore.getPage(projectName, branchName, path);
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
 			model.addAttribute("text", page.getText()); //$NON-NLS-1$

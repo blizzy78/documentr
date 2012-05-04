@@ -29,9 +29,21 @@
 	</function>
 
 	<function>
+		<name>listPageAttachments</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>List listPageAttachments(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
 		<name>isPageSharedWithOtherBranches</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>boolean isPageSharedWithOtherBranches(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>getPageTitle</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String getPageTitle(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>

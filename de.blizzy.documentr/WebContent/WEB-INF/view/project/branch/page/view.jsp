@@ -12,22 +12,28 @@
 	<li class="active"><c:out value="${title}"/></li>
 </ul>
 
-<div class="btn-toolbar">
+<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
+<div class="btn-toolbar" style="float:right">
 	<div class="btn-group">
-		<a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript:;"><i class="icon-plus"></i> <spring:message code="button.add"/> <span class="caret"></span></a>
+		<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
+	</div>
+	<div class="btn-group">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript:;"><i class="icon-cog"></i> <spring:message code="button.tools"/> <span class="caret"></span></a>
 		<ul class="dropdown-menu">
-			<li><a href="javascript:;"><i class="icon-download-alt"></i> <spring:message code="button.attachment"/></a></li>
-			<li><a href="javascript:;"><i class="icon-file"></i> <spring:message code="button.childPage"/></a></li>
+			<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
+			<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>
+					<c:choose>
+						<c:when test="${!empty attachments}"><spring:message code="button.attachmentsX" arguments="${fn:length(attachments)}"/></c:when>
+						<c:otherwise><spring:message code="button.attachments"/></c:otherwise>
+					</c:choose>
+				</a></li>
+			<li class="divider"></li>
+			<li><a href="javascript:;"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
 		</ul>
 	</div>
 </div>
 
-<div class="page-header"><h1>
-<c:out value="${title}"/>
-<small>
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-mini" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i></a>
-</small>
-</h1></div>
+<div class="page-header"><h1><c:out value="${title}"/></h1></div>
 
 <c:out value="${d:markdownToHTML(text)}" escapeXml="false"/>
 

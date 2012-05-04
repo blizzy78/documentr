@@ -7,22 +7,22 @@ public class Page {
 	private byte[] data;
 	private String contentType;
 
-	public Page(String title, byte[] data, String contentType) {
+	private Page(String title, byte[] data, String contentType) {
 		this.title = title;
 		this.data = data;
 		this.contentType = contentType;
 	}
 
 	public static Page fromText(String title, String text) {
-		return fromText(title, text, "text/plain"); //$NON-NLS-1$
-	}
-	
-	public static Page fromText(String title, String text, String contentType) {
 		try {
-			return new Page(title, text.getBytes("UTF-8"), contentType); //$NON-NLS-1$
+			return new Page(title, text.getBytes("UTF-8"), "text/plain"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static Page fromData(byte[] data, String contentType) {
+		return new Page(null, data, contentType);
 	}
 
 	public String getTitle() {

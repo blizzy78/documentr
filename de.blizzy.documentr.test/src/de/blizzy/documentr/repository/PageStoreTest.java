@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,6 +136,31 @@ public class PageStoreTest {
 		assertBranchesPageIsSharedWith(BRANCH_3, BRANCH_3);
 	}
 
+	@Test
+	public void saveAndGetAttachment() throws IOException, GitAPIException {
+		globalRepoManager.createProjectCentralRepository(PROJECT);
+		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		Page result = pageStore.getAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(ArrayUtils.isEquals(attachment.getData(), result.getData()));
+		assertEquals(attachment.getContentType(), result.getContentType());
+	}
+
+	@Test
+	public void listPageAttachments() throws IOException, GitAPIException {
+		globalRepoManager.createProjectCentralRepository(PROJECT);
+		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
+		List<String> attachments = pageStore.listPageAttachments(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		assertEquals(1, attachments.size());
+		assertTrue(attachments.contains("test.dat")); //$NON-NLS-1$
+	}
+	
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
 		

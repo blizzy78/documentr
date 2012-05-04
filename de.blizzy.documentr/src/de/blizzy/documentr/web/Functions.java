@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.Page;
 import de.blizzy.documentr.repository.PageStore;
 
 @Component
@@ -49,6 +50,23 @@ public final class Functions {
 	public static List<String> listPagePaths(String projectName, String branchName) {
 		try {
 			return pageStore.listPagePaths(projectName, branchName);
+		} catch (IOException | GitAPIException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static List<String> listPageAttachments(String projectName, String branchName, String path) {
+		try {
+			return pageStore.listPageAttachments(projectName, branchName, path);
+		} catch (IOException | GitAPIException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String getPageTitle(String projectName, String branchName, String path) {
+		try {
+			Page page = pageStore.getPage(projectName, branchName, path);
+			return page.getTitle();
 		} catch (IOException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}
