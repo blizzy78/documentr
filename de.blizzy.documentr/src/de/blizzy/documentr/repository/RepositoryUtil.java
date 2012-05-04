@@ -19,7 +19,7 @@ public final class RepositoryUtil {
 		}
 	}
 	
-	static File getWorkingDir(Repository repo) {
+	public static File getWorkingDir(Repository repo) {
 		return repo.getDirectory().getParentFile();
 	}
 }

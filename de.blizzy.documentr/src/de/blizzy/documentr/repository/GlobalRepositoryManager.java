@@ -81,7 +81,7 @@ public class GlobalRepositoryManager {
 		return result;
 	}
 	
-	protected void setSettings(Settings settings) {
+	public void setSettings(Settings settings) {
 		this.settings = settings;
 	}
 	

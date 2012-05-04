@@ -1,4 +1,4 @@
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr.pagestore;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -17,6 +17,9 @@ import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.TestUtil;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.LockManager;
+import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 
 public class PageStoreTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -168,7 +171,7 @@ public class PageStoreTest {
 		assertEquals(Sets.newHashSet(expectedBranches), branches);
 	}
 	
-	private Page saveRandomPage(String branchName, String path) throws IOException, GitAPIException {
+	private Page saveRandomPage(String branchName, String path) throws IOException {
 		Page page = createRandomPage();
 		pageStore.savePage(PROJECT, branchName, path, page);
 		return page;

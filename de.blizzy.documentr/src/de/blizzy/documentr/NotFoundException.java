@@ -1,4 +1,4 @@
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr;
 
 public abstract class NotFoundException extends RuntimeException {
 }

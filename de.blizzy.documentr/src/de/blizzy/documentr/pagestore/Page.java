@@ -1,4 +1,4 @@
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr.pagestore;
 
 import java.io.UnsupportedEncodingException;
 

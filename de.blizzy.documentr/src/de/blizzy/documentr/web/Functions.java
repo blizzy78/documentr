@@ -11,9 +11,9 @@ import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.repository.Page;
-import de.blizzy.documentr.repository.PageStore;
 
 @Component
 public final class Functions {

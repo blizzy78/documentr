@@ -1,4 +1,4 @@
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr.pagestore;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -35,6 +35,10 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Component
 public class PageStore {

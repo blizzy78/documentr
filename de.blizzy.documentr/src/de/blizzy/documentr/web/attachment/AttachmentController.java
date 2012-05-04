@@ -14,8 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
-import de.blizzy.documentr.repository.Page;
-import de.blizzy.documentr.repository.PageStore;
+import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageStore;
 
 @Controller
 @RequestMapping("/attachment")

@@ -1,4 +1,6 @@
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr.pagestore;
+
+import de.blizzy.documentr.NotFoundException;
 
 public class PageNotFoundException extends NotFoundException {
 	private String projectName;

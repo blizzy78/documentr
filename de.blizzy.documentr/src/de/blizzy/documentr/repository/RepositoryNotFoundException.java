@@ -1,5 +1,7 @@
 package de.blizzy.documentr.repository;
 
+import de.blizzy.documentr.NotFoundException;
+
 public class RepositoryNotFoundException extends NotFoundException {
 	private String projectName;
 	private String branchName;

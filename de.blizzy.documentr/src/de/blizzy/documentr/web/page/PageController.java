@@ -25,11 +25,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.NotFoundException;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.repository.NotFoundException;
-import de.blizzy.documentr.repository.Page;
-import de.blizzy.documentr.repository.PageStore;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.Functions;
 

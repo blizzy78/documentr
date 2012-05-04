@@ -19,7 +19,7 @@ public class ProjectRepositoryManagerFactory {
 		return new ProjectRepositoryManager(projectName, projectDir, lockManager);
 	}
 	
-	void setLockManager(LockManager lockManager) {
+	public void setLockManager(LockManager lockManager) {
 		this.lockManager = lockManager;
 	}
 }
