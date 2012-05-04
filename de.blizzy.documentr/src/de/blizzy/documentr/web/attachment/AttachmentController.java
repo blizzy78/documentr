@@ -3,7 +3,6 @@ package de.blizzy.documentr.web.attachment;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,7 +53,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @RequestParam MultipartFile file) throws IOException, GitAPIException {
+			@PathVariable String pagePath, @RequestParam MultipartFile file) throws IOException {
 
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		Page attachment = Page.fromData(data, "application/octet-stream"); //$NON-NLS-1$

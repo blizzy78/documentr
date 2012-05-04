@@ -49,17 +49,21 @@ public class PageStore {
 	private GlobalRepositoryManager repoManager;
 	
 	public void savePage(String projectName, String branchName, String path, Page page)
-			throws IOException, GitAPIException {
+			throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		
-		savePageData(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME);
+		try {
+			savePageData(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME);
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		}
 	}
 
 	public void saveAttachment(String projectName, String branchName, String pagePath, String name, Page attachment)
-			throws IOException, GitAPIException {
+			throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -68,7 +72,11 @@ public class PageStore {
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, pagePath);
 		
-		savePageData(projectName, branchName, pagePath + "/" + name, null, attachment, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+		try {
+			savePageData(projectName, branchName, pagePath + "/" + name, null, attachment, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		}
 	}
 
 	private void savePageData(String projectName, String branchName, String path, String suffix, Page page, String rootDir)
@@ -109,15 +117,19 @@ public class PageStore {
 		return result;
 	}
 	
-	public Page getPage(String projectName, String branchName, String path) throws IOException, GitAPIException {
+	public Page getPage(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 
-		Map<String, Object> pageData = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME);
-		String title = (String) pageData.get(TITLE);
-		byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-		return Page.fromText(title, new String(data, "UTF-8")); //$NON-NLS-1$
+		try {
+			Map<String, Object> pageData = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME);
+			String title = (String) pageData.get(TITLE);
+			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
+			return Page.fromText(title, new String(data, "UTF-8")); //$NON-NLS-1$
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		}
 	}
 
 	private Map<String, Object> getPageData(String projectName, String branchName, String path, String suffix, String rootDir)
@@ -141,21 +153,25 @@ public class PageStore {
 	}
 	
 	public Page getAttachment(String projectName, String branchName, String pagePath, String name)
-			throws IOException, GitAPIException {
+			throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
 		Assert.hasLength(name);
 
-		Map<String, Object> pageData = getPageData(projectName, branchName, pagePath + "/" + name, null, //$NON-NLS-1$
-				ATTACHMENTS_DIR_NAME);
-		String contentType = (String) pageData.get(CONTENT_TYPE);
-		byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-		return Page.fromData(data, contentType);
+		try {
+			Map<String, Object> pageData = getPageData(projectName, branchName, pagePath + "/" + name, null, //$NON-NLS-1$
+					ATTACHMENTS_DIR_NAME);
+			String contentType = (String) pageData.get(CONTENT_TYPE);
+			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
+			return Page.fromData(data, contentType);
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		}
 	}
 	
-	public List<String> listPagePaths(String projectName, String branchName) throws IOException, GitAPIException {
+	public List<String> listPagePaths(String projectName, String branchName) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 
@@ -179,13 +195,15 @@ public class PageStore {
 			paths = new ArrayList<>(Lists.transform(paths, function));
 			Collections.sort(paths);
 			return paths;
+		} catch (GitAPIException e) {
+			throw new IOException(e);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
 
 	public List<String> listPageAttachments(String projectName, String branchName, String pagePath)
-			throws IOException, GitAPIException {
+			throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -209,6 +227,8 @@ public class PageStore {
 			List<String> names = new ArrayList<>(Lists.transform(files, function));
 			Collections.sort(names);
 			return names;
+		} catch (GitAPIException e) {
+			throw new IOException(e);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}

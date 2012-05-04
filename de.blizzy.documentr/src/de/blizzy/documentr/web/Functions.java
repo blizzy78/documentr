@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
@@ -50,7 +49,7 @@ public final class Functions {
 	public static List<String> listPagePaths(String projectName, String branchName) {
 		try {
 			return pageStore.listPagePaths(projectName, branchName);
-		} catch (IOException | GitAPIException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -58,7 +57,7 @@ public final class Functions {
 	public static List<String> listPageAttachments(String projectName, String branchName, String path) {
 		try {
 			return pageStore.listPageAttachments(projectName, branchName, path);
-		} catch (IOException | GitAPIException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -67,7 +66,7 @@ public final class Functions {
 		try {
 			Page page = pageStore.getPage(projectName, branchName, path);
 			return page.getTitle();
-		} catch (IOException | GitAPIException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

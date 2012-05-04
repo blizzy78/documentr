@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +45,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model) throws IOException, GitAPIException {
+			@PathVariable String path, Model model) throws IOException {
 
 		try {
 			path = Util.toRealPagePath(path);
@@ -72,7 +71,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model) throws IOException, GitAPIException {
+			@PathVariable String path, Model model) throws IOException {
 		
 		try {
 			path = Util.toRealPagePath(path);
@@ -88,7 +87,7 @@ public class PageController {
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult)
-			throws IOException, GitAPIException {
+			throws IOException {
 		
 		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -117,7 +116,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.GET)
 	public HttpEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path) throws IOException, GitAPIException {
+			@PathVariable String path) throws IOException {
 
 		boolean pageExists = false;
 		try {
