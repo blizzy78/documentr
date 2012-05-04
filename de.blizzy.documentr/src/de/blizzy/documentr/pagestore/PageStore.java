@@ -221,15 +221,18 @@ public class PageStore {
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
 			File pageAttachmentsDir = toFile(attachmentsDir, pagePath);
-			List<File> files = Arrays.asList(pageAttachmentsDir.listFiles());
-			Function<File, String> function = new Function<File, String>() {
-				@Override
-				public String apply(File file) {
-					return file.getName();
-				}
-			};
-			List<String> names = new ArrayList<>(Lists.transform(files, function));
-			Collections.sort(names);
+			List<String> names = Collections.emptyList();
+			if (pageAttachmentsDir.isDirectory()) {
+				List<File> files = Arrays.asList(pageAttachmentsDir.listFiles());
+				Function<File, String> function = new Function<File, String>() {
+					@Override
+					public String apply(File file) {
+						return file.getName();
+					}
+				};
+				names = new ArrayList<>(Lists.transform(files, function));
+				Collections.sort(names);
+			}
 			return names;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
