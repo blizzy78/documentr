@@ -35,7 +35,7 @@
 
 <div class="page-header"><h1><c:out value="${title}"/></h1></div>
 
-<c:out value="${d:markdownToHTML(text)}" escapeXml="false"/>
+<c:out value="${d:markdownToHTML(text, projectName, branchName, path)}" escapeXml="false"/>
 
 <p class="spacer">
 <a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>

@@ -1,13 +1,18 @@
 package de.blizzy.documentr.web;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pegdown.LinkRenderer;
 import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.VerbatimNode;
 
 public class HtmlSerializer extends ToHtmlSerializer {
-	HtmlSerializer() {
+	private HtmlSerializerContext context;
+
+	HtmlSerializer(HtmlSerializerContext context) {
 		super(new LinkRenderer());
+		this.context = context;
 	}
 
 	@Override
@@ -31,5 +36,18 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		} else {
 			super.printIndentedTag(node, tag);
 		}
+	}
+	
+	@Override
+	protected void printImageTag(SuperNode imageNode, String url) {
+		printer.print("<img src=\"").print(context.getAttachmentURI(url)) //$NON-NLS-1$
+			.print("\" alt=\"").printEncoded(printChildrenToString(imageNode)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+		if (imageNode instanceof ExpImageNode) {
+			String title = ((ExpImageNode) imageNode).title;
+			if (StringUtils.isNotBlank(title)) {
+				printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		printer.print("/>"); //$NON-NLS-1$
 	}
 }

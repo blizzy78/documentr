@@ -32,6 +32,7 @@ import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.Functions;
+import de.blizzy.documentr.web.HtmlSerializerContext;
 
 @Controller
 @RequestMapping("/page")
@@ -135,10 +136,12 @@ public class PageController {
 	@RequestMapping(value="/markdownToHTML/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST)
-	public HttpEntity<String> markdownToHTML(@RequestParam String markdown) {
+	public HttpEntity<String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
+			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
 		
 		Map<String, String> result = new HashMap<>();
-		result.put("html", Functions.markdownToHTML(markdown)); //$NON-NLS-1$
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, pagePath);
+		result.put("html", Functions.markdownToHTML(markdown, context)); //$NON-NLS-1$
 		return createJSONResponse(result);
 	}
 

@@ -79,9 +79,15 @@ public final class Functions {
 		}
 	}
 	
-	public static String markdownToHTML(String markdown) {
+	public static String markdownToHTML(String markdown, String projectName, String branchName, String path) {
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path);
+		return markdownToHTML(markdown, context);
+	}
+
+	public static String markdownToHTML(String markdown, HtmlSerializerContext context) {
 		PegDownProcessor proc = new PegDownProcessor(PEGDOWN_OPTIONS);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		return new HtmlSerializer().toHtml(rootNode);
+		HtmlSerializer serializer = new HtmlSerializer(context);
+		return serializer.toHtml(rootNode);
 	}
 }

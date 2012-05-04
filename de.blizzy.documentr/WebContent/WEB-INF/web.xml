@@ -39,6 +39,7 @@
 		<filter-class>de.blizzy.documentr.web.filter.RequestEncodingFilter</filter-class>
 	</filter>
 
+
 	<filter-mapping>
 		<filter-name>requestEncodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>

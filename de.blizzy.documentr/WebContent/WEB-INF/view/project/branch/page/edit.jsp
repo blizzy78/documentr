@@ -35,6 +35,9 @@ function showPreview() {
 		type: 'POST',
 		dataType: 'json',
 		data: {
+			<c:if test="${!empty pageForm.path}">
+				pagePath: '<c:out value="${pageForm.path}"/>',
+			</c:if>
 			markdown: textEl.val()
 		},
 		success: function(result) {
