@@ -10,6 +10,6 @@ public class ProjectsController {
 	@RequestMapping
 	@PreAuthorize("permitAll")
 	public String getProjects() {
-		return "/index"; //$NON-NLS-1$
+		return "/project/index"; //$NON-NLS-1$
 	}
 }
