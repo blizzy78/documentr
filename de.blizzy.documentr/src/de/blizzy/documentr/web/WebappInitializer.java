@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -20,6 +21,8 @@ public class WebappInitializer implements WebApplicationInitializer {
 		appContext.setServletContext(context);
 		appContext.setConfigLocation(ContextConfig.class.getName());
 		
+		context.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, appContext);
+
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(appContext);
 		ServletRegistration.Dynamic dispatcher = context.addServlet("dispatcher", dispatcherServlet); //$NON-NLS-1$
 		dispatcher.setLoadOnStartup(1);

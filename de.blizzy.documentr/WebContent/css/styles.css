@@ -32,3 +32,7 @@ table.table-documentr {
 .spacer {
 	margin-top: 25pt;
 }
+
+.securityHiddenUI * {
+	background-color: red !important;
+}

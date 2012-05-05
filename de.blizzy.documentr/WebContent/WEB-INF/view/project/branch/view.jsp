@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <jsp:include page="/WEB-INF/view/header.jsp"/>
 
@@ -30,8 +31,10 @@
 	<c:otherwise><p>No pages found.</p></c:otherwise>
 </c:choose>
 
+<sec:authorize access="isAuthenticated()">
 <p>
 <a href="<c:url value="/page/create/${projectName}/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createPage"/></a>
 </p>
+</sec:authorize>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>

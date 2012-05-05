@@ -2,7 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
+<sec:authorize access="isAuthenticated()">
+
 <jsp:include page="/WEB-INF/view/header.jsp"/>
 
 <ul class="breadcrumb">
@@ -38,3 +41,5 @@
 </p>
 
 <jsp:include page="/WEB-INF/view/footer.jsp"/>
+
+</sec:authorize>
