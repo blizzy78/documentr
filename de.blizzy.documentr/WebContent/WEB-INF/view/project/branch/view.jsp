@@ -4,13 +4,15 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
-<jsp:include page="/WEB-INF/view/header.jsp"/>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<ul class="breadcrumb">
+<dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
 	<li class="active"><c:out value="${name}"/></li>
-</ul>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <div class="page-header"><h1><spring:message code="title.branchX" arguments="${name}"/></h1></div>
 
@@ -32,9 +34,9 @@
 </c:choose>
 
 <sec:authorize access="isAuthenticated()">
-<p>
-<a href="<c:url value="/page/create/${projectName}/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createPage"/></a>
-</p>
+	<p>
+	<a href="<c:url value="/page/create/${projectName}/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createPage"/></a>
+	</p>
 </sec:authorize>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>

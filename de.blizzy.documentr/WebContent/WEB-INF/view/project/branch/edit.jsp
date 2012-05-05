@@ -4,15 +4,16 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 <sec:authorize access="isAuthenticated()">
 
-<jsp:include page="/WEB-INF/view/header.jsp"/>
-
-<ul class="breadcrumb">
+<dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${branchForm.projectName}"/>"><c:out value="${branchForm.projectName}"/></a> <span class="divider">/</span></li>
 	<li class="active"><spring:message code="title.editBranch"/></li>
-</ul>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <div class="page-header"><h1><spring:message code="title.editBranch"/></h1></div>
 
@@ -40,6 +41,6 @@
 </form:form>
 </p>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>
 
 </sec:authorize>

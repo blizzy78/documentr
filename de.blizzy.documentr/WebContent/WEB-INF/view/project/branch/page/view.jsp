@@ -4,14 +4,16 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
-<jsp:include page="/WEB-INF/view/header.jsp"/>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<ul class="breadcrumb">
+<dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/branch/${projectName}/${branchName}"/>"><c:out value="${branchName}"/></a> <span class="divider">/</span></li>
 	<li class="active"><c:out value="${title}"/></li>
-</ul>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <sec:authorize access="isAuthenticated()">
 	<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
@@ -41,9 +43,9 @@
 <c:out value="${d:markdownToHTML(text, projectName, branchName, path)}" escapeXml="false"/>
 
 <sec:authorize access="isAuthenticated()">
-<p class="spacer">
-<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
-</p>
+	<p class="spacer">
+	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
+	</p>
 </sec:authorize>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>

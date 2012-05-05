@@ -5,9 +5,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 <sec:authorize access="isAuthenticated()">
 
-<c:set var="headerJavascript" scope="request">
+<dt:headerJS>
 
 <c:if test="${empty pageForm.path}">
 $(function() {
@@ -71,10 +72,9 @@ function hidePreview() {
 	$('#preview').modal('hide');
 }
 
-</c:set>
-<jsp:include page="/WEB-INF/view/header.jsp"/>
+</dt:headerJS>
 
-<ul class="breadcrumb">
+<dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${pageForm.projectName}"/>"><c:out value="${pageForm.projectName}"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/branch/${pageForm.projectName}/${pageForm.branchName}"/>"><c:out value="${pageForm.branchName}"/></a> <span class="divider">/</span></li>
@@ -82,7 +82,9 @@ function hidePreview() {
 		<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(pageForm.path)}"/>"><c:out value="${pageForm.title}"/></a> <span class="divider">/</span></li>
 	</c:if>
 	<li class="active"><spring:message code="title.editPage"/></li>
-</ul>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <div class="page-header"><h1><spring:message code="title.editPage"/></h1></div>
 
@@ -131,6 +133,6 @@ function hidePreview() {
 	</div>
 </div>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>
 
 </sec:authorize>

@@ -1,5 +1,4 @@
 body {
-	padding-top: 40px;
 	background-color: white;
 }
 
@@ -35,4 +34,18 @@ table.table-documentr {
 
 .securityHiddenUI * {
 	background-color: red !important;
+}
+
+.breadcrumb {
+	background-color: #f0f0f0;
+	background-image: -moz-linear-gradient(center top, #f5f5f5, #f0f0f0);
+	border-radius: 0;
+}
+
+.breadcrumb ul {
+	margin: 0;
+}
+
+.breadcrumb .btn-toolbar {
+	margin: 0;
 }

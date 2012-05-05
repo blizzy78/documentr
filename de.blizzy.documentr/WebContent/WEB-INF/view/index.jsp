@@ -3,14 +3,17 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
-<jsp:include page="/WEB-INF/view/header.jsp"/>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
+
+<dt:breadcrumbs>
+	<li class="active"><spring:message code="title.projects"/></li>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <c:set var="projects" value="${d:listProjects()}"/>
 <c:choose>
 	<c:when test="${!empty projects}">
-		<ul class="breadcrumb">
-			<li class="active"><spring:message code="title.projects"/></li>
-		</ul>
 		
 		<div class="page-header"><h1><spring:message code="title.projects"/></h1></div>
 
@@ -44,4 +47,4 @@
 	</c:otherwise>
 </c:choose>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>

@@ -1,7 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<jsp:include page="/WEB-INF/view/header.jsp"/>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
+
+<dt:page>
 
 <div class="page-header"><h1>Error</h1></div>
 
@@ -21,4 +23,4 @@
 <a href="javascript:void(history.go(-1))" class="btn">Go Back</a>
 </p>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>

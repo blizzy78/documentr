@@ -3,14 +3,15 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 <sec:authorize access="isAuthenticated()">
 
-<jsp:include page="/WEB-INF/view/header.jsp"/>
-
-<ul class="breadcrumb">
+<dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li class="active"><spring:message code="title.editProject"/></li>
-</ul>
+</dt:breadcrumbs>
+
+<dt:page>
 
 <div class="page-header"><h1><spring:message code="title.editProject"/></h1></div>
 
@@ -29,6 +30,6 @@
 </form:form>
 </p>
 
-<jsp:include page="/WEB-INF/view/footer.jsp"/>
+</dt:page>
 
 </sec:authorize>

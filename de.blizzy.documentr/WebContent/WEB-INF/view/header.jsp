@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 <!DOCTYPE html>
 <html>
 
@@ -28,35 +29,12 @@ $(function() {
 
 </script>
 
-<c:if test="${!empty requestScope.headerJavascript}">
+<c:if test="${!empty requestScope._headerJS}">
 <script type="text/javascript">
-<c:out value="${requestScope.headerJavascript}" escapeXml="false"/>
+<c:out value="${requestScope._headerJS}" escapeXml="false"/>
 </script>
 </c:if>
 
 </head>
 
 <body id="#top">
-
-<nav>
-<div class="navbar navbar-fixed-top">
-	<div class="navbar-inner">
-		<div class="container">
-			<ul class="nav">
-				<li><a href="<c:url value="/projects"/>"><spring:message code="button.projects"/></a></li>
-			</ul>
-
-			<ul class="nav pull-right">
-				<sec:authorize access="isAnonymous()">
-					<li><a href="<c:url value="/access/login"/>"><i class="icon-lock icon-white"></i> <spring:message code="button.login"/></a></li>
-				</sec:authorize>
-				<sec:authorize access="isAuthenticated()">
-					<li><a href="<c:url value="/j_spring_security_logout"/>"><i class="icon-off icon-white"></i> <spring:message code="button.logout"/></a></li>
-				</sec:authorize>
-			</ul>
-		</div>
-	</div>
-</div>
-</nav>
-
-<div class="container">
