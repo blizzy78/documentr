@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,6 +46,7 @@ public class PageController {
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
+	@PreAuthorize("permitAll")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException {
 
@@ -62,6 +64,7 @@ public class PageController {
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("isAuthenticated()")
 	public String createPage(@PathVariable String projectName, @PathVariable String branchName, Model model) {
 		PageForm form = new PageForm(projectName, branchName, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
@@ -71,6 +74,7 @@ public class PageController {
 	@RequestMapping(value="/edit/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
+	@PreAuthorize("isAuthenticated()")
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException {
 		
@@ -87,6 +91,7 @@ public class PageController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
+	@PreAuthorize("isAuthenticated()")
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult)
 			throws IOException {
 		
@@ -120,6 +125,7 @@ public class PageController {
 	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST)
+	@PreAuthorize("permitAll")
 	public HttpEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String title) throws IOException {
 
@@ -142,6 +148,7 @@ public class PageController {
 	@RequestMapping(value="/markdownToHTML/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST)
+	@PreAuthorize("isAuthenticated()")
 	public HttpEntity<String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
 		

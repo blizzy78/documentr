@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class AttachmentController {
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
+	@PreAuthorize("permitAll")
 	public String getAttachments(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 
@@ -50,6 +52,7 @@ public class AttachmentController {
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
 			"{name:.*}", method=RequestMethod.GET)
+	@PreAuthorize("permitAll")
 	public HttpEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name) throws IOException {
 		
@@ -67,6 +70,7 @@ public class AttachmentController {
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
+	@PreAuthorize("isAuthenticated()")
 	public String createAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 		
@@ -80,6 +84,7 @@ public class AttachmentController {
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
+	@PreAuthorize("isAuthenticated()")
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @RequestParam MultipartFile file, Model model) throws IOException {
 

@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ public class BranchController {
 
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{name:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("permitAll")
 	public String getBranch(@PathVariable String projectName, @PathVariable String name, Model model) {
 		model.addAttribute("projectName", projectName); //$NON-NLS-1$
 		model.addAttribute("name", name); //$NON-NLS-1$
@@ -36,6 +38,7 @@ public class BranchController {
 	}
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("isAuthenticated()")
 	public String createBranch(@PathVariable String projectName, Model model) {
 		BranchForm form = new BranchForm(projectName, StringUtils.EMPTY, null);
 		model.addAttribute("branchForm", form); //$NON-NLS-1$
@@ -43,6 +46,7 @@ public class BranchController {
 	}
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.POST)
+	@PreAuthorize("isAuthenticated()")
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult)
 			throws IOException, GitAPIException {
 		
