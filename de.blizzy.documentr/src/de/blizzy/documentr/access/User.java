@@ -9,13 +9,13 @@ public class User {
 	
 	private String loginName;
 	private String password;
-	private boolean locked;
+	private boolean disabled;
 	private boolean admin;
 
-	public User(String loginName, String password, boolean locked, boolean admin) {
+	public User(String loginName, String password, boolean disabled, boolean admin) {
 		this.loginName = loginName;
 		this.password = password;
-		this.locked = locked;
+		this.disabled = disabled;
 		this.admin = admin;
 	}
 	
@@ -27,8 +27,8 @@ public class User {
 		return password;
 	}
 	
-	public boolean isLocked() {
-		return locked;
+	public boolean isDisabled() {
+		return disabled;
 	}
 	
 	public boolean isAdmin() {

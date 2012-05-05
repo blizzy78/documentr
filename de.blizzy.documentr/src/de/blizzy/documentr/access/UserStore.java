@@ -63,7 +63,7 @@ public class UserStore {
 			Map<String, Object> userMap = new HashMap<>();
 			userMap.put("loginName", user.getLoginName()); //$NON-NLS-1$
 			userMap.put("password", user.getPassword()); //$NON-NLS-1$
-			userMap.put("locked", Boolean.valueOf(user.isLocked())); //$NON-NLS-1$
+			userMap.put("disabled", Boolean.valueOf(user.isDisabled())); //$NON-NLS-1$
 			userMap.put("admin", Boolean.valueOf(user.isAdmin())); //$NON-NLS-1$
 
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
@@ -94,9 +94,9 @@ public class UserStore {
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> userMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			String password = (String) userMap.get("password"); //$NON-NLS-1$
-			boolean locked = ((Boolean) userMap.get("locked")).booleanValue(); //$NON-NLS-1$
+			boolean disabled = ((Boolean) userMap.get("disabled")).booleanValue(); //$NON-NLS-1$
 			boolean admin = ((Boolean) userMap.get("admin")).booleanValue(); //$NON-NLS-1$
-			User user = new User(loginName, password, locked, admin);
+			User user = new User(loginName, password, disabled, admin);
 			return user;
 		} catch (IOException e) {
 			throw new IOException(e);

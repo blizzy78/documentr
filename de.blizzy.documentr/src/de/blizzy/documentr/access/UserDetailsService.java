@@ -27,7 +27,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 				authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN")); //$NON-NLS-1$
 			}
 			return new org.springframework.security.core.userdetails.User(
-					loginName, user.getPassword(), true, true, true, !user.isLocked(), authorities);
+					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
 		} catch (UsernameNotFoundException e) {
 			throw new UsernameNotFoundException(StringUtils.EMPTY);
 		} catch (IOException e) {
