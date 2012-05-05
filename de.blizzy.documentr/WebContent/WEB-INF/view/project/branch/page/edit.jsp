@@ -129,7 +129,7 @@ function hidePreview() {
 	</div>
 	<div class="modal-body" id="previewText"></div>
 	<div class="modal-footer">
-		<a href="javascript:hidePreview();" class="btn">Close</a>
+		<a href="javascript:hidePreview();" class="btn"><spring:message code="button.close"/></a>
 	</div>
 </div>
 
