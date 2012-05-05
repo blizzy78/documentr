@@ -37,9 +37,19 @@ public class GlobalRepositoryManager {
 		return repoManager.createCentralRepository();
 	}
 
+	public ILockedRepository createProjectCentralRepository(String projectName, boolean bare) throws IOException, GitAPIException {
+		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		return repoManager.createCentralRepository(bare);
+	}
+	
 	public ILockedRepository getProjectCentralRepository(String projectName) throws IOException {
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository();
+	}
+	
+	public ILockedRepository getProjectCentralRepository(String projectName, boolean bare) throws IOException {
+		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		return repoManager.getCentralRepository(bare);
 	}
 	
 	public ILockedRepository createProjectBranchRepository(String projectName, String branchName, String startingBranch)

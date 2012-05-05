@@ -36,6 +36,10 @@ class ProjectRepositoryManager {
 	}
 	
 	ILockedRepository createCentralRepository() throws IOException, GitAPIException {
+		return createCentralRepository(true);
+	}
+	
+	ILockedRepository createCentralRepository(boolean bare) throws IOException, GitAPIException {
 		if (centralRepoDir.isDirectory()) {
 			throw new IllegalStateException("repository already exists: " + centralRepoDir.getAbsolutePath()); //$NON-NLS-1$
 		}
@@ -45,7 +49,11 @@ class ProjectRepositoryManager {
 			Repository repo = null;
 			File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
 			try {
-				repo = new RepositoryBuilder().setGitDir(gitDir).setBare().build();
+				RepositoryBuilder builder = new RepositoryBuilder().setGitDir(gitDir);
+				if (bare) {
+					builder.setBare();
+				}
+				repo = builder.build();
 				repo.create();
 			} finally {
 				RepositoryUtil.closeQuietly(repo);
@@ -70,22 +78,30 @@ class ProjectRepositoryManager {
 			lockManager.unlock(lock);
 		}
 
-		return getCentralRepository();
+		return getCentralRepository(bare);
 	}
 	
 	ILockedRepository getCentralRepository() throws IOException {
+		return getCentralRepository(true);
+	}
+	
+	ILockedRepository getCentralRepository(boolean bare) throws IOException {
 		if (!centralRepoDir.isDirectory()) {
 			throw RepositoryNotFoundException.forCentralRepository(projectName);
 		}
 
 		LockedRepository lockedRepo = LockedRepository.lockProjectCentral(projectName, lockManager);
-		Repository repo = getCentralRepositoryInternal();
+		Repository repo = getCentralRepositoryInternal(bare);
 		lockedRepo.setRepository(repo);
 		return lockedRepo;
 	}
 
-	private Repository getCentralRepositoryInternal() throws IOException {
-		return new RepositoryBuilder().findGitDir(centralRepoDir).setBare().build();
+	private Repository getCentralRepositoryInternal(boolean bare) throws IOException {
+		RepositoryBuilder builder = new RepositoryBuilder().findGitDir(centralRepoDir);
+		if (bare) {
+			builder.setBare();
+		}
+		return builder.build();
 	}
 	
 	ILockedRepository createBranchRepository(String branchName, String startingBranch) throws IOException, GitAPIException {
@@ -113,7 +129,7 @@ class ProjectRepositoryManager {
 			Repository centralRepo = null;
 			File centralRepoGitDir;
 			try {
-				centralRepo = getCentralRepositoryInternal();
+				centralRepo = getCentralRepositoryInternal(true);
 				centralRepoGitDir = centralRepo.getDirectory();
 			} finally {
 				RepositoryUtil.closeQuietly(centralRepo);
@@ -129,7 +145,7 @@ class ProjectRepositoryManager {
 						.getRepository();
 				
 				try {
-					centralRepo = getCentralRepositoryInternal();
+					centralRepo = getCentralRepositoryInternal(true);
 					if (!RepositoryUtils.getBranches(centralRepo).contains(branchName)) {
 						CreateBranchCommand createBranchCommand = Git.wrap(centralRepo).branchCreate();
 						if (startingBranch != null) {

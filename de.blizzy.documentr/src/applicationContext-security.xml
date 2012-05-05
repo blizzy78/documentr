@@ -20,10 +20,12 @@
 	</http>
 
 	<authentication-manager>
-		<authentication-provider>
-			<user-service>
-				<user name="admin" password="admin" authorities="ROLE_USER, ROLE_ADMIN"/>
-			</user-service>
+		<authentication-provider user-service-ref="userDetailsService">
+			<password-encoder hash="sha">
+				<salt-source user-property="username"/>
+			</password-encoder>
 		</authentication-provider>
 	</authentication-manager>
+	
+	<beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
 </beans:beans>
