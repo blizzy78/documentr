@@ -1,7 +1,6 @@
 package de.blizzy.documentr.web;
 
 import org.apache.commons.lang3.StringUtils;
-import org.pegdown.LinkRenderer;
 import org.pegdown.ToHtmlSerializer;
 import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.SuperNode;
