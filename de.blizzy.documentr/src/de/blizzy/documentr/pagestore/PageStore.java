@@ -93,7 +93,7 @@ public class PageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			HashMap<String, Object> pageMap = new HashMap<>();
+			Map<String, Object> pageMap = new HashMap<>();
 			pageMap.put(TITLE, page.getTitle());
 			pageMap.put(CONTENT_TYPE, page.getContentType());
 			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
