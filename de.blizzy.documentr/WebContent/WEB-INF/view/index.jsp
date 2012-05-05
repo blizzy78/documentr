@@ -31,11 +31,14 @@
 			<div class="hero-unit span8 offset2 hero-single">
 				<h1>documentr</h1>
 				<p><spring:message code="welcomeToDocumentr" htmlEscape="false"/></p>
-				<sec:authorize access="isAuthenticated()">
-					<p>
-					<a href="<c:url value="/project/create"/>" class="btn btn-primary btn-large"><spring:message code="button.createFirstProject"/></a>
-					</p>
-				</sec:authorize>
+				<p>
+					<sec:authorize access="isAnonymous()">
+						<a href="<c:url value="/access/login"/>" class="btn btn-primary btn-large"><spring:message code="button.login"/></a>
+					</sec:authorize>
+					<sec:authorize access="isAuthenticated()">
+						<a href="<c:url value="/project/create"/>" class="btn btn-primary btn-large"><spring:message code="button.createFirstProject"/></a>
+					</sec:authorize>
+				</p>
 			</div>
 		</div>
 	</c:otherwise>
