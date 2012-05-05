@@ -25,9 +25,6 @@ public class PageForm {
 	@ValidBranchName
 	@BranchNameNotBlacklisted
 	private String branchName;
-	@NotNull(message="{page.path.blank}")
-	@NotEmpty(message="{page.path.blank}")
-	@NotBlank(message="{page.path.blank}")
 	@ValidPagePath
 	@PagePathNotBlacklisted
 	private String path;

@@ -6,8 +6,9 @@
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <c:set var="headerJavascript" scope="request">
 
+<c:if test="${empty pageForm.path}">
 $(function() {
-	var el = $('#pageForm').find('#path');
+	var el = $('#pageForm').find('#title');
 	el.blur(function() {
 		var fieldset = $('#pathFieldset');
 		fieldset.removeClass('warning').removeClass('error');
@@ -15,18 +16,26 @@ $(function() {
 
 		var value = el.val();
 		if (value.length > 0) {
-			value = value.replace(/\//g, ',');
-			$.getJSON('<c:url value="/page/exists/${pageForm.projectName}/${pageForm.branchName}/"/>' + value + '/json')
-				.success(function(result) {
+			$.ajax({
+				url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/json"/>',
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					title: value
+				},
+				success: function(result) {
+					$('#pageForm').find('#path').val(result.name);
 					if (result.exists) {
 						fieldset.addClass('warning');
 						fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
 							'<spring:message code="page.path.exists"/></span>'));
 					}
-				});
+				}
+			});
 		}
 	});
 });
+</c:if>
 
 function showPreview() {
 	var textEl = $('#pageForm').find('#text');
@@ -77,21 +86,16 @@ function hidePreview() {
 <p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well">
-	<c:set var="errorText"><form:errors path="path"/></c:set>
-	<fieldset id="pathFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
-		<form:label path="path"><spring:message code="label.path"/>:</form:label>
-		<c:set var="disabled"><c:if test="${!empty pageForm.path}">disabled</c:if></c:set>
-		<form:input path="path" cssClass="input-xlarge ${disabled}" disabled="${!empty disabled}"/>
-		<c:if test="${!empty disabled}">
-			<form:hidden path="path"/>
-		</c:if>
-		<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
-	</fieldset>
 	<c:set var="errorText"><form:errors path="title"/></c:set>
 	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
 		<form:label path="title"><spring:message code="label.title"/>:</form:label>
 		<form:input path="title" cssClass="input-xlarge"/>
 		<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+	</fieldset>
+	<fieldset id="pathFieldset" class="control-group">
+		<form:label path="path"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
+		<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
+		<form:hidden path="path"/>
 	</fieldset>
 	<fieldset class="control-group">
 		<form:label path="text"><spring:message code="label.contents"/>:</form:label>

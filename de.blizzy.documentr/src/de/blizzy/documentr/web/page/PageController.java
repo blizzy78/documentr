@@ -99,9 +99,13 @@ public class PageController {
 		}
 
 		Page page = Page.fromText(form.getTitle(), form.getText());
-		pageStore.savePage(form.getProjectName(), form.getBranchName(), Util.toRealPagePath(form.getPath()), page);
+		String path = form.getPath();
+		if (StringUtils.isBlank(path)) {
+			path = Util.generatePageName(form.getTitle());
+		}
+		pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page);
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(form.getPath());
+			Util.toURLPagePath(path);
 	}
 	
 	@ModelAttribute
@@ -113,22 +117,24 @@ public class PageController {
 				new PageForm(projectName, branchName, path, title, text) : null;
 	}
 	
-	@RequestMapping(value="/exists/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
-			method=RequestMethod.GET)
+	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
+			method=RequestMethod.POST)
 	public HttpEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path) throws IOException {
+			@RequestParam String title) throws IOException {
 
+		String name = Util.generatePageName(title);
+		String path = name;
 		boolean pageExists = false;
 		try {
-			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
 			pageExists = page != null;
 		} catch (NotFoundException e) {
 			// okay
 		}
 
-		Map<String, Boolean> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>();
+		result.put("name", name); //$NON-NLS-1$
 		result.put("exists", Boolean.valueOf(pageExists)); //$NON-NLS-1$
 		return createJSONResponse(result);
 	}
