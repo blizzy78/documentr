@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -86,6 +87,12 @@ public class GlobalRepositoryManager {
 				}
 			};
 			result = new ArrayList<>(Lists.transform(Arrays.asList(files), function));
+			for (Iterator<String> iter = result.iterator(); iter.hasNext();) {
+				String project = iter.next();
+				if (project.startsWith("_")) { //$NON-NLS-1$
+					iter.remove();
+				}
+			}
 			Collections.sort(result);
 		}
 		return result;
