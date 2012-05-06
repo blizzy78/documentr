@@ -88,7 +88,7 @@ public class UserStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			Map<String, Object> userMap = new HashMap<>();
+			Map<String, Object> userMap = new HashMap<String, Object>();
 			userMap.put("loginName", user.getLoginName()); //$NON-NLS-1$
 			userMap.put("password", user.getPassword()); //$NON-NLS-1$
 			userMap.put("disabled", Boolean.valueOf(user.isDisabled())); //$NON-NLS-1$
@@ -149,7 +149,7 @@ public class UserStore {
 					return StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
 				}
 			};
-			List<String> users = new ArrayList<>(Lists.transform(files, function));
+			List<String> users = new ArrayList<String>(Lists.transform(files, function));
 			Collections.sort(users);
 			return users;
 		} finally {

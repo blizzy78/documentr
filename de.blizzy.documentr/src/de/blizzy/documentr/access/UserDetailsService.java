@@ -38,7 +38,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
 		try {
 			User user = userStore.getUser(loginName);
-			Set<GrantedAuthority> authorities = new HashSet<>();
+			Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
 			authorities.add(new SimpleGrantedAuthority("ROLE_USER")); //$NON-NLS-1$
 			if (user.isAdmin()) {
 				authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN")); //$NON-NLS-1$

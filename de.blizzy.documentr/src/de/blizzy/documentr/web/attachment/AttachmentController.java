@@ -78,9 +78,9 @@ public class AttachmentController {
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
 			headers.set("Content-Type", attachment.getContentType()); //$NON-NLS-1$
-			return new ResponseEntity<>(attachment.getData(), headers, HttpStatus.OK);
+			return new ResponseEntity<byte[]>(attachment.getData(), headers, HttpStatus.OK);
 		} catch (PageNotFoundException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND);
 		}
 	}
 	

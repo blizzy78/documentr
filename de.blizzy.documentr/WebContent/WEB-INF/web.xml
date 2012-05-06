@@ -25,12 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<display-name>de.blizzy.documentr</display-name>
 
 
-	<context-param>
-		<param-name>documentr.dataDir</param-name>
-		<param-value>D:\bZ\documentr_data</param-value>
-	</context-param>
-
-
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

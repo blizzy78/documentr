@@ -110,7 +110,7 @@ public class PageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Map<String, Object> pageMap = new HashMap<>();
+			Map<String, Object> pageMap = new HashMap<String, Object>();
 			pageMap.put(TITLE, page.getTitle());
 			pageMap.put(CONTENT_TYPE, page.getContentType());
 			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
@@ -213,7 +213,7 @@ public class PageStore {
 					return path;
 				}
 			};
-			paths = new ArrayList<>(Lists.transform(paths, function));
+			paths = new ArrayList<String>(Lists.transform(paths, function));
 			Collections.sort(paths);
 			return paths;
 		} catch (GitAPIException e) {
@@ -247,7 +247,7 @@ public class PageStore {
 						return file.getName();
 					}
 				};
-				names = new ArrayList<>(Lists.transform(files, function));
+				names = new ArrayList<String>(Lists.transform(files, function));
 				Collections.sort(names);
 			}
 			return names;
@@ -259,7 +259,7 @@ public class PageStore {
 	}
 	
 	private List<String> listPagePaths(File dir) {
-		List<String> result = new ArrayList<>();
+		List<String> result = new ArrayList<String>();
 		if (dir.isDirectory()) {
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -316,13 +316,13 @@ public class PageStore {
 			RepositoryUtil.closeQuietly(centralRepo);
 		}
 		
-		Set<String> branches = new HashSet<>(branchesWithCommit);
+		Set<String> branches = new HashSet<String>(branchesWithCommit);
 		branches.add(branchName);
 		return branches;
 	}
 	
 	private Set<String> getBranchesWithCommit(final RevCommit commit, List<String> allBranches, Repository centralRepo) {
-		final Set<String> result = new HashSet<>();
+		final Set<String> result = new HashSet<String>();
 		for (final String branch : allBranches) {
 			CommitFilter matcher = new CommitFilter() {
 				@Override

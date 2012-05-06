@@ -103,7 +103,7 @@ public class GlobalRepositoryManager {
 					return dir.getName();
 				}
 			};
-			result = new ArrayList<>(Lists.transform(Arrays.asList(files), function));
+			result = new ArrayList<String>(Lists.transform(Arrays.asList(files), function));
 			for (Iterator<String> iter = result.iterator(); iter.hasNext();) {
 				String project = iter.next();
 				if (project.startsWith("_")) { //$NON-NLS-1$

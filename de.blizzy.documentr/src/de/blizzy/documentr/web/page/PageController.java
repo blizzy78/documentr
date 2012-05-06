@@ -156,7 +156,7 @@ public class PageController {
 			// okay
 		}
 
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("name", name); //$NON-NLS-1$
 		result.put("exists", Boolean.valueOf(pageExists)); //$NON-NLS-1$
 		return createJSONResponse(result);
@@ -169,7 +169,7 @@ public class PageController {
 	public HttpEntity<String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
 		
-		Map<String, String> result = new HashMap<>();
+		Map<String, String> result = new HashMap<String, String>();
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, pagePath);
 		result.put("html", Functions.markdownToHTML(markdown, context)); //$NON-NLS-1$
 		return createJSONResponse(result);
@@ -180,6 +180,6 @@ public class PageController {
 		String json = gson.toJson(o);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json"); //$NON-NLS-1$ //$NON-NLS-2$
-		return new ResponseEntity<>(json, headers, HttpStatus.OK);
+		return new ResponseEntity<String>(json, headers, HttpStatus.OK);
 	}
 }

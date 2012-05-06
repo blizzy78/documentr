@@ -63,7 +63,7 @@ public class LockManager {
 		}
 	}
 	
-	private Set<LockKey> locks = new HashSet<>();
+	private Set<LockKey> locks = new HashSet<LockKey>();
 
 	ILock lockAll() {
 		return lock(new LockKey(null, null, false), true);

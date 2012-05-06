@@ -208,7 +208,7 @@ class ProjectRepositoryManager {
 		ILockedRepository repo = null;
 		try {
 			repo = getCentralRepository();
-			List<String> result = new ArrayList<>(RepositoryUtils.getBranches(repo.r()));
+			List<String> result = new ArrayList<String>(RepositoryUtils.getBranches(repo.r()));
 			final int prefixLen = "refs/heads/".length(); //$NON-NLS-1$
 			Function<String, String> function = new Function<String, String>() {
 				@Override
@@ -216,7 +216,7 @@ class ProjectRepositoryManager {
 					return branch.substring(prefixLen);
 				}
 			};
-			result = new ArrayList<>(Lists.transform(result, function));
+			result = new ArrayList<String>(Lists.transform(result, function));
 			result.remove(Constants.MASTER);
 			Collections.sort(result);
 			return result;
