@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
+
 <sec:authorize access="isAuthenticated()">
 
 <dt:breadcrumbs>
