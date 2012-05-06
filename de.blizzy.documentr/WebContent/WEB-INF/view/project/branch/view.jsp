@@ -42,7 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<c:forEach var="path" items="${pagePaths}">
 			<li>
 				<a href="<c:url value="/page/${projectName}/${name}/${d:toURLPagePath(path)}"/>"><c:out value="${path}"/></a>
-				<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}"> <span class="shared-page">(<spring:message code="shared"/>)</span></c:if>
+				<sec:authorize access="isAuthenticated()">
+					<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}"> <span class="shared-page">(<spring:message code="shared"/>)</span></c:if>
+				</sec:authorize>
 			</li>
 		</c:forEach>
 		</ul>
