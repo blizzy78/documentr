@@ -1,5 +1,7 @@
 package de.blizzy.documentr;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.blizzy.documentr.web.page.PagePathValidator;
 
 
@@ -46,8 +48,8 @@ public final class Util {
 
 		String name = buf.toString()
 				.replaceAll("--", "-") //$NON-NLS-1$ //$NON-NLS-2$
-				.replaceAll("^-", "") //$NON-NLS-1$ //$NON-NLS-2$
-				.replaceAll("-$", "") //$NON-NLS-1$ //$NON-NLS-2$
+				.replaceAll("^-", StringUtils.EMPTY) //$NON-NLS-1$
+				.replaceAll("-$", StringUtils.EMPTY) //$NON-NLS-1$
 				.toLowerCase();
 		return name;
 	}
