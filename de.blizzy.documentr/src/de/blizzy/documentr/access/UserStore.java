@@ -1,20 +1,29 @@
 package de.blizzy.documentr.access;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gitective.core.BlobUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -57,6 +66,8 @@ public class UserStore {
 	}
 
 	public void saveUser(User user) throws IOException {
+		Assert.notNull(user);
+		
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -98,8 +109,32 @@ public class UserStore {
 			boolean admin = ((Boolean) userMap.get("admin")).booleanValue(); //$NON-NLS-1$
 			User user = new User(loginName, password, disabled, admin);
 			return user;
-		} catch (IOException e) {
-			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public List<String> listUsers() throws IOException {
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			FileFilter filter = new FileFilter() {
+				@Override
+				public boolean accept(File file) {
+					return file.isFile() && file.getName().endsWith(USER_SUFFIX);
+				}
+			};
+			List<File> files = Arrays.asList(workingDir.listFiles(filter));
+			Function<File, String> function = new Function<File, String>() {
+				@Override
+				public String apply(File file) {
+					return StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
+				}
+			};
+			List<String> users = new ArrayList<>(Lists.transform(files, function));
+			Collections.sort(users);
+			return users;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}

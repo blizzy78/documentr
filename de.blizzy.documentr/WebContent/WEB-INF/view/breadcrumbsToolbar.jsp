@@ -14,7 +14,8 @@
 			<div class="btn-group">
 				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
 				<ul class="dropdown-menu">
-					<li><a href="#"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
+					<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
+					<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
 				</ul>
 			</div>
 		</sec:authorize>

@@ -9,7 +9,7 @@
 
 <form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well">
 	<fieldset class="control-group">
-		<label><spring:message code="label.user"/>:</label>
+		<label><spring:message code="label.loginName"/>:</label>
 		<input type="text" name="j_username"/>
 	</fieldset>
 	<fieldset class="control-group">

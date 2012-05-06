@@ -63,4 +63,10 @@
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.lang.String markdownToHTML(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
+
+	<function>
+		<name>listUsers</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>List listUsers()</function-signature>
+	</function>
 </taglib>

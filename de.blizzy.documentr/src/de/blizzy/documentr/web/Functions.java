@@ -11,6 +11,7 @@ import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -22,16 +23,20 @@ public final class Functions {
 
 	private static PageStore pageStore;
 	private static GlobalRepositoryManager repoManager;
+	private static UserStore userStore;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
 	@Autowired
 	private PageStore _pageStore;
+	@Autowired
+	private UserStore _userStore;
 	
 	@PostConstruct
 	public void init() {
 		pageStore = _pageStore;
 		repoManager = _repoManager;
+		userStore = _userStore;
 	}
 
 	public static List<String> listProjects() {
@@ -74,6 +79,14 @@ public final class Functions {
 	public static boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) {
 		try {
 			return pageStore.isPageSharedWithOtherBranches(projectName, branchName, path);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static List<String> listUsers() {
+		try {
+			return userStore.listUsers();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
