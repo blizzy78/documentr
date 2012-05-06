@@ -22,6 +22,7 @@ import java.io.File;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -35,7 +36,12 @@ public class Settings {
 	@PostConstruct
 	public void init() {
 		String dataDirParam = servletContext.getInitParameter("documentr.dataDir"); //$NON-NLS-1$
+		if (StringUtils.isBlank(dataDirParam)) {
+			dataDirParam = System.getProperty("documentr.dataDir"); //$NON-NLS-1$
+		}
+		
 		Assert.hasLength(dataDirParam);
+		
 		dataDir = new File(dataDirParam);
 	}
 	
