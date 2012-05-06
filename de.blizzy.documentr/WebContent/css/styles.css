@@ -49,3 +49,11 @@ table.table-documentr {
 .breadcrumb .btn-toolbar {
 	margin: 0;
 }
+
+.breadcrumb .dropdown-menu li {
+	display: list-item;
+}
+
+.breadcrumb li.btn-toolbar {
+	line-height: 1px;
+}

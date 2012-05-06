@@ -68,7 +68,7 @@ public class BranchController {
 	}
 	
 	@ModelAttribute
-	public BranchForm createBranchForm(@PathVariable String projectName,@RequestParam(required=false) String name,
+	public BranchForm createBranchForm(@PathVariable String projectName, @RequestParam(required=false) String name,
 			@RequestParam(required=false) String startingBranch) {
 		
 		return (name != null) ? new BranchForm(projectName, name, startingBranch) : null;
