@@ -43,7 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<li>
 				<a href="<c:url value="/page/${projectName}/${name}/${d:toURLPagePath(path)}"/>"><c:out value="${path}"/></a>
 				<sec:authorize access="isAuthenticated()">
-					<c:if test="${d:isPageSharedWithOtherBranches(projectName, name, path)}"> <span class="shared-page">(<spring:message code="shared"/>)</span></c:if>
+					<c:set var="branches" value="${d:getBranchesPageIsSharedWith(projectName, name, path)}"/>
+					<c:if test="${fn:length(branches) ge 2}">
+						<c:set var="branches" value="${d:join(branches, ', ')}"/>
+						<span class="shared-page">(<spring:message code="sharedWithX" arguments="${branches}" argumentSeparator="|"/>)</span></c:if>
 				</sec:authorize>
 			</li>
 		</c:forEach>

@@ -22,8 +22,8 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -184,8 +184,9 @@ public class PageStoreTest {
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
 		
-		Set<String> branches = pageStore.getBranchesPageIsSharedWith(PROJECT, branchName, PAGE);
-		assertEquals(Sets.newHashSet(expectedBranches), branches);
+		List<String> branches = pageStore.getBranchesPageIsSharedWith(PROJECT, branchName, PAGE);
+		assertEquals(expectedBranches.length, branches.size());
+		assertEquals(Sets.newHashSet(expectedBranches), new HashSet<>(branches));
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {

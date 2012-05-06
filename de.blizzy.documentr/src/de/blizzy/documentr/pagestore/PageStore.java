@@ -281,11 +281,11 @@ public class PageStore {
 	}
 	
 	public boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) throws IOException {
-		Set<String> branches = getBranchesPageIsSharedWith(projectName, branchName, path);
+		List<String> branches = getBranchesPageIsSharedWith(projectName, branchName, path);
 		return branches.size() >= 2;
 	}
 
-	public Set<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) throws IOException {
+	public List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -316,8 +316,11 @@ public class PageStore {
 			RepositoryUtil.closeQuietly(centralRepo);
 		}
 		
-		Set<String> branches = new HashSet<String>(branchesWithCommit);
-		branches.add(branchName);
+		List<String> branches = new ArrayList<String>(branchesWithCommit);
+		if (!branches.contains(branchName)) {
+			branches.add(branchName);
+		}
+		Collections.sort(branches);
 		return branches;
 	}
 	

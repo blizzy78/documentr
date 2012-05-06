@@ -52,9 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</function>
 
 	<function>
-		<name>isPageSharedWithOtherBranches</name>
+		<name>getBranchesPageIsSharedWith</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>boolean isPageSharedWithOtherBranches(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>List getBranchesPageIsSharedWith(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>
@@ -85,5 +85,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<name>listUsers</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>List listUsers()</function-signature>
+	</function>
+
+	<function>
+		<name>join</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>String join(java.lang.Object, java.lang.String)</function-signature>
 	</function>
 </taglib>
