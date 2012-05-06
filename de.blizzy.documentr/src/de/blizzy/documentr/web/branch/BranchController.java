@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.branch;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -44,6 +47,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 public class BranchController {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private PageStore pageStore;
 
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{name:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
@@ -67,7 +72,9 @@ public class BranchController {
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult)
 			throws IOException, GitAPIException {
 		
-		if (repoManager.listProjectBranches(form.getProjectName()).contains(form.getName())) {
+		List<String> branches = repoManager.listProjectBranches(form.getProjectName());
+		boolean firstBranch = branches.isEmpty();
+		if (branches.contains(form.getName())) {
 			bindingResult.rejectValue("name", "branch.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
@@ -81,6 +88,13 @@ public class BranchController {
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+		
+		if (firstBranch) {
+			Page page = Page.fromText("Home", StringUtils.EMPTY); //$NON-NLS-1$
+			pageStore.savePage(form.getProjectName(), form.getName(), "home", page); //$NON-NLS-1$
+			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		
 		return "redirect:/branch/" + form.getProjectName() + "/" + form.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
