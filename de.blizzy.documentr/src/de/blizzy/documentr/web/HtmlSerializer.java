@@ -20,6 +20,7 @@ package de.blizzy.documentr.web;
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.ToHtmlSerializer;
 import org.pegdown.ast.ExpImageNode;
+import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.VerbatimNode;
 
@@ -65,5 +66,10 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			}
 		}
 		printer.print("/>"); //$NON-NLS-1$
+	}
+	
+	@Override
+	public void visit(HeaderNode node) {
+		printTag(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
 	}
 }
