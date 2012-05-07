@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<c:when test="${!empty branches}">
 		<ul>
 		<c:forEach var="branch" items="${branches}">
-			<li><a href="<c:url value="/branch/${name}/${branch}"/>"><c:out value="${branch}"/></a></li>
+			<li><a href="<c:url value="/page/${name}/${branch}/home"/>"><c:out value="${branch}"/></a></li>
 		</c:forEach>
 		</ul>
 	</c:when>

@@ -45,16 +45,23 @@ public class PageForm {
 	@ValidPagePath
 	@PagePathNotBlacklisted
 	private String path;
+	@NotNull(message="{page.parentPagePath.blank}")
+	@NotEmpty(message="{page.parentPagePath.blank}")
+	@NotBlank(message="{page.parentPagePath.blank}")
+	@ValidPagePath
+	@PagePathNotBlacklisted
+	private String parentPagePath;
 	@NotNull(message="{page.title.blank}")
 	@NotEmpty(message="{page.title.blank}")
 	@NotBlank(message="{page.title.blank}")
 	private String title;
 	private String text;
 
-	PageForm(String projectName, String branchName, String path, String title, String text) {
+	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text) {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
+		this.parentPagePath = parentPagePath;
 		this.title = title;
 		this.text = text;
 	}
@@ -69,6 +76,10 @@ public class PageForm {
 	
 	public String getPath() {
 		return path;
+	}
+	
+	public String getParentPagePath() {
+		return parentPagePath;
 	}
 
 	public String getTitle() {

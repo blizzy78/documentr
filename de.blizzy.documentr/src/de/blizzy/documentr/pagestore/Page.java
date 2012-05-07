@@ -20,28 +20,34 @@ package de.blizzy.documentr.pagestore;
 import java.io.UnsupportedEncodingException;
 
 public class Page {
+	private String parentPagePath;
 	private String title;
 	private byte[] data;
 	private String contentType;
 
-	private Page(String title, byte[] data, String contentType) {
+	private Page(String parentPagePath, String title, byte[] data, String contentType) {
+		this.parentPagePath = parentPagePath;
 		this.title = title;
 		this.data = data;
 		this.contentType = contentType;
 	}
 
-	public static Page fromText(String title, String text) {
+	public static Page fromText(String parentPagePath, String title, String text) {
 		try {
-			return new Page(title, text.getBytes("UTF-8"), "text/plain"); //$NON-NLS-1$ //$NON-NLS-2$
+			return new Page(parentPagePath, title, text.getBytes("UTF-8"), "text/plain"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public static Page fromData(byte[] data, String contentType) {
-		return new Page(null, data, contentType);
+	public static Page fromData(String parentPagePath, byte[] data, String contentType) {
+		return new Page(parentPagePath, null, data, contentType);
 	}
 
+	public String getParentPagePath() {
+		return parentPagePath;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

@@ -91,10 +91,14 @@ public class PageController {
 	}
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
-	public String createPage(@PathVariable String projectName, @PathVariable String branchName, Model model) {
-		PageForm form = new PageForm(projectName, branchName, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY);
+	public String createPage(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String parentPagePath, Model model) {
+
+		PageForm form = new PageForm(projectName, branchName, StringUtils.EMPTY,
+				Util.toRealPagePath(parentPagePath), StringUtils.EMPTY, StringUtils.EMPTY);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -109,7 +113,8 @@ public class PageController {
 		try {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
-			PageForm form = new PageForm(projectName, branchName, path, page.getTitle(), page.getText());
+			PageForm form = new PageForm(projectName, branchName, path, page.getParentPagePath(),
+					page.getTitle(), page.getText());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (NotFoundException e) {
@@ -126,28 +131,35 @@ public class PageController {
 		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
+		if (bindingResult.hasErrors()) {
+			return "/project/branch/page/edit"; //$NON-NLS-1$
+		}
+
+		String parentPagePath = Util.toRealPagePath(form.getParentPagePath());
+		Page page = Page.fromText(parentPagePath, form.getTitle(), form.getText());
+		String path = form.getPath();
+		if (StringUtils.isBlank(path)) {
+			path = Util.generatePageName(form.getTitle());
+		}
 		
 		if (bindingResult.hasErrors()) {
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		}
 
-		Page page = Page.fromText(form.getTitle(), form.getText());
-		String path = form.getPath();
-		if (StringUtils.isBlank(path)) {
-			path = Util.generatePageName(form.getTitle());
-		}
-		pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page);
+		String fullPagePath = parentPagePath + "/" + path; //$NON-NLS-1$
+		pageStore.savePage(form.getProjectName(), form.getBranchName(), fullPagePath, page);
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(path);
+			Util.toURLPagePath(fullPagePath);
 	}
 	
 	@ModelAttribute
 	public PageForm createPageForm(@PathVariable String projectName, @PathVariable String branchName,
-			@RequestParam(required=false) String path, @RequestParam(required=false) String title,
-			@RequestParam(required=false) String text) {
+			@RequestParam(required=false) String path, @RequestParam(required=false) String parentPagePath,
+			@RequestParam(required=false) String title, @RequestParam(required=false) String text) {
 		
 		return ((path != null) && (title != null) && (text != null)) ?
-				new PageForm(projectName, branchName, path, title, text) : null;
+				new PageForm(projectName, branchName, path, parentPagePath, title, text) : null;
 	}
 	
 	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +

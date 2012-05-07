@@ -59,6 +59,7 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Component
 public class PageStore {
+	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 	private static final String DATA = "data"; //$NON-NLS-1$
@@ -111,6 +112,9 @@ public class PageStore {
 
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = new HashMap<String, Object>();
+			if (page.getParentPagePath() != null) {
+				pageMap.put(PARENT_PAGE_PATH, page.getParentPagePath());
+			}
 			pageMap.put(TITLE, page.getTitle());
 			pageMap.put(CONTENT_TYPE, page.getContentType());
 			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
@@ -145,9 +149,10 @@ public class PageStore {
 
 		try {
 			Map<String, Object> pageData = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME);
+			String parentPagePath = (String) pageData.get(PARENT_PAGE_PATH);
 			String title = (String) pageData.get(TITLE);
 			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-			return Page.fromText(title, new String(data, "UTF-8")); //$NON-NLS-1$
+			return Page.fromText(parentPagePath, title, new String(data, "UTF-8")); //$NON-NLS-1$
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -186,7 +191,7 @@ public class PageStore {
 					ATTACHMENTS_DIR_NAME);
 			String contentType = (String) pageData.get(CONTENT_TYPE);
 			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-			return Page.fromData(data, contentType);
+			return Page.fromData(null, data, contentType);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}

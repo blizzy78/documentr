@@ -161,7 +161,7 @@ public class PageStoreTest {
 		globalRepoManager.createProjectCentralRepository(PROJECT);
 		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
-		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Page result = pageStore.getAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -174,7 +174,7 @@ public class PageStoreTest {
 		globalRepoManager.createProjectCentralRepository(PROJECT);
 		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
-		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
 		List<String> attachments = pageStore.listPageAttachments(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		assertEquals(1, attachments.size());
@@ -190,12 +190,8 @@ public class PageStoreTest {
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {
-		Page page = createRandomPage();
+		Page page = TestUtil.createRandomPage();
 		pageStore.savePage(PROJECT, branchName, path, page);
 		return page;
-	}
-	
-	private Page createRandomPage() {
-		return Page.fromText(String.valueOf(Math.random() * Long.MAX_VALUE), String.valueOf(Math.random() * Long.MAX_VALUE));
 	}
 }

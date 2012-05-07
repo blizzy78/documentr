@@ -50,15 +50,6 @@ public class BranchController {
 	@Autowired
 	private PageStore pageStore;
 
-	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{name:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("permitAll")
-	public String getBranch(@PathVariable String projectName, @PathVariable String name, Model model) {
-		model.addAttribute("projectName", projectName); //$NON-NLS-1$
-		model.addAttribute("name", name); //$NON-NLS-1$
-		return "/project/branch/view"; //$NON-NLS-1$
-	}
-
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	public String createBranch(@PathVariable String projectName, Model model) {
@@ -90,7 +81,7 @@ public class BranchController {
 		}
 		
 		if (firstBranch) {
-			Page page = Page.fromText("Home", StringUtils.EMPTY); //$NON-NLS-1$
+			Page page = Page.fromText(null, "Home", StringUtils.EMPTY); //$NON-NLS-1$
 			pageStore.savePage(form.getProjectName(), form.getName(), "home", page); //$NON-NLS-1$
 			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}

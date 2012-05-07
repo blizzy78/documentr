@@ -95,10 +95,17 @@ function hidePreview() {
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${pageForm.projectName}"/>"><c:out value="${pageForm.projectName}"/></a> <span class="divider">/</span></li>
-	<li><a href="<c:url value="/branch/${pageForm.projectName}/${pageForm.branchName}"/>"><c:out value="${pageForm.branchName}"/></a> <span class="divider">/</span></li>
-	<c:if test="${!empty pageForm.path}">
-		<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(pageForm.path)}"/>"><c:out value="${pageForm.title}"/></a> <span class="divider">/</span></li>
-	</c:if>
+	<c:choose>
+		<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>
+		<c:otherwise><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}"/></c:otherwise>
+	</c:choose>
+	<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/home"/>"><c:out value="${pageForm.branchName}"/></a> <span class="divider">/</span></li>
+	<c:set var="hierarchy" value="${d:getPagePathHierarchy(pageForm.projectName, pageForm.branchName, hierarchyPagePath)}"/>
+	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
+		<c:if test="${!status.first}">
+			<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(pageForm.projectName, pageForm.branchName, entry)}"/></a> <span class="divider">/</span></li>
+		</c:if>
+	</c:forEach>
 	<li class="active"><spring:message code="title.editPage"/></li>
 </dt:breadcrumbs>
 
@@ -109,6 +116,7 @@ function hidePreview() {
 <p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well">
+	<form:hidden path="parentPagePath"/>
 	<c:set var="errorText"><form:errors path="title"/></c:set>
 	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
 		<form:label path="title"><spring:message code="label.title"/>:</form:label>
@@ -133,7 +141,7 @@ function hidePreview() {
 				<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${pathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
 			</c:when>
 			<c:otherwise>
-				<a href="<c:url value="/branch/${pageForm.projectName}/${pageForm.branchName}"/>" class="btn"><spring:message code="button.cancel"/></a>
+				<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/home"/>" class="btn"><spring:message code="button.cancel"/></a>
 			</c:otherwise>
 		</c:choose>
 	</fieldset>

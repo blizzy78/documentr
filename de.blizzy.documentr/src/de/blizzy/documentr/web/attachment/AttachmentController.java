@@ -110,7 +110,7 @@ public class AttachmentController {
 		if (StringUtils.isBlank(contentType)) {
 			contentType = DEFAULT_MIME_TYPE;
 		}
-		Page attachment = Page.fromData(data, contentType);
+		Page attachment = Page.fromData(null, data, contentType);
 		pagePath = Util.toRealPagePath(pagePath);
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment);
 		

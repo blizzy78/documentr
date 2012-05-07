@@ -29,6 +29,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import de.blizzy.documentr.pagestore.Page;
+
 public final class TestUtil {
 	private static Set<File> tempDirs = new HashSet<>();
 
@@ -65,5 +67,14 @@ public final class TestUtil {
 				// ignore
 			}
 		}
+	}
+
+	public static Page createRandomPage() {
+		return createRandomPage(null);
+	}
+	
+	public static Page createRandomPage(String parentPagePath) {
+		return Page.fromText(parentPagePath, String.valueOf(Math.random() * Long.MAX_VALUE),
+				String.valueOf(Math.random() * Long.MAX_VALUE));
 	}
 }

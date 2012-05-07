@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 @Component
@@ -72,14 +73,6 @@ public final class Functions {
 		}
 	}
 
-	public static List<String> listPagePaths(String projectName, String branchName) {
-		try {
-			return pageStore.listPagePaths(projectName, branchName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	public static List<String> listPageAttachments(String projectName, String branchName, String path) {
 		try {
 			return pageStore.listPageAttachments(projectName, branchName, path);
@@ -135,5 +128,13 @@ public final class Functions {
 			c = Collections.singleton(o);
 		}
 		return StringUtils.join(c, delimiter);
+	}
+	
+	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {
+		try {
+			return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

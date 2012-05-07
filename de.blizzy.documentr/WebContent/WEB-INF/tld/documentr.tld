@@ -40,12 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</function>
 
 	<function>
-		<name>listPagePaths</name>
-		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listPagePaths(java.lang.String, java.lang.String)</function-signature>
-	</function>
-
-	<function>
 		<name>listPageAttachments</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>List listPageAttachments(java.lang.String, java.lang.String, java.lang.String)</function-signature>
@@ -91,5 +85,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<name>join</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>String join(java.lang.Object, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>getPagePathHierarchy</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.util.List getPagePathHierarchy(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 </taglib>
