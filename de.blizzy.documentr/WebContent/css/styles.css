@@ -20,8 +20,12 @@ body {
 	background-color: white;
 }
 
-.shared-page {
-	color: gray;
+h1 .shared-page {
+	color: #999999;
+	display: block;
+	font-size: 11px;
+	margin-top: 2pt;
+	font-weight: normal;
 }
 
 textarea.code {

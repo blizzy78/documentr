@@ -68,7 +68,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</div>
 </sec:authorize>
 
-<div class="page-header"><h1><c:out value="${title}"/></h1></div>
+<div class="page-header"><h1><c:out value="${title}"/>
+<sec:authorize access="isAuthenticated()">
+	<c:set var="branches" value="${d:getBranchesPageIsSharedWith(projectName, branchName, path)}"/>
+	<c:if test="${fn:length(branches) ge 2}">
+		<c:set var="branches" value="${d:join(branches, ', ')}"/>
+		<span class="shared-page">(<spring:message code="sharedWithX" arguments="${branches}" argumentSeparator="|"/>)</span>
+	</c:if>
+</sec:authorize>
+</h1>
+</div>
 
 <c:out value="${d:markdownToHTML(text, projectName, branchName, path)}" escapeXml="false"/>
 
