@@ -45,9 +45,11 @@ public class HtmlSerializerContext {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
 				String pattern = "/attachment/{projectName}/{branchName}/{pagePath}/{name}"; //$NON-NLS-1$
-				String uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(pattern).build()
-					.expand(projectName, branchName, Util.toURLPagePath(pagePath), name)
-					.encode("UTF-8").toUriString(); //$NON-NLS-1$
+				String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path(pattern).build()
+						.expand(projectName, branchName, Util.toURLPagePath(pagePath), name)
+						.encode("UTF-8").toUriString() //$NON-NLS-1$
+						.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 				return uri;
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
