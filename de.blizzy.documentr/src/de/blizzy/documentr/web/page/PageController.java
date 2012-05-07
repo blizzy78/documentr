@@ -113,7 +113,11 @@ public class PageController {
 		try {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
-			PageForm form = new PageForm(projectName, branchName, path, page.getParentPagePath(),
+			if (path.contains("/")) { //$NON-NLS-1$
+				path = StringUtils.substringAfterLast(path, "/"); //$NON-NLS-1$
+			}
+			PageForm form = new PageForm(projectName, branchName,
+					path, page.getParentPagePath(),
 					page.getTitle(), page.getText());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
@@ -136,7 +140,11 @@ public class PageController {
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		}
 
-		String parentPagePath = Util.toRealPagePath(form.getParentPagePath());
+		String parentPagePath = form.getParentPagePath();
+		if (StringUtils.isBlank(parentPagePath)) {
+			parentPagePath = null;
+		}
+		parentPagePath = Util.toRealPagePath(parentPagePath);
 		Page page = Page.fromText(parentPagePath, form.getTitle(), form.getText());
 		String path = form.getPath();
 		if (StringUtils.isBlank(path)) {
@@ -147,7 +155,7 @@ public class PageController {
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		}
 
-		String fullPagePath = parentPagePath + "/" + path; //$NON-NLS-1$
+		String fullPagePath = (parentPagePath != null) ? (parentPagePath + "/" + path) : path; //$NON-NLS-1$
 		pageStore.savePage(form.getProjectName(), form.getBranchName(), fullPagePath, page);
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(fullPagePath);

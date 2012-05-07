@@ -30,11 +30,11 @@ public final class Util {
 	private Util() {}
 
 	public static String toRealPagePath(String pagePath) {
-		return pagePath.replace(',', '/');
+		return (pagePath != null) ? pagePath.replace(',', '/') : null;
 	}
 
 	public static String toURLPagePath(String pagePath) {
-		return pagePath.replace('/', ',');
+		return (pagePath != null) ? pagePath.replace('/', ',') : null;
 	}
 
 	public static String generatePageName(String title) {

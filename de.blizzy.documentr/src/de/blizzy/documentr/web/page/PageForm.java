@@ -45,9 +45,6 @@ public class PageForm {
 	@ValidPagePath
 	@PagePathNotBlacklisted
 	private String path;
-	@NotNull(message="{page.parentPagePath.blank}")
-	@NotEmpty(message="{page.parentPagePath.blank}")
-	@NotBlank(message="{page.parentPagePath.blank}")
 	@ValidPagePath
 	@PagePathNotBlacklisted
 	private String parentPagePath;
