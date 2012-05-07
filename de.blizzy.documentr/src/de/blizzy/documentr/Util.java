@@ -17,6 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.web.page.PagePathValidator;
@@ -69,5 +73,17 @@ public final class Util {
 				.replaceAll("-$", StringUtils.EMPTY) //$NON-NLS-1$
 				.toLowerCase();
 		return name;
+	}
+
+	public static String join(Object o, String delimiter) {
+		Collection<?> c;
+		if (o instanceof Collection) {
+			c = (Collection<?>) o;
+		} else if (o.getClass().isArray()) {
+			c = Arrays.asList((Object[]) o);
+		} else {
+			c = Collections.singleton(o);
+		}
+		return StringUtils.join(c, delimiter);
 	}
 }

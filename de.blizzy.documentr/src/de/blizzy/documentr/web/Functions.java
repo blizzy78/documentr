@@ -18,14 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
@@ -116,18 +112,6 @@ public final class Functions {
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		return serializer.toHtml(rootNode);
-	}
-	
-	public static String join(Object o, String delimiter) {
-		Collection<?> c;
-		if (o instanceof Collection) {
-			c = (Collection<?>) o;
-		} else if (o.getClass().isArray()) {
-			c = Arrays.asList((Object[]) o);
-		} else {
-			c = Collections.singleton(o);
-		}
-		return StringUtils.join(c, delimiter);
 	}
 	
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {

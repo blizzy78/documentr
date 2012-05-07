@@ -19,6 +19,8 @@ package de.blizzy.documentr;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 public class UtilTest {
@@ -38,5 +40,14 @@ public class UtilTest {
 	public void generatePageName() {
 		assertEquals("changes-for-1-0-x-code-name-wheatley-xl", //$NON-NLS-1$
 				Util.generatePageName("Changes For 1.0.x: Code Name \"Wheatley\" (XL)")); //$NON-NLS-1$
+	}
+
+	@Test
+	public void join() {
+		assertEquals("1, 2, 3", Util.join( //$NON-NLS-1$
+				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }, ", ")); //$NON-NLS-1$
+		assertEquals("1, 2, 3", Util.join(Arrays.asList( //$NON-NLS-1$
+				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }), ", ")); //$NON-NLS-1$
+		assertEquals("123", Util.join(Integer.valueOf(123), ", ")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
