@@ -20,19 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<%
+pageContext.setAttribute("statusCode", request.getAttribute("javax.servlet.error.status_code")); //$NON-NLS-1$ //$NON-NLS-2$
+%>
+
 <dt:page>
 
 <div class="page-header"><h1>Error</h1></div>
 
 <p>
 <c:choose>
-	<c:when test="${!empty messageKey}"><spring:message code="${messageKey}"/></c:when>
-	<c:otherwise>
-		<%
-		request.setAttribute("statusCode", request.getAttribute("javax.servlet.error.status_code")); //$NON-NLS-1$ //$NON-NLS-2$
-		%>
-		<c:out value="Error ${statusCode}"/>
-	</c:otherwise>
+	<c:when test="${!empty messageKey}"><spring:message code="${messageKey}"/> (error <c:out value="${statusCode}"/>)</c:when>
+	<c:otherwise>Error <c:out value="${statusCode}"/></c:otherwise>
 </c:choose>
 </p>
 
