@@ -71,6 +71,8 @@ public class PageController {
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model, Authentication authentication) throws IOException {
 
+		path = Util.toRealPagePath(path);
+
 		if ((authentication == null) || !authentication.isAuthenticated()) {
 			branchName = pageBranchResolver.resolvePageBranch(projectName, branchName, path);
 			if (branchName == null) {
