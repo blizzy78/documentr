@@ -22,7 +22,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
-
 public class ProjectForm {
 	@NotNull(message="{project.name.blank}")
 	@NotEmpty(message="{project.name.blank}")
