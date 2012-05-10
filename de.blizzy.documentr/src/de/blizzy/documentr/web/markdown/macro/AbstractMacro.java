@@ -17,16 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
-import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
-class ChildrenMacro implements IMacro {
+public abstract class AbstractMacro implements IMacro {
 	private HtmlSerializerContext context;
 	private PageStore pageStore;
 
@@ -38,37 +32,17 @@ class ChildrenMacro implements IMacro {
 	public void setHtmlSerializerContext(HtmlSerializerContext context) {
 		this.context = context;
 	}
+	
+	protected HtmlSerializerContext getHtmlSerializerContext() {
+		return context;
+	}
 
 	@Override
 	public void setPageStore(PageStore pageStore) {
 		this.pageStore = pageStore;
 	}
-
-	@Override
-	@SuppressWarnings("nls")
-	public String getHtml() {
-		try {
-			List<String> children = pageStore.listChildPagePaths(context.getProjectName(), context.getBranchName(), context.getPagePath());
-			if (!children.isEmpty()) {
-				StringBuilder buf = new StringBuilder();
-				Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), context.getPagePath());
-				buf.append("<div class=\"children-box\">")
-					.append("<ul class=\"children\">")
-					.append("<li>").append(page.getTitle()).append("</li>")
-					.append("<ul>");
-				for (String childPath : children) {
-					page = pageStore.getPage(context.getProjectName(), context.getBranchName(), childPath);
-					buf.append("<li><a href=\"").append(context.getPageURI(childPath)).append("\">")
-						.append(page.getTitle())
-						.append("</a></li>");
-				}
-				buf.append("</ul>")
-					.append("</ul></div>");
-				return buf.toString();
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return StringUtils.EMPTY;
+	
+	protected PageStore getPageStore() {
+		return pageStore;
 	}
 }

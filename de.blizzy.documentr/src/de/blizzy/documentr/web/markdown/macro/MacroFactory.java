@@ -35,7 +35,8 @@ public class MacroFactory {
 	private PageStore pageStore;
 
 	static {
-		MACRO_CLASSES.put("children", ChildrenMacro.class); //$NON-NLS-1$
+		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
+		MACRO_CLASSES.put("neighbours", NeighborsMacro.class); //$NON-NLS-1$
 	}
 	
 	public IMacro get(String macroName, HtmlSerializerContext context) {

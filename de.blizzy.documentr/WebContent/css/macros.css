@@ -32,3 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .children-box ul.children {
 	margin: 0 0 0 25px;
 }
+
+.children-box li.active {
+	font-weight: bold;
+}
+
+.children-box li.active ul {
+	font-weight: normal;
+}
