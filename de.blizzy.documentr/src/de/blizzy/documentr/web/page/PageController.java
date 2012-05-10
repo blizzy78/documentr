@@ -25,10 +25,6 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -39,9 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.NotFoundException;
@@ -174,9 +168,10 @@ public class PageController {
 	
 	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
-			method=RequestMethod.POST)
+			method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
 	@PreAuthorize("permitAll")
-	public HttpEntity<String> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
+	public Map<String, Object> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String title) throws IOException {
 
 		String name = Util.generatePageName(title);
@@ -192,27 +187,20 @@ public class PageController {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("name", name); //$NON-NLS-1$
 		result.put("exists", Boolean.valueOf(pageExists)); //$NON-NLS-1$
-		return createJSONResponse(result);
+		return result;
 	}
 
 	@RequestMapping(value="/markdownToHTML/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
-			method=RequestMethod.POST)
+			method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
 	@PreAuthorize("isAuthenticated()")
-	public HttpEntity<String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
+	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
 		
 		Map<String, String> result = new HashMap<String, String>();
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, pagePath);
 		result.put("html", Functions.markdownToHTML(markdown, context)); //$NON-NLS-1$
-		return createJSONResponse(result);
-	}
-
-	private HttpEntity<String> createJSONResponse(Object o) {
-		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-		String json = gson.toJson(o);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/json"); //$NON-NLS-1$ //$NON-NLS-2$
-		return new ResponseEntity<String>(json, headers, HttpStatus.OK);
+		return result;
 	}
 }
