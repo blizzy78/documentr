@@ -20,6 +20,8 @@ package de.blizzy.documentr.web.markdown.macro;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
@@ -28,16 +30,20 @@ class NeighborsMacro extends AbstractMacro {
 	@Override
 	public String getHtml() {
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		try {
-			StringBuilder buf = new StringBuilder();
-			buf.append("<div class=\"children-box\"><ul class=\"children\">"); //$NON-NLS-1$
-			buf.append(printParent(
-					printLinkListItem(context.getPagePath(), context.getPagePath()),
-					context.getPagePath(), context.getPagePath()));
-			buf.append("</ul></div>"); //$NON-NLS-1$
-			return buf.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (context.getPagePath() != null) {
+			try {
+				StringBuilder buf = new StringBuilder();
+				buf.append("<div class=\"children-box\"><ul class=\"children\">"); //$NON-NLS-1$
+				buf.append(printParent(
+						printLinkListItem(context.getPagePath(), context.getPagePath()),
+						context.getPagePath(), context.getPagePath()));
+				buf.append("</ul></div>"); //$NON-NLS-1$
+				return buf.toString();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			return StringUtils.EMPTY;
 		}
 	}
 	
