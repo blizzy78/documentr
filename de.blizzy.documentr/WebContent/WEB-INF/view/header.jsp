@@ -42,6 +42,7 @@ $(function() {
 	$.ajaxSetup({
 		cache: false
 	});
+	
 	prettyPrint();
 });
 
