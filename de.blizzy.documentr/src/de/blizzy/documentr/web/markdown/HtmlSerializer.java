@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.markdown;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.ToHtmlSerializer;
@@ -24,12 +24,18 @@ import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.VerbatimNode;
 
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+
 public class HtmlSerializer extends ToHtmlSerializer {
 	private HtmlSerializerContext context;
+	private MacroFactory macroFactory;
 
-	HtmlSerializer(HtmlSerializerContext context) {
-		super(new LinkRenderer());
+	public HtmlSerializer(HtmlSerializerContext context, MacroFactory macroFactory) {
+		super(new DocumentrLinkRenderer());
+		
 		this.context = context;
+		this.macroFactory = macroFactory;
 	}
 
 	@Override
@@ -71,5 +77,17 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	@Override
 	public void visit(HeaderNode node) {
 		printTag(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
+	}
+
+	@Override
+	public void visit(SuperNode node) {
+		if (node instanceof MacroNode) {
+			MacroNode macroNode = (MacroNode) node;
+			String macroName = macroNode.getMacroName();
+			IMacro macro = macroFactory.get(macroName, context);
+			printer.print(macro.getHtml());
+		} else {
+			super.visit(node);
+		}
 	}
 }

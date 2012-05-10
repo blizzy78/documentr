@@ -15,28 +15,32 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.markdown.macro;
 
-import org.apache.commons.lang3.StringUtils;
-import org.pegdown.ast.WikiLinkNode;
+import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
-/*
- * allows the following Wiki-style links:
- * 
- * [[URI]]
- * [[URI link text]]
- */
-class LinkRenderer extends org.pegdown.LinkRenderer {
+class UnknownMacroMacro implements IMacro {
+	private String macroName;
+
+	public UnknownMacroMacro(String macroName) {
+		this.macroName = macroName;
+	}
+
 	@Override
-	public Rendering render(WikiLinkNode node) {
-		String text = node.getText();
-		String uri = StringUtils.substringBefore(text, " "); //$NON-NLS-1$
-		text = StringUtils.substringAfter(text, " "); //$NON-NLS-1$
-		if (StringUtils.isBlank(text)) {
-			text = uri;
-		}
-		text = text.trim();
-		
-		return new Rendering(uri, text);
+	public void setHtmlSerializerContext(HtmlSerializerContext context) {
+	}
+	
+	@Override
+	public void setPageStore(PageStore pageStore) {
+	}
+	
+	@Override
+	public void setParameters(String params) {
+	}
+
+	@Override
+	public String getHtml() {
+		return "<span class=\"unknown-macro\">!" + macroName + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

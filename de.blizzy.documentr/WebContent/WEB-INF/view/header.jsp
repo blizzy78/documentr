@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <link rel="stylesheet" href="<c:url value="/css/bootstrap-responsive-2.0.3.min.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/prettify.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/styles.css"/>" media="all"/>
+<link rel="stylesheet" href="<c:url value="/css/macros.css"/>" media="all"/>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.19.custom.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-modal.js"/>"></script>

@@ -22,7 +22,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.pegdown.Extensions;
+import org.parboiled.Parboiled;
+import org.pegdown.DocumentrParser;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +34,16 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.web.markdown.HtmlSerializer;
+import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
 public final class Functions {
-	private static final int PEGDOWN_OPTIONS = Extensions.ALL -
-			Extensions.QUOTES - Extensions.SMARTS - Extensions.SMARTYPANTS;
-
 	private static PageStore pageStore;
 	private static GlobalRepositoryManager repoManager;
 	private static UserStore userStore;
+	private static MacroFactory macroFactory;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
@@ -49,12 +51,15 @@ public final class Functions {
 	private PageStore _pageStore;
 	@Autowired
 	private UserStore _userStore;
+	@Autowired
+	private MacroFactory _macroFactory;
 	
 	@PostConstruct
 	public void init() {
 		pageStore = _pageStore;
 		repoManager = _repoManager;
 		userStore = _userStore;
+		macroFactory = _macroFactory;
 	}
 
 	public static List<String> listProjects() {
@@ -108,9 +113,10 @@ public final class Functions {
 	}
 
 	public static String markdownToHTML(String markdown, HtmlSerializerContext context) {
-		PegDownProcessor proc = new PegDownProcessor(PEGDOWN_OPTIONS);
+		DocumentrParser parser = Parboiled.createParser(DocumentrParser.class);
+		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		HtmlSerializer serializer = new HtmlSerializer(context);
+		HtmlSerializer serializer = new HtmlSerializer(context, macroFactory);
 		return serializer.toHtml(rootNode);
 	}
 	

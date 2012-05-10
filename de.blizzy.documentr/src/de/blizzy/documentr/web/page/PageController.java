@@ -52,7 +52,7 @@ import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.Functions;
-import de.blizzy.documentr.web.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 @Controller
 @RequestMapping("/page")

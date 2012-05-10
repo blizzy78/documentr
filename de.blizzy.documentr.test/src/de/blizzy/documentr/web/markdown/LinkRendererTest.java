@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.markdown;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +27,7 @@ public class LinkRendererTest {
 	@Test
 	public void renderWikiLink() {
 		WikiLinkNode node = new WikiLinkNode("foo"); //$NON-NLS-1$
-		Rendering rendering = new LinkRenderer().render(node);
+		Rendering rendering = new DocumentrLinkRenderer().render(node);
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("foo", rendering.text); //$NON-NLS-1$
 	}
@@ -35,7 +35,7 @@ public class LinkRendererTest {
 	@Test
 	public void renderWikiLinkWithText() {
 		WikiLinkNode node = new WikiLinkNode("foo link text"); //$NON-NLS-1$
-		Rendering rendering = new LinkRenderer().render(node);
+		Rendering rendering = new DocumentrLinkRenderer().render(node);
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 	}

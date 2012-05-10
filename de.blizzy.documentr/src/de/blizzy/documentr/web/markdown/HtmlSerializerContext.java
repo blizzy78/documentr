@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.markdown;
 
 import java.io.UnsupportedEncodingException;
 
@@ -31,7 +31,6 @@ public class HtmlSerializerContext {
 	private String pagePath;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath) {
-		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
@@ -40,8 +39,20 @@ public class HtmlSerializerContext {
 		this.branchName = branchName;
 		this.pagePath = pagePath;
 	}
+
+	public String getProjectName() {
+		return projectName;
+	}
 	
-	String getAttachmentURI(String name) {
+	public String getBranchName() {
+		return branchName;
+	}
+	
+	public String getPagePath() {
+		return pagePath;
+	}
+	
+	public String getAttachmentURI(String name) {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
 				String pattern = "/attachment/{projectName}/{branchName}/{pagePath}/{name}"; //$NON-NLS-1$
@@ -56,5 +67,19 @@ public class HtmlSerializerContext {
 			}
 		}
 		return "#"; //$NON-NLS-1$
+	}
+	
+	public String getPageURI(String path) {
+		try {
+			String pattern = "/page/{projectName}/{branchName}/{pagePath}"; //$NON-NLS-1$
+			String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+					.path(pattern).build()
+					.expand(projectName, branchName, Util.toURLPagePath(path))
+					.encode("UTF-8").toUriString() //$NON-NLS-1$
+					.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			return uri;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

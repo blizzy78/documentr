@@ -206,20 +206,7 @@ public class PageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-			List<String> paths = listPagePaths(pagesDir);
-			String prefix = pagesDir.getAbsolutePath() + File.separator;
-			final int prefixLen = prefix.length();
-			final int pageSuffixLen = PAGE_SUFFIX.length();
-			Function<String, String> function = new Function<String, String>() {
-				@Override
-				public String apply(String path) {
-					path = path.substring(prefixLen, path.length() - pageSuffixLen);
-					path = path.replace('\\', '/');
-					return path;
-				}
-			};
-			paths = new ArrayList<String>(Lists.transform(paths, function));
-			Collections.sort(paths);
+			List<String> paths = listPagePaths(pagesDir, true);
 			return paths;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -263,7 +250,25 @@ public class PageStore {
 		}
 	}
 	
-	private List<String> listPagePaths(File dir) {
+	private List<String> listPagePaths(File pagesDir, boolean recursive) {
+		List<String> paths = listPagePathsInDir(pagesDir, recursive);
+		String prefix = pagesDir.getAbsolutePath() + File.separator;
+		final int prefixLen = prefix.length();
+		final int pageSuffixLen = PAGE_SUFFIX.length();
+		Function<String, String> function = new Function<String, String>() {
+			@Override
+			public String apply(String path) {
+				path = path.substring(prefixLen, path.length() - pageSuffixLen);
+				path = path.replace('\\', '/');
+				return path;
+			}
+		};
+		paths = new ArrayList<String>(Lists.transform(paths, function));
+		Collections.sort(paths);
+		return paths;
+	}
+
+	private List<String> listPagePathsInDir(File dir, boolean recursive) {
 		List<String> result = new ArrayList<String>();
 		if (dir.isDirectory()) {
 			FileFilter filter = new FileFilter() {
@@ -276,7 +281,9 @@ public class PageStore {
 			File[] files = dir.listFiles(filter);
 			for (File file : files) {
 				if (file.isDirectory()) {
-					result.addAll(listPagePaths(file));
+					if (recursive) {
+						result.addAll(listPagePathsInDir(file, true));
+					}
 				} else {
 					result.add(file.getAbsolutePath());
 				}
@@ -351,5 +358,31 @@ public class PageStore {
 	
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		this.repoManager = repoManager;
+	}
+
+	public List<String> listChildPagePaths(String projectName, String branchName, final String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = toFile(new File(workingDir, PAGES_DIR_NAME), path);
+			List<String> paths = new ArrayList<String>(listPagePaths(pagesDir, false));
+			Function<String, String> function = new Function<String, String>() {
+				@Override
+				public String apply(String childName) {
+					return path + "/" + childName; //$NON-NLS-1$
+				}
+			};
+			paths = Lists.transform(paths, function);
+			return paths;
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
 	}
 }
