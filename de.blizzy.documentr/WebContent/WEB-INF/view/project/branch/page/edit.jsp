@@ -137,15 +137,7 @@ function hidePreview() {
 	</fieldset>
 	<fieldset class="control-group">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<c:choose>
-			<c:when test="${!empty pageForm.path}">
-				<c:set var="pathUrl" value="${d:toURLPagePath(pageForm.path)}"/>
-				<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${pathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
-			</c:when>
-			<c:otherwise>
-				<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/home"/>" class="btn"><spring:message code="button.cancel"/></a>
-			</c:otherwise>
-		</c:choose>
+		<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</fieldset>
 </form:form>
 </p>
