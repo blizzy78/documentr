@@ -174,11 +174,17 @@ public class PageStoreTest {
 		globalRepoManager.createProjectCentralRepository(PROJECT);
 		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "foo/bar/baz/qux"); //$NON-NLS-1$
 		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz/qux", "test2.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
+
 		List<String> attachments = pageStore.listPageAttachments(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		assertEquals(1, attachments.size());
 		assertTrue(attachments.contains("test.dat")); //$NON-NLS-1$
+		attachments = pageStore.listPageAttachments(PROJECT, BRANCH_1, "foo/bar/baz/qux"); //$NON-NLS-1$
+		assertEquals(1, attachments.size());
+		assertTrue(attachments.contains("test2.dat")); //$NON-NLS-1$
 	}
 	
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)

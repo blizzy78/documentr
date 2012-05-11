@@ -232,7 +232,13 @@ public class PageStore {
 			File pageAttachmentsDir = toFile(attachmentsDir, pagePath);
 			List<String> names = Collections.emptyList();
 			if (pageAttachmentsDir.isDirectory()) {
-				List<File> files = Arrays.asList(pageAttachmentsDir.listFiles());
+				FileFilter filter = new FileFilter() {
+					@Override
+					public boolean accept(File file) {
+						return file.isFile();
+					}
+				};
+				List<File> files = Arrays.asList(pageAttachmentsDir.listFiles(filter));
 				Function<File, String> function = new Function<File, String>() {
 					@Override
 					public String apply(File file) {
