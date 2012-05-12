@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="<c:url value="/css/css.jsp"/>" media="all"/>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.19.custom.min.js"/>"></script>
