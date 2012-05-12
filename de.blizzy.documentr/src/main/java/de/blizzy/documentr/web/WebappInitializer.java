@@ -30,6 +30,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import de.blizzy.documentr.ContextConfig;
 import de.blizzy.documentr.web.filter.RequestEncodingFilter;
+import de.blizzy.documentr.web.filter.TrimFilter;
 
 public class WebappInitializer implements WebApplicationInitializer {
 	@Override
@@ -48,6 +49,9 @@ public class WebappInitializer implements WebApplicationInitializer {
 		FilterRegistration.Dynamic encodingFilterConfig =
 				context.addFilter("requestEncodingFilter", RequestEncodingFilter.class); //$NON-NLS-1$
 		encodingFilterConfig.addMappingForUrlPatterns(null, true, "/*"); //$NON-NLS-1$
+
+		FilterRegistration.Dynamic trimFilterConfig = context.addFilter("trimFilter", TrimFilter.class); //$NON-NLS-1$
+		trimFilterConfig.addMappingForUrlPatterns(null, true, "/*"); //$NON-NLS-1$
 		
 		DelegatingFilterProxy securityFilter =
 				new DelegatingFilterProxy("springSecurityFilterChain", appContext); //$NON-NLS-1$
