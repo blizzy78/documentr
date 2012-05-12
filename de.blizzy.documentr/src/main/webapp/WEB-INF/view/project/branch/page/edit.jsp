@@ -26,6 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="isAuthenticated()">
 
+<c:choose>
+	<c:when test="${(!empty pageForm.parentPagePath) and (!empty pageForm.path)}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}/${pageForm.path}"/></c:when>
+	<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>
+	<c:when test="${!empty pageForm.parentPagePath}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}"/></c:when>
+	<c:otherwise><c:set var="hierarchyPagePath" value="home"/></c:otherwise>
+</c:choose>
+
 <dt:headerJS>
 
 <c:if test="${empty pageForm.path}">
@@ -66,9 +73,7 @@ function showPreview() {
 		type: 'POST',
 		dataType: 'json',
 		data: {
-			<c:if test="${!empty pageForm.path}">
-				pagePath: '<c:out value="${pageForm.path}"/>',
-			</c:if>
+			pagePath: '<c:out value="${hierarchyPagePath}"/>',
 			markdown: textEl.val()
 		},
 		success: function(result) {
@@ -96,12 +101,6 @@ function hidePreview() {
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${pageForm.projectName}"/>"><c:out value="${pageForm.projectName}"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/home"/>"><c:out value="${pageForm.branchName}"/></a> <span class="divider">/</span></li>
-	<c:choose>
-		<c:when test="${(!empty pageForm.parentPagePath) and (!empty pageForm.path)}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}/${pageForm.path}"/></c:when>
-		<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>
-		<c:when test="${!empty pageForm.parentPagePath}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}"/></c:when>
-		<c:otherwise><c:set var="hierarchyPagePath" value="home"/></c:otherwise>
-	</c:choose>
 	<c:set var="hierarchy" value="${d:getPagePathHierarchy(pageForm.projectName, pageForm.branchName, hierarchyPagePath)}"/>
 	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 		<c:if test="${!status.first}">
