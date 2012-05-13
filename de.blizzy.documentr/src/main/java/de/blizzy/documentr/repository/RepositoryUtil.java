@@ -26,13 +26,21 @@ public final class RepositoryUtil {
 	
 	public static void closeQuietly(Repository repo) {
 		if (repo != null) {
-			repo.close();
+			try {
+				repo.close();
+			} catch (RuntimeException e) {
+				// ignore
+			}
 		}
 	}
 	
 	public static void closeQuietly(ILockedRepository repo) {
 		if (repo != null) {
-			repo.close();
+			try {
+				repo.close();
+			} catch (RuntimeException e) {
+				// ignore
+			}
 		}
 	}
 	
