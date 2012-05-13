@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -30,9 +29,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
 
-public class GlobalRepositoryManagerTest {
+public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	
 	private File allReposDir;

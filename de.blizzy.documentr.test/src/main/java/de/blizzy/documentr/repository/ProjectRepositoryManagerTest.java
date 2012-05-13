@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -35,7 +34,9 @@ import org.gitective.core.RepositoryUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProjectRepositoryManagerTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	private LockManager lockManager;
 
 	@Before

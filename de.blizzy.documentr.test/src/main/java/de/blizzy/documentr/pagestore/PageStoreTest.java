@@ -32,13 +32,14 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 
-public class PageStoreTest {
+public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH_1 = "branch_1"; //$NON-NLS-1$
 	private static final String BRANCH_2 = "branch_2"; //$NON-NLS-1$
@@ -50,7 +51,7 @@ public class PageStoreTest {
 
 	@Before
 	public void setUp() {
-		File dataDir = TestUtil.createTempDir();
+		File dataDir = createTempDir();
 		Settings settings = new Settings();
 		settings.setDocumentrDataDir(dataDir);
 
@@ -67,8 +68,8 @@ public class PageStoreTest {
 	
 	@Test
 	public void saveAndGetPage() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
@@ -78,8 +79,8 @@ public class PageStoreTest {
 	
 	@Test
 	public void listPagePaths() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, "test"); //$NON-NLS-1$
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		List<String> paths = pageStore.listPagePaths(PROJECT, BRANCH_1);
@@ -90,14 +91,14 @@ public class PageStoreTest {
 	
 	@Test
 	public void isPageSharedWithOtherBranches() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, PAGE);
 		
 		assertFalse(isPageSharedWithOtherBranches(BRANCH_1));
 
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_3, BRANCH_1);
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_3, BRANCH_1));
 		assertTrue(isPageSharedWithOtherBranches(BRANCH_1));
 		assertTrue(isPageSharedWithOtherBranches(BRANCH_2));
 		assertTrue(isPageSharedWithOtherBranches(BRANCH_3));
@@ -126,14 +127,14 @@ public class PageStoreTest {
 	
 	@Test
 	public void getBranchesPageIsSharedWith() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, PAGE);
 
 		assertBranchesPageIsSharedWith(BRANCH_1, BRANCH_1);
 		
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_3, BRANCH_1);
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_3, BRANCH_1));
 		assertBranchesPageIsSharedWith(BRANCH_1, BRANCH_1, BRANCH_2, BRANCH_3);
 		assertBranchesPageIsSharedWith(BRANCH_2, BRANCH_1, BRANCH_2, BRANCH_3);
 		assertBranchesPageIsSharedWith(BRANCH_3, BRANCH_1, BRANCH_2, BRANCH_3);
@@ -158,8 +159,8 @@ public class PageStoreTest {
 
 	@Test
 	public void saveAndGetAttachment() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment); //$NON-NLS-1$ //$NON-NLS-2$
@@ -171,8 +172,8 @@ public class PageStoreTest {
 
 	@Test
 	public void listPageAttachments() throws IOException, GitAPIException {
-		globalRepoManager.createProjectCentralRepository(PROJECT);
-		globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		saveRandomPage(BRANCH_1, "foo/bar/baz/qux"); //$NON-NLS-1$
 		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
