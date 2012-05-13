@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import static org.junit.Assert.*;
 import de.blizzy.documentr.pagestore.Page;
 
 public final class TestUtil {
@@ -25,5 +26,53 @@ public final class TestUtil {
 	public static Page createRandomPage(String parentPagePath) {
 		return Page.fromText(parentPagePath, String.valueOf(Math.random() * Long.MAX_VALUE),
 				String.valueOf(Math.random() * Long.MAX_VALUE));
+	}
+	
+	public static void assertEqualsContract(Object equal1, Object equal2, Object equal3, Object different) {
+		assertNotSame(equal1, equal2);
+		assertNotSame(equal1, equal3);
+		assertNotSame(equal2, equal3);
+
+		// same object
+		assertTrue(equal1.equals(equal1));
+		
+		// reflexive
+		assertTrue(equal1.equals(equal2));
+		
+		// symmetric
+		if (equal1.equals(equal2)) {
+			assertTrue(equal2.equals(equal1));
+		}
+		
+		// transitive
+		if (equal1.equals(equal2) && equal2.equals(equal3)) {
+			assertTrue(equal1.equals(equal3));
+		}
+		
+		// consistent
+		if (equal1.equals(equal2)) {
+			assertTrue(equal1.equals(equal2));
+		} else {
+			assertFalse(equal1.equals(equal2));
+		}
+		
+		// null
+		assertFalse(equal1.equals(null));
+		
+		// difference
+		assertFalse(equal1.equals(different));
+		assertFalse(different.equals(equal1));
+	}
+
+	public static void assertHashCodeContract(Object equal1, Object equal2) {
+		assertNotSame(equal1, equal2);
+		assertEquals(equal1, equal2);
+		
+		// consistent
+		int hashCode = equal1.hashCode();
+		assertEquals(hashCode, equal1.hashCode());
+		
+		// equal hash code for equal objects
+		assertEquals(equal1.hashCode(), equal2.hashCode());
 	}
 }
