@@ -300,6 +300,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<xmlOutput>true</xmlOutput>
 					<effort>Max</effort>
 					<encoding>UTF-8</encoding>
+					<excludeFilterFile>etc/findbugs/exclude.xml</excludeFilterFile>
 				</configuration>
 			</plugin>
 		</plugins>
