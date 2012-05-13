@@ -22,8 +22,11 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -70,11 +73,24 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	public void saveAndGetPage() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
-		Page page = saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
-		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
+		Page page = saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo"); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
 		assertEquals(page.getText(), result.getText());
 		assertEquals(page.getContentType(), result.getContentType());
+		assertEquals(page.getParentPagePath(), result.getParentPagePath());
+	}
+	
+	@Test
+	public void saveAndGetPageWithParentPagePath() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = saveRandomPage(BRANCH_1, "foo/bar", "parent"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar"); //$NON-NLS-1$
+		assertEquals(page.getTitle(), result.getTitle());
+		assertEquals(page.getText(), result.getText());
+		assertEquals(page.getContentType(), result.getContentType());
+		assertEquals(page.getParentPagePath(), result.getParentPagePath());
 	}
 	
 	@Test
@@ -187,6 +203,24 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(1, attachments.size());
 		assertTrue(attachments.contains("test2.dat")); //$NON-NLS-1$
 	}
+
+	@Test
+	public void listChildPagePaths() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo/bar"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo/bar/baz"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo/qux"); //$NON-NLS-1$
+		
+		Set<String> expected = new HashSet<String>(
+				Arrays.asList("home/foo/bar", "home/foo/qux")); //$NON-NLS-1$ //$NON-NLS-2$
+		Set<String> result = new HashSet<String>(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo")); //$NON-NLS-1$
+		assertEquals(expected, result);
+		expected = Collections.singleton("home/foo/bar/baz"); //$NON-NLS-1$
+		result = new HashSet<String>(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo/bar")); //$NON-NLS-1$
+		assertEquals(expected, result);
+	}
 	
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
@@ -197,7 +231,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {
-		Page page = TestUtil.createRandomPage();
+		return saveRandomPage(branchName, path, null);
+	}
+	
+	private Page saveRandomPage(String branchName, String path, String parentPagePath) throws IOException {
+		Page page = TestUtil.createRandomPage(parentPagePath);
 		pageStore.savePage(PROJECT, branchName, path, page);
 		return page;
 	}

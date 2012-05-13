@@ -156,4 +156,12 @@ public class UserStore {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
+
+	void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
 }

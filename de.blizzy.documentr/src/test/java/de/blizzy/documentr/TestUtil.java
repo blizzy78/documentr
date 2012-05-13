@@ -22,10 +22,6 @@ import de.blizzy.documentr.pagestore.Page;
 public final class TestUtil {
 	private TestUtil() {}
 
-	public static Page createRandomPage() {
-		return createRandomPage(null);
-	}
-	
 	public static Page createRandomPage(String parentPagePath) {
 		return Page.fromText(parentPagePath, String.valueOf(Math.random() * Long.MAX_VALUE),
 				String.valueOf(Math.random() * Long.MAX_VALUE));
