@@ -39,19 +39,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<url>http://documentr.org</url>
 	</organization>
 
-	<contributors>
-		<contributor>
+	<developers>
+		<developer>
 			<name>Maik Schreiber</name>
 			<email>blizzy@blizzy.de</email>
 			<url>http://blizzy.de</url>
-		</contributor>
-	</contributors>
+		</developer>
+	</developers>
 	
 	<scm>
 		<connection>scm:git:git://github.com/blizzy78/documentr.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com:blizzy78/documentr.git</developerConnection>
 		<url>https://github.com/blizzy78/documentr</url>
 	</scm>
+	
+	<ciManagement>
+		<url>http://ci.documentr.org</url>
+		<system>jenkins</system>
+	</ciManagement>
 
 	<dependencies>
 		<dependency>
