@@ -31,7 +31,6 @@ import org.pegdown.ast.VerbatimNode;
 
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class HtmlSerializer extends ToHtmlSerializer {
 	static final class MacroInvocation {
@@ -46,14 +45,12 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	}
 	
 	private HtmlSerializerContext context;
-	private MacroFactory macroFactory;
 	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
 
-	public HtmlSerializer(HtmlSerializerContext context, MacroFactory macroFactory) {
+	public HtmlSerializer(HtmlSerializerContext context) {
 		super(new DocumentrLinkRenderer());
 		
 		this.context = context;
-		this.macroFactory = macroFactory;
 	}
 
 	@Override
@@ -99,8 +96,10 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			Node childNode = children.get(0);
 			if (childNode instanceof TextNode) {
 				TextNode textNode = (TextNode) childNode;
-				String anchor = Util.simplifyForURL(textNode.getText());
+				String text = textNode.getText();
+				String anchor = Util.simplifyForURL(text);
 				printer.print("<a name=\"").print(anchor).print("\"></a>"); //$NON-NLS-1$ //$NON-NLS-2$
+				context.addHeader(text, node.getLevel());
 			}
 		}
 		printTag(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
@@ -111,7 +110,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		if (node instanceof MacroNode) {
 			MacroNode macroNode = (MacroNode) node;
 			String macroName = macroNode.getMacroName();
-			IMacro macro = macroFactory.get(macroName, context);
+			IMacro macro = context.getMacroFactory().get(macroName, context);
 			MacroInvocation invocation = new MacroInvocation(macro);
 			macroInvocations.add(invocation);
 			printer.print(invocation.marker);

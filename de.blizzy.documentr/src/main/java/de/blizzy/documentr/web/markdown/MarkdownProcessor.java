@@ -46,14 +46,22 @@ public class MarkdownProcessor {
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path);
-		HtmlSerializer serializer = new HtmlSerializer(context, macroFactory);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, macroFactory);
+		HtmlSerializer serializer = new HtmlSerializer(context);
 		List<MacroInvocation> macroInvocations = serializer.getMacroInvocations();
 		String html = serializer.toHtml(rootNode);
 		for (MacroInvocation invocation : macroInvocations) {
 			String macroHtml = invocation.macro.getHtml();
 			html = StringUtils.replace(html, invocation.marker, macroHtml);
 		}
+		html = cleanupHTML(html);
 		return html;
+	}
+
+	private String cleanupHTML(String html) {
+		return html
+			.replaceAll("<p>(<div(?:.|[\r\n])*?</div>)</p>", "$1") //$NON-NLS-1$ //$NON-NLS-2$
+			.replaceAll("<p>(<ul(?:.|[\r\n])*?</ul>)</p>", "$1") //$NON-NLS-1$ //$NON-NLS-2$
+			.replaceAll("<p>(<ol(?:.|[\r\n])*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

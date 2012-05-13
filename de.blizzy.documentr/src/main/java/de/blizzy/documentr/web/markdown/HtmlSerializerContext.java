@@ -18,26 +18,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class HtmlSerializerContext {
+	public static final class Header {
+		public final String text;
+		public final int level;
+
+		private Header(String text, int level) {
+			this.text = text;
+			this.level = level;
+		}
+	}
+	
 	private String projectName;
 	private String branchName;
 	private String pagePath;
+	private MacroFactory macroFactory;
+	private List<Header> headers = new ArrayList<Header>();
 
-	public HtmlSerializerContext(String projectName, String branchName, String pagePath) {
+	public HtmlSerializerContext(String projectName, String branchName, String pagePath, MacroFactory macroFactory) {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
+		Assert.notNull(macroFactory);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;
+		this.macroFactory = macroFactory;
 	}
 
 	public String getProjectName() {
@@ -52,6 +70,10 @@ public class HtmlSerializerContext {
 		return pagePath;
 	}
 	
+	MacroFactory getMacroFactory() {
+		return macroFactory;
+	}
+
 	public String getAttachmentURI(String name) {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
@@ -81,5 +103,18 @@ public class HtmlSerializerContext {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public String markdownToHTML(String markdown) {
+		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, pagePath, macroFactory);
+		return proc.markdownToHTML(markdown);
+	}
+
+	void addHeader(String text, int level) {
+		headers.add(new Header(text, level));
+	}
+	
+	public List<Header> getHeaders() {
+		return Collections.unmodifiableList(headers);
 	}
 }
