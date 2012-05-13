@@ -45,8 +45,8 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
-import de.blizzy.documentr.web.Functions;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Controller
 @RequestMapping("/page")
@@ -57,6 +57,8 @@ public class PageController {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private IPageBranchResolver pageBranchResolver;
+	@Autowired
+	private MacroFactory macroFactory;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -197,10 +199,10 @@ public class PageController {
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
-		
+
+		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, pagePath, macroFactory);
 		Map<String, String> result = new HashMap<String, String>();
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, pagePath);
-		result.put("html", Functions.markdownToHTML(markdown, context)); //$NON-NLS-1$
+		result.put("html", proc.markdownToHTML(markdown)); //$NON-NLS-1$
 		return result;
 	}
 }

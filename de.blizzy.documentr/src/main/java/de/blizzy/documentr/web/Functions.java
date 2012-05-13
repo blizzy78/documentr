@@ -22,10 +22,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.parboiled.Parboiled;
-import org.pegdown.DocumentrParser;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,8 +30,7 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.web.markdown.HtmlSerializer;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
@@ -108,18 +103,10 @@ public final class Functions {
 	}
 	
 	public static String markdownToHTML(String markdown, String projectName, String branchName, String path) {
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path);
-		return markdownToHTML(markdown, context);
+		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, path, macroFactory);
+		return proc.markdownToHTML(markdown);
 	}
 
-	public static String markdownToHTML(String markdown, HtmlSerializerContext context) {
-		DocumentrParser parser = Parboiled.createParser(DocumentrParser.class);
-		PegDownProcessor proc = new PegDownProcessor(parser);
-		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		HtmlSerializer serializer = new HtmlSerializer(context, macroFactory);
-		return serializer.toHtml(rootNode);
-	}
-	
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {
 		try {
 			return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
