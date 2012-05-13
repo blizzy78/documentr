@@ -20,49 +20,11 @@ package de.blizzy.documentr.repository;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
 public class LockManager {
-	private static final class LockKey implements ILock {
-		private String projectName;
-		private String branchName;
-		private boolean central;
-
-		private LockKey(String projectName, String branchName, boolean central) {
-			this.projectName = projectName;
-			this.branchName = branchName;
-			this.central = central;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (o == this) {
-				return true;
-			} else if ((o != null) && o.getClass().equals(getClass())) {
-				LockKey other = (LockKey) o;
-				return new EqualsBuilder()
-					.append(projectName, other.projectName)
-					.append(branchName, other.branchName)
-					.append(central, other.central)
-					.isEquals();
-			}
-			return false;
-		}
-		
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder()
-				.append(projectName)
-				.append(branchName)
-				.append(central)
-				.toHashCode();
-		}
-	}
-	
 	private Set<LockKey> locks = new HashSet<LockKey>();
 
 	ILock lockAll() {
