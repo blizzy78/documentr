@@ -46,10 +46,14 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			}
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
-		} catch (UsernameNotFoundException e) {
+		} catch (UserNotFoundException e) {
 			throw new UsernameNotFoundException(StringUtils.EMPTY);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }
