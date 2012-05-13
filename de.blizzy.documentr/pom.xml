@@ -298,6 +298,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<version>2.4.0</version>
 				<configuration>
 					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
 					<effort>Max</effort>
 					<encoding>UTF-8</encoding>
 					<excludeFilterFile>etc/findbugs/exclude.xml</excludeFilterFile>
