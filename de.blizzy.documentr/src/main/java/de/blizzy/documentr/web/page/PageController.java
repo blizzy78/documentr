@@ -144,7 +144,7 @@ public class PageController {
 		Page page = Page.fromText(parentPagePath, form.getTitle(), form.getText());
 		String path = form.getPath();
 		if (StringUtils.isBlank(path)) {
-			path = Util.generatePageName(form.getTitle());
+			path = Util.simplifyForURL(form.getTitle());
 		}
 		
 		if (bindingResult.hasErrors()) {
@@ -174,7 +174,7 @@ public class PageController {
 	public Map<String, Object> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String title) throws IOException {
 
-		String name = Util.generatePageName(title);
+		String name = Util.simplifyForURL(title);
 		String path = name;
 		boolean pageExists = false;
 		try {

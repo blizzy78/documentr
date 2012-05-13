@@ -17,9 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package org.pegdown;
 
+import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Rule;
+import org.parboiled.annotations.Cached;
 import org.parboiled.common.ArrayBuilder;
 import org.parboiled.matchers.AnyOfMatcher;
+import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.StringVar;
 
 import de.blizzy.documentr.web.markdown.MacroNode;
@@ -131,5 +134,46 @@ public class DocumentrParser extends Parser {
 		String chars = String.valueOf(anyOf.characters.getChars());
 		chars += "{}/"; //$NON-NLS-1$
 		return AnyOf(chars);
+	}
+
+	@Override
+	@Cached
+	@SuppressWarnings("boxing")
+	public Rule LinkSource() {
+		StringBuilderVar url = new StringBuilderVar();
+		return FirstOf(
+				Sequence('(', LinkSource(), ')'),
+				Sequence('<', LinkSource(), '>'),
+				Sequence('#', AnchorName(url)),
+				Sequence(TestNot(AnyOf("#")), Url(url)), //$NON-NLS-1$
+				push(StringUtils.EMPTY)
+		);
+	}
+	
+	@SuppressWarnings("boxing")
+	public Rule AnchorName(StringBuilderVar url) {
+		return Sequence(AnchorNameChars(url), push("#" + url.getString())); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("boxing")
+	public Rule Url(StringBuilderVar url) {
+		return Sequence(UrlChars(url), push(url.getString()));
+	}
+	
+	@SuppressWarnings("boxing")
+	public Rule AnchorNameChars(StringBuilderVar url) {
+		return OneOrMore(
+				Sequence(NoneOf("()<>[]#"), url.append(matchedChar())) //$NON-NLS-1$
+		);
+	}
+
+	@SuppressWarnings("boxing")
+	public Rule UrlChars(StringBuilderVar url) {
+		return OneOrMore(
+				FirstOf(
+						Sequence('\\', AnyOf("()"), url.append(matchedChar())), //$NON-NLS-1$
+						Sequence(TestNot(AnyOf("()>")), Nonspacechar(), url.append(matchedChar())) //$NON-NLS-1$
+				)
+		);
 	}
 }

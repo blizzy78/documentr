@@ -17,27 +17,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.LinkRenderer;
+import org.pegdown.ast.ExpLinkNode;
+import org.pegdown.ast.Node;
 import org.pegdown.ast.WikiLinkNode;
 
-/*
- * allows the following Wiki-style links:
- * 
- * [[URI]]
- * [[URI link text]]
- */
+import de.blizzy.documentr.Util;
+
 class DocumentrLinkRenderer extends LinkRenderer {
+	/*
+	 * allows the following Wiki-style links:
+	 * 
+	 * [[URI]]
+	 * [[URI link text]]
+	 * [[#Headline]]
+	 */
 	@Override
 	public Rendering render(WikiLinkNode node) {
 		String text = node.getText();
-		String uri = StringUtils.substringBefore(text, " "); //$NON-NLS-1$
-		text = StringUtils.substringAfter(text, " "); //$NON-NLS-1$
-		if (StringUtils.isBlank(text)) {
-			text = uri;
+		String uri;
+		if (text.startsWith("#")) { //$NON-NLS-1$
+			text = text.substring(1).trim();
+			uri = "#" + Util.simplifyForURL(text); //$NON-NLS-1$
+		} else {
+			uri = StringUtils.substringBefore(text, " "); //$NON-NLS-1$
+			text = StringUtils.substringAfter(text, " "); //$NON-NLS-1$
+			if (StringUtils.isBlank(text)) {
+				text = uri;
+			}
+			text = text.trim();
 		}
-		text = text.trim();
-		
 		return new Rendering(uri, text);
+	}
+
+	/*
+	 * allows the following link:
+	 * 
+	 * [text](#Headline)
+	 */
+	@Override
+	public Rendering render(ExpLinkNode node, String text) {
+		if (node.url.startsWith("#")) { //$NON-NLS-1$
+			List<Node> children = node.getChildren();
+			Node child = !children.isEmpty() ? children.get(0) : null;
+			String url = "#" + Util.simplifyForURL(node.url.substring(1)); //$NON-NLS-1$
+			node = new ExpLinkNode(node.title, url, child);
+		}
+		return super.render(node, text);
 	}
 }

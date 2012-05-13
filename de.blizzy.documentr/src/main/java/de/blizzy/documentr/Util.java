@@ -37,7 +37,7 @@ public final class Util {
 		return (pagePath != null) ? pagePath.replace('/', ',') : null;
 	}
 
-	public static String generatePageName(String title) {
+	public static String simplifyForURL(String title) {
 		PagePathValidator validator = new PagePathValidator();
 		StringBuilder buf = new StringBuilder();
 		int len = title.length();

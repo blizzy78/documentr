@@ -17,13 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.ToHtmlSerializer;
 import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.HeaderNode;
+import org.pegdown.ast.Node;
 import org.pegdown.ast.SuperNode;
+import org.pegdown.ast.TextNode;
 import org.pegdown.ast.VerbatimNode;
 
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
@@ -76,6 +81,15 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	
 	@Override
 	public void visit(HeaderNode node) {
+		List<Node> children = node.getChildren();
+		if (!children.isEmpty()) {
+			Node childNode = children.get(0);
+			if (childNode instanceof TextNode) {
+				TextNode textNode = (TextNode) childNode;
+				String anchor = Util.simplifyForURL(textNode.getText());
+				printer.print("<a name=\"").print(anchor).print("\"></a>"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 		printTag(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
 	}
 

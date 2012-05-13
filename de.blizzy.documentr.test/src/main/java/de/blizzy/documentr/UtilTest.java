@@ -37,9 +37,9 @@ public class UtilTest {
 	}
 	
 	@Test
-	public void generatePageName() {
+	public void simplifyForURL() {
 		assertEquals("changes-for-1-0-x-code-name-wheatley-xl", //$NON-NLS-1$
-				Util.generatePageName("Changes For 1.0.x: Code Name \"Wheatley\" (XL)")); //$NON-NLS-1$
+				Util.simplifyForURL("Changes For 1.0.x: Code Name \"Wheatley\" (XL)")); //$NON-NLS-1$
 	}
 
 	@Test
