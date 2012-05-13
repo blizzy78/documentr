@@ -193,7 +193,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		
 		List<String> branches = pageStore.getBranchesPageIsSharedWith(PROJECT, branchName, PAGE);
 		assertEquals(expectedBranches.length, branches.size());
-		assertEquals(Sets.newHashSet(expectedBranches), new HashSet<>(branches));
+		assertEquals(Sets.newHashSet(expectedBranches), new HashSet<String>(branches));
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {

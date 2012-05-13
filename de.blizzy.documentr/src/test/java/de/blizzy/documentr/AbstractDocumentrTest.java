@@ -21,8 +21,6 @@ import static junit.framework.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,8 +35,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 public abstract class AbstractDocumentrTest {
 	private static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 	
-	private Set<File> tempDirs = new HashSet<>();
-	private Set<ILockedRepository> repositories = new HashSet<>();
+	private Set<File> tempDirs = new HashSet<File>();
+	private Set<ILockedRepository> repositories = new HashSet<ILockedRepository>();
 	
 	@Before
 	public void setUpTempDirs() {
@@ -63,12 +61,12 @@ public abstract class AbstractDocumentrTest {
 	}
 	
 	protected File createTempDir() {
-		Path tempDir = new File(TEMP_DIR_PATH).toPath();
+		File tempDir = new File(TEMP_DIR_PATH);
 		try {
-			Path dir = Files.createTempDirectory(tempDir, "documentr-tests-"); //$NON-NLS-1$
-			File f = dir.toFile();
-			tempDirs.add(f);
-			return f;
+			File dir = new File(tempDir, "documentr-tests-" + (long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
+			FileUtils.forceMkdir(dir);
+			tempDirs.add(dir);
+			return dir;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
