@@ -333,6 +333,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						</executions>
 						<configuration>
 							<format>xml</format>
+							<instrumentation>
+								<excludes>
+									<exclude>de/blizzy/documentr/**/*Exception.class</exclude>
+									<exclude>de/blizzy/documentr/**/*Test.class</exclude>
+									<exclude>de/blizzy/documentr/TestUtil.class</exclude>
+									<exclude>org/pegdown/DocumentrParser.class</exclude>
+								</excludes>
+							</instrumentation>
 						</configuration>
 					</plugin>
 				</plugins>
