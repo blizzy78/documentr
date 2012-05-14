@@ -30,7 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("userDetailsService")
 public class DocumentrUserDetailsService implements UserDetailsService {
 	@Autowired
 	private UserStore userStore;
