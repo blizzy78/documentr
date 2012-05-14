@@ -281,6 +281,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.1</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>findbugs-maven-plugin</artifactId>
+							<version>2.4.0</version>
+							<configuration>
+								<effort>Max</effort>
+								<encoding>UTF-8</encoding>
+								<excludeFilterFile>etc/findbugs/exclude.xml</excludeFilterFile>
+							</configuration>
+						</plugin>
+					</reportPlugins>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -302,10 +316,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.4.0</version>
 				<configuration>
-					<xmlOutput>true</xmlOutput>
-					<xmlOutputDirectory>target/site</xmlOutputDirectory>
-					<findbugsXmlOutput>true</findbugsXmlOutput>
-					<findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
 					<effort>Max</effort>
 					<encoding>UTF-8</encoding>
 					<excludeFilterFile>etc/findbugs/exclude.xml</excludeFilterFile>
