@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.NotFoundException;
 import de.blizzy.documentr.Util;
-import de.blizzy.documentr.pagestore.IPageBranchResolver;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -56,8 +54,6 @@ public class PageController {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
-	private IPageBranchResolver pageBranchResolver;
-	@Autowired
 	private MacroFactory macroFactory;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -65,17 +61,8 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("permitAll")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model, Authentication authentication) throws IOException {
+			@PathVariable String path, Model model) throws IOException {
 
-		path = Util.toRealPagePath(path);
-
-		if ((authentication == null) || !authentication.isAuthenticated()) {
-			branchName = pageBranchResolver.resolvePageBranch(projectName, branchName, path);
-			if (branchName == null) {
-				return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
-			}
-		}
-		
 		try {
 			path = Util.toRealPagePath(path);
 			model.addAttribute("path", path); //$NON-NLS-1$
