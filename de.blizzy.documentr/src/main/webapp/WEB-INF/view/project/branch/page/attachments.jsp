@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</ul>
 	</c:when>
 	<c:otherwise>
-		<p>No attachments found.</p>
+		<p><spring:message code="noAttachmentsFound"/></p>
 	</c:otherwise>
 </c:choose>
 
