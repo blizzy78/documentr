@@ -43,6 +43,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</password-encoder>
 		</authentication-provider>
 	</authentication-manager>
-	
-	<beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
 </beans:beans>
