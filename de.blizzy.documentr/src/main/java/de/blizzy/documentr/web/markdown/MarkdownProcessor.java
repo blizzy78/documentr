@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Parboiled;
@@ -59,9 +61,15 @@ public class MarkdownProcessor {
 	}
 
 	private String cleanupHTML(String html) {
-		return html
-			.replaceAll("<p>(<div(?:.|[\r\n])*?</div>)</p>", "$1") //$NON-NLS-1$ //$NON-NLS-2$
-			.replaceAll("<p>(<ul(?:.|[\r\n])*?</ul>)</p>", "$1") //$NON-NLS-1$ //$NON-NLS-2$
-			.replaceAll("<p>(<ol(?:.|[\r\n])*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		html = replace(html, "<p>(<div.*?</div>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		html = replace(html, "<p>(<ul.*?</ul>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		html = replace(html, "<p>(<ol.*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		return html;
+	}
+	
+	private String replace(String html, String pattern, String replaceWith) {
+		Pattern p = Pattern.compile(pattern, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+		Matcher matcher = p.matcher(html);
+		return matcher.replaceAll(replaceWith);
 	}
 }
