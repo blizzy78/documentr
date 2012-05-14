@@ -355,6 +355,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 									<exclude>de/blizzy/documentr/ContextConfig.class</exclude>
 									<exclude>de/blizzy/documentr/DocumentrConstants.class</exclude>
 									<exclude>de/blizzy/documentr/TestUtil.class</exclude>
+									<exclude>de/blizzy/documentr/web/WebappInitializer.class</exclude>
 									<exclude>org/pegdown/DocumentrParser.class</exclude>
 								</excludes>
 							</instrumentation>
