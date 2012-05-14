@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr;
 
 import static org.junit.Assert.*;
+
+import org.apache.commons.lang3.StringUtils;
+
 import de.blizzy.documentr.pagestore.Page;
 
 public final class TestUtil {
@@ -74,5 +77,9 @@ public final class TestUtil {
 		
 		// equal hash code for equal objects
 		assertEquals(equal1.hashCode(), equal2.hashCode());
+	}
+	
+	public static String removeViewPrefix(String view) {
+		return view.contains(":") ? StringUtils.substringAfter(view, ":") : view; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

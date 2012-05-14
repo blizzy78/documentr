@@ -15,18 +15,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.access;
+package de.blizzy.documentr.web.access;
 
-import de.blizzy.documentr.NotFoundException;
+import static org.junit.Assert.*;
 
-public class UserNotFoundException extends NotFoundException {
-	private String loginName;
+import org.junit.Test;
 
-	public UserNotFoundException(String loginName) {
-		this.loginName = loginName;
-	}
-	
-	public String getLoginName() {
-		return loginName;
+public class LoginNameValidatorTest {
+	@Test
+	public void isValid() {
+		LoginNameValidator validator = new LoginNameValidator();
+		assertTrue(validator.isValid("admin", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("x/y", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("x,y", null)); //$NON-NLS-1$
 	}
 }

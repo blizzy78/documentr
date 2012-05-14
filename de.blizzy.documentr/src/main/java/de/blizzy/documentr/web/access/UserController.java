@@ -123,4 +123,12 @@ public class UserController {
 		
 		return (loginName != null) ? new UserForm(loginName, password1, password2, disabled, admin) : null;
 	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
+	}
+
+	void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
 }
