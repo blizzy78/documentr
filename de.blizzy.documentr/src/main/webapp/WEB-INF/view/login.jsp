@@ -20,18 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<dt:breadcrumbs>
+	<li class="active"><spring:message code="title.login"/></li>
+</dt:breadcrumbs>
+
 <dt:page>
 
-<div class="page-header"><h1><spring:message code="title.login"/></h1></div>
-
-<form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well">
+<form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well span2 offset4 loginForm">
 	<fieldset class="control-group">
 		<label><spring:message code="label.loginName"/>:</label>
-		<input type="text" name="j_username"/>
+		<input type="text" name="j_username" class="input-medium"/>
 	</fieldset>
 	<fieldset class="control-group">
 		<label><spring:message code="label.password"/>:</label>
-		<input type="password" name="j_password"/>
+		<input type="password" name="j_password" class="input-medium"/>
 	</fieldset>
 	<fieldset class="control-group">
 		<input type="submit" value="<spring:message code="button.login"/>" class="btn btn-primary"/>

@@ -78,3 +78,7 @@ table.table-documentr {
 .breadcrumb li.btn-toolbar {
 	line-height: 1px;
 }
+
+.loginForm {
+	margin-top: 100pt;
+}
