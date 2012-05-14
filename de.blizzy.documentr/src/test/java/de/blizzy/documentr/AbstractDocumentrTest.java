@@ -73,6 +73,8 @@ public abstract class AbstractDocumentrTest {
 	}
 	
 	protected void register(ILockedRepository repository) {
-		repositories.add(repository);
+		if (repository != null) {
+			repositories.add(repository);
+		}
 	}
 }
