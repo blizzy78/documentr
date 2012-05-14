@@ -45,6 +45,10 @@ public class Settings {
 		dataDir = new File(dataDirParam);
 	}
 	
+	void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+
 	public File getDocumentrDataDir() {
 		return dataDir;
 	}
