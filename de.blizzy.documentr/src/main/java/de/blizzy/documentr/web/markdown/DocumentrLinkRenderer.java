@@ -32,25 +32,39 @@ class DocumentrLinkRenderer extends LinkRenderer {
 	 * allows the following Wiki-style links:
 	 * 
 	 * [[URI]]
+	 * [[URI | nofollow]]
 	 * [[URI link text]]
+	 * [[URI link text | nofollow]]
 	 * [[#Headline]]
 	 */
 	@Override
 	public Rendering render(WikiLinkNode node) {
 		String text = node.getText();
 		String uri;
+		boolean noFollow = false;
 		if (text.startsWith("#")) { //$NON-NLS-1$
 			text = text.substring(1).trim();
 			uri = "#" + Util.simplifyForURL(text); //$NON-NLS-1$
 		} else {
-			uri = StringUtils.substringBefore(text, " "); //$NON-NLS-1$
+			uri = StringUtils.substringBefore(text, " ").trim(); //$NON-NLS-1$
 			text = StringUtils.substringAfter(text, " "); //$NON-NLS-1$
+			String params = StringUtils.substringAfter(text, "|").trim(); //$NON-NLS-1$
+			text = StringUtils.substringBefore(text, "|"); //$NON-NLS-1$
+
 			if (StringUtils.isBlank(text)) {
 				text = uri;
 			}
 			text = text.trim();
+			
+			if (params.equalsIgnoreCase("nofollow")) { //$NON-NLS-1$
+				noFollow = true;
+			}
 		}
-		return new Rendering(uri, text);
+		Rendering rendering = new Rendering(uri, text);
+		if (noFollow) {
+			rendering.withAttribute(Attribute.NO_FOLLOW);
+		}
+		return rendering;
 	}
 
 	/*

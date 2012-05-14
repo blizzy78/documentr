@@ -20,6 +20,7 @@ package de.blizzy.documentr.web.markdown;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.pegdown.LinkRenderer.Attribute;
 import org.pegdown.LinkRenderer.Rendering;
 import org.pegdown.ast.WikiLinkNode;
 
@@ -33,10 +34,28 @@ public class LinkRendererTest {
 	}
 	
 	@Test
+	public void renderWikiLinkWithNoFollow() {
+		WikiLinkNode node = new WikiLinkNode("foo | nofollow"); //$NON-NLS-1$
+		Rendering rendering = new DocumentrLinkRenderer().render(node);
+		assertEquals("foo", rendering.href); //$NON-NLS-1$
+		assertEquals("foo", rendering.text); //$NON-NLS-1$
+		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
+	}
+	
+	@Test
 	public void renderWikiLinkWithText() {
 		WikiLinkNode node = new WikiLinkNode("foo link text"); //$NON-NLS-1$
 		Rendering rendering = new DocumentrLinkRenderer().render(node);
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void renderWikiLinkWithTextAndNoFollow() {
+		WikiLinkNode node = new WikiLinkNode("foo link text | nofollow"); //$NON-NLS-1$
+		Rendering rendering = new DocumentrLinkRenderer().render(node);
+		assertEquals("foo", rendering.href); //$NON-NLS-1$
+		assertEquals("link text", rendering.text); //$NON-NLS-1$
+		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
 	}
 }
