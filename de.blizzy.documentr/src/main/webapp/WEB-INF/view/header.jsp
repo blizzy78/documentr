@@ -35,6 +35,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <script type="text/javascript">
 
+$.fn.extend({
+	showModal: function(options) {
+		this.modal(options);
+		this.position({
+			my: 'center center',
+			at: 'center center',
+			of: window
+		});
+	},
+	
+	hideModal: function() {
+		this.modal('hide');
+	}
+});
+
 $(function() {
 	$.ajaxSetup({
 		cache: false

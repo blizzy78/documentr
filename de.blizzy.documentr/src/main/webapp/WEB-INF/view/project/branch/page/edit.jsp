@@ -78,21 +78,12 @@ function showPreview() {
 		},
 		success: function(result) {
 			$('#previewText').html(result.html);
-			$('#preview').modal({
+			$('#preview').showModal({
 				backdrop: true,
 				keyboard: true
 			});
-			$('#preview').position({
-				my: 'center center',
-				at: 'center center',
-				of: window
-			});
 		}
 	});
-}
-
-function hidePreview() {
-	$('#preview').modal('hide');
 }
 
 </dt:headerJS>
@@ -143,12 +134,12 @@ function hidePreview() {
 
 <div class="modal" id="preview" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="hidePreview();">×</button>
+		<button class="close" onclick="$('#preview').hideModal();">×</button>
 		<h3><spring:message code="title.pagePreview"/></h3>
 	</div>
 	<div class="modal-body" id="previewText"></div>
 	<div class="modal-footer">
-		<a href="javascript:hidePreview();" class="btn"><spring:message code="button.close"/></a>
+		<a href="javascript:$('#preview').hideModal();" class="btn"><spring:message code="button.close"/></a>
 	</div>
 </div>
 
