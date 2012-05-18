@@ -35,15 +35,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <p>
 <c:set var="action"><c:url value="/project/save"/></c:set>
-<form:form commandName="projectForm" action="${action}" method="POST" cssClass="well">
-	<fieldset class="control-group <spring:hasBindErrors name="projectForm">error</spring:hasBindErrors>">
-		<form:label path="name"><spring:message code="label.name"/>:</form:label>
-		<form:input path="name" cssClass="input-xlarge"/>
-		<spring:hasBindErrors name="projectForm"><span class="help-inline"><form:errors path="name"/></span></spring:hasBindErrors>
-	</fieldset>
-	<fieldset class="control-group">
-		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<a href="<c:url value="/"/>" class="btn"><spring:message code="button.cancel"/></a>
+<form:form commandName="projectForm" action="${action}" method="POST" cssClass="well form-inline">
+	<fieldset>
+		<div class="control-group <spring:hasBindErrors name="projectForm">error</spring:hasBindErrors>">
+			<form:label path="name" cssClass="control-label"><spring:message code="label.name"/>:</form:label>
+			<form:input path="name" cssClass="input-xlarge"/>
+			<spring:hasBindErrors name="projectForm"><span class="help-inline"><form:errors path="name"/></span></spring:hasBindErrors>
+		</div>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<a href="<c:url value="/"/>" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
 	</fieldset>
 </form:form>
 </p>

@@ -44,20 +44,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <div class="page-header"><h1><spring:message code="title.editAttachment"/></h1></div>
 
 <form action="<c:url value="/attachment/save/${projectName}/${branchName}/${pagePathUrl}"/>"
-	method="post" enctype="multipart/form-data" class="well">
-	
-	<input type="hidden" name="projectName" value="<c:out value="${projectName}"/>"/>
-	<input type="hidden" name="branchName" value="<c:out value="${branchName}"/>"/>
-	<input type="hidden" name="pagePath" value="<c:out value="${pagePath}"/>"/>
+	method="post" enctype="multipart/form-data" class="well form-inline">
 
-	<fieldset class="control-group">
-		<label>File:</label>
-		<input type="file" name="file" class="input-file"/>
-	</fieldset>
-	<fieldset class="control-group">
-		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<a href="<c:url value="/page/${projectName}/${branchName}/${pagePathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
-	</fieldset>
+	<fieldset>
+		<input type="hidden" name="projectName" value="<c:out value="${projectName}"/>"/>
+		<input type="hidden" name="branchName" value="<c:out value="${branchName}"/>"/>
+		<input type="hidden" name="pagePath" value="<c:out value="${pagePath}"/>"/>
+	
+		<div class="control-group">
+			<label class="control-label">File:</label>
+			<input type="file" name="file" class="input-file"/>
+		</div>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<a href="<c:url value="/page/${projectName}/${branchName}/${pagePathUrl}"/>" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</fieldset>	
 </form>
 
 </dt:page>

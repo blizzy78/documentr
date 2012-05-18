@@ -82,3 +82,17 @@ table.table-documentr {
 .loginForm {
 	margin-top: 100pt;
 }
+
+.form-horizontal .control-label {
+	text-align: left;
+}
+
+.well .form-actions {
+	margin-bottom: 0;
+	padding: 17px 20px 0;
+}
+
+.form-horizontal .form-actions,
+.form-inline .form-actions {
+	padding-left: 0;
+}

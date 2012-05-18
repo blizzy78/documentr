@@ -37,24 +37,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <p>
 <c:set var="action"><c:url value="/branch/save/${branchForm.projectName}"/></c:set>
-<form:form commandName="branchForm" action="${action}" method="POST" cssClass="well">
-	<fieldset class="control-group <spring:hasBindErrors name="branchForm">error</spring:hasBindErrors>">
-		<form:label path="name"><spring:message code="label.name"/>:</form:label>
-		<form:input path="name" cssClass="input-xlarge"/>
-		<spring:hasBindErrors name="branchForm"><span class="help-inline"><form:errors path="name"/></span></spring:hasBindErrors>
-	</fieldset>
-	<c:set var="branches" value="${d:listProjectBranches(branchForm.projectName)}"/>
-	<c:if test="${!empty branches}">
-		<fieldset>
-			<form:label path="startingBranch"><spring:message code="label.branchFrom"/>:</form:label>
-			<form:select path="startingBranch">
-				<form:options items="${branches}"/>
-			</form:select>
-		</fieldset>
-	</c:if>
+<c:set var="branches" value="${d:listProjectBranches(branchForm.projectName)}"/>
+<c:choose>
+	<c:when test="${!empty branches}"><c:set var="cssClass" value="form-horizontal"/></c:when>
+	<c:otherwise><c:set var="cssClass" value="form-inline"/></c:otherwise>
+</c:choose>
+<form:form commandName="branchForm" action="${action}" method="POST" cssClass="well ${cssClass}">
 	<fieldset>
-		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<a href="<c:url value="/project/${branchForm.projectName}"/>" class="btn"><spring:message code="button.cancel"/></a>
+		<div class="control-group <spring:hasBindErrors name="branchForm">error</spring:hasBindErrors>">
+			<form:label path="name" cssClass="control-label"><spring:message code="label.name"/>:</form:label>
+			<form:input path="name" cssClass="input-xlarge"/>
+			<spring:hasBindErrors name="branchForm"><span class="help-inline"><form:errors path="name"/></span></spring:hasBindErrors>
+		</div>
+		<c:if test="${!empty branches}">
+			<div class="control-group">
+				<form:label path="startingBranch" cssClass="control-label"><spring:message code="label.branchFrom"/>:</form:label>
+				<form:select path="startingBranch">
+					<form:options items="${branches}"/>
+				</form:select>
+			</div>
+		</c:if>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<a href="<c:url value="/project/${branchForm.projectName}"/>" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
 	</fieldset>
 </form:form>
 </p>

@@ -107,27 +107,29 @@ function showPreview() {
 
 <p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
-<form:form commandName="pageForm" action="${action}" method="POST" cssClass="well">
-	<form:hidden path="parentPagePath"/>
-	<c:set var="errorText"><form:errors path="title"/></c:set>
-	<fieldset class="control-group <c:if test="${!empty errorText}">error</c:if>">
-		<form:label path="title"><spring:message code="label.title"/>:</form:label>
-		<form:input path="title" cssClass="input-xlarge"/>
-		<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
-	</fieldset>
-	<fieldset id="pathFieldset" class="control-group">
-		<form:label path="path"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
-		<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
-		<form:hidden path="path"/>
-	</fieldset>
-	<fieldset class="control-group">
-		<form:label path="text"><spring:message code="label.contents"/>:</form:label>
-		<form:textarea path="text" cssClass="span11 code" rows="20"/>
-		<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
-	</fieldset>
-	<fieldset class="control-group">
-		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
+<form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal">
+	<fieldset>
+		<form:hidden path="parentPagePath"/>
+		<c:set var="errorText"><form:errors path="title"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="title" cssClass="control-label"><spring:message code="label.title"/>:</form:label>
+			<form:input path="title" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<div id="pathFieldset" class="control-group">
+			<form:label path="path" cssClass="control-label"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
+			<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
+			<form:hidden path="path"/>
+		</div>
+		<div class="control-group">
+			<form:label path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
+			<form:textarea path="text" cssClass="span11 code" rows="20"/>
+			<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
+		</div>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
 	</fieldset>
 </form:form>
 </p>
