@@ -175,7 +175,7 @@ public class PageController {
 			@PathVariable String parentPagePath, @RequestParam String title) throws IOException {
 
 		String name = Util.simplifyForURL(title);
-		String path = parentPagePath + "/" + name; //$NON-NLS-1$
+		String path = Util.toRealPagePath(parentPagePath) + "/" + name; //$NON-NLS-1$
 		boolean pageExists = false;
 		try {
 			Page page = pageStore.getPage(projectName, branchName, path);
