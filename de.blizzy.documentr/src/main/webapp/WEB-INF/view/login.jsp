@@ -30,11 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<fieldset>
 		<div class="control-group">
 			<label class="control-label"><spring:message code="label.loginName"/>:</label>
-			<input type="text" name="j_username" class="input-medium"/>
+			<input type="text" name="j_username" class="input-large"/>
 		</div>
 		<div class="control-group">
 			<label class="control-label"><spring:message code="label.password"/>:</label>
-			<input type="password" name="j_password" class="input-medium"/>
+			<input type="password" name="j_password" class="input-large"/>
 		</div>
 		<div class="form-actions">
 			<input type="submit" value="<spring:message code="button.login"/>" class="btn btn-primary"/>
