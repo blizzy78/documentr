@@ -66,7 +66,10 @@ public class PageController {
 		try {
 			path = Util.toRealPagePath(path);
 			model.addAttribute("path", path); //$NON-NLS-1$
+			model.addAttribute("pageName", //$NON-NLS-1$
+					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
 			Page page = pageStore.getPage(projectName, branchName, path);
+			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
 			model.addAttribute("text", page.getText()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$
@@ -201,5 +204,20 @@ public class PageController {
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("html", proc.markdownToHTML(markdown)); //$NON-NLS-1$
 		return result;
+	}
+	
+	@RequestMapping(value="/copyToBranch/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			method=RequestMethod.POST)
+	@PreAuthorize("isAuthenticated()")
+	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam String targetBranchName) throws IOException {
+
+		path = Util.toRealPagePath(path);
+		Page page = pageStore.getPage(projectName, branchName, path);
+		pageStore.savePage(projectName, targetBranchName, path, page);
+		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Util.toURLPagePath(path);
 	}
 }

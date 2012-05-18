@@ -23,6 +23,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<sec:authorize access="isAuthenticated()">
+<dt:headerJS>
+
+function showCopyToBranchDialog() {
+	$('#copy-dialog').showModal({backdrop: true, keyboard: true});
+	copyToBranchSelected();
+}
+
+function copyToBranchSelected() {
+	var button = $('#copyToBranchButton');
+	button.addClass('disabled');
+	
+	var el = $('#copyToBranchForm').find('select');
+	var branch = el.val();
+	$.ajax({
+		url: '<c:url value="/page/generateName/${projectName}/"/>' + branch + '/<c:out value="${d:toURLPagePath(parentPagePath)}"/>/json',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			title: '<c:out value="${pageName}"/>'
+		},
+		success: function(result) {
+			if (result.exists) {
+				button.removeClass('btn-primary').addClass('btn-warning');
+				button.text('<spring:message code="button.overwrite"/>');
+			} else {
+				button.removeClass('btn-warning').addClass('btn-primary');
+				button.text('<spring:message code="button.copy"/>');
+			}
+		},
+		complete: function() {
+			button.removeClass('disabled');
+		}
+	});
+}
+
+</dt:headerJS>
+</sec:authorize>
+
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
@@ -63,6 +102,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</a></li>
 				<li class="divider"></li>
 				<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
+				
+				<%-- doesn't work correctly for "home" page --%>
+				<c:if test="${path ne 'home'}">
+					<li class="divider"></li>
+					<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+				</c:if>
 			</ul>
 		</div>
 	</div>
@@ -85,6 +130,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<p class="spacer">
 	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 	</p>
+
+	<div class="modal" id="copy-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#copy-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.copyPageToBranch"/></h3>
+		</div>
+		<div class="modal-body">
+			<form id="copyToBranchForm" action="<c:url value="/page/copyToBranch/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+				<fieldset class="control-group">
+					<label class="control-label"><spring:message code="label.copyToBranch"/>:</label>
+					<select name="targetBranchName" onchange="copyToBranchSelected();">
+						<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
+						<c:forEach var="branch" items="${branches}">
+							<c:if test="${branch ne branchName}">
+								<option value="<c:out value="${branch}"/>"><c:out value="${branch}"/></option>
+							</c:if>
+						</c:forEach>
+					</select>
+				</fieldset>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<a id="copyToBranchButton" href="javascript:$('#copyToBranchForm').submit();" class="btn btn-primary"><spring:message code="button.copy"/></a>
+			<a href="javascript:void($('#copy-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
 </sec:authorize>
 
 </dt:page>
