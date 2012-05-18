@@ -40,6 +40,7 @@ import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.NotFoundException;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
@@ -141,7 +142,16 @@ public class PageController {
 		}
 
 		String fullPagePath = (parentPagePath != null) ? (parentPagePath + "/" + path) : path; //$NON-NLS-1$
-		pageStore.savePage(form.getProjectName(), form.getBranchName(), fullPagePath, page);
+		Page oldPage = null;
+		try {
+			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), fullPagePath);
+		} catch (PageNotFoundException e) {
+			// okay
+		}
+		if ((oldPage == null) || !page.equals(oldPage)) {
+			pageStore.savePage(form.getProjectName(), form.getBranchName(), fullPagePath, page);
+		}
+
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(fullPagePath);
 	}

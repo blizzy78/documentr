@@ -19,6 +19,8 @@ package de.blizzy.documentr.pagestore;
 
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 public class Page {
 	private String parentPagePath;
 	private String title;
@@ -66,5 +68,21 @@ public class Page {
 
 	public String getContentType() {
 		return contentType;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		} else if ((o != null) && o.getClass().equals(getClass())) {
+			Page other = (Page) o;
+			return new EqualsBuilder()
+				.append(parentPagePath, other.parentPagePath)
+				.append(title, other.title)
+				.append(data, other.data)
+				.append(contentType, other.contentType)
+				.isEquals();
+		}
+		return false;
 	}
 }
