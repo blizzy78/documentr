@@ -46,14 +46,14 @@ $(function() {
 		var value = el.val();
 		if (value.length > 0) {
 			$.ajax({
-				url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/json"/>',
+				url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
 				type: 'POST',
 				dataType: 'json',
 				data: {
 					title: value
 				},
 				success: function(result) {
-					$('#pageForm').find('#path').val(result.name);
+					$('#pageForm').find('#path').val(result.path);
 					if (result.exists) {
 						fieldset.addClass('warning');
 						fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +

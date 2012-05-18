@@ -166,15 +166,16 @@ public class PageController {
 	}
 	
 	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	@PreAuthorize("permitAll")
-	public Map<String, Object> isPageExistent(@PathVariable String projectName, @PathVariable String branchName,
-			@RequestParam String title) throws IOException {
+	public Map<String, Object> generateName(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String parentPagePath, @RequestParam String title) throws IOException {
 
 		String name = Util.simplifyForURL(title);
-		String path = name;
+		String path = parentPagePath + "/" + name; //$NON-NLS-1$
 		boolean pageExists = false;
 		try {
 			Page page = pageStore.getPage(projectName, branchName, path);
@@ -184,7 +185,7 @@ public class PageController {
 		}
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("name", name); //$NON-NLS-1$
+		result.put("path", path); //$NON-NLS-1$
 		result.put("exists", Boolean.valueOf(pageExists)); //$NON-NLS-1$
 		return result;
 	}
