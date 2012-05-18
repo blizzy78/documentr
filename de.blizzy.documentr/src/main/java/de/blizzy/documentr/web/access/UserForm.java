@@ -20,11 +20,9 @@ package de.blizzy.documentr.web.access;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class UserForm {
 	@NotNull(message="{user.loginName.blank}")
-	@NotEmpty(message="{user.loginName.blank}")
 	@NotBlank(message="{user.loginName.blank}")
 	@ValidLoginName
 	private String loginName;

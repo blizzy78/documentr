@@ -20,7 +20,6 @@ package de.blizzy.documentr.web.page;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import de.blizzy.documentr.web.branch.BranchNameNotBlacklisted;
 import de.blizzy.documentr.web.branch.ValidBranchName;
@@ -30,14 +29,12 @@ import de.blizzy.documentr.web.project.ValidProjectName;
 
 public class PageForm {
 	@NotNull(message="{project.name.blank}")
-	@NotEmpty(message="{project.name.blank}")
 	@NotBlank(message="{project.name.blank}")
 	@ValidProjectName
 	@ProjectNameNotBlacklisted
 	@ProjectExists
 	private String projectName;
 	@NotNull(message="{branch.name.blank}")
-	@NotEmpty(message="{branch.name.blank}")
 	@NotBlank(message="{branch.name.blank}")
 	@ValidBranchName
 	@BranchNameNotBlacklisted
@@ -49,7 +46,6 @@ public class PageForm {
 	@PagePathNotBlacklisted
 	private String parentPagePath;
 	@NotNull(message="{page.title.blank}")
-	@NotEmpty(message="{page.title.blank}")
 	@NotBlank(message="{page.title.blank}")
 	private String title;
 	private String text;
