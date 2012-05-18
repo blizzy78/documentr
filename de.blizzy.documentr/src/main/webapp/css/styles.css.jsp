@@ -33,7 +33,7 @@ textarea.code {
 	font-size: 12px;
 }
 
-.modal {
+.modal.modal-wide {
 	width: 800px;
 }
 

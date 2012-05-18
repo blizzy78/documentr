@@ -132,7 +132,7 @@ function showPreview() {
 </form:form>
 </p>
 
-<div class="modal" id="preview" style="display: none;">
+<div class="modal modal-wide" id="preview" style="display: none;">
 	<div class="modal-header">
 		<button class="close" onclick="$('#preview').hideModal();">×</button>
 		<h3><spring:message code="title.pagePreview"/></h3>
