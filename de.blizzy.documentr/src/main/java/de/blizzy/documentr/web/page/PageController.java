@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.NotFoundException;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
@@ -71,7 +70,7 @@ public class PageController {
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
 			model.addAttribute("text", page.getText()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$
-		} catch (NotFoundException e) {
+		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
 		}
 	}
@@ -107,7 +106,7 @@ public class PageController {
 					page.getTitle(), page.getText());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
-		} catch (NotFoundException e) {
+		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
 		}
 	}
@@ -180,7 +179,7 @@ public class PageController {
 		try {
 			Page page = pageStore.getPage(projectName, branchName, path);
 			pageExists = page != null;
-		} catch (NotFoundException e) {
+		} catch (PageNotFoundException e) {
 			// okay
 		}
 
