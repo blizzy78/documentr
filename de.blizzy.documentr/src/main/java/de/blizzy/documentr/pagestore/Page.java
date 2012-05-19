@@ -20,6 +20,7 @@ package de.blizzy.documentr.pagestore;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Page {
 	private String parentPagePath;
@@ -84,5 +85,15 @@ public class Page {
 				.isEquals();
 		}
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(parentPagePath)
+			.append(title)
+			.append(data)
+			.append(contentType)
+			.toHashCode();
 	}
 }
