@@ -86,4 +86,8 @@ public final class TestUtil {
 	public static void assertRedirect(String view) {
 		assertTrue(view.startsWith("redirect:")); //$NON-NLS-1$
 	}
+	
+	public static void assertForward(String view) {
+		assertTrue(view.startsWith("forward:")); //$NON-NLS-1$
+	}
 }
