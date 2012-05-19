@@ -222,7 +222,7 @@ public class PageController {
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
-	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
+	public String deletePage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path) throws IOException {
 		
 		path = Util.toRealPagePath(path);

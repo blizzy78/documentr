@@ -168,6 +168,15 @@ public class PageControllerTest {
 				argPage(PARENT_PAGE, "title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
+	@Test
+	public void deletePage() throws IOException {
+		String view = pageController.deletePage(PROJECT, BRANCH, PAGE_PATH_URL);
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+		
+		verify(pageStore).deletePage(PROJECT, BRANCH, PAGE_PATH);
+	}
+	
 	private PageForm argPageForm(final String projectName, final String branchName, final String path,
 			final String parentPagePath, final String title, final String text) {
 		
