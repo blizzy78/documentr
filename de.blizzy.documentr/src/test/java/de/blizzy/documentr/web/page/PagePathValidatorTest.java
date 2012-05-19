@@ -17,28 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.page;
 
-import java.util.regex.Pattern;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
-
-public class PagePathBlacklistValidator implements ConstraintValidator<PagePathNotBlacklisted, String> {
-	@Override
-	public void initialize(PagePathNotBlacklisted annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-
-		value = Util.toRealPagePath(value);
-		return !Pattern.matches("^" + DocumentrConstants.PAGE_PATHS_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
+public class PagePathValidatorTest {
+	@Test
+	public void isValid() {
+		PagePathValidator validator = new PagePathValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("foo", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("foo/bar", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("foo,bar", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid(".foo", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("foo/.bar", null)); //$NON-NLS-1$
 	}
 }

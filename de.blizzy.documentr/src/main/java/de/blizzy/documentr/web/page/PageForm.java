@@ -40,10 +40,8 @@ public class PageForm {
 	@BranchNameNotBlacklisted
 	private String branchName;
 	@ValidPagePath
-	@PagePathNotBlacklisted
 	private String path;
 	@ValidPagePath
-	@PagePathNotBlacklisted
 	private String parentPagePath;
 	@NotNull(message="{page.title.blank}")
 	@NotBlank(message="{page.title.blank}")
