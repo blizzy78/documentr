@@ -25,6 +25,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -50,6 +51,16 @@ public class UserControllerTest {
 		userController = new UserController();
 		userController.setUserStore(userStore);
 		userController.setPasswordEncoder(passwordEncoder);
+	}
+	
+	@Test
+	public void addUser() {
+		Model model = mock(Model.class);
+		String view = userController.addUser(model);
+		assertEquals("/user/edit", view); //$NON-NLS-1$
+		
+		verify(model).addAttribute(eq("userForm"), //$NON-NLS-1$
+				argUserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, false, false));
 	}
 	
 	@Test
@@ -164,7 +175,7 @@ public class UserControllerTest {
 	private UserForm argUserForm(final String loginName, final String password1, final String password2,
 			final boolean disabled, final boolean admin) {
 		
-		ArgumentMatcher<UserForm> matcher = new ArgumentMatcher<UserForm>() {
+		Matcher<UserForm> matcher = new ArgumentMatcher<UserForm>() {
 			@Override
 			public boolean matches(Object argument) {
 				UserForm form = (UserForm) argument;

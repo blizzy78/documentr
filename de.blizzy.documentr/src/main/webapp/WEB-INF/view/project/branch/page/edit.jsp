@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="isAuthenticated()">
 
 <c:choose>
-	<c:when test="${(!empty pageForm.parentPagePath) and (!empty pageForm.path)}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}/${pageForm.path}"/></c:when>
 	<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>
 	<c:when test="${!empty pageForm.parentPagePath}"><c:set var="hierarchyPagePath" value="${pageForm.parentPagePath}"/></c:when>
 	<c:otherwise><c:set var="hierarchyPagePath" value="home"/></c:otherwise>

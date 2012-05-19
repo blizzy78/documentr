@@ -101,9 +101,6 @@ public class PageController {
 		try {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path);
-			if (path.contains("/")) { //$NON-NLS-1$
-				path = StringUtils.substringAfterLast(path, "/"); //$NON-NLS-1$
-			}
 			PageForm form = new PageForm(projectName, branchName,
 					path, page.getParentPagePath(),
 					page.getTitle(), page.getText());
@@ -143,19 +140,18 @@ public class PageController {
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		}
 
-		String fullPagePath = (parentPagePath != null) ? (parentPagePath + "/" + path) : path; //$NON-NLS-1$
 		Page oldPage = null;
 		try {
-			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), fullPagePath);
+			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), path);
 		} catch (PageNotFoundException e) {
 			// okay
 		}
 		if ((oldPage == null) || !page.equals(oldPage)) {
-			pageStore.savePage(form.getProjectName(), form.getBranchName(), fullPagePath, page);
+			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page);
 		}
 
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(fullPagePath);
+			Util.toURLPagePath(path);
 	}
 	
 	@ModelAttribute
@@ -219,5 +215,17 @@ public class PageController {
 		pageStore.savePage(projectName, targetBranchName, path, page);
 		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Util.toURLPagePath(path);
+	}
+
+	void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
+	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
+
+	void setMacroFactory(MacroFactory macroFactory) {
+		this.macroFactory = macroFactory;
 	}
 }
