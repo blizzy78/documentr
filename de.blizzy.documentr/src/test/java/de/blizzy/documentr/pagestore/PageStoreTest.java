@@ -222,6 +222,16 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(expected, result);
 	}
 	
+	@Test
+	public void deletePage() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
+		pageStore.deletePage(PROJECT, BRANCH_1, "foo"); //$NON-NLS-1$
+		List<String> result = pageStore.listPagePaths(PROJECT, BRANCH_1);
+		assertEquals(Collections.emptySet(), new HashSet<String>(result));
+	}
+
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
 		

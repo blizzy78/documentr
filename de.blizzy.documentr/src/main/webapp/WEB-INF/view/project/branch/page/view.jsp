@@ -23,6 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<%
+long random = (long) (Math.random() * Long.MAX_VALUE);
+pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
+%>
+
 <sec:authorize access="isAuthenticated()">
 <dt:headerJS>
 
@@ -57,6 +62,10 @@ function copyToBranchSelected() {
 			button.removeClass('disabled');
 		}
 	});
+}
+
+function showDeleteDialog() {
+	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
 }
 
 </dt:headerJS>
@@ -103,10 +112,12 @@ function copyToBranchSelected() {
 				<li class="divider"></li>
 				<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
 				
-				<%-- doesn't work correctly for "home" page --%>
 				<c:if test="${path ne 'home'}">
 					<li class="divider"></li>
+					<%-- doesn't work correctly for "home" page --%>
 					<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+					<%-- "home" page must not be deleted --%>
+					<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
 				</c:if>
 			</ul>
 		</div>
@@ -154,6 +165,20 @@ function copyToBranchSelected() {
 		<div class="modal-footer">
 			<a id="copyToBranchButton" href="javascript:$('#copyToBranchForm').submit();" class="btn btn-primary"><spring:message code="button.copy"/></a>
 			<a href="javascript:void($('#copy-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
+
+	<div class="modal" id="delete-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#delete-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.deletePage"/></h3>
+		</div>
+		<div class="modal-body">
+			<spring:message code="deletePageX" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/>
+		</div>
+		<div class="modal-footer">
+			<a href="<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-danger"><spring:message code="button.delete"/></a>
+			<a href="javascript:void($('#delete-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
 </sec:authorize>

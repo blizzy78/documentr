@@ -217,6 +217,19 @@ public class PageController {
 				Util.toURLPagePath(path);
 	}
 
+	@RequestMapping(value="/delete/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			method=RequestMethod.GET)
+	@PreAuthorize("isAuthenticated()")
+	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path) throws IOException {
+		
+		path = Util.toRealPagePath(path);
+		pageStore.deletePage(projectName, branchName, path);
+		return "redirect:/page/" + projectName + "/" + branchName + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	void setPageStore(PageStore pageStore) {
 		this.pageStore = pageStore;
 	}

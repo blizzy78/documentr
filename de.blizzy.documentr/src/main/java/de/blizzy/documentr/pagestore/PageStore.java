@@ -391,4 +391,27 @@ public class PageStore {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
+
+	public void deletePage(String projectName, String branchName, String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File file = toFile(new File(workingDir, PAGES_DIR_NAME), path + PAGE_SUFFIX);
+			if (file.isFile()) {
+				FileUtils.forceDelete(file);
+				Git git = Git.wrap(repo.r());
+				git.commit().setMessage("delete " + path).call(); //$NON-NLS-1$
+				git.push().call();
+			}
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
 }
