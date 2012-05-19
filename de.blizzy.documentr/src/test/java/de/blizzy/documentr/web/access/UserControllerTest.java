@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -31,7 +32,6 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 
-import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
@@ -59,7 +59,8 @@ public class UserControllerTest {
 		when(userStore.getUser("user")).thenThrow(new UserNotFoundException("user")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/users", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/users", removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 
 		String passwordHash = passwordEncoder.encodePassword("pw", "user"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -75,7 +76,8 @@ public class UserControllerTest {
 		when(userStore.getUser("user")).thenReturn(oldUser); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/users", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/users", removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		
 		String passwordHash = passwordEncoder.encodePassword("newPW", "user"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -91,7 +93,8 @@ public class UserControllerTest {
 		when(userStore.getUser("user")).thenReturn(oldUser); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/users", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/users", removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		
 		verify(userStore).saveUser(argUser("user", "oldPW", true, false)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -103,7 +106,7 @@ public class UserControllerTest {
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/user/edit", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/user/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("password1")); //$NON-NLS-1$
 	}
@@ -114,7 +117,7 @@ public class UserControllerTest {
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/user/edit", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/user/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("password2")); //$NON-NLS-1$
 	}
@@ -125,7 +128,7 @@ public class UserControllerTest {
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult);
-		assertEquals("/user/edit", TestUtil.removeViewPrefix(view)); //$NON-NLS-1$
+		assertEquals("/user/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("password1")); //$NON-NLS-1$
 		assertTrue(bindingResult.hasFieldErrors("password2")); //$NON-NLS-1$

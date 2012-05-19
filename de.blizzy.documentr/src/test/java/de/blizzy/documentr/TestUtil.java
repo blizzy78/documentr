@@ -82,4 +82,8 @@ public final class TestUtil {
 	public static String removeViewPrefix(String view) {
 		return view.contains(":") ? StringUtils.substringAfter(view, ":") : view; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	public static void assertRedirect(String view) {
+		assertTrue(view.startsWith("redirect:")); //$NON-NLS-1$
+	}
 }
