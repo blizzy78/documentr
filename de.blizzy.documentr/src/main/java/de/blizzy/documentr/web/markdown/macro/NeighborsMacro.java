@@ -72,6 +72,9 @@ class NeighborsMacro extends AbstractMacro {
 			} else {
 				parentBuf.append(inner);
 			}
+			parentBuf.append("</ul>") //$NON-NLS-1$
+				.append("</li>"); //$NON-NLS-1$
+			
 			buf.append(printParent(parentBuf, page.getParentPagePath(), currentPagePath));
 		} else {
 			buf.append(inner);
