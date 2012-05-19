@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,22 +29,10 @@ import org.pegdown.ast.TextNode;
 import org.pegdown.ast.VerbatimNode;
 
 import de.blizzy.documentr.Util;
-import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializer extends ToHtmlSerializer {
-	static final class MacroInvocation {
-		final IMacro macro;
-		final String marker;
-
-		private MacroInvocation(IMacro macro) {
-			this.macro = macro;
-			
-			marker = "__" + macro.getClass().getName() + "_" + System.currentTimeMillis() + "__"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-	}
-	
 	private HtmlSerializerContext context;
-	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
 
 	public HtmlSerializer(HtmlSerializerContext context) {
 		super(new DocumentrLinkRenderer());
@@ -110,16 +97,11 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		if (node instanceof MacroNode) {
 			MacroNode macroNode = (MacroNode) node;
 			String macroName = macroNode.getMacroName();
-			IMacro macro = context.getMacroFactory().get(macroName, context);
-			MacroInvocation invocation = new MacroInvocation(macro);
-			macroInvocations.add(invocation);
-			printer.print(invocation.marker);
+			String params = macroNode.getParams();
+			MacroInvocation invocation = context.addMacroInvocation(macroName, params);
+			printer.print(invocation.getMarker());
 		} else {
 			super.visit(node);
 		}
-	}
-	
-	List<MacroInvocation> getMacroInvocations() {
-		return macroInvocations;
 	}
 }

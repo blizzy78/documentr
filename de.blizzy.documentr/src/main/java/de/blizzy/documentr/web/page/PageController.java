@@ -44,7 +44,6 @@ import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Controller
 @RequestMapping("/page")
@@ -54,7 +53,7 @@ public class PageController {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
-	private MacroFactory macroFactory;
+	private MarkdownProcessor markdownProcessor;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -192,9 +191,8 @@ public class PageController {
 	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
 
-		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, pagePath, macroFactory);
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("html", proc.markdownToHTML(markdown)); //$NON-NLS-1$
+		result.put("html", markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath)); //$NON-NLS-1$
 		return result;
 	}
 	
@@ -234,7 +232,7 @@ public class PageController {
 		this.repoManager = repoManager;
 	}
 
-	void setMacroFactory(MacroFactory macroFactory) {
-		this.macroFactory = macroFactory;
+	void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
+		this.markdownProcessor = markdownProcessor;
 	}
 }

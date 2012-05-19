@@ -40,7 +40,7 @@ public class MacroFactory {
 		MACRO_CLASSES.put("toc", TableOfContentsMacro.class); //$NON-NLS-1$
 	}
 	
-	public IMacro get(String macroName, HtmlSerializerContext context) {
+	public IMacro get(String macroName, String params, HtmlSerializerContext context) {
 		try {
 			Class<? extends IMacro> clazz = MACRO_CLASSES.get(macroName);
 			IMacro macro;
@@ -49,6 +49,7 @@ public class MacroFactory {
 			} else {
 				macro = new UnknownMacroMacro(macroName);
 			}
+			macro.setParameters(params);
 			macro.setHtmlSerializerContext(context);
 			macro.setPageStore(pageStore);
 			return macro;

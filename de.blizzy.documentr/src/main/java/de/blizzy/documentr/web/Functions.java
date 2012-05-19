@@ -31,14 +31,13 @@ import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
 public final class Functions {
 	private static PageStore pageStore;
 	private static GlobalRepositoryManager repoManager;
 	private static UserStore userStore;
-	private static MacroFactory macroFactory;
+	private static MarkdownProcessor markdownProcessor;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
@@ -47,14 +46,14 @@ public final class Functions {
 	@Autowired
 	private UserStore _userStore;
 	@Autowired
-	private MacroFactory _macroFactory;
+	private MarkdownProcessor _markdownProcessor;
 	
 	@PostConstruct
 	public void init() {
 		pageStore = _pageStore;
 		repoManager = _repoManager;
 		userStore = _userStore;
-		macroFactory = _macroFactory;
+		markdownProcessor = _markdownProcessor;
 	}
 
 	public static List<String> listProjects() {
@@ -103,8 +102,7 @@ public final class Functions {
 	}
 	
 	public static String markdownToHTML(String markdown, String projectName, String branchName, String path) {
-		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, path, macroFactory);
-		return proc.markdownToHTML(markdown);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path);
 	}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {

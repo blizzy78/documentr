@@ -27,34 +27,31 @@ import org.pegdown.DocumentrParser;
 import org.pegdown.Parser;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.HtmlSerializer.MacroInvocation;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
+@Component
 public class MarkdownProcessor {
-	private String projectName;
-	private String branchName;
-	private String path;
+	@Autowired
 	private MacroFactory macroFactory;
 
-	public MarkdownProcessor(String projectName, String branchName, String path, MacroFactory macroFactory) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
-		this.macroFactory = macroFactory;
-	}
-	
-	public String markdownToHTML(String markdown) {
+	public String markdownToHTML(String markdown, String projectName, String branchName, String path) {
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, macroFactory);
+
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
 		HtmlSerializer serializer = new HtmlSerializer(context);
-		List<MacroInvocation> macroInvocations = serializer.getMacroInvocations();
 		String html = serializer.toHtml(rootNode);
+		
+		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
 		for (MacroInvocation invocation : macroInvocations) {
-			String macroHtml = StringUtils.defaultString(invocation.macro.getHtml());
-			html = StringUtils.replace(html, invocation.marker, macroHtml);
+			String macroHtml = StringUtils.defaultString(invocation.getMacro().getHtml());
+			html = StringUtils.replace(html, invocation.getMarker(), macroHtml);
 		}
 		html = cleanupHTML(html);
 		return html;
@@ -71,5 +68,10 @@ public class MarkdownProcessor {
 		Pattern p = Pattern.compile(pattern, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(html);
 		return matcher.replaceAll(replaceWith);
+	}
+
+	public MacroInvocation getMacroInvocation(String macroName, String params, HtmlSerializerContext context) {
+		IMacro macro = macroFactory.get(macroName, params, context);
+		return new MacroInvocation(macro);
 	}
 }

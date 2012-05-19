@@ -27,25 +27,28 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import de.blizzy.documentr.Util;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContext {
 	private String projectName;
 	private String branchName;
 	private String pagePath;
-	private MacroFactory macroFactory;
+	private MarkdownProcessor markdownProcessor;
 	private List<Header> headers = new ArrayList<Header>();
+	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
 
-	public HtmlSerializerContext(String projectName, String branchName, String pagePath, MacroFactory macroFactory) {
+	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
+			MarkdownProcessor markdownProcessor) {
+		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
-		Assert.notNull(macroFactory);
+		Assert.notNull(markdownProcessor);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;
-		this.macroFactory = macroFactory;
+		this.markdownProcessor = markdownProcessor;
 	}
 
 	public String getProjectName() {
@@ -60,10 +63,6 @@ public class HtmlSerializerContext {
 		return pagePath;
 	}
 	
-	MacroFactory getMacroFactory() {
-		return macroFactory;
-	}
-
 	public String getAttachmentURI(String name) {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
@@ -96,8 +95,7 @@ public class HtmlSerializerContext {
 	}
 
 	public String markdownToHTML(String markdown) {
-		MarkdownProcessor proc = new MarkdownProcessor(projectName, branchName, pagePath, macroFactory);
-		return proc.markdownToHTML(markdown);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath);
 	}
 
 	void addHeader(String text, int level) {
@@ -106,5 +104,15 @@ public class HtmlSerializerContext {
 	
 	public List<Header> getHeaders() {
 		return Collections.unmodifiableList(headers);
+	}
+
+	public MacroInvocation addMacroInvocation(String macroName, String params) {
+		MacroInvocation invocation = markdownProcessor.getMacroInvocation(macroName, params, this);
+		macroInvocations.add(invocation);
+		return invocation;
+	}
+	
+	List<MacroInvocation> getMacroInvocations() {
+		return macroInvocations;
 	}
 }

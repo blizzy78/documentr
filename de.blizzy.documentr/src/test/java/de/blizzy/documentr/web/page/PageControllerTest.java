@@ -43,7 +43,7 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 public class PageControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -61,12 +61,11 @@ public class PageControllerTest {
 	public void setUp() {
 		pageStore = mock(PageStore.class);
 		repoManager = mock(GlobalRepositoryManager.class);
-		MacroFactory macroFactory = mock(MacroFactory.class);
 		
 		pageController = new PageController();
 		pageController.setPageStore(pageStore);
 		pageController.setGlobalRepositoryManager(repoManager);
-		pageController.setMacroFactory(macroFactory);
+		pageController.setMarkdownProcessor(new MarkdownProcessor());
 	}
 	
 	@Test
