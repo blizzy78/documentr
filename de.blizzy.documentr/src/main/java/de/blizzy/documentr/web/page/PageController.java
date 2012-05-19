@@ -133,13 +133,9 @@ public class PageController {
 		Page page = Page.fromText(parentPagePath, form.getTitle(), form.getText());
 		String path = form.getPath();
 		if (StringUtils.isBlank(path)) {
-			path = Util.simplifyForURL(form.getTitle());
+			path = parentPagePath + "/" + Util.simplifyForURL(form.getTitle()); //$NON-NLS-1$
 		}
 		
-		if (bindingResult.hasErrors()) {
-			return "/project/branch/page/edit"; //$NON-NLS-1$
-		}
-
 		Page oldPage = null;
 		try {
 			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), path);

@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -38,6 +40,7 @@ import org.springframework.validation.BindingResult;
 
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
@@ -83,6 +86,17 @@ public class PageControllerTest {
 	}
 	
 	@Test
+	public void getPageButNonexistent() throws IOException {
+		when(pageStore.getPage(PROJECT, BRANCH, "nonexistent")) //$NON-NLS-1$
+			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
+		
+		Model model = mock(Model.class);
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model); //$NON-NLS-1$
+		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
+		assertForward(view);
+	}
+	
+	@Test
 	public void createPage() {
 		Model model = mock(Model.class);
 		String view = pageController.createPage(PROJECT, BRANCH, PARENT_PAGE, model);
@@ -107,6 +121,17 @@ public class PageControllerTest {
 	}
 	
 	@Test
+	public void editPageButNonexistent() throws IOException {
+		when(pageStore.getPage(PROJECT, BRANCH, "nonexistent")) //$NON-NLS-1$
+			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
+		
+		Model model = mock(Model.class);
+		String view = pageController.editPage(PROJECT, BRANCH, "nonexistent", model); //$NON-NLS-1$
+		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
+		assertForward(view);
+	}
+	
+	@Test
 	public void savePage() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -119,6 +144,45 @@ public class PageControllerTest {
 		
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage(PARENT_PAGE, "title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Test
+	public void savePageMustNotChangeExistingPath() throws IOException {
+		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
+		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
+		pageController.savePage(pageForm, bindingResult);
+		
+		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH)).thenReturn(page);
+		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2"); //$NON-NLS-1$ //$NON-NLS-2$
+		bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
+
+		String view = pageController.savePage(pageForm, bindingResult);
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+		assertFalse(bindingResult.hasErrors());
+
+		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
+				argPage(PARENT_PAGE, "title2", "text2")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Test
+	public void savePageBlankPath() throws IOException {
+		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
+		String title = "title"; //$NON-NLS-1$
+		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text"); //$NON-NLS-1$
+		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
+		
+		String view = pageController.savePage(pageForm, bindingResult);
+		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
+		String pathUrl = Util.toURLPagePath(path);
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + pathUrl, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+		assertFalse(bindingResult.hasErrors());
+		
+		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(path),
+				argPage(PARENT_PAGE, title, "text")); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -135,17 +199,32 @@ public class PageControllerTest {
 	}
 	
 	@Test
+	public void savePageButNonexistentBranch() throws IOException {
+		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
+		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
+		
+		String view = pageController.savePage(pageForm, bindingResult);
+		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
+		assertTrue(bindingResult.hasErrors());
+		assertTrue(bindingResult.hasFieldErrors("branchName")); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void generateName() throws IOException {
 		String title = "simple as 1, 2, 3"; //$NON-NLS-1$
+		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, path)).thenThrow(new PageNotFoundException(PROJECT, BRANCH, path));
 		Map<String, Object> result = pageController.generateName(PROJECT, BRANCH, PARENT_PAGE, title);
-		assertEquals(PARENT_PAGE + "/" + Util.simplifyForURL(title), result.get("path")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(path, result.get("path")); //$NON-NLS-1$
 		assertEquals(Boolean.FALSE, result.get("exists")); //$NON-NLS-1$
 
 		title = "title"; //$NON-NLS-1$
+		path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
 		Page page = Page.fromText(PARENT_PAGE, title, "text"); //$NON-NLS-1$
-		when(pageStore.getPage(PROJECT, BRANCH, PARENT_PAGE + "/" + Util.simplifyForURL(title))).thenReturn(page); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, path)).thenReturn(page);
 		result = pageController.generateName(PROJECT, BRANCH, PARENT_PAGE, title);
-		assertEquals(PARENT_PAGE + "/" + Util.simplifyForURL(title), result.get("path")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(path, result.get("path")); //$NON-NLS-1$
 		assertEquals(Boolean.TRUE, result.get("exists")); //$NON-NLS-1$
 	}
 	
