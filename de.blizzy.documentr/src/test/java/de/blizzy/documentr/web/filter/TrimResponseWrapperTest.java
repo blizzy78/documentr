@@ -17,11 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.filter;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class TrimResponseWrapperTest {
@@ -31,5 +38,41 @@ public class TrimResponseWrapperTest {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentLength(123);
 		verify(response, never()).setContentLength(anyInt());
+	}
+	
+	@Test
+	public void getOutputStreamAndGetData() throws IOException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+		byte[] data = "hello \u20AC".getBytes("UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		ServletOutputStream out = null;
+		try {
+			out = wrapper.getOutputStream();
+			out.write(data);
+		} finally {
+			IOUtils.closeQuietly(out);
+		}
+		
+		assertTrue(Arrays.equals(data, wrapper.getData()));
+	}
+
+	@Test
+	public void getWriterAndGetData() throws IOException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		when(response.getCharacterEncoding()).thenReturn("UTF-8"); //$NON-NLS-1$
+		
+		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+		String s = "hello \u20AC"; //$NON-NLS-1$
+
+		PrintWriter out = null;
+		try {
+			out = wrapper.getWriter();
+			out.write(s);
+		} finally {
+			IOUtils.closeQuietly(out);
+		}
+		
+		assertTrue(Arrays.equals(s.getBytes("UTF-8"), wrapper.getData())); //$NON-NLS-1$
 	}
 }
