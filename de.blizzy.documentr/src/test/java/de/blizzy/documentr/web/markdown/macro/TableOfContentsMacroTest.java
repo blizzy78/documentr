@@ -17,26 +17,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
-class TableOfContentsMacro extends AbstractMarkdownMacro {
-	@Override
-	public String getMarkdown() {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		List<Header> headers = context.getHeaders();
-		if (!headers.isEmpty()) {
-			StringBuilder buf = new StringBuilder();
-			for (Header header : headers) {
-				buf.append(StringUtils.repeat("    ", header.getLevel() - 1)) //$NON-NLS-1$
-					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return buf.toString() + "\n"; //$NON-NLS-1$
-		}
-		return null;
+public class TableOfContentsMacroTest {
+	@Test
+	public void getMarkdown() {
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(new Header("foo", 1)); //$NON-NLS-1$
+		headers.add(new Header("bar", 2)); //$NON-NLS-1$
+		headers.add(new Header("baz", 3)); //$NON-NLS-1$
+		headers.add(new Header("qux", 1)); //$NON-NLS-1$
+		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
+		when(context.getHeaders()).thenReturn(headers);
+		
+		TableOfContentsMacro macro = new TableOfContentsMacro();
+		macro.setHtmlSerializerContext(context);
+		
+		assertEquals(
+				"- [[#foo]]\n" + //$NON-NLS-1$
+				"    - [[#bar]]\n" + //$NON-NLS-1$
+				"        - [[#baz]]\n" + //$NON-NLS-1$
+				"- [[#qux]]\n\n", //$NON-NLS-1$
+				macro.getMarkdown());
 	}
 }

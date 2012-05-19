@@ -17,26 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import java.util.List;
+import static org.junit.Assert.*;
 
-import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import de.blizzy.documentr.web.markdown.Header;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-
-class TableOfContentsMacro extends AbstractMarkdownMacro {
-	@Override
-	public String getMarkdown() {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		List<Header> headers = context.getHeaders();
-		if (!headers.isEmpty()) {
-			StringBuilder buf = new StringBuilder();
-			for (Header header : headers) {
-				buf.append(StringUtils.repeat("    ", header.getLevel() - 1)) //$NON-NLS-1$
-					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return buf.toString() + "\n"; //$NON-NLS-1$
-		}
-		return null;
+public class UnknownMacroMacroTest {
+	@Test
+	public void getHtml() {
+		UnknownMacroMacro macro = new UnknownMacroMacro("nonexistent"); //$NON-NLS-1$
+		String html = macro.getHtml();
+		assertEquals("<span class=\"unknown-macro\">!nonexistent!</span>", html); //$NON-NLS-1$
 	}
 }

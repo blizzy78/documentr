@@ -53,7 +53,7 @@ public class MarkdownProcessor {
 		List<MacroInvocation> macroInvocations = serializer.getMacroInvocations();
 		String html = serializer.toHtml(rootNode);
 		for (MacroInvocation invocation : macroInvocations) {
-			String macroHtml = invocation.macro.getHtml();
+			String macroHtml = StringUtils.defaultString(invocation.macro.getHtml());
 			html = StringUtils.replace(html, invocation.marker, macroHtml);
 		}
 		html = cleanupHTML(html);

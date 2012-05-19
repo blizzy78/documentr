@@ -17,26 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 
-import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
-class TableOfContentsMacro extends AbstractMarkdownMacro {
+public abstract class AbstractMarkdownMacro extends AbstractMacro {
 	@Override
-	public String getMarkdown() {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		List<Header> headers = context.getHeaders();
-		if (!headers.isEmpty()) {
-			StringBuilder buf = new StringBuilder();
-			for (Header header : headers) {
-				buf.append(StringUtils.repeat("    ", header.getLevel() - 1)) //$NON-NLS-1$
-					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return buf.toString() + "\n"; //$NON-NLS-1$
+	public final String getHtml() {
+		String markdown = getMarkdown();
+		if (StringUtils.isNotBlank(markdown)) {
+			HtmlSerializerContext context = getHtmlSerializerContext();
+			return context.markdownToHTML(markdown);
 		}
 		return null;
 	}
+	
+	protected abstract String getMarkdown();
 }

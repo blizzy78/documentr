@@ -30,16 +30,6 @@ import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class HtmlSerializerContext {
-	public static final class Header {
-		public final String text;
-		public final int level;
-
-		private Header(String text, int level) {
-			this.text = text;
-			this.level = level;
-		}
-	}
-	
 	private String projectName;
 	private String branchName;
 	private String pagePath;
