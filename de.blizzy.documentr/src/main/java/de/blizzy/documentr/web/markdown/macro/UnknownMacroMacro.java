@@ -17,26 +17,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import de.blizzy.documentr.pagestore.PageStore;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-
-class UnknownMacroMacro implements IMacro {
+class UnknownMacroMacro extends AbstractMacro {
 	private String macroName;
 
 	public UnknownMacroMacro(String macroName) {
 		this.macroName = macroName;
-	}
-
-	@Override
-	public void setHtmlSerializerContext(HtmlSerializerContext context) {
-	}
-	
-	@Override
-	public void setPageStore(PageStore pageStore) {
-	}
-	
-	@Override
-	public void setParameters(String params) {
 	}
 
 	@Override
