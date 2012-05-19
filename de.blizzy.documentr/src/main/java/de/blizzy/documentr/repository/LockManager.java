@@ -78,7 +78,7 @@ public class LockManager {
 				throw new IllegalStateException("unknown lock"); //$NON-NLS-1$
 			}
 			
-			locks.notify();
+			locks.notifyAll();
 		}
 	}
 }
