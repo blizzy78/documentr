@@ -24,9 +24,9 @@ import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -69,14 +69,14 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
 			"{name:.*}", method=RequestMethod.GET)
 	@PreAuthorize("permitAll")
-	public HttpEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
+	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name) throws IOException {
 		
 		try {
 			pagePath = Util.toRealPagePath(pagePath);
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("Content-Type", attachment.getContentType()); //$NON-NLS-1$
+			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
 			return new ResponseEntity<byte[]>(attachment.getData(), headers, HttpStatus.OK);
 		} catch (PageNotFoundException e) {
 			return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND);
@@ -114,5 +114,13 @@ public class AttachmentController {
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment);
 		
 		return getAttachments(projectName, branchName, pagePath, model);
+	}
+
+	void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
+	}
+
+	void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 }
