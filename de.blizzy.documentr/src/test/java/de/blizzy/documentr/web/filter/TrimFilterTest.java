@@ -17,10 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.filter;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -56,6 +59,7 @@ public class TrimFilterTest {
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
 				byte[] data = TEXT.getBytes("UTF-8"); //$NON-NLS-1$
+				response.setContentType(CONTENT_TYPE);
 				response.setContentLength(data.length);
 				response.getOutputStream().write(data);
 				return null;
@@ -71,6 +75,7 @@ public class TrimFilterTest {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
 				byte[] data = TEXT.getBytes("UTF-8");  //$NON-NLS-1$
 				response.setContentLength(data.length);
+				response.setContentType(CONTENT_TYPE);
 				response.getWriter().print(TEXT);
 				return null;
 			}
@@ -84,11 +89,26 @@ public class TrimFilterTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+				response.setContentType("image/png"); //$NON-NLS-1$
 				response.setContentLength(data.length);
 				response.getOutputStream().write(data);
 				return null;
 			}
 		}, "image/png", data); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void doFilterWithUnknownContentType() throws IOException, ServletException {
+		final byte[] data = { 1, 2, 3 };
+		doFilter(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+				response.setContentLength(data.length);
+				response.getOutputStream().write(data);
+				return null;
+			}
+		}, null, data);
 	}
 	
 	private void doFilter(Answer<Void> doFilterAnswer, String contentType, byte[] expectedData) throws IOException, ServletException {
@@ -99,14 +119,21 @@ public class TrimFilterTest {
 		when(response.getCharacterEncoding()).thenReturn("UTF-8"); //$NON-NLS-1$
 		when(response.getContentType()).thenReturn(contentType);
 
-		ServletOutputStream out = mock(ServletOutputStream.class);
-		when(response.getOutputStream()).thenReturn(out);
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ServletOutputStream servletOut = new ServletOutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				out.write(b);
+			}
+		};
+		when(response.getOutputStream()).thenReturn(servletOut);
 		
 		doAnswer(doFilterAnswer).when(filterChain).doFilter(Matchers.<ServletRequest>any(), Matchers.<ServletResponse>any());
 		
 		new TrimFilter().doFilter(request, response, filterChain);
 		
 		verify(response).setContentLength(expectedData.length);
-		verify(out).write(expectedData);
+		servletOut.flush();
+		assertTrue(Arrays.equals(expectedData, out.toByteArray()));
 	}
 }

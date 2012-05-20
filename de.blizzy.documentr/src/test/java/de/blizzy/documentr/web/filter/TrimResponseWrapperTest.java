@@ -36,6 +36,7 @@ public class TrimResponseWrapperTest {
 	public void setContentLengthMustBeIgnored() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 		wrapper.setContentLength(123);
 		verify(response, never()).setContentLength(anyInt());
 	}
@@ -44,6 +45,8 @@ public class TrimResponseWrapperTest {
 	public void getOutputStreamAndGetData() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+		wrapper.setContentType("text/plain"); //$NON-NLS-1$
+
 		byte[] data = "hello \u20AC".getBytes("UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		ServletOutputStream out = null;
@@ -63,6 +66,8 @@ public class TrimResponseWrapperTest {
 		when(response.getCharacterEncoding()).thenReturn("UTF-8"); //$NON-NLS-1$
 		
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+		wrapper.setContentType("text/plain"); //$NON-NLS-1$
+
 		String s = "hello \u20AC"; //$NON-NLS-1$
 
 		PrintWriter out = null;

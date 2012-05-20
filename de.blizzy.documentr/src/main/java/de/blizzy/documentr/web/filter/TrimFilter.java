@@ -31,18 +31,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class TrimFilter implements Filter {
 	private TrimWriter writer = new TrimWriter();
-	
-	@SuppressWarnings("nls")
-	private static final String[] TRIMMABLE_CONTENT_TYPE_PREFIXES = {
-		"text/",
-		"application/html",
-		"application/xml",
-		"application/json"
-	};
 	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -60,34 +51,27 @@ public class TrimFilter implements Filter {
 		TrimResponseWrapper trimResponse = new TrimResponseWrapper(resp);
 		chain.doFilter(request, trimResponse);
 		
-		byte[] data;
-		if (isTrimmable(StringUtils.defaultString(trimResponse.getContentType()))) {
-			String encoding = trimResponse.getCharacterEncoding();
-			String text = new String(trimResponse.getData(), encoding);
-			BufferedReader in = null;
-			ByteArrayOutputStream out = null;
-			try {
-				in = new BufferedReader(new StringReader(text));
-				out = new ByteArrayOutputStream();
-				writer.write(text, out, encoding);
-			} finally {
-				IOUtils.closeQuietly(in);
-				IOUtils.closeQuietly(out);
-			}
-			data = out.toByteArray();
-		} else {
-			data = trimResponse.getData();
+		Boolean trimmable = trimResponse.isTrimmable();
+		if ((trimmable != null) && trimmable.booleanValue()) {
+			byte[] data = getTrimmedData(trimResponse);
+			response.setContentLength(data.length);
+			response.getOutputStream().write(data);
 		}
-		response.setContentLength(data.length);
-		response.getOutputStream().write(data);
 	}
 
-	private boolean isTrimmable(String contentType) {
-		for (String prefix : TRIMMABLE_CONTENT_TYPE_PREFIXES) {
-			if (contentType.startsWith(prefix)) {
-				return true;
-			}
+	private byte[] getTrimmedData(TrimResponseWrapper trimResponse) throws IOException {
+		BufferedReader in = null;
+		ByteArrayOutputStream out = null;
+		try {
+			String encoding = trimResponse.getCharacterEncoding();
+			String text = new String(trimResponse.getData(), encoding);
+			in = new BufferedReader(new StringReader(text));
+			out = new ByteArrayOutputStream();
+			writer.write(text, out, encoding);
+		} finally {
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
-		return false;
+		return out.toByteArray();
 	}
 }

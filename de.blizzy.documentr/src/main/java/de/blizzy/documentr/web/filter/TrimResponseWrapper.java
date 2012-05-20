@@ -27,9 +27,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 class TrimResponseWrapper extends HttpServletResponseWrapper {
+	@SuppressWarnings("nls")
+	private static final String[] TRIMMABLE_CONTENT_TYPE_PREFIXES = {
+		"text/",
+		"application/html",
+		"application/xml",
+		"application/json"
+	};
+
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	private PrintWriter writer;
 	private ServletOutputStream outputStream;
+	private Boolean trimmable;
+	private Integer contentLength;
 	
 	TrimResponseWrapper(HttpServletResponse response) {
 		super(response);
@@ -37,31 +47,56 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-		if (outputStream == null) {
-			outputStream = new ServletOutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-					buffer.write(b);
-				}
-			};
+		if ((trimmable != null) && trimmable.booleanValue()) {
+			if (outputStream == null) {
+				outputStream = new ServletOutputStream() {
+					@Override
+					public void write(int b) throws IOException {
+						buffer.write(b);
+					}
+				};
+			}
+			return outputStream;
 		}
-		return outputStream;
+		
+		setContentLengthIfNecessary();
+		return super.getOutputStream();
 	}
 	
 	@Override
 	public PrintWriter getWriter() throws IOException {
-		if (writer == null) {
-			writer = new PrintWriter(new OutputStreamWriter(buffer, getCharacterEncoding()));
+		if ((trimmable != null) && trimmable.booleanValue()) {
+			if (writer == null) {
+				writer = new PrintWriter(new OutputStreamWriter(buffer, getCharacterEncoding()));
+			}
+			return writer;
 		}
-		return writer;
+		
+		setContentLengthIfNecessary();
+		return super.getWriter();
 	}
 	
 	@Override
 	public void setContentLength(int len) {
-		// ignore
+		if ((trimmable == null) || trimmable.booleanValue()) {
+			contentLength = Integer.valueOf(len);
+			// don't send to superclass
+		} else {
+			super.setContentLength(len);
+		}
+	}
+	
+	@Override
+	public void setContentType(String type) {
+		super.setContentType(type);
+		trimmable = Boolean.valueOf(isTrimmable(type));
 	}
 	
 	byte[] getData() throws IOException {
+		if ((trimmable != null) && !trimmable.booleanValue()) {
+			throw new IllegalStateException("content is not trimmable"); //$NON-NLS-1$
+		}
+		
 		if (writer != null) {
 			writer.flush();
 		}
@@ -69,5 +104,25 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 			outputStream.flush();
 		}
 		return buffer.toByteArray();
+	}
+
+	Boolean isTrimmable() {
+		return trimmable;
+	}
+	
+	private boolean isTrimmable(String contentType) {
+		for (String prefix : TRIMMABLE_CONTENT_TYPE_PREFIXES) {
+			if (contentType.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void setContentLengthIfNecessary() {
+		if (contentLength != null) {
+			super.setContentLength(contentLength.intValue());
+			contentLength = null;
+		}
 	}
 }
