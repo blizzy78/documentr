@@ -20,7 +20,6 @@ package de.blizzy.documentr.web.filter;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringReader;
 
 import javax.servlet.Filter;
@@ -35,6 +34,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class TrimFilter implements Filter {
+	private TrimWriter writer = new TrimWriter();
+	
+	@SuppressWarnings("nls")
+	private static final String[] TRIMMABLE_CONTENT_TYPE_PREFIXES = {
+		"text/",
+		"application/html",
+		"application/xml",
+		"application/json"
+	};
+	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 	}
@@ -52,12 +61,7 @@ public class TrimFilter implements Filter {
 		chain.doFilter(request, trimResponse);
 		
 		byte[] data;
-		String contentType = StringUtils.defaultString(trimResponse.getContentType());
-		if (contentType.startsWith("text/") || //$NON-NLS-1$
-			contentType.startsWith("application/html") || //$NON-NLS-1$
-			contentType.startsWith("application/xml") || //$NON-NLS-1$
-			contentType.startsWith("application/json")) { //$NON-NLS-1$
-			
+		if (isTrimmable(StringUtils.defaultString(trimResponse.getContentType()))) {
 			String encoding = trimResponse.getCharacterEncoding();
 			String text = new String(trimResponse.getData(), encoding);
 			BufferedReader in = null;
@@ -65,38 +69,12 @@ public class TrimFilter implements Filter {
 			try {
 				in = new BufferedReader(new StringReader(text));
 				out = new ByteArrayOutputStream();
-				String line;
-				boolean textarea = false;
-				boolean pre = false;
-				while ((line = in.readLine()) != null) {
-					if (line.contains("<textarea")) { //$NON-NLS-1$
-						textarea = true;
-					}
-					if (line.contains("<pre")) { //$NON-NLS-1$
-						pre = true;
-					}
-
-					if (textarea || pre) {
-						writeln(line, encoding, out);
-					} else {
-						line = line.trim();
-						if (StringUtils.isNotBlank(line)) {
-							writeln(line, encoding, out);
-						}
-					}
-
-					if (line.contains("</textarea")) { //$NON-NLS-1$
-						textarea = false;
-					}
-					if (line.contains("</pre")) { //$NON-NLS-1$
-						pre = false;
-					}
-				}
-				data = out.toByteArray();
+				writer.write(text, out, encoding);
 			} finally {
 				IOUtils.closeQuietly(in);
 				IOUtils.closeQuietly(out);
 			}
+			data = out.toByteArray();
 		} else {
 			data = trimResponse.getData();
 		}
@@ -104,9 +82,12 @@ public class TrimFilter implements Filter {
 		response.getOutputStream().write(data);
 	}
 
-	private void writeln(String line, String encoding, OutputStream out) throws IOException {
-		byte[] lineData = line.getBytes(encoding);
-		out.write(lineData);
-		out.write('\n');
+	private boolean isTrimmable(String contentType) {
+		for (String prefix : TRIMMABLE_CONTENT_TYPE_PREFIXES) {
+			if (contentType.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
