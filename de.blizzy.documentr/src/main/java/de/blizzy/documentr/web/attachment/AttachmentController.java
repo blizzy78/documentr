@@ -46,7 +46,6 @@ import de.blizzy.documentr.pagestore.PageStore;
 @Controller
 @RequestMapping("/attachment")
 public class AttachmentController {
-	private static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
 	@Autowired
 	private PageStore pageStore;
 	@Autowired
@@ -108,7 +107,7 @@ public class AttachmentController {
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		String contentType = servletContext.getMimeType(file.getOriginalFilename());
 		if (StringUtils.isBlank(contentType)) {
-			contentType = DEFAULT_MIME_TYPE;
+			contentType = DocumentrConstants.DEFAULT_MIME_TYPE;
 		}
 		Page attachment = Page.fromData(null, data, contentType);
 		pagePath = Util.toRealPagePath(pagePath);

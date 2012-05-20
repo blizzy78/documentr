@@ -35,5 +35,7 @@ public final class DocumentrConstants {
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
 			"(?:create|save|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
 	
+	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
+	
 	private DocumentrConstants() {}
 }
