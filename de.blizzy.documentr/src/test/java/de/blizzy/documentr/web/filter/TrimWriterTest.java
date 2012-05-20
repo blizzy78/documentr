@@ -37,6 +37,10 @@ public class TrimWriterTest {
 					"xyz\r\n" +
 					"\tfoo\r\n" +
 					"  bar  \r\n" +
+					"<pre class=\"xyz\">  a b c  \r\n" +
+					"  d e  \r\n" +
+					"  f g  </pre>\r\n" +
+					"  \t  \r\n" +
 					"<textarea class=\"test\">  a b c  \r\n" +
 					"  d e  \r\n" +
 					"  f g  </textarea>\r\n" +
@@ -52,6 +56,9 @@ public class TrimWriterTest {
 				"xyz\n" +
 				"foo\n" +
 				"bar\n" +
+				"<pre class=\"xyz\">  a b c  \n" +
+				"  d e  \n" +
+				"  f g  </pre>\n" +
 				"<textarea class=\"test\">  a b c  \n" +
 				"  d e  \n" +
 				"  f g  </textarea>\n" +
