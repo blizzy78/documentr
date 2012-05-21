@@ -22,6 +22,8 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
@@ -83,7 +85,7 @@ public class TrimFilterTest {
 	}
 	
 	@Test
-	public void doFilterWithNonTrimmableContent() throws IOException, ServletException {
+	public void doFilterWithOutputStreamButNonTrimmableContent() throws IOException, ServletException {
 		final byte[] data = { 1, 2, 3 };
 		doFilter(new Answer<Void>() {
 			@Override
@@ -91,10 +93,27 @@ public class TrimFilterTest {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
 				response.setContentType("image/png"); //$NON-NLS-1$
 				response.setContentLength(data.length);
-				response.getOutputStream().write(data);
+				for (byte b : data) {
+					response.getOutputStream().write(b);
+				}
 				return null;
 			}
 		}, "image/png", data); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void doFilterWithWriterButNonTrimmableContent() throws IOException, ServletException {
+		doFilter(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+				response.setContentType("image/png"); //$NON-NLS-1$
+				response.setContentLength(TEXT.getBytes("UTF-8").length); //$NON-NLS-1$
+				response.getWriter().print(TEXT.substring(0, 1));
+				response.getWriter().print(TEXT.substring(1));
+				return null;
+			}
+		}, "image/png", TEXT.getBytes("UTF-8")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
@@ -128,12 +147,15 @@ public class TrimFilterTest {
 		};
 		when(response.getOutputStream()).thenReturn(servletOut);
 		
+		PrintWriter writer = new PrintWriter(new OutputStreamWriter(servletOut, "UTF-8")); //$NON-NLS-1$
+		when(response.getWriter()).thenReturn(writer);
+		
 		doAnswer(doFilterAnswer).when(filterChain).doFilter(Matchers.<ServletRequest>any(), Matchers.<ServletResponse>any());
 		
 		new TrimFilter().doFilter(request, response, filterChain);
 		
 		verify(response).setContentLength(expectedData.length);
-		servletOut.flush();
+		writer.flush();
 		assertTrue(Arrays.equals(expectedData, out.toByteArray()));
 	}
 }
