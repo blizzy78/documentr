@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -48,5 +49,17 @@ public class TableOfContentsMacroTest {
 				"        - [[#baz]]\n" + //$NON-NLS-1$
 				"- [[#qux]]\n\n", //$NON-NLS-1$
 				macro.getMarkdown());
+	}
+	
+	@Test
+	public void getMarkdownButNoHeaders() {
+		List<Header> headers = Collections.emptyList();
+		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
+		when(context.getHeaders()).thenReturn(headers);
+		
+		TableOfContentsMacro macro = new TableOfContentsMacro();
+		macro.setHtmlSerializerContext(context);
+		
+		assertNull(macro.getMarkdown());
 	}
 }
