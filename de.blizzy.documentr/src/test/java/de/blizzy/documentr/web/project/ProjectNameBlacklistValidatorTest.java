@@ -17,32 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.project;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.Test;
 
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
-
-public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
-	@Autowired
-	private GlobalRepositoryManager repoManager;
-	
-	@Override
-	public void initialize(ProjectExists annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-
-		return repoManager.listProjects().contains(value);
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
+public class ProjectNameBlacklistValidatorTest {
+	@Test
+	public void isValid() {
+		ProjectNameBlacklistValidator validator = new ProjectNameBlacklistValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("project", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("create", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("save", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("list", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("_foo", null)); //$NON-NLS-1$
 	}
 }

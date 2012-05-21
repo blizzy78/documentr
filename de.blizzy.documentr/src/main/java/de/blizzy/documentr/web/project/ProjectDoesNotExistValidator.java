@@ -41,4 +41,8 @@ public class ProjectDoesNotExistValidator implements ConstraintValidator<Project
 
 		return !repoManager.listProjects().contains(value);
 	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
 }
