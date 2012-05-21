@@ -30,7 +30,7 @@ public abstract class AbstractMacro implements IMacro {
 		this.params = params;
 	}
 	
-	protected String getParams() {
+	protected String getParameters() {
 		return params;
 	}
 

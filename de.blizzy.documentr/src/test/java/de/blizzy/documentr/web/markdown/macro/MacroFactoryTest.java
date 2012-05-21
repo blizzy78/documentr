@@ -53,7 +53,7 @@ public class MacroFactoryTest {
 		assertTrue(macroClass.isInstance(macro));
 		if (macro instanceof AbstractMacro) {
 			assertSame(context, ((AbstractMacro) macro).getHtmlSerializerContext());
-			assertEquals("params", ((AbstractMacro) macro).getParams()); //$NON-NLS-1$
+			assertEquals("params", ((AbstractMacro) macro).getParameters()); //$NON-NLS-1$
 		}
 	}
 }
