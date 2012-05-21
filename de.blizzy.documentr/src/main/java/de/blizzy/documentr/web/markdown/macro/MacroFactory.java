@@ -59,4 +59,8 @@ public class MacroFactory {
 			throw new RuntimeException(e);
 		}
 	}
+
+	void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
+	}
 }

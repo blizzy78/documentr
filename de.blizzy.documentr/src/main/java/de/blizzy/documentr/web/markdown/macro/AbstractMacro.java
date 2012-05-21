@@ -23,9 +23,15 @@ import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 public abstract class AbstractMacro implements IMacro {
 	private HtmlSerializerContext context;
 	private PageStore pageStore;
+	private String params;
 
 	@Override
 	public void setParameters(String params) {
+		this.params = params;
+	}
+	
+	protected String getParams() {
+		return params;
 	}
 
 	@Override
