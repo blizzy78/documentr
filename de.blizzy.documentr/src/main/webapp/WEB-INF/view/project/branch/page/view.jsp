@@ -95,7 +95,7 @@ function showDeleteDialog() {
 
 <sec:authorize access="isAuthenticated()">
 	<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
-	<div class="btn-toolbar pull-right">
+	<div class="btn-toolbar pull-right page-toolbar">
 		<div class="btn-group">
 			<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
 		</div>

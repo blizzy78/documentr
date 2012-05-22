@@ -96,3 +96,7 @@ table.table-documentr {
 .form-inline .form-actions {
 	padding-left: 0;
 }
+
+.page-toolbar {
+	margin-top: 18px;
+}
