@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.page;
 
+import static de.blizzy.documentr.DocumentrMatchers.*;
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -29,10 +30,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -253,36 +252,5 @@ public class PageControllerTest {
 		assertRedirect(view);
 		
 		verify(pageStore).deletePage(PROJECT, BRANCH, PAGE_PATH);
-	}
-	
-	private PageForm argPageForm(final String projectName, final String branchName, final String path,
-			final String parentPagePath, final String title, final String text) {
-		
-		Matcher<PageForm> matcher = new ArgumentMatcher<PageForm>() {
-			@Override
-			public boolean matches(Object argument) {
-				PageForm form = (PageForm) argument;
-				return StringUtils.equals(form.getProjectName(), projectName) &&
-						StringUtils.equals(form.getBranchName(), branchName) &&
-						StringUtils.equals(form.getPath(), path) &&
-						StringUtils.equals(form.getParentPagePath(), parentPagePath) &&
-						StringUtils.equals(form.getTitle(), title) &&
-						StringUtils.equals(form.getText(), text);
-			}
-		};
-		return argThat(matcher);
-	}
-	
-	private Page argPage(final String parentPagePath, final String title, final String text) {
-		Matcher<Page> matcher = new ArgumentMatcher<Page>() {
-			@Override
-			public boolean matches(Object argument) {
-				Page page = (Page) argument;
-				return StringUtils.equals(page.getParentPagePath(), parentPagePath) &&
-						StringUtils.equals(page.getTitle(), title) &&
-						StringUtils.equals(page.getText(), text);
-			}
-		};
-		return argThat(matcher);
 	}
 }

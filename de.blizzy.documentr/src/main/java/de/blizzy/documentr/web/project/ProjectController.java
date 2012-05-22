@@ -82,4 +82,8 @@ public class ProjectController {
 	public ProjectForm createProjectForm(@RequestParam(required=false) String name) {
 		return (name != null) ? new ProjectForm(name) : null;
 	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
 }

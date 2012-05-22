@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
+import static de.blizzy.documentr.DocumentrMatchers.*;
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -25,10 +26,8 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -156,36 +155,5 @@ public class UserControllerTest {
 		
 		verify(model).addAttribute(eq("userForm"), //$NON-NLS-1$
 				argUserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, false, false)); //$NON-NLS-1$
-	}
-	
-	private User argUser(final String loginName, final String password, final boolean disabled, final boolean admin) {
-		ArgumentMatcher<User> matcher = new ArgumentMatcher<User>() {
-			@Override
-			public boolean matches(Object argument) {
-				User user = (User) argument;
-				return StringUtils.equals(user.getLoginName(), loginName) &&
-						StringUtils.equals(user.getPassword(), password) &&
-						(user.isDisabled() == disabled) &&
-						(user.isAdmin() == admin);
-			}
-		};
-		return argThat(matcher);
-	}
-	
-	private UserForm argUserForm(final String loginName, final String password1, final String password2,
-			final boolean disabled, final boolean admin) {
-		
-		Matcher<UserForm> matcher = new ArgumentMatcher<UserForm>() {
-			@Override
-			public boolean matches(Object argument) {
-				UserForm form = (UserForm) argument;
-				return StringUtils.equals(form.getLoginName(), loginName) &&
-						StringUtils.equals(form.getPassword1(), password1) &&
-						StringUtils.equals(form.getPassword2(), password2) &&
-						(form.isDisabled() == disabled) &&
-						(form.isAdmin() == admin);
-			}
-		};
-		return argThat(matcher);
 	}
 }

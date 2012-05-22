@@ -95,4 +95,12 @@ public class BranchController {
 		
 		return (name != null) ? new BranchForm(projectName, name, startingBranch) : null;
 	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
+
+	void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
+	}
 }
