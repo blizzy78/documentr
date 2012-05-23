@@ -58,9 +58,19 @@ public class MarkdownProcessor {
 	}
 
 	private String cleanupHTML(String html) {
-		html = replace(html, "<p>(<div.*?</div>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-		html = replace(html, "<p>(<ul.*?</ul>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-		html = replace(html, "<p>(<ol.*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		for (;;) {
+			String newHtml = html;
+			newHtml = replace(newHtml, "<p>(<p.*?</p>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			newHtml = replace(newHtml, "<p>(<div.*?</div>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			newHtml = replace(newHtml, "<p>(<ul.*?</ul>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			newHtml = replace(newHtml, "<p>(<ol.*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			if (newHtml.equals(html)) {
+				break;
+			}
+			
+			html = newHtml;
+		}
 		return html;
 	}
 	
@@ -73,5 +83,9 @@ public class MarkdownProcessor {
 	public MacroInvocation getMacroInvocation(String macroName, String params, HtmlSerializerContext context) {
 		IMacro macro = macroFactory.get(macroName, params, context);
 		return new MacroInvocation(macro);
+	}
+
+	void setMacroFactory(MacroFactory macroFactory) {
+		this.macroFactory = macroFactory;
 	}
 }

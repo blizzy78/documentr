@@ -22,7 +22,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.pegdown.LinkRenderer.Attribute;
 import org.pegdown.LinkRenderer.Rendering;
+import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.WikiLinkNode;
+
+import de.blizzy.documentr.Util;
 
 public class LinkRendererTest {
 	@Test
@@ -57,5 +60,23 @@ public class LinkRendererTest {
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
+	}
+	
+	@Test
+	public void renderWikiLinkWithAnchor() {
+		String headline = "A Headline"; //$NON-NLS-1$
+		WikiLinkNode node = new WikiLinkNode("#" + headline); //$NON-NLS-1$
+		Rendering rendering = new DocumentrLinkRenderer().render(node);
+		assertEquals("#" + Util.simplifyForURL(headline), rendering.href); //$NON-NLS-1$
+		assertEquals(headline, rendering.text);
+	}
+	
+	@Test
+	public void renderExpLinkNodeWithAnchor() {
+		String headline = "A Headline"; //$NON-NLS-1$
+		ExpLinkNode node = new ExpLinkNode(null, "#" + headline, null); //$NON-NLS-1$
+		Rendering rendering = new DocumentrLinkRenderer().render(node, headline);
+		assertEquals("#" + Util.simplifyForURL(headline), rendering.href); //$NON-NLS-1$
+		assertEquals(headline, rendering.text);
 	}
 }
