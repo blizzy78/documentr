@@ -20,5 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <jsp:include page="/css/bootstrap-2.0.3.min.css.jsp"/>
 <jsp:include page="/css/bootstrap-responsive-2.0.3.min.css.jsp"/>
 <jsp:include page="/css/prettify.css.jsp"/>
+<jsp:include page="/css/lightbox-2.51.css.jsp"/>
+
 <jsp:include page="/css/styles.css.jsp"/>
 <jsp:include page="/css/macros.css.jsp"/>

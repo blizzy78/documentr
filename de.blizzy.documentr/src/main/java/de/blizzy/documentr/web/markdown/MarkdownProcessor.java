@@ -64,6 +64,11 @@ public class MarkdownProcessor {
 			newHtml = replace(newHtml, "<p>(<div.*?</div>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 			newHtml = replace(newHtml, "<p>(<ul.*?</ul>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 			newHtml = replace(newHtml, "<p>(<ol.*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+			newHtml = replace(newHtml, "(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
+						"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
+						"<ul class=\"thumbnails\">(<li class=\"span3\">" +
+						"<a class=\"thumbnail\" (?:[^>]+)>)",
+						"$1$2");
 			
 			if (newHtml.equals(html)) {
 				break;

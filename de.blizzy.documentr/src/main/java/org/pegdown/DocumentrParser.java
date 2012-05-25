@@ -172,7 +172,10 @@ public class DocumentrParser extends Parser {
 		return OneOrMore(
 				FirstOf(
 						Sequence('\\', AnyOf("()"), url.append(matchedChar())), //$NON-NLS-1$
-						Sequence(TestNot(AnyOf("()>")), Nonspacechar(), url.append(matchedChar())) //$NON-NLS-1$
+						Sequence(
+								TestNot(AnyOf("()>")), //$NON-NLS-1$
+								FirstOf(Nonspacechar(), Spacechar(), '|'),
+								url.append(matchedChar()))
 				)
 		);
 	}
