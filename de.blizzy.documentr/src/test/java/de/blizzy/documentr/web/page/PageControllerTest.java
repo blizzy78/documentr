@@ -41,7 +41,6 @@ import de.blizzy.documentr.Util;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
-import de.blizzy.documentr.pagestore.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
@@ -71,7 +70,7 @@ public class PageControllerTest {
 	@Test
 	public void getPage() throws IOException {
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
 		Model model = mock(Model.class);
 		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model);
@@ -81,7 +80,6 @@ public class PageControllerTest {
 		verify(model).addAttribute("pageName", PAGE_NAME); //$NON-NLS-1$
 		verify(model).addAttribute("parentPagePath", PARENT_PAGE); //$NON-NLS-1$
 		verify(model).addAttribute("title", page.getTitle()); //$NON-NLS-1$
-		verify(model).addAttribute("text", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
 	}
 	
 	@Test
