@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.pagestore;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -32,17 +31,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
-import org.eclipse.jgit.lib.ObjectStream;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.gitective.core.BlobUtils;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.CommitUtils;
 import org.gitective.core.filter.commit.CommitFilter;
@@ -179,15 +175,21 @@ public class PageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String json = BlobUtils.getHeadContent(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
-			if (json == null) {
+			
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = new File(workingDir, rootDir);
+			File workingFile = toFile(pagesDir, path + META_SUFFIX);
+			if (!workingFile.isFile()) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
+			
+			String json = FileUtils.readFileToString(workingFile, "UTF-8"); //$NON-NLS-1$
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			
 			if (loadData) {
-				byte[] data = loadPageData(path, suffix, rootDir, repo);
+				workingFile = toFile(pagesDir, path + PAGE_SUFFIX);
+				byte[] data = FileUtils.readFileToByteArray(workingFile);
 				String contentType = (String) pageMap.get(CONTENT_TYPE);
 				PageData pageData;
 				if (contentType.equals(PageTextData.CONTENT_TYPE)) {
@@ -204,22 +206,6 @@ public class PageStore {
 		}
 	}
 
-	private byte[] loadPageData(String path, String suffix, String rootDir, ILockedRepository repo) throws IOException {
-		ObjectStream in = null;
-		ByteArrayOutputStream out = null;
-		try {
-			in = BlobUtils.getHeadStream(repo.r(), rootDir + "/" + path + suffix); //$NON-NLS-1$
-			out = new ByteArrayOutputStream();
-			if (in != null) {
-				IOUtils.copy(in, out);
-			}
-		} finally {
-			IOUtils.closeQuietly(in);
-			IOUtils.closeQuietly(out);
-		}
-		return out.toByteArray();
-	}
-	
 	public Page getAttachment(String projectName, String branchName, String pagePath, String name)
 			throws IOException {
 		
