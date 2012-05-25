@@ -38,9 +38,9 @@ public class PageUtilTest {
 		Page page2 = TestUtil.createRandomPage("page1"); //$NON-NLS-1$
 		Page page3 = TestUtil.createRandomPage("page1/page2"); //$NON-NLS-1$
 		PageStore pageStore = mock(PageStore.class);
-		when(pageStore.getPage(PROJECT, BRANCH, "page1")).thenReturn(page1); //$NON-NLS-1$
-		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2")).thenReturn(page2); //$NON-NLS-1$
-		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2/page3")).thenReturn(page3); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, "page1", false)).thenReturn(page1); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2", false)).thenReturn(page2); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2/page3", false)).thenReturn(page3); //$NON-NLS-1$
 		
 		assertEquals(Lists.newArrayList("page1", "page1/page2", "page1/page2/page3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				PageUtil.getPagePathHierarchy(PROJECT, BRANCH, "page1/page2/page3", pageStore)); //$NON-NLS-1$

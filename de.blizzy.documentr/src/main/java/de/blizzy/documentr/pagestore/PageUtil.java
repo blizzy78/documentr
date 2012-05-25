@@ -29,9 +29,9 @@ public final class PageUtil {
 		
 		List<String> result = new ArrayList<String>();
 		result.add(pagePath);
-		for (Page page = pageStore.getPage(projectName, branchName, pagePath);
+		for (Page page = pageStore.getPage(projectName, branchName, pagePath, false);
 			page.getParentPagePath() != null;
-			page = pageStore.getPage(projectName, branchName, page.getParentPagePath())) {
+			page = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false)) {
 			
 			result.add(0, page.getParentPagePath());
 		}

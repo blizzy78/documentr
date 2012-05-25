@@ -148,6 +148,6 @@ public class NeighborsMacroTest {
 				StringUtils.substringBeforeLast(pagePath, "/") : //$NON-NLS-1$
 				null;
 		Page page = Page.fromText(parentPagePath, pagePath, "text"); //$NON-NLS-1$
-		when(pageStore.getPage(PROJECT, BRANCH, pagePath)).thenReturn(page);
+		when(pageStore.getPage(PROJECT, BRANCH, pagePath, false)).thenReturn(page);
 	}
 }

@@ -74,9 +74,9 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
-		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo"); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo", true); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
-		assertEquals(page.getText(), result.getText());
+		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
 		assertEquals(page.getContentType(), result.getContentType());
 		assertEquals(page.getParentPagePath(), result.getParentPagePath());
 	}
@@ -86,13 +86,22 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = saveRandomPage(BRANCH_1, "foo/bar", "parent"); //$NON-NLS-1$ //$NON-NLS-2$
-		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar"); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar", true); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
-		assertEquals(page.getText(), result.getText());
+		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
 		assertEquals(page.getContentType(), result.getContentType());
 		assertEquals(page.getParentPagePath(), result.getParentPagePath());
 	}
 	
+	@Test
+	public void getPageWithoutData() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo", false); //$NON-NLS-1$
+		assertNull(result.getData());
+	}
+
 	@Test
 	public void listPagePaths() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT));

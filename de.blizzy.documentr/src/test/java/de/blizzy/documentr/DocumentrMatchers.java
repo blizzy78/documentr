@@ -25,6 +25,7 @@ import org.mockito.ArgumentMatcher;
 
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageTextData;
 import de.blizzy.documentr.web.access.UserForm;
 import de.blizzy.documentr.web.branch.BranchForm;
 import de.blizzy.documentr.web.page.PageForm;
@@ -38,9 +39,13 @@ public final class DocumentrMatchers {
 			@Override
 			public boolean matches(Object argument) {
 				Page page = (Page) argument;
+				String pageText = null;
+				if (page.getData() instanceof PageTextData) {
+					pageText = ((PageTextData) page.getData()).getText();
+				}
 				return StringUtils.equals(page.getParentPagePath(), parentPagePath) &&
 						StringUtils.equals(page.getTitle(), title) &&
-						StringUtils.equals(page.getText(), text);
+						StringUtils.equals(pageText, text);
 			}
 		};
 		return argThat(matcher);

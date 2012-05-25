@@ -17,34 +17,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.pagestore;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Page {
 	private String parentPagePath;
 	private String title;
-	private byte[] data;
 	private String contentType;
+	private PageData data;
 
-	private Page(String parentPagePath, String title, byte[] data, String contentType) {
+	Page(String parentPagePath, String title, String contentType, PageData data) {
 		this.parentPagePath = parentPagePath;
 		this.title = title;
-		this.data = data;
 		this.contentType = contentType;
+		this.data = data;
 	}
 
 	public static Page fromText(String parentPagePath, String title, String text) {
-		try {
-			return new Page(parentPagePath, title, text.getBytes("UTF-8"), "text/plain"); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		PageTextData pageData = new PageTextData(text);
+		return new Page(parentPagePath, title, pageData.getContentType(), pageData);
 	}
 	
 	public static Page fromData(String parentPagePath, byte[] data, String contentType) {
-		return new Page(parentPagePath, null, data, contentType);
+		PageData pageData = new PageData(data, contentType);
+		return new Page(parentPagePath, null, contentType, pageData);
+	}
+	
+	public static Page fromMeta(String parentPagePath, String title, String contentType) {
+		return new Page(parentPagePath, title, contentType, null);
 	}
 
 	public String getParentPagePath() {
@@ -54,21 +54,13 @@ public class Page {
 	public String getTitle() {
 		return title;
 	}
-	
-	public byte[] getData() {
-		return data;
-	}
-	
-	public String getText() {
-		try {
-			return new String(data, "UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public String getContentType() {
 		return contentType;
+	}
+	
+	public PageData getData() {
+		return data;
 	}
 	
 	@Override

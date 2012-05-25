@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.pagestore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -30,12 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
+import org.eclipse.jgit.lib.ObjectStream;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -62,7 +65,8 @@ public class PageStore {
 	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
-	private static final String DATA = "data"; //$NON-NLS-1$
+	private static final String PAGE_DATA = "pageData"; //$NON-NLS-1$
+	private static final String META_SUFFIX = ".meta"; //$NON-NLS-1$
 	private static final String PAGE_SUFFIX = ".page"; //$NON-NLS-1$
 	private static final String PAGES_DIR_NAME = "pages"; //$NON-NLS-1$
 	private static final String ATTACHMENTS_DIR_NAME = "attachments"; //$NON-NLS-1$
@@ -78,7 +82,7 @@ public class PageStore {
 		Assert.hasLength(path);
 		
 		try {
-			savePageData(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME);
+			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -92,41 +96,49 @@ public class PageStore {
 		Assert.hasLength(pagePath);
 		Assert.hasLength(name);
 		// check if page exists by trying to load it
-		getPage(projectName, branchName, pagePath);
+		getPage(projectName, branchName, pagePath, false);
 		
 		try {
-			savePageData(projectName, branchName, pagePath + "/" + name, null, attachment, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+			savePageInternal(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, attachment, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
 	}
 
-	private void savePageData(String projectName, String branchName, String path, String suffix, Page page, String rootDir)
+	private void savePageInternal(String projectName, String branchName, String path, String suffix, Page page, String rootDir)
 			throws IOException, GitAPIException {
-		
-		suffix = StringUtils.defaultString(suffix);
 		
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Map<String, Object> pageMap = new HashMap<String, Object>();
+			Map<String, Object> metaMap = new HashMap<String, Object>();
 			if (page.getParentPagePath() != null) {
-				pageMap.put(PARENT_PAGE_PATH, page.getParentPagePath());
+				metaMap.put(PARENT_PAGE_PATH, page.getParentPagePath());
 			}
-			pageMap.put(TITLE, page.getTitle());
-			pageMap.put(CONTENT_TYPE, page.getContentType());
-			pageMap.put(DATA, Base64.encodeBase64String(page.getData()));
-			String json = gson.toJson(pageMap);
+			metaMap.put(TITLE, page.getTitle());
+			metaMap.put(CONTENT_TYPE, page.getContentType());
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			String json = gson.toJson(metaMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
-			File workingFile = toFile(pagesDir, path + suffix);
+			File workingFile = toFile(pagesDir, path + META_SUFFIX);
 			FileUtils.forceMkdir(workingFile.getParentFile());
 			FileUtils.write(workingFile, json, "UTF-8"); //$NON-NLS-1$
 
+			PageData pageData = page.getData();
+			if (pageData != null) {
+				workingFile = toFile(pagesDir, path + suffix);
+				FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
+			}
+			
 			Git git = Git.wrap(repo.r());
-			git.add().addFilepattern(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
+			AddCommand addCommand = git.add()
+				.addFilepattern(rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
+			if (pageData != null) {
+				addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
+			}
+			addCommand.call();
 			git.commit().setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 			git.push().call();
 		} finally {
@@ -142,40 +154,70 @@ public class PageStore {
 		return result;
 	}
 	
-	public Page getPage(String projectName, String branchName, String path) throws IOException {
+	public Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 
 		try {
-			Map<String, Object> pageData = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME);
-			String parentPagePath = (String) pageData.get(PARENT_PAGE_PATH);
-			String title = (String) pageData.get(TITLE);
-			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-			return Page.fromText(parentPagePath, title, new String(data, "UTF-8")); //$NON-NLS-1$
+			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME, loadData);
+			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
+			String title = (String) pageMap.get(TITLE);
+			String contentType = (String) pageMap.get(CONTENT_TYPE);
+			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
+			return new Page(parentPagePath, title, contentType, pageData);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
 	}
 
-	private Map<String, Object> getPageData(String projectName, String branchName, String path, String suffix, String rootDir)
-			throws IOException, GitAPIException {
+	private Map<String, Object> getPageData(String projectName, String branchName, String path, String suffix, String rootDir,
+		boolean loadData) throws IOException, GitAPIException {
 		
 		suffix = StringUtils.defaultString(suffix);
 		
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String json = BlobUtils.getHeadContent(repo.r(), rootDir + "/" + path + suffix); //$NON-NLS-1$
+			String json = BlobUtils.getHeadContent(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
 			if (json == null) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Map<String, Object> pageData = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
-			return pageData;
+			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
+			
+			if (loadData) {
+				byte[] data = loadPageData(path, suffix, rootDir, repo);
+				String contentType = (String) pageMap.get(CONTENT_TYPE);
+				PageData pageData;
+				if (contentType.equals(PageTextData.CONTENT_TYPE)) {
+					pageData = PageTextData.fromBytes(data);
+				} else {
+					pageData = new PageData(data, contentType);
+				}
+				pageMap.put(PAGE_DATA, pageData);
+			}
+			
+			return pageMap;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+
+	private byte[] loadPageData(String path, String suffix, String rootDir, ILockedRepository repo) throws IOException {
+		ObjectStream in = null;
+		ByteArrayOutputStream out = null;
+		try {
+			in = BlobUtils.getHeadStream(repo.r(), rootDir + "/" + path + suffix); //$NON-NLS-1$
+			out = new ByteArrayOutputStream();
+			if (in != null) {
+				IOUtils.copy(in, out);
+			}
+		} finally {
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
+		}
+		return out.toByteArray();
 	}
 	
 	public Page getAttachment(String projectName, String branchName, String pagePath, String name)
@@ -187,11 +229,12 @@ public class PageStore {
 		Assert.hasLength(name);
 
 		try {
-			Map<String, Object> pageData = getPageData(projectName, branchName, pagePath + "/" + name, null, //$NON-NLS-1$
-					ATTACHMENTS_DIR_NAME);
-			String contentType = (String) pageData.get(CONTENT_TYPE);
-			byte[] data = Base64.decodeBase64((String) pageData.get(DATA));
-			return Page.fromData(null, data, contentType);
+			Map<String, Object> pageMap = getPageData(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, //$NON-NLS-1$
+					ATTACHMENTS_DIR_NAME, true);
+			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
+			String contentType = (String) pageMap.get(CONTENT_TYPE);
+			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
+			return new Page(parentPagePath, null, contentType, pageData);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -222,7 +265,7 @@ public class PageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
 		// check if page exists by trying to load it
-		getPage(projectName, branchName, pagePath);
+		getPage(projectName, branchName, pagePath, false);
 		
 		ILockedRepository repo = null;
 		try {
@@ -235,14 +278,14 @@ public class PageStore {
 				FileFilter filter = new FileFilter() {
 					@Override
 					public boolean accept(File file) {
-						return file.isFile();
+						return file.isFile() && file.getName().endsWith(META_SUFFIX);
 					}
 				};
 				List<File> files = Arrays.asList(pageAttachmentsDir.listFiles(filter));
 				Function<File, String> function = new Function<File, String>() {
 					@Override
 					public String apply(File file) {
-						return file.getName();
+						return StringUtils.substringBeforeLast(file.getName(), META_SUFFIX);
 					}
 				};
 				names = new ArrayList<String>(Lists.transform(files, function));

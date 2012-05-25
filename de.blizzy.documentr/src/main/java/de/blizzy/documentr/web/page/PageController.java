@@ -41,6 +41,7 @@ import de.blizzy.documentr.Util;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
@@ -67,10 +68,10 @@ public class PageController {
 			model.addAttribute("path", path); //$NON-NLS-1$
 			model.addAttribute("pageName", //$NON-NLS-1$
 					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
-			Page page = pageStore.getPage(projectName, branchName, path);
+			Page page = pageStore.getPage(projectName, branchName, path, true);
 			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
-			model.addAttribute("text", page.getText()); //$NON-NLS-1$
+			model.addAttribute("text", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -99,10 +100,10 @@ public class PageController {
 		
 		try {
 			path = Util.toRealPagePath(path);
-			Page page = pageStore.getPage(projectName, branchName, path);
+			Page page = pageStore.getPage(projectName, branchName, path, true);
 			PageForm form = new PageForm(projectName, branchName,
 					path, page.getParentPagePath(),
-					page.getTitle(), page.getText());
+					page.getTitle(), ((PageTextData) page.getData()).getText());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
@@ -137,7 +138,7 @@ public class PageController {
 		
 		Page oldPage = null;
 		try {
-			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), path);
+			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), path, true);
 		} catch (PageNotFoundException e) {
 			// okay
 		}
@@ -171,7 +172,7 @@ public class PageController {
 		String path = Util.toRealPagePath(parentPagePath) + "/" + name; //$NON-NLS-1$
 		boolean pageExists = false;
 		try {
-			Page page = pageStore.getPage(projectName, branchName, path);
+			Page page = pageStore.getPage(projectName, branchName, path, false);
 			pageExists = page != null;
 		} catch (PageNotFoundException e) {
 			// okay
@@ -205,7 +206,7 @@ public class PageController {
 			@PathVariable String path, @RequestParam String targetBranchName) throws IOException {
 
 		path = Util.toRealPagePath(path);
-		Page page = pageStore.getPage(projectName, branchName, path);
+		Page page = pageStore.getPage(projectName, branchName, path, true);
 		pageStore.savePage(projectName, targetBranchName, path, page);
 		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Util.toURLPagePath(path);

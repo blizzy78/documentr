@@ -51,10 +51,11 @@ class NeighborsMacro extends AbstractMacro {
 		StringBuilder buf = new StringBuilder();
 		PageStore pageStore = getPageStore();
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path);
+		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (page.getParentPagePath() != null) {
 			StringBuilder parentBuf = new StringBuilder();
-			Page parentPage = pageStore.getPage(context.getProjectName(), context.getBranchName(), page.getParentPagePath());
+			Page parentPage = pageStore.getPage(context.getProjectName(), context.getBranchName(),
+				page.getParentPagePath(), false);
 			String uri = context.getPageURI(page.getParentPagePath());
 			parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 				.append(parentPage.getTitle())
@@ -86,7 +87,7 @@ class NeighborsMacro extends AbstractMacro {
 		StringBuilder buf = new StringBuilder();
 		PageStore pageStore = getPageStore();
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path);
+		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (path.equals(currentPagePath)) {
 			buf.append("<li class=\"active\">").append(page.getTitle()); //$NON-NLS-1$
 			buf.append(printChildren(path, currentPagePath));

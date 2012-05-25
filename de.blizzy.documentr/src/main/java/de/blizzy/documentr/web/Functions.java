@@ -78,7 +78,7 @@ public final class Functions {
 	
 	public static String getPageTitle(String projectName, String branchName, String path) {
 		try {
-			Page page = pageStore.getPage(projectName, branchName, path);
+			Page page = pageStore.getPage(projectName, branchName, path, false);
 			return page.getTitle();
 		} catch (IOException e) {
 			throw new RuntimeException(e);

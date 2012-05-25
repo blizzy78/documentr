@@ -77,7 +77,7 @@ public class AttachmentController {
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
-			return new ResponseEntity<byte[]>(attachment.getData(), headers, HttpStatus.OK);
+			return new ResponseEntity<byte[]>(attachment.getData().getData(), headers, HttpStatus.OK);
 		} catch (PageNotFoundException e) {
 			return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND);
 		}
