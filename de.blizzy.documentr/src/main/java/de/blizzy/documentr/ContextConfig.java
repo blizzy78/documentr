@@ -17,6 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.annotation.PreDestroy;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.MemoryUnit;
+
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,8 +50,14 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 @Configuration
 @EnableWebMvc
 @ComponentScan("de.blizzy.documentr")
-@ImportResource("classpath:/applicationContext-security.xml")
+@ImportResource({ "classpath:/applicationContext-security.xml", "classpath:/applicationContext-cache.xml" })
 public class ContextConfig extends WebMvcConfigurerAdapter {
+	private static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
+	
+	@Autowired
+	private Settings settings;
+	private net.sf.ehcache.CacheManager ehCacheManager;
+	
 	@Bean
 	public ViewResolver viewResolver() {
 		UrlBasedViewResolver resolver = new UrlBasedViewResolver();
@@ -68,5 +87,31 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new ShaPasswordEncoder();
+	}
+	
+	@Bean
+	public CacheManager cacheManager() throws IOException {
+		File cacheDir = new File(settings.getDocumentrDataDir(), CACHE_DIR_NAME);
+		FileUtils.forceMkdir(cacheDir);
+
+		ehCacheManager = net.sf.ehcache.CacheManager.newInstance();
+		ehCacheManager.addCache(new Cache(new CacheConfiguration()
+			.name("pageHTML") //$NON-NLS-1$
+			.diskStorePath(cacheDir.getAbsolutePath())
+			.overflowToDisk(true)
+			.diskPersistent(true)
+			.maxEntriesLocalHeap(1000)
+			.maxBytesLocalDisk(100, MemoryUnit.MEGABYTES)
+			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
+		
+		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
+		cacheManager.setCacheManager(ehCacheManager);
+
+		return cacheManager;
+	}
+
+	@PreDestroy
+	public void destroy() {
+		ehCacheManager.shutdown();
 	}
 }

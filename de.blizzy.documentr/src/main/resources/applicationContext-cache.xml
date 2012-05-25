@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 documentr - Edit, maintain, and present software documentation on the web.
 Copyright (C) 2012 Maik Schreiber
 
@@ -14,27 +15,15 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-package de.blizzy.documentr.pagestore;
+-->
+<beans:beans xmlns="http://www.springframework.org/schema/cache"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/cache
+		http://www.springframework.org/schema/cache/spring-cache-3.1.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-public final class PageUtil {
-	private PageUtil() {}
-
-	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath,
-			IPageStore pageStore) throws IOException {
-		
-		List<String> result = new ArrayList<String>();
-		result.add(pagePath);
-		for (Page page = pageStore.getPage(projectName, branchName, pagePath, false);
-			page.getParentPagePath() != null;
-			page = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false)) {
-			
-			result.add(0, page.getParentPagePath());
-		}
-		return result;
-	}
-}
+	<annotation-driven/>
+</beans:beans>

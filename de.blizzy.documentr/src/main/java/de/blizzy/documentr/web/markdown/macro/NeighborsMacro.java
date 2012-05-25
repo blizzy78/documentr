@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 class NeighborsMacro extends AbstractMacro {
@@ -49,7 +49,7 @@ class NeighborsMacro extends AbstractMacro {
 	
 	private StringBuilder printParent(CharSequence inner, String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
-		PageStore pageStore = getPageStore();
+		IPageStore pageStore = getPageStore();
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (page.getParentPagePath() != null) {
@@ -85,7 +85,7 @@ class NeighborsMacro extends AbstractMacro {
 
 	private StringBuilder printLinkListItem(String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
-		PageStore pageStore = getPageStore();
+		IPageStore pageStore = getPageStore();
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (path.equals(currentPagePath)) {
@@ -103,7 +103,7 @@ class NeighborsMacro extends AbstractMacro {
 
 	private StringBuilder printChildren(String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
-		PageStore pageStore = getPageStore();
+		IPageStore pageStore = getPageStore();
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		List<String> childPaths = pageStore.listChildPagePaths(context.getProjectName(), context.getBranchName(), path);
 		if (!childPaths.isEmpty()) {

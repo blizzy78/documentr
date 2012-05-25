@@ -36,8 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -48,7 +48,7 @@ public class BranchController {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
-	private PageStore pageStore;
+	private IPageStore pageStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
@@ -100,7 +100,7 @@ public class BranchController {
 		this.repoManager = repoManager;
 	}
 
-	void setPageStore(PageStore pageStore) {
+	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
 }

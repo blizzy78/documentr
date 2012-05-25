@@ -57,7 +57,7 @@ import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Component
-public class PageStore {
+public class PageStore implements IPageStore {
 	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
@@ -70,6 +70,7 @@ public class PageStore {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	
+	@Override
 	public void savePage(String projectName, String branchName, String path, Page page)
 			throws IOException {
 		
@@ -84,6 +85,7 @@ public class PageStore {
 		}
 	}
 
+	@Override
 	public void saveAttachment(String projectName, String branchName, String pagePath, String name, Page attachment)
 			throws IOException {
 		
@@ -150,6 +152,7 @@ public class PageStore {
 		return result;
 	}
 	
+	@Override
 	public Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -206,6 +209,7 @@ public class PageStore {
 		}
 	}
 
+	@Override
 	public Page getAttachment(String projectName, String branchName, String pagePath, String name)
 			throws IOException {
 		
@@ -226,6 +230,7 @@ public class PageStore {
 		}
 	}
 	
+	@Override
 	public List<String> listPagePaths(String projectName, String branchName) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -244,6 +249,7 @@ public class PageStore {
 		}
 	}
 
+	@Override
 	public List<String> listPageAttachments(String projectName, String branchName, String pagePath)
 			throws IOException {
 		
@@ -327,11 +333,13 @@ public class PageStore {
 		return result;
 	}
 	
+	@Override
 	public boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) throws IOException {
 		List<String> branches = getBranchesPageIsSharedWith(projectName, branchName, path);
 		return branches.size() >= 2;
 	}
 
+	@Override
 	public List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -395,6 +403,7 @@ public class PageStore {
 		this.repoManager = repoManager;
 	}
 
+	@Override
 	public List<String> listChildPagePaths(String projectName, String branchName, final String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -421,6 +430,7 @@ public class PageStore {
 		}
 	}
 
+	@Override
 	public void deletePage(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);

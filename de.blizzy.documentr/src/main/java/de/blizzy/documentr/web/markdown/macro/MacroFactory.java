@@ -23,7 +23,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 @Component
@@ -32,7 +32,7 @@ public class MacroFactory {
 			new HashMap<String, Class<? extends IMacro>>();
 	
 	@Autowired
-	private PageStore pageStore;
+	private IPageStore pageStore;
 
 	static {
 		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
@@ -60,7 +60,7 @@ public class MacroFactory {
 		}
 	}
 
-	void setPageStore(PageStore pageStore) {
+	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
 }

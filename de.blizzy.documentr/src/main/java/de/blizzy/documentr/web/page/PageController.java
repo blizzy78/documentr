@@ -38,9 +38,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.pagestore.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
@@ -50,7 +50,7 @@ import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 @RequestMapping("/page")
 public class PageController {
 	@Autowired
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
@@ -68,10 +68,9 @@ public class PageController {
 			model.addAttribute("path", path); //$NON-NLS-1$
 			model.addAttribute("pageName", //$NON-NLS-1$
 					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
-			Page page = pageStore.getPage(projectName, branchName, path, true);
+			Page page = pageStore.getPage(projectName, branchName, path, false);
 			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
-			model.addAttribute("text", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -225,7 +224,7 @@ public class PageController {
 		return "redirect:/page/" + projectName + "/" + branchName + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	void setPageStore(PageStore pageStore) {
+	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
 

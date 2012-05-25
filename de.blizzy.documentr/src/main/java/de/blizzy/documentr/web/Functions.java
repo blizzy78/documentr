@@ -26,34 +26,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.web.markdown.MarkdownProcessor;
+import de.blizzy.documentr.web.markdown.IPageRenderer;
 
 @Component
 public final class Functions {
-	private static PageStore pageStore;
+	private static IPageStore pageStore;
 	private static GlobalRepositoryManager repoManager;
 	private static UserStore userStore;
-	private static MarkdownProcessor markdownProcessor;
+	private static IPageRenderer pageRenderer;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
 	@Autowired
-	private PageStore _pageStore;
+	private IPageStore _pageStore;
 	@Autowired
 	private UserStore _userStore;
 	@Autowired
-	private MarkdownProcessor _markdownProcessor;
+	private IPageRenderer _pageRenderer;
 	
 	@PostConstruct
 	public void init() {
 		pageStore = _pageStore;
 		repoManager = _repoManager;
 		userStore = _userStore;
-		markdownProcessor = _markdownProcessor;
+		pageRenderer = _pageRenderer;
 	}
 
 	public static List<String> listProjects() {
@@ -101,8 +101,12 @@ public final class Functions {
 		}
 	}
 	
-	public static String markdownToHTML(String markdown, String projectName, String branchName, String path) {
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path);
+	public static String getPageHTML(String projectName, String branchName, String path) {
+		try {
+			return pageRenderer.getHTML(projectName, branchName, path);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {

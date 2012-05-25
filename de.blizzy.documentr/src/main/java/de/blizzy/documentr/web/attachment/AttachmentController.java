@@ -39,15 +39,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
-import de.blizzy.documentr.pagestore.PageStore;
 
 @Controller
 @RequestMapping("/attachment")
 public class AttachmentController {
 	@Autowired
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	@Autowired
 	private ServletContext servletContext;
 	
@@ -116,7 +116,7 @@ public class AttachmentController {
 		return getAttachments(projectName, branchName, pagePath, model);
 	}
 
-	void setPageStore(PageStore pageStore) {
+	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
 

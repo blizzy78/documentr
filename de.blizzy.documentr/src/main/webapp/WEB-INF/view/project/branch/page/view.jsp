@@ -135,7 +135,7 @@ function showDeleteDialog() {
 </h1>
 </div>
 
-<c:out value="${d:markdownToHTML(text, projectName, branchName, path)}" escapeXml="false"/>
+<c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/>
 
 <sec:authorize access="isAuthenticated()">
 	<p class="spacer">

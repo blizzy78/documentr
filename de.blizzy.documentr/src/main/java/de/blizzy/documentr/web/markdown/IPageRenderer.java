@@ -15,26 +15,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.web.markdown;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public final class PageUtil {
-	private PageUtil() {}
+import org.springframework.cache.annotation.Cacheable;
 
-	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath,
-			IPageStore pageStore) throws IOException {
-		
-		List<String> result = new ArrayList<String>();
-		result.add(pagePath);
-		for (Page page = pageStore.getPage(projectName, branchName, pagePath, false);
-			page.getParentPagePath() != null;
-			page = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false)) {
-			
-			result.add(0, page.getParentPagePath());
-		}
-		return result;
-	}
+public interface IPageRenderer {
+	@Cacheable(value="pageHTML", key="#p0 + \"/\" + #p1 + \"/\" + #p2")
+	String getHTML(String projectName, String branchName, String path) throws IOException;
 }

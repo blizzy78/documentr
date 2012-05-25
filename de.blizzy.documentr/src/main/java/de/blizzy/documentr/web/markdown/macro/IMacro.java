@@ -17,12 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 public interface IMacro {
 	void setParameters(String params);
 	void setHtmlSerializerContext(HtmlSerializerContext context);
-	void setPageStore(PageStore pageStore);
+	void setPageStore(IPageStore pageStore);
 	String getHtml();
 }
