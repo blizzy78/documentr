@@ -1,3 +1,5 @@
+<%@ page contentType="text/javascript; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 /*
 Lightbox v2.51
@@ -48,8 +50,8 @@ lightbox = new Lightbox options
   LightboxOptions = (function() {
 
     function LightboxOptions() {
-      this.fileLoadingImage = 'images/loading.gif';
-      this.fileCloseImage = 'images/close.png';
+      this.fileLoadingImage = '<c:url value="/img/lightbox-2.51/loading.gif"/>';
+      this.fileCloseImage = '<c:url value="/img/lightbox-2.51/close.png"/>';
       this.resizeDuration = 700;
       this.fadeDuration = 500;
       this.labelImage = "Image";
