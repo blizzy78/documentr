@@ -476,9 +476,12 @@ public class PageStore implements IPageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			RevCommit commit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
 
 			// FIXME: would love to use author details instead of committer, but JGit doesn't have getAuthoredTime()
+			
+			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
+			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			RevCommit commit = getNewestCommit(metaCommit, pageCommit);
 			
 			PersonIdent committer = commit.getCommitterIdent();
 			String lastEditedBy = null;
@@ -493,5 +496,19 @@ public class PageStore implements IPageStore {
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+	
+	private RevCommit getNewestCommit(RevCommit... commits) {
+		RevCommit newestCommit = null;
+		int newestCommitTime = Integer.MIN_VALUE;
+		for (RevCommit commit : commits) {
+			if (commit != null) {
+				int time = commit.getCommitTime();
+				if (time > newestCommitTime) {
+					newestCommit = commit;
+				}
+			}
+		}
+		return newestCommit;
 	}
 }

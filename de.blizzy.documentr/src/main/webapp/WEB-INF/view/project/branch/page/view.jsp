@@ -135,11 +135,11 @@ function showDeleteDialog() {
 <sec:authorize access="isAuthenticated()">
 	<c:set var="branches" value="${d:getBranchesPageIsSharedWith(projectName, branchName, path)}"/>
 	<c:if test="${fn:length(branches) ge 2}">
-		<c:set var="branches" value="${d:join(branches, ', ')}"/>
+		<c:set var="branchNames" value="${d:join(branches, ', ')}"/>
 	</c:if>
 </sec:authorize>
 <span class="page-metadata">(<spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
---%><c:if test="${!empty branches}"> &ndash; <spring:message code="sharedWithX" arguments="${branches}" argumentSeparator="|"/></c:if><%--
+--%><c:if test="${!empty branchNames}"> &ndash; <spring:message code="sharedWithX" arguments="${branchNames}" argumentSeparator="|"/></c:if><%--
 --%>)</span>
 </h1>
 </div>
