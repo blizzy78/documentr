@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +35,15 @@ import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 @Component
 public class MarkdownProcessor {
+	@SuppressWarnings("nls")
+	private static final Pattern[] CLEANUP_RE = {
+		Pattern.compile("<p>(<p.*?</p>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p>(<div.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p>(<ul.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p>(<ol.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE)
+	};
+	private static final String CLEANUP_REPLACE_WITH = "$1"; //$NON-NLS-1$
+	
 	@Autowired
 	private MacroFactory macroFactory;
 
@@ -53,22 +61,19 @@ public class MarkdownProcessor {
 			String macroHtml = StringUtils.defaultString(invocation.getMacro().getHtml());
 			html = StringUtils.replace(html, invocation.getMarker(), macroHtml);
 		}
-		html = cleanupHTML(html);
+		html = cleanupHTML(html, macroInvocations);
 		return html;
 	}
 
-	private String cleanupHTML(String html) {
+	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations) {
 		for (;;) {
 			String newHtml = html;
-			newHtml = replace(newHtml, "<p>(<p.*?</p>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-			newHtml = replace(newHtml, "<p>(<div.*?</div>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-			newHtml = replace(newHtml, "<p>(<ul.*?</ul>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-			newHtml = replace(newHtml, "<p>(<ol.*?</ol>)</p>", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-			newHtml = replace(newHtml, "(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" + //$NON-NLS-1$
-						"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" + //$NON-NLS-1$
-						"<ul class=\"thumbnails\">(<li class=\"span3\">" + //$NON-NLS-1$
-						"<a class=\"thumbnail\" (?:[^>]+)>)", //$NON-NLS-1$
-						"$1$2"); //$NON-NLS-1$
+			for (Pattern pattern : CLEANUP_RE) {
+				newHtml = pattern.matcher(newHtml).replaceAll(CLEANUP_REPLACE_WITH);
+			}
+			for (MacroInvocation macroInvocation : macroInvocations) {
+				newHtml = macroInvocation.getMacro().cleanupHTML(newHtml);
+			}
 			
 			if (newHtml.equals(html)) {
 				break;
@@ -79,12 +84,6 @@ public class MarkdownProcessor {
 		return html;
 	}
 	
-	private String replace(String html, String pattern, String replaceWith) {
-		Pattern p = Pattern.compile(pattern, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-		Matcher matcher = p.matcher(html);
-		return matcher.replaceAll(replaceWith);
-	}
-
 	public MacroInvocation getMacroInvocation(String macroName, String params, HtmlSerializerContext context) {
 		IMacro macro = macroFactory.get(macroName, params, context);
 		return new MacroInvocation(macro);

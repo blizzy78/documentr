@@ -15,28 +15,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+package de.blizzy.documentr;
 
-/* {{neighbors/}} macro */
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
-.neighbors-box {
-	background-color: #e5f3fa;
-	border: 1px solid rgba(0, 0, 0, 0.05);
-	border-radius: 4px 4px 4px 4px;
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
-	padding: 10px;
-	float: right;
-	margin-left: 20px;
-	margin-bottom: 20px;
-}
-
-.neighbors-box ul.neighbors {
-	margin: 0 0 0 16px;
-}
-
-.neighbors-box li.active {
-	font-weight: bold;
-}
-
-.neighbors-box li.active ul {
-	font-weight: normal;
+public class FirstParameter<T> implements Answer<T> {
+	@Override
+	public T answer(InvocationOnMock invocation) throws Throwable {
+		@SuppressWarnings("unchecked")
+		T result = (T) invocation.getArguments()[0];
+		return result;
+	}
 }

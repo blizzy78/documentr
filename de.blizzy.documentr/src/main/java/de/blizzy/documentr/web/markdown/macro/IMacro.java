@@ -25,4 +25,5 @@ public interface IMacro {
 	void setHtmlSerializerContext(HtmlSerializerContext context);
 	void setPageStore(IPageStore pageStore);
 	String getHtml();
+	String cleanupHTML(String html);
 }

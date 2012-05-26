@@ -19,6 +19,7 @@ package de.blizzy.documentr.web.markdown.macro;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,13 +28,22 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 class NeighborsMacro extends AbstractMacro {
+	@SuppressWarnings("nls")
+	private static final Pattern CLEANUP_RE = Pattern.compile(
+			"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
+			"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
+			"<ul class=\"thumbnails\">(<li class=\"span3\">" +
+			"<a class=\"thumbnail\" (?:[^>]+)>)",
+			Pattern.DOTALL);
+	private static final String CLEANUP_REPLACE_WITH = "$1$2"; //$NON-NLS-1$
+
 	@Override
 	public String getHtml() {
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		if (context.getPagePath() != null) {
 			try {
 				StringBuilder buf = new StringBuilder();
-				buf.append("<div class=\"children-box\"><ul class=\"children\">"); //$NON-NLS-1$
+				buf.append("<div class=\"neighbors-box\"><ul class=\"neighbors\">"); //$NON-NLS-1$
 				buf.append(printParent(
 						printLinkListItem(context.getPagePath(), context.getPagePath()),
 						context.getPagePath(), context.getPagePath()));
@@ -114,5 +124,10 @@ class NeighborsMacro extends AbstractMacro {
 			buf.append("</ul>"); //$NON-NLS-1$
 		}
 		return buf;
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return CLEANUP_RE.matcher(html).replaceAll(CLEANUP_REPLACE_WITH);
 	}
 }

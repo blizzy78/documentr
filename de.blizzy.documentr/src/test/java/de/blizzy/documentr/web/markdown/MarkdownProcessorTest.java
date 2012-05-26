@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import de.blizzy.documentr.FirstParameter;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
@@ -47,6 +48,7 @@ public class MarkdownProcessorTest {
 		IMacro macro = mock(IMacro.class);
 		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
 		when(macro.getHtml()).thenReturn(macroHtml);
+		when(macro.cleanupHTML(anyString())).thenAnswer(new FirstParameter<String>());
 		
 		when(macroFactory.get(eq(MACRO), (String) isNull(), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 		

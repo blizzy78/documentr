@@ -110,8 +110,8 @@ public class NeighborsMacroTest {
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")
 		String html =
-				"<div class=\"children-box\">" +
-					"<ul class=\"children\">" +
+				"<div class=\"neighbors-box\">" +
+					"<ul class=\"neighbors\">" +
 						"<li>" +
 							"<a href=\"/home\">home</a>" +
 							"<ul>" +

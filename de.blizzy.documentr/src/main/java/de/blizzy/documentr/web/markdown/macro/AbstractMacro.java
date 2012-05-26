@@ -44,6 +44,11 @@ public abstract class AbstractMacro implements IMacro {
 	}
 
 	@Override
+	public String cleanupHTML(String html) {
+		return html;
+	}
+	
+	@Override
 	public void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
