@@ -60,60 +60,38 @@ public final class Functions {
 		return repoManager.listProjects();
 	}
 	
-	public static List<String> listProjectBranches(String projectName) {
-		try {
-			return repoManager.listProjectBranches(projectName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static List<String> listProjectBranches(String projectName) throws IOException {
+		return repoManager.listProjectBranches(projectName);
 	}
 
-	public static List<String> listPageAttachments(String projectName, String branchName, String path) {
-		try {
-			return pageStore.listPageAttachments(projectName, branchName, path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static List<String> listPageAttachments(String projectName, String branchName, String path)
+			throws IOException {
+		
+		return pageStore.listPageAttachments(projectName, branchName, path);
 	}
 	
-	public static String getPageTitle(String projectName, String branchName, String path) {
-		try {
-			Page page = pageStore.getPage(projectName, branchName, path, false);
-			return page.getTitle();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static String getPageTitle(String projectName, String branchName, String path) throws IOException {
+		Page page = pageStore.getPage(projectName, branchName, path, false);
+		return page.getTitle();
 	}
 	
-	public static List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) {
-		try {
-			return pageStore.getBranchesPageIsSharedWith(projectName, branchName, path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path)
+			throws IOException {
+		
+		return pageStore.getBranchesPageIsSharedWith(projectName, branchName, path);
 	}
 	
-	public static List<String> listUsers() {
-		try {
-			return userStore.listUsers();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static List<String> listUsers() throws IOException {
+		return userStore.listUsers();
 	}
 	
-	public static String getPageHTML(String projectName, String branchName, String path) {
-		try {
-			return pageRenderer.getHTML(projectName, branchName, path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static String getPageHTML(String projectName, String branchName, String path) throws IOException {
+		return pageRenderer.getHTML(projectName, branchName, path);
 	}
 
-	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath) {
-		try {
-			return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)
+			throws IOException {
+		
+		return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
 	}
 }
