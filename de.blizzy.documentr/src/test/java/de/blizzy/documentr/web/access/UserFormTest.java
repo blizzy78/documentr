@@ -41,6 +41,12 @@ public class UserFormTest {
 	}
 	
 	@Test
+	public void getEmail() {
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		assertEquals("email", form.getEmail()); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void isDisabled() {
 		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertFalse(form.isDisabled());
