@@ -24,17 +24,35 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class SettingsTest {
+	private ServletContext servletContext;
+	private Settings settings;
+
+	@Before
+	public void setUp() {
+		servletContext = mock(ServletContext.class);
+		
+		settings = new Settings();
+		settings.setServletContext(servletContext);
+	}
+	
 	@Test
 	public void init() {
-		ServletContext servletContext = mock(ServletContext.class);
 		when(servletContext.getInitParameter("documentr.dataDir")).thenReturn("."); //$NON-NLS-1$ //$NON-NLS-2$
-		Settings settings = new Settings();
-		settings.setServletContext(servletContext);
 		
 		settings.init();
+		assertEquals(new File("."), settings.getDocumentrDataDir()); //$NON-NLS-1$
+	}
+
+	@Test
+	public void initMustFallBackToSystemProperty() {
+		System.setProperty("documentr.dataDir", "."); //$NON-NLS-1$ //$NON-NLS-2$
+		settings.init();
+		System.setProperty("documentr.dataDir", "nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		assertEquals(new File("."), settings.getDocumentrDataDir()); //$NON-NLS-1$
 	}
 }
