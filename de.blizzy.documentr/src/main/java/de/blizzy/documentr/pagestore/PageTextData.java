@@ -17,36 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.pagestore;
 
-import java.io.UnsupportedEncodingException;
+import de.blizzy.documentr.Util;
 
 public class PageTextData extends PageData {
 	static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
 	
 	public PageTextData(String text) {
-		super(toBytes(text), CONTENT_TYPE);
-	}
-	
-	private static byte[] toBytes(String s) {
-		try {
-			return s.getBytes("UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		super(Util.toBytes(text), CONTENT_TYPE);
 	}
 	
 	static PageTextData fromBytes(byte[] data) {
-		try {
-			return new PageTextData(new String(data, "UTF-8")); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return new PageTextData(Util.fromBytes(data));
 	}
 	
 	public String getText() {
-		try {
-			return new String(getData(), "UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return Util.fromBytes(getData());
 	}
 }

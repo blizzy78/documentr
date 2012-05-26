@@ -37,5 +37,7 @@ public final class DocumentrConstants {
 	
 	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
 	
+	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+	
 	private DocumentrConstants() {}
 }

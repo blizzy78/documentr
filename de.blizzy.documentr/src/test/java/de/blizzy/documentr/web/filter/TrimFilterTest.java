@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import javax.servlet.FilterChain;
@@ -40,27 +39,22 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Util;
+
 public class TrimFilterTest {
 	private static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
 	private static final String TEXT = "  foo  \r\n"; //$NON-NLS-1$
 	private static final String TRIMMED_TEXT = "foo\n"; //$NON-NLS-1$
-	private static final byte[] TRIMMED_TEXT_DATA;
+	private static final byte[] TRIMMED_TEXT_DATA = Util.toBytes(TRIMMED_TEXT);
 	
-	static {
-		try {
-			TRIMMED_TEXT_DATA = TRIMMED_TEXT.getBytes("UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Test
 	public void doFilterWithOutputStream() throws IOException, ServletException {
 		doFilter(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
-				byte[] data = TEXT.getBytes("UTF-8"); //$NON-NLS-1$
+				byte[] data = Util.toBytes(TEXT);
 				response.setContentType(CONTENT_TYPE);
 				response.setContentLength(data.length);
 				response.getOutputStream().write(data);
@@ -75,7 +69,7 @@ public class TrimFilterTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
-				byte[] data = TEXT.getBytes("UTF-8");  //$NON-NLS-1$
+				byte[] data = Util.toBytes(TEXT);
 				response.setContentLength(data.length);
 				response.setContentType(CONTENT_TYPE);
 				response.getWriter().print(TEXT);
@@ -108,12 +102,12 @@ public class TrimFilterTest {
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
 				response.setContentType("image/png"); //$NON-NLS-1$
-				response.setContentLength(TEXT.getBytes("UTF-8").length); //$NON-NLS-1$
+				response.setContentLength(Util.toBytes(TEXT).length);
 				response.getWriter().print(TEXT.substring(0, 1));
 				response.getWriter().print(TEXT.substring(1));
 				return null;
 			}
-		}, "image/png", TEXT.getBytes("UTF-8")); //$NON-NLS-1$ //$NON-NLS-2$
+		}, "image/png", Util.toBytes(TEXT)); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -135,7 +129,7 @@ public class TrimFilterTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		FilterChain filterChain = mock(FilterChain.class);
 
-		when(response.getCharacterEncoding()).thenReturn("UTF-8"); //$NON-NLS-1$
+		when(response.getCharacterEncoding()).thenReturn(DocumentrConstants.ENCODING);
 		when(response.getContentType()).thenReturn(contentType);
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -147,7 +141,7 @@ public class TrimFilterTest {
 		};
 		when(response.getOutputStream()).thenReturn(servletOut);
 		
-		PrintWriter writer = new PrintWriter(new OutputStreamWriter(servletOut, "UTF-8")); //$NON-NLS-1$
+		PrintWriter writer = new PrintWriter(new OutputStreamWriter(servletOut, DocumentrConstants.ENCODING));
 		when(response.getWriter()).thenReturn(writer);
 		
 		doAnswer(doFilterAnswer).when(filterChain).doFilter(Matchers.<ServletRequest>any(), Matchers.<ServletResponse>any());

@@ -20,15 +20,15 @@ package de.blizzy.documentr.pagestore;
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 
-import java.io.UnsupportedEncodingException;
-
 import org.junit.Test;
+
+import de.blizzy.documentr.Util;
 
 public class PageTextDataTest {
 	@Test
-	public void getText() throws UnsupportedEncodingException {
+	public void getText() {
 		assertEquals("foo", new PageTextData("foo").getText()); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("foo", PageTextData.fromBytes("foo".getBytes("UTF-8")).getText()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("foo", PageTextData.fromBytes(Util.toBytes("foo")).getText()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

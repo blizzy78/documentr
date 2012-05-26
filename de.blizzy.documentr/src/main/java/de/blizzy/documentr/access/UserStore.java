@@ -45,6 +45,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -98,7 +99,7 @@ public class UserStore {
 			String json = gson.toJson(userMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File workingFile = new File(workingDir, user.getLoginName() + USER_SUFFIX);
-			FileUtils.write(workingFile, json, "UTF-8"); //$NON-NLS-1$
+			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
 
 			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(user.getLoginName() + USER_SUFFIX).call();

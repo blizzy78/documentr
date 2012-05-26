@@ -25,6 +25,9 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Util;
+
 public class TrimWriterTest {
 	@Test
 	public void write() throws IOException {
@@ -45,12 +48,12 @@ public class TrimWriterTest {
 					"  d e  \r\n" +
 					"  f g  </textarea>\r\n" +
 					"  zzz \t  \r\n";
-			writer.write(text, out, "UTF-8"); //$NON-NLS-1$
+			writer.write(text, out, DocumentrConstants.ENCODING);
 		} finally {
 			IOUtils.closeQuietly(out);
 		}
 		
-		String result = new String(out.toByteArray(), "UTF-8"); //$NON-NLS-1$
+		String result = Util.fromBytes(out.toByteArray());
 		@SuppressWarnings("nls")
 		String expected =
 				"xyz\n" +

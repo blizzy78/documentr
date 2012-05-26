@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import de.blizzy.documentr.web.filter.RequestEncodingFilter;
+import de.blizzy.documentr.DocumentrConstants;
 
 public class RequestEncodingFilterTest {
 	@Test
@@ -42,8 +42,8 @@ public class RequestEncodingFilterTest {
 		filter.doFilter(request, response, chain);
 
 		InOrder inOrder = inOrder(request, response, chain);
-		inOrder.verify(request).setCharacterEncoding("UTF-8"); //$NON-NLS-1$
-		inOrder.verify(response).setCharacterEncoding("UTF-8"); //$NON-NLS-1$
+		inOrder.verify(request).setCharacterEncoding(DocumentrConstants.ENCODING);
+		inOrder.verify(response).setCharacterEncoding(DocumentrConstants.ENCODING);
 		inOrder.verify(chain).doFilter(request, response);
 	}
 }

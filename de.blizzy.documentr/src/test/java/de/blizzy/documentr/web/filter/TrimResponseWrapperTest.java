@@ -31,6 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Util;
+
 public class TrimResponseWrapperTest {
 	@Test
 	public void setContentLengthMustBeIgnored() {
@@ -47,7 +50,7 @@ public class TrimResponseWrapperTest {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 
-		byte[] data = "hello \u20AC".getBytes("UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
+		byte[] data = Util.toBytes("hello \u20AC"); //$NON-NLS-1$
 		
 		ServletOutputStream out = null;
 		try {
@@ -63,7 +66,7 @@ public class TrimResponseWrapperTest {
 	@Test
 	public void getWriterAndGetData() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		when(response.getCharacterEncoding()).thenReturn("UTF-8"); //$NON-NLS-1$
+		when(response.getCharacterEncoding()).thenReturn(DocumentrConstants.ENCODING);
 		
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
@@ -78,6 +81,6 @@ public class TrimResponseWrapperTest {
 			IOUtils.closeQuietly(out);
 		}
 		
-		assertTrue(Arrays.equals(s.getBytes("UTF-8"), wrapper.getData())); //$NON-NLS-1$
+		assertTrue(Arrays.equals(Util.toBytes(s), wrapper.getData()));
 	}
 }

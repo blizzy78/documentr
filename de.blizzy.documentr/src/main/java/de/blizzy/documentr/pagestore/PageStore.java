@@ -52,6 +52,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -122,7 +123,7 @@ public class PageStore implements IPageStore {
 			File pagesDir = new File(workingDir, rootDir);
 			File workingFile = toFile(pagesDir, path + META_SUFFIX);
 			FileUtils.forceMkdir(workingFile.getParentFile());
-			FileUtils.write(workingFile, json, "UTF-8"); //$NON-NLS-1$
+			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
 
 			PageData pageData = page.getData();
 			if (pageData != null) {
@@ -186,7 +187,7 @@ public class PageStore implements IPageStore {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
 			
-			String json = FileUtils.readFileToString(workingFile, "UTF-8"); //$NON-NLS-1$
+			String json = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			

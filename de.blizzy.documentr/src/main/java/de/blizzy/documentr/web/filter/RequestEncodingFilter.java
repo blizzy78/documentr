@@ -26,6 +26,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import de.blizzy.documentr.DocumentrConstants;
+
 public class RequestEncodingFilter implements Filter {
 	@Override
 	public void init(FilterConfig config) throws ServletException {
@@ -39,8 +41,8 @@ public class RequestEncodingFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		
-		request.setCharacterEncoding("UTF-8"); //$NON-NLS-1$
-		response.setCharacterEncoding("UTF-8"); //$NON-NLS-1$
+		request.setCharacterEncoding(DocumentrConstants.ENCODING);
+		response.setCharacterEncoding(DocumentrConstants.ENCODING);
 		chain.doFilter(request, response);
 	}
 }

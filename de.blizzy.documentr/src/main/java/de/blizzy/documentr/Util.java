@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -85,5 +86,21 @@ public final class Util {
 			c = Collections.singleton(o);
 		}
 		return StringUtils.join(c, delimiter);
+	}
+	
+	public static byte[] toBytes(String s) {
+		try {
+			return s.getBytes(DocumentrConstants.ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String fromBytes(byte[] b) {
+		try {
+			return StringUtils.toString(b, DocumentrConstants.ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
