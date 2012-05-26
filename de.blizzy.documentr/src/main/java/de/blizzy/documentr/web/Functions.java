@@ -94,4 +94,20 @@ public final class Functions {
 		
 		return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
 	}
+
+	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		Functions.repoManager = repoManager;
+	}
+
+	static void setPageStore(IPageStore pageStore) {
+		Functions.pageStore = pageStore;
+	}
+
+	static void setUserStore(UserStore userStore) {
+		Functions.userStore = userStore;
+	}
+
+	static void setPageRenderer(IPageRenderer pageRenderer) {
+		Functions.pageRenderer = pageRenderer;
+	}
 }
