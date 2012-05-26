@@ -27,7 +27,7 @@ import org.pegdown.ast.WikiLinkNode;
 
 import de.blizzy.documentr.Util;
 
-public class LinkRendererTest {
+public class DocumentrLinkRendererTest {
 	@Test
 	public void renderWikiLink() {
 		WikiLinkNode node = new WikiLinkNode("foo"); //$NON-NLS-1$
