@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
@@ -125,13 +126,21 @@ function showDeleteDialog() {
 </sec:authorize>
 
 <div class="page-header"><h1><c:out value="${title}"/>
+<c:set var="metadata" value="${d:getPageMetadata(projectName, branchName, path)}"/>
+<c:set var="lastEdited"><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></c:set>
+<c:choose>
+	<c:when test="${!empty metadata.lastEditedBy}"><c:set var="lastEdit"><spring:message code="lastEdit.userXOnDateX" arguments="${metadata.lastEditedBy}|${lastEdited}" argumentSeparator="|"/></c:set></c:when>
+	<c:otherwise><c:set var="lastEdit" value="${lastEdited}"/></c:otherwise>
+</c:choose>
 <sec:authorize access="isAuthenticated()">
 	<c:set var="branches" value="${d:getBranchesPageIsSharedWith(projectName, branchName, path)}"/>
 	<c:if test="${fn:length(branches) ge 2}">
 		<c:set var="branches" value="${d:join(branches, ', ')}"/>
-		<span class="shared-page">(<spring:message code="sharedWithX" arguments="${branches}" argumentSeparator="|"/>)</span>
 	</c:if>
 </sec:authorize>
+<span class="page-metadata">(<spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
+--%><c:if test="${!empty branches}"> &ndash; <spring:message code="sharedWithX" arguments="${branches}" argumentSeparator="|"/></c:if><%--
+--%>)</span>
 </h1>
 </div>
 

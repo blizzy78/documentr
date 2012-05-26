@@ -51,6 +51,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<form:password path="password1" cssClass="input-xlarge" autocomplete="off"/>
 			<c:if test="${!empty errorText1}"><span class="help-inline"><c:out value="${errorText1}" escapeXml="false"/></span></c:if>
 		</div>
+		<c:set var="errorText"><form:errors path="email"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="email" cssClass="control-label"><spring:message code="label.email"/>:</form:label>
+			<form:input path="email" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
 		<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
 			<form:label path="password2" cssClass="control-label"><spring:message code="label.repeatPassword"/>:</form:label>
 			<form:password path="password2" cssClass="input-xlarge" autocomplete="off"/>

@@ -29,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
@@ -50,6 +53,8 @@ public class AttachmentController {
 	private IPageStore pageStore;
 	@Autowired
 	private ServletContext servletContext;
+	@Autowired
+	private UserStore userStore;
 	
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -102,7 +107,8 @@ public class AttachmentController {
 			method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @RequestParam MultipartFile file, Model model) throws IOException {
+			@PathVariable String pagePath, @RequestParam MultipartFile file, Model model,
+			Authentication authentication) throws IOException {
 
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		String contentType = servletContext.getMimeType(file.getOriginalFilename());
@@ -111,7 +117,8 @@ public class AttachmentController {
 		}
 		Page attachment = Page.fromData(null, data, contentType);
 		pagePath = Util.toRealPagePath(pagePath);
-		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment);
+		User user = userStore.getUser(authentication.getName());
+		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);
 		
 		return getAttachments(projectName, branchName, pagePath, model);
 	}
@@ -122,5 +129,9 @@ public class AttachmentController {
 
 	void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }

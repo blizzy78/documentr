@@ -31,29 +31,41 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class BranchControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private BranchController branchController;
 	private GlobalRepositoryManager repoManager;
 	private PageStore pageStore;
+	private Authentication authentication;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		repoManager = mock(GlobalRepositoryManager.class);
 		pageStore = mock(PageStore.class);
 		
+		UserStore userStore = mock(UserStore.class);
+		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
+
 		branchController = new BranchController();
 		branchController.setGlobalRepositoryManager(repoManager);
 		branchController.setPageStore(pageStore);
+		branchController.setUserStore(userStore);
+
+		authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
@@ -72,14 +84,14 @@ public class BranchControllerTest {
 		
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
-		String view = branchController.saveBranch(branchForm, bindingResult);
+		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/page/edit/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		
 		verify(repoManager).createProjectBranchRepository(PROJECT, BRANCH, null);
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq("home"), //$NON-NLS-1$
-				argPage(null, "Home", StringUtils.EMPTY)); //$NON-NLS-1$
+				argPage(null, "Home", StringUtils.EMPTY), same(USER)); //$NON-NLS-1$
 	}
 
 	@Test
@@ -88,7 +100,7 @@ public class BranchControllerTest {
 		
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
-		String view = branchController.saveBranch(branchForm, bindingResult);
+		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -102,7 +114,7 @@ public class BranchControllerTest {
 		
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
-		String view = branchController.saveBranch(branchForm, bindingResult);
+		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/project/branch/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("name")); //$NON-NLS-1$

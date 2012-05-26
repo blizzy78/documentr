@@ -26,12 +26,14 @@ public class User {
 	
 	private String loginName;
 	private String password;
+	private String email;
 	private boolean disabled;
 	private boolean admin;
 
-	public User(String loginName, String password, boolean disabled, boolean admin) {
+	public User(String loginName, String password, String email, boolean disabled, boolean admin) {
 		this.loginName = loginName;
 		this.password = password;
+		this.email = email;
 		this.disabled = disabled;
 		this.admin = admin;
 	}
@@ -44,6 +46,10 @@ public class User {
 		return password;
 	}
 	
+	public String getEmail() {
+		return email;
+	}
+
 	public boolean isDisabled() {
 		return disabled;
 	}

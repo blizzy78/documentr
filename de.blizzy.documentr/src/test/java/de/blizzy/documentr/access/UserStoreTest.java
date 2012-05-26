@@ -39,6 +39,8 @@ import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 
 public class UserStoreTest extends AbstractDocumentrTest {
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 	private UserStore userStore;
 	private PasswordEncoder passwordEncoder;
 
@@ -75,8 +77,8 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void saveAndGetUser() throws IOException {
-		User user = new User("user", "p", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-		userStore.saveUser(user);
+		User user = new User("user", "p", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
 		User result = userStore.getUser("user"); //$NON-NLS-1$
 		assertEquals(user.getLoginName(), result.getLoginName());
 		assertEquals(user.getPassword(), result.getPassword());
@@ -86,9 +88,9 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void listUsers() throws IOException {
-		userStore.saveUser(new User("u1", "pw", false, false)); //$NON-NLS-1$ //$NON-NLS-2$
-		userStore.saveUser(new User("u2", "pw", false, false)); //$NON-NLS-1$ //$NON-NLS-2$
-		userStore.saveUser(new User("u3", "pw", false, false)); //$NON-NLS-1$ //$NON-NLS-2$
+		userStore.saveUser(new User("u1", "pw", "email", false, false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(new User("u2", "pw", "email", false, false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(new User("u3", "pw", "email", false, false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		Set<String> expected = new HashSet<String>(Arrays.asList("admin", "u1", "u2", "u3")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		Set<String> result = new HashSet<String>(userStore.listUsers());
 		assertEquals(expected, result);

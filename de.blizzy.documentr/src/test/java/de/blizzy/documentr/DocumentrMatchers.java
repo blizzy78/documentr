@@ -69,13 +69,16 @@ public final class DocumentrMatchers {
 		return argThat(matcher);
 	}
 
-	public static User argUser(final String loginName, final String password, final boolean disabled, final boolean admin) {
+	public static User argUser(final String loginName, final String password, final String email,
+			final boolean disabled, final boolean admin) {
+		
 		Matcher<User> matcher = new ArgumentMatcher<User>() {
 			@Override
 			public boolean matches(Object argument) {
 				User user = (User) argument;
 				return StringUtils.equals(user.getLoginName(), loginName) &&
 						StringUtils.equals(user.getPassword(), password) &&
+						StringUtils.equals(user.getEmail(), email) &&
 						(user.isDisabled() == disabled) &&
 						(user.isAdmin() == admin);
 			}

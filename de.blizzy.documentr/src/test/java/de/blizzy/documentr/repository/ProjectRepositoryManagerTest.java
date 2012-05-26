@@ -35,8 +35,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.access.User;
 
 public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 	private LockManager lockManager;
 
 	@Before
@@ -50,7 +53,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository lockedRepo = null;
 		try {
-			lockedRepo = repoManager.createCentralRepository();
+			lockedRepo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(lockedRepo);
 			lockedRepo = null;
@@ -72,13 +75,13 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository lockedRepo = null;
 		try {
-			lockedRepo = repoManager.createCentralRepository();
+			lockedRepo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(lockedRepo);
 			lockedRepo = null;
 		}
 		
-		register(repoManager.createCentralRepository());
+		register(repoManager.createCentralRepository(USER));
 	}
 	
 	@Test
@@ -88,7 +91,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ILockedRepository repo = null;
 		File gitDir;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 			gitDir = repo.r().getDirectory();
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
@@ -117,7 +120,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -146,7 +149,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -168,7 +171,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -195,7 +198,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 			Git.wrap(repo.r()).branchCreate().setName("startingBranch").call(); //$NON-NLS-1$
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
@@ -225,7 +228,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 			repo = null;
@@ -259,7 +262,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createCentralRepository();
+			repo = repoManager.createCentralRepository(USER);
 			Git.wrap(repo.r()).branchCreate().setName("branch1").call(); //$NON-NLS-1$
 			Git.wrap(repo.r()).branchCreate().setName("branch2").call(); //$NON-NLS-1$
 		} finally {

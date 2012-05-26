@@ -31,9 +31,11 @@ import org.junit.Test;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.access.User;
 
 public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private File allReposDir;
 	private GlobalRepositoryManager globalRepoManager;
@@ -63,8 +65,8 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void createProjectCentralRepository() throws IOException, GitAPIException {
-		when(repoManager.createCentralRepository()).thenReturn(repo);
-		assertSame(repo, globalRepoManager.createProjectCentralRepository(PROJECT));
+		when(repoManager.createCentralRepository(USER)).thenReturn(repo);
+		assertSame(repo, globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 	}
 	
 	@Test
@@ -103,8 +105,8 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 		repoManagerFactory.setLockManager(mock(LockManager.class));
 		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
 		globalRepoManager.init();
-		globalRepoManager.createProjectCentralRepository("project1"); //$NON-NLS-1$
-		globalRepoManager.createProjectCentralRepository("project2"); //$NON-NLS-1$
+		globalRepoManager.createProjectCentralRepository("project1", USER); //$NON-NLS-1$
+		globalRepoManager.createProjectCentralRepository("project2", USER); //$NON-NLS-1$
 		
 		List<String> projects = globalRepoManager.listProjects();
 		assertEquals(2, projects.size());

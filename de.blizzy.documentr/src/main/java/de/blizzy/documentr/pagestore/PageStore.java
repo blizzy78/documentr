@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +37,7 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -53,6 +55,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -72,23 +75,23 @@ public class PageStore implements IPageStore {
 	private GlobalRepositoryManager repoManager;
 	
 	@Override
-	public void savePage(String projectName, String branchName, String path, Page page)
-			throws IOException {
+	public void savePage(String projectName, String branchName, String path, Page page,
+			User user) throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		
 		try {
-			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME);
+			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME, user);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
 	}
 
 	@Override
-	public void saveAttachment(String projectName, String branchName, String pagePath, String name, Page attachment)
-			throws IOException {
+	public void saveAttachment(String projectName, String branchName, String pagePath, String name,
+			Page attachment, User user) throws IOException {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
@@ -98,15 +101,16 @@ public class PageStore implements IPageStore {
 		getPage(projectName, branchName, pagePath, false);
 		
 		try {
-			savePageInternal(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, attachment, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+			savePageInternal(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, attachment, //$NON-NLS-1$
+					ATTACHMENTS_DIR_NAME, user);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
 	}
 
-	private void savePageInternal(String projectName, String branchName, String path, String suffix, Page page, String rootDir)
-			throws IOException, GitAPIException {
-		
+	private void savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
+			String rootDir, User user) throws IOException, GitAPIException {
+
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
@@ -138,7 +142,11 @@ public class PageStore implements IPageStore {
 				addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
 			}
 			addCommand.call();
-			git.commit().setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
+			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 			git.push().call();
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
@@ -432,7 +440,7 @@ public class PageStore implements IPageStore {
 	}
 
 	@Override
-	public void deletePage(String projectName, String branchName, String path) throws IOException {
+	public void deletePage(String projectName, String branchName, String path, User user) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -445,9 +453,41 @@ public class PageStore implements IPageStore {
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
 				Git git = Git.wrap(repo.r());
-				git.commit().setMessage("delete " + path).call(); //$NON-NLS-1$
+				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+				git.commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("delete " + path).call(); //$NON-NLS-1$
 				git.push().call();
 			}
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+	
+	@Override
+	public PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			RevCommit commit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
+
+			// FIXME: would love to use author details instead of committer, but JGit doesn't have getAuthoredTime()
+			
+			PersonIdent committer = commit.getCommitterIdent();
+			String lastEditedBy = null;
+			if (committer != null) {
+				lastEditedBy = committer.getName();
+			}
+			Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+
+			return new PageMetadata(lastEditedBy, lastEdited);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {

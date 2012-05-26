@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -49,6 +52,8 @@ public class BranchController {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private IPageStore pageStore;
+	@Autowired
+	private UserStore userStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
@@ -60,8 +65,8 @@ public class BranchController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
-	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult)
-			throws IOException, GitAPIException {
+	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult,
+			Authentication authentication) throws IOException, GitAPIException {
 		
 		List<String> branches = repoManager.listProjectBranches(form.getProjectName());
 		boolean firstBranch = branches.isEmpty();
@@ -82,7 +87,8 @@ public class BranchController {
 		
 		if (firstBranch) {
 			Page page = Page.fromText(null, "Home", StringUtils.EMPTY); //$NON-NLS-1$
-			pageStore.savePage(form.getProjectName(), form.getName(), "home", page); //$NON-NLS-1$
+			User user = userStore.getUser(authentication.getName());
+			pageStore.savePage(form.getProjectName(), form.getName(), "home", page, user); //$NON-NLS-1$
 			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		
@@ -102,5 +108,9 @@ public class BranchController {
 
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }

@@ -42,7 +42,7 @@ public class DocumentrUserDetailsServiceTest {
 	
 	@Test
 	public void loadUserByUsername() throws IOException {
-		User user = new User("user", "pw", false, false); //$NON-NLS-1$ //$NON-NLS-2$
+		User user = new User("user", "pw", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
@@ -53,7 +53,7 @@ public class DocumentrUserDetailsServiceTest {
 	
 	@Test
 	public void loadUserByUsernameAdmin() throws IOException {
-		User user = new User("user", "pw", false, true); //$NON-NLS-1$ //$NON-NLS-2$
+		User user = new User("user", "pw", "email", false, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class DocumentrUserDetailsServiceTest {
 
 	@Test
 	public void loadUserByUsernameDisabled() throws IOException {
-		User user = new User("user", "pw", true, false); //$NON-NLS-1$ //$NON-NLS-2$
+		User user = new User("user", "pw", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$

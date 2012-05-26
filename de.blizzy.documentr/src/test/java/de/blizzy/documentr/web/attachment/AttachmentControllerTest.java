@@ -32,10 +32,13 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
 import de.blizzy.documentr.pagestore.PageStore;
@@ -45,20 +48,29 @@ public class AttachmentControllerTest {
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE_PATH_URL = "home,foo"; //$NON-NLS-1$
 	private static final String PAGE_PATH = "home/foo"; //$NON-NLS-1$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private AttachmentController attachmentController;
 	private PageStore pageStore;
+	private Authentication authentication;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		pageStore = mock(PageStore.class);
 		
 		ServletContext servletContext = mock(ServletContext.class);
 		when(servletContext.getMimeType("test.png")).thenReturn("image/png"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		UserStore userStore = mock(UserStore.class);
+		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
+		
 		attachmentController = new AttachmentController();
 		attachmentController.setPageStore(pageStore);
 		attachmentController.setServletContext(servletContext);
+		attachmentController.setUserStore(userStore);
+		
+		authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
@@ -116,11 +128,11 @@ public class AttachmentControllerTest {
 		when(file.getOriginalFilename()).thenReturn("test.png"); //$NON-NLS-1$
 		Model model = mock(Model.class);
 
-		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model);
+		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model, authentication);
 		assertEquals("/project/branch/page/attachments", view); //$NON-NLS-1$
 		
 		Page attachment = Page.fromData(null, data, "image/png"); //$NON-NLS-1$
-		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png", attachment); //$NON-NLS-1$
+		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png", attachment, USER); //$NON-NLS-1$
 	}
 
 	@Test
@@ -132,10 +144,10 @@ public class AttachmentControllerTest {
 		when(file.getOriginalFilename()).thenReturn("test.dat"); //$NON-NLS-1$
 		Model model = mock(Model.class);
 		
-		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model);
+		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model, authentication);
 		assertEquals("/project/branch/page/attachments", view); //$NON-NLS-1$
 		
 		Page attachment = Page.fromData(null, data, DocumentrConstants.DEFAULT_MIME_TYPE);
-		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment); //$NON-NLS-1$
+		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment, USER); //$NON-NLS-1$
 	}
 }

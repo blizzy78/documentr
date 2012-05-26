@@ -36,6 +36,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.access.User;
 
 @Component
 public class GlobalRepositoryManager {
@@ -50,14 +51,18 @@ public class GlobalRepositoryManager {
 		reposDir = new File(settings.getDocumentrDataDir(), "repositories"); //$NON-NLS-1$
 	}
 
-	public ILockedRepository createProjectCentralRepository(String projectName) throws IOException, GitAPIException {
+	public ILockedRepository createProjectCentralRepository(String projectName, User user)
+			throws IOException, GitAPIException {
+		
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
-		return repoManager.createCentralRepository();
+		return repoManager.createCentralRepository(user);
 	}
 
-	public ILockedRepository createProjectCentralRepository(String projectName, boolean bare) throws IOException, GitAPIException {
+	public ILockedRepository createProjectCentralRepository(String projectName, boolean bare, User user)
+			throws IOException, GitAPIException {
+		
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
-		return repoManager.createCentralRepository(bare);
+		return repoManager.createCentralRepository(bare, user);
 	}
 	
 	public ILockedRepository getProjectCentralRepository(String projectName) throws IOException {

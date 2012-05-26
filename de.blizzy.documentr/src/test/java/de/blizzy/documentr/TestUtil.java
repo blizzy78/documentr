@@ -19,6 +19,8 @@ package de.blizzy.documentr;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.pagestore.Page;
@@ -89,5 +91,11 @@ public final class TestUtil {
 	
 	public static void assertForward(String view) {
 		assertTrue(view.startsWith("forward:")); //$NON-NLS-1$
+	}
+	
+	public static void assertSecondsAgo(Date d, int seconds) {
+		long time = d.getTime();
+		long now = System.currentTimeMillis();
+		assertTrue((now - time) <= (seconds * 1000L));
 	}
 }

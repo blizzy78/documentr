@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,14 +51,17 @@ public class UserController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public String addUser(Model model) {
-		UserForm form = new UserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, false, false);
+		UserForm form = new UserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
+				StringUtils.EMPTY, false, false);
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
 	}
 
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public String saveUser(@ModelAttribute @Valid UserForm form, BindingResult bindingResult) throws IOException {
+	public String saveUser(@ModelAttribute @Valid UserForm form, BindingResult bindingResult,
+			Authentication authentication) throws IOException {
+		
 		if (StringUtils.isBlank(form.getPassword1()) && StringUtils.isNotBlank(form.getPassword2())) {
 			bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -100,8 +104,9 @@ public class UserController {
 			return "/user/edit"; //$NON-NLS-1$
 		}
 
-		User user = new User(form.getLoginName(), password, form.isDisabled(), form.isAdmin());
-		userStore.saveUser(user);
+		User newUser = new User(form.getLoginName(), password, form.getEmail(), form.isDisabled(), form.isAdmin());
+		User user = userStore.getUser(authentication.getName());
+		userStore.saveUser(newUser, user);
 		
 		return "redirect:/users"; //$NON-NLS-1$
 	}
@@ -111,7 +116,7 @@ public class UserController {
 	public String editUser(@PathVariable String loginName, Model model) throws IOException {
 		User user = userStore.getUser(loginName);
 		UserForm form = new UserForm(loginName, StringUtils.EMPTY, StringUtils.EMPTY,
-				user.isDisabled(), user.isAdmin());
+				user.getEmail(), user.isDisabled(), user.isAdmin());
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
 	}
@@ -119,9 +124,12 @@ public class UserController {
 	@ModelAttribute
 	public UserForm createUserForm(@RequestParam(required=false) String loginName,
 			@RequestParam(required=false) String password1, @RequestParam(required=false) String password2,
-			@RequestParam(required=false) boolean disabled, @RequestParam(required=false) boolean admin) {
+			@RequestParam(required=false) String email, @RequestParam(required=false) boolean disabled,
+			@RequestParam(required=false) boolean admin) {
 		
-		return (loginName != null) ? new UserForm(loginName, password1, password2, disabled, admin) : null;
+		return (loginName != null) ?
+				new UserForm(loginName, password1, password2, email, disabled, admin) :
+				null;
 	}
 
 	void setUserStore(UserStore userStore) {

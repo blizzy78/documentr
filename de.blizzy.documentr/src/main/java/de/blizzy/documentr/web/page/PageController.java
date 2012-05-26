@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +39,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
@@ -55,6 +58,8 @@ public class PageController {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private MarkdownProcessor markdownProcessor;
+	@Autowired
+	private UserStore userStore;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -113,8 +118,8 @@ public class PageController {
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
-	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult)
-			throws IOException {
+	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
+			Authentication authentication) throws IOException {
 		
 		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -142,7 +147,8 @@ public class PageController {
 			// okay
 		}
 		if ((oldPage == null) || !page.equals(oldPage)) {
-			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page);
+			User user = userStore.getUser(authentication.getName());
+			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page, user);
 		}
 
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -202,11 +208,13 @@ public class PageController {
 			method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
 	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, @RequestParam String targetBranchName) throws IOException {
+			@PathVariable String path, @RequestParam String targetBranchName, Authentication authentication)
+			throws IOException {
 
 		path = Util.toRealPagePath(path);
 		Page page = pageStore.getPage(projectName, branchName, path, true);
-		pageStore.savePage(projectName, targetBranchName, path, page);
+		User user = userStore.getUser(authentication.getName());
+		pageStore.savePage(projectName, targetBranchName, path, page, user);
 		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Util.toURLPagePath(path);
 	}
@@ -217,10 +225,11 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	public String deletePage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path) throws IOException {
+			@PathVariable String path, Authentication authentication) throws IOException {
 		
 		path = Util.toRealPagePath(path);
-		pageStore.deletePage(projectName, branchName, path);
+		User user = userStore.getUser(authentication.getName());
+		pageStore.deletePage(projectName, branchName, path, user);
 		return "redirect:/page/" + projectName + "/" + branchName + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
@@ -234,5 +243,9 @@ public class PageController {
 
 	void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
 		this.markdownProcessor = markdownProcessor;
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }

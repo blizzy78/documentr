@@ -29,24 +29,36 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class ProjectControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private ProjectController projectController;
 	private GlobalRepositoryManager repoManager;
+	private Authentication authentication;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		repoManager = mock(GlobalRepositoryManager.class);
 		
+		UserStore userStore = mock(UserStore.class);
+		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
+
 		projectController = new ProjectController();
 		projectController.setGlobalRepositoryManager(repoManager);
+		projectController.setUserStore(userStore);
+
+		authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
@@ -71,10 +83,10 @@ public class ProjectControllerTest {
 	public void saveProject() throws IOException, GitAPIException {
 		ProjectForm projectForm = new ProjectForm(PROJECT);
 		BindingResult bindingResult = new BeanPropertyBindingResult(projectForm, "projectForm"); //$NON-NLS-1$
-		String view = projectController.saveProject(projectForm, bindingResult);
+		String view = projectController.saveProject(projectForm, bindingResult, authentication);
 		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
 		
-		verify(repoManager).createProjectCentralRepository(PROJECT);
+		verify(repoManager).createProjectCentralRepository(PROJECT, USER);
 	}
 }

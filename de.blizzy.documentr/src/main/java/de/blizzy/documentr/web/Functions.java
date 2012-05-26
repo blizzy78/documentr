@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageMetadata;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
@@ -93,6 +94,10 @@ public final class Functions {
 			throws IOException {
 		
 		return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
+	}
+	
+	public static PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
+		return pageStore.getPageMetadata(projectName, branchName, path);
 	}
 
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -44,6 +47,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 public class ProjectController {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private UserStore userStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("permitAll")
@@ -62,8 +67,8 @@ public class ProjectController {
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
-	public String saveProject(@ModelAttribute @Valid ProjectForm form, BindingResult bindingResult)
-			throws IOException, GitAPIException {
+	public String saveProject(@ModelAttribute @Valid ProjectForm form, BindingResult bindingResult,
+			Authentication authentication) throws IOException, GitAPIException {
 		
 		if (bindingResult.hasErrors()) {
 			return "/project/edit"; //$NON-NLS-1$
@@ -71,7 +76,8 @@ public class ProjectController {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createProjectCentralRepository(form.getName());
+			User user = userStore.getUser(authentication.getName());
+			repo = repoManager.createProjectCentralRepository(form.getName(), user);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -85,5 +91,9 @@ public class ProjectController {
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		this.repoManager = repoManager;
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }

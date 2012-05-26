@@ -28,6 +28,7 @@ import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.transport.RefSpec;
@@ -36,6 +37,8 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
+import de.blizzy.documentr.access.User;
 
 class ProjectRepositoryManager {
 	private static final String CENTRAL_REPO_NAME = "_central"; //$NON-NLS-1$
@@ -52,11 +55,11 @@ class ProjectRepositoryManager {
 		centralRepoDir = new File(reposDir, CENTRAL_REPO_NAME);
 	}
 	
-	ILockedRepository createCentralRepository() throws IOException, GitAPIException {
-		return createCentralRepository(true);
+	ILockedRepository createCentralRepository(User user) throws IOException, GitAPIException {
+		return createCentralRepository(true, user);
 	}
 	
-	ILockedRepository createCentralRepository(boolean bare) throws IOException, GitAPIException {
+	ILockedRepository createCentralRepository(boolean bare, User user) throws IOException, GitAPIException {
 		if (centralRepoDir.isDirectory()) {
 			throw new IllegalStateException("repository already exists: " + centralRepoDir.getAbsolutePath()); //$NON-NLS-1$
 		}
@@ -85,7 +88,11 @@ class ProjectRepositoryManager {
 					.call()
 					.getRepository();
 				Git git = Git.wrap(tempRepo);
-				git.commit().setMessage("init").call(); //$NON-NLS-1$
+				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+				git.commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("init").call(); //$NON-NLS-1$
 				git.push().call();
 			} finally {
 				RepositoryUtil.closeQuietly(tempRepo);

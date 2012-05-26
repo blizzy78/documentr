@@ -20,7 +20,7 @@ body {
 	background-color: white;
 }
 
-h1 .shared-page {
+h1 .page-metadata {
 	color: #999999;
 	display: block;
 	font-size: 11px;

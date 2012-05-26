@@ -28,13 +28,19 @@ public class UserForm {
 	private String loginName;
 	private String password1;
 	private String password2;
+	@NotNull(message="{user.email.blank}")
+	@NotBlank(message="{user.email.blank}")
+	private String email;
 	private boolean disabled;
 	private boolean admin;
 
-	public UserForm(String loginName, String password1, String password2, boolean disabled, boolean admin) {
+	public UserForm(String loginName, String password1, String password2, String email,
+			boolean disabled, boolean admin) {
+		
 		this.loginName = loginName;
 		this.password1 = password1;
 		this.password2 = password2;
+		this.email = email;
 		this.disabled = disabled;
 		this.admin = admin;
 	}
@@ -49,6 +55,10 @@ public class UserForm {
 	
 	public String getPassword2() {
 		return password2;
+	}
+	
+	public String getEmail() {
+		return email;
 	}
 	
 	public boolean isDisabled() {

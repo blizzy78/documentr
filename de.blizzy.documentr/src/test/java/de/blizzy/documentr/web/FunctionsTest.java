@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -34,6 +35,7 @@ import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.pagestore.PageMetadata;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 
@@ -124,5 +126,14 @@ public class FunctionsTest {
 		
 		assertEquals(Lists.newArrayList("page1", "page1/page2", "page1/page2/page3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Functions.getPagePathHierarchy(PROJECT, BRANCH, "page1/page2/page3")); //$NON-NLS-1$
+	}
+
+	@Test
+	public void getPageMetadata() throws IOException {
+		Date date = new Date();
+		PageMetadata metadata = new PageMetadata("user", date); //$NON-NLS-1$
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(metadata);
+		assertEquals("user", metadata.getLastEditedBy()); //$NON-NLS-1$
+		assertEquals(date, metadata.getLastEdited());
 	}
 }

@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.gitective.core.BlobUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -61,10 +62,13 @@ public class UserStore {
 	
 	@PostConstruct
 	public void init() throws IOException, GitAPIException {
+		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
+		User adminUser = new User("admin", passwordHash, "admin@example.com", false, true); //$NON-NLS-1$ //$NON-NLS-2$
+
 		ILockedRepository repo = null;
 		boolean created = false;
 		try {
-			repo = repoManager.createProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = repoManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
 			created = true;
 		} catch (IllegalStateException e) {
 			// okay
@@ -73,17 +77,15 @@ public class UserStore {
 		}
 		
 		if (created) {
-			createInitialAdmin();
+			createInitialAdmin(adminUser);
 		}
 	}
 
-	private void createInitialAdmin() throws IOException {
-		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
-		User user = new User("admin", passwordHash, false, true); //$NON-NLS-1$
-		saveUser(user);
+	private void createInitialAdmin(User adminUser) throws IOException {
+		saveUser(adminUser, adminUser);
 	}
 
-	public void saveUser(User user) throws IOException {
+	public void saveUser(User user, User currentUser) throws IOException {
 		Assert.notNull(user);
 		
 		ILockedRepository repo = null;
@@ -92,6 +94,7 @@ public class UserStore {
 			Map<String, Object> userMap = new HashMap<String, Object>();
 			userMap.put("loginName", user.getLoginName()); //$NON-NLS-1$
 			userMap.put("password", user.getPassword()); //$NON-NLS-1$
+			userMap.put("email", user.getEmail()); //$NON-NLS-1$
 			userMap.put("disabled", Boolean.valueOf(user.isDisabled())); //$NON-NLS-1$
 			userMap.put("admin", Boolean.valueOf(user.isAdmin())); //$NON-NLS-1$
 
@@ -103,7 +106,11 @@ public class UserStore {
 
 			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(user.getLoginName() + USER_SUFFIX).call();
-			git.commit().setMessage(user.getLoginName()).call();
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(user.getLoginName()).call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
@@ -123,9 +130,10 @@ public class UserStore {
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> userMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			String password = (String) userMap.get("password"); //$NON-NLS-1$
+			String email = (String) userMap.get("email"); //$NON-NLS-1$
 			boolean disabled = ((Boolean) userMap.get("disabled")).booleanValue(); //$NON-NLS-1$
 			boolean admin = ((Boolean) userMap.get("admin")).booleanValue(); //$NON-NLS-1$
-			User user = new User(loginName, password, disabled, admin);
+			User user = new User(loginName, password, email, disabled, admin);
 			return user;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
