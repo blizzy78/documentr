@@ -46,11 +46,12 @@ table.table-documentr {
 }
 
 .hero-unit.hero-single {
-	margin-top: 100pt;
+	margin-top: 150px;
+	margin-bottom: 150px;
 }
 
 .spacer {
-	margin-top: 25pt;
+	margin-top: 45px;
 }
 
 .securityHiddenUI * {
@@ -80,7 +81,9 @@ table.table-documentr {
 }
 
 .loginForm {
-	margin-top: 100pt;
+	margin-top: 150px;
+	margin-bottom: 150px;
+	float: none;
 }
 
 .form-horizontal .control-label {
@@ -99,4 +102,16 @@ table.table-documentr {
 
 .page-toolbar {
 	margin-top: 18px;
+}
+
+.footer {
+	border-top: 1px solid #E5E5E5;
+	margin-top: 45px;
+	padding: 35px 0 36px;
+}
+
+.footer, .footer p {
+	font-size: 11px;
+	line-height: 16px;
+	color: #606060;
 }

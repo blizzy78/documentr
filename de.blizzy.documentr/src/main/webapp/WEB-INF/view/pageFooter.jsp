@@ -15,19 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%>
-<%@ tag pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<jsp:include page="/WEB-INF/view/pageHeader.jsp"/>
+</body>
 
-<c:if test="${!empty requestScope._breadcrumbs}"><c:out value="${requestScope._breadcrumbs}" escapeXml="false"/></c:if>
-
-<c:set var="pageContents"><jsp:doBody/></c:set>
-<c:if test="${!empty pageContents}">
-	<div class="container">
-		<c:out value="${pageContents}" escapeXml="false"/>
-		<jsp:include page="/WEB-INF/view/footer.jsp"/>
-	</div>
-</c:if>
-
-<jsp:include page="/WEB-INF/view/pageFooter.jsp"/>
+</html>
