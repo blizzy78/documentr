@@ -95,6 +95,8 @@ function showDeleteDialog() {
 <dt:page>
 
 <sec:authorize access="isAuthenticated()">
+	<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
+	
 	<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
 	<div class="btn-toolbar pull-right page-toolbar">
 		<div class="btn-group">
@@ -115,8 +117,10 @@ function showDeleteDialog() {
 				
 				<c:if test="${path ne 'home'}">
 					<li class="divider"></li>
-					<%-- doesn't work correctly for "home" page --%>
-					<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+					<c:if test="${fn:length(branches) ge 2}">
+						<%-- doesn't work correctly for "home" page --%>
+						<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+					</c:if>
 					<%-- "home" page must not be deleted --%>
 					<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
 				</c:if>
@@ -161,7 +165,6 @@ function showDeleteDialog() {
 				<fieldset class="control-group">
 					<label class="control-label"><spring:message code="label.copyToBranch"/>:</label>
 					<select name="targetBranchName" onchange="copyToBranchSelected();">
-						<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
 						<c:forEach var="branch" items="${branches}">
 							<c:if test="${branch ne branchName}">
 								<option value="<c:out value="${branch}"/>"><c:out value="${branch}"/></option>
