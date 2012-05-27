@@ -115,3 +115,9 @@ table.table-documentr {
 	line-height: 16px;
 	color: #606060;
 }
+
+.progress.password-strength-indicator {
+	width: 150px;
+	margin-top: 0;
+	margin-bottom: 0;
+}

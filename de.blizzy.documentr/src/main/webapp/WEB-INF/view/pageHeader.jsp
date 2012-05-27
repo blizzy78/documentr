@@ -34,6 +34,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="<c:url value="/js/google-code-prettify/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
 
+<c:if test="${!empty requestScope._headerJSFiles}">
+	<c:forTokens var="uri" items="${requestScope._headerJSFiles}" delims="|">
+		<script type="text/javascript" src="<c:url value="${uri}"/>"></script>
+	</c:forTokens> 
+</c:if>
+
 <script type="text/javascript">
 
 $.fn.extend({

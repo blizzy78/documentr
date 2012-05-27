@@ -25,6 +25,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission('ADMIN')">
 
+<dt:headerJSFile uri="/js/zxcvbn-20120527.js"/>
+
+<dt:headerJS>
+
+function updatePasswordStrengthIndicator() {
+	var result = zxcvbn($('#password1').val(), [ 'documentr' ]);
+
+	$('#password1Error').remove();
+
+	var indicator = $('#passwordStrengthIndicator');
+	if (indicator.length == 0) {
+		indicator = $('<span class="help-inline" id="passwordStrengthIndicator"><div class="progress password-strength-indicator"><div class="bar"></div></div></span>');
+		$('#password1Fieldset').append(indicator);
+	}
+
+	indicator.find('.bar').width(((result.score + 1) * 20) + '%');
+	indicator.removeClass('progress-success').removeClass('progress-warning').removeClass('progress-danger');
+	if (result.score <= 1) {
+		indicator.addClass('progress-danger');
+	} else if (result.score <= 3) {
+		indicator.addClass('progress-warning');
+	} else {
+		indicator.addClass('progress-success');
+	}
+}
+
+</dt:headerJS>
+
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/users"/>"><spring:message code="title.users"/></a> <span class="divider">/</span></li>
 	<li class="active"><spring:message code="title.editUser"/></li>
@@ -46,21 +74,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 		<c:set var="errorText1"><form:errors path="password1"/></c:set>
 		<c:set var="errorText2"><form:errors path="password2"/></c:set>
-		<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
+		<div id="password1Fieldset" class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
 			<form:label path="password1" cssClass="control-label"><spring:message code="label.password"/>:</form:label>
-			<form:password path="password1" cssClass="input-xlarge" autocomplete="off"/>
-			<c:if test="${!empty errorText1}"><span class="help-inline"><c:out value="${errorText1}" escapeXml="false"/></span></c:if>
+			<form:password path="password1" cssClass="input-xlarge" autocomplete="off" onkeyup="updatePasswordStrengthIndicator()"/>
+			<c:if test="${!empty errorText1}"><span class="help-inline" id="password1Error"><c:out value="${errorText1}" escapeXml="false"/></span></c:if>
+		</div>
+		<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
+			<form:label path="password2" cssClass="control-label"><spring:message code="label.repeatPassword"/>:</form:label>
+			<form:password path="password2" cssClass="input-xlarge" autocomplete="off"/>
+			<c:if test="${!empty errorText2}"><span class="help-inline"><c:out value="${errorText2}" escapeXml="false"/></span></c:if>
 		</div>
 		<c:set var="errorText"><form:errors path="email"/></c:set>
 		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="email" cssClass="control-label"><spring:message code="label.email"/>:</form:label>
 			<form:input path="email" cssClass="input-xlarge"/>
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
-		</div>
-		<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
-			<form:label path="password2" cssClass="control-label"><spring:message code="label.repeatPassword"/>:</form:label>
-			<form:password path="password2" cssClass="input-xlarge" autocomplete="off"/>
-			<c:if test="${!empty errorText2}"><span class="help-inline"><c:out value="${errorText2}" escapeXml="false"/></span></c:if>
 		</div>
 		<div class="control-group">
 			<form:label path="disabled" cssClass="checkbox">
