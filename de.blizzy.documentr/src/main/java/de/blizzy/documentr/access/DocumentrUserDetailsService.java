@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,11 +38,12 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
 		try {
 			User user = userStore.getUser(loginName);
+
 			Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-			authorities.add(new SimpleGrantedAuthority("ROLE_USER")); //$NON-NLS-1$
 			if (user.isAdmin()) {
-				authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN")); //$NON-NLS-1$
+				authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.ADMIN));
 			}
+
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
 		} catch (UserNotFoundException e) {

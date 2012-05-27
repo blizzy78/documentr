@@ -15,19 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.access;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-@Controller
-@RequestMapping("/users")
-public class UsersController {
-	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
-	public String getUsers() {
-		return "/user/index"; //$NON-NLS-1$
-	}
+enum Permission {
+	ADMIN;
 }

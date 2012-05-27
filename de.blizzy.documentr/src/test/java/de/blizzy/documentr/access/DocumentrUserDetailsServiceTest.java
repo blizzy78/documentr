@@ -21,10 +21,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -48,7 +48,6 @@ public class DocumentrUserDetailsServiceTest {
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
 		assertEquals("user", details.getUsername()); //$NON-NLS-1$
 		assertTrue(details.isEnabled());
-		assertTrue(details.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -57,7 +56,9 @@ public class DocumentrUserDetailsServiceTest {
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
-		assertTrue(details.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))); //$NON-NLS-1$
+		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, Permission.ADMIN);
+		assertEquals(Collections.singleton(authority), details.getAuthorities());
 	}
 
 	@Test

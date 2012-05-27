@@ -26,8 +26,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.MessageSource;
@@ -36,8 +36,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.web.FilterInvocation;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
@@ -47,6 +50,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import de.blizzy.documentr.access.DocumentrMethodSecurityExpressionHandler;
+import de.blizzy.documentr.web.access.DocumentrWebSecurityExpressionHandler;
+
 @Configuration
 @EnableWebMvc
 @ComponentScan("de.blizzy.documentr")
@@ -54,8 +60,6 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 public class ContextConfig extends WebMvcConfigurerAdapter {
 	private static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
 	
-	@Autowired
-	private Settings settings;
 	private net.sf.ehcache.CacheManager ehCacheManager;
 	
 	@Bean
@@ -90,7 +94,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public CacheManager cacheManager() throws IOException {
+	public CacheManager cacheManager(Settings settings) throws IOException {
 		File cacheDir = new File(settings.getDocumentrDataDir(), CACHE_DIR_NAME);
 		FileUtils.forceMkdir(cacheDir);
 
@@ -108,6 +112,22 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 		cacheManager.setCacheManager(ehCacheManager);
 
 		return cacheManager;
+	}
+
+	@Bean
+	public SecurityExpressionHandler<MethodInvocation> expressionHandler(PermissionEvaluator permissionEvaluator) {
+		DocumentrMethodSecurityExpressionHandler expressionHandler = new DocumentrMethodSecurityExpressionHandler();
+		expressionHandler.setPermissionEvaluator(permissionEvaluator);
+		return expressionHandler;
+	}
+	
+	@Bean
+	public SecurityExpressionHandler<FilterInvocation> webExpressionHandler(
+			PermissionEvaluator permissionEvaluator) {
+		
+		DocumentrWebSecurityExpressionHandler expressionHandler = new DocumentrWebSecurityExpressionHandler();
+		expressionHandler.setPermissionEvaluator(permissionEvaluator);
+		return expressionHandler;
 	}
 
 	@PreDestroy

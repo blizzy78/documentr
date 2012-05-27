@@ -17,17 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
-@Controller
-@RequestMapping("/users")
-public class UsersController {
-	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
-	public String getUsers() {
-		return "/user/index"; //$NON-NLS-1$
+import de.blizzy.documentr.access.DocumentrSecurityExpressionRoot;
+
+public class DocumentrWebSecurityExpressionHandler extends DefaultWebSecurityExpressionHandler {
+	@Override
+	protected SecurityExpressionRoot createSecurityExpressionRoot(Authentication authentication, FilterInvocation fi) {
+		SecurityExpressionRoot root = new DocumentrSecurityExpressionRoot(authentication);
+        root.setPermissionEvaluator(getPermissionEvaluator());
+        return root;
 	}
 }

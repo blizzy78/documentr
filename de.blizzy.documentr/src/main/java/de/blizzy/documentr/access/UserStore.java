@@ -87,6 +87,7 @@ public class UserStore {
 
 	public void saveUser(User user, User currentUser) throws IOException {
 		Assert.notNull(user);
+		Assert.notNull(currentUser);
 		
 		ILockedRepository repo = null;
 		try {
@@ -119,6 +120,8 @@ public class UserStore {
 	}
 	
 	public User getUser(String loginName) throws IOException {
+		Assert.notNull(loginName);
+		
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);

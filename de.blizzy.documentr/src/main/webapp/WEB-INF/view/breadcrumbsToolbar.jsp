@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 	</sec:authorize>
 	<sec:authorize access="isAuthenticated()">
-		<sec:authorize access="hasRole('ROLE_ADMIN')">
+		<sec:authorize access="hasApplicationPermission('ADMIN')">
 			<div class="btn-group">
 				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
 				<ul class="dropdown-menu">
