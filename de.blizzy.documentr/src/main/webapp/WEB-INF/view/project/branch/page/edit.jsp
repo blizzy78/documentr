@@ -38,28 +38,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 $(function() {
 	var el = $('#pageForm').find('#title');
 	el.blur(function() {
-		var fieldset = $('#pathFieldset');
-		fieldset.removeClass('warning').removeClass('error');
-		$('#pathExistsWarning').remove();
-
-		var value = el.val();
-		if (value.length > 0) {
-			$.ajax({
-				url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
-				type: 'POST',
-				dataType: 'json',
-				data: {
-					title: value
-				},
-				success: function(result) {
-					$('#pageForm').find('#path').val(result.path);
-					if (result.exists) {
-						fieldset.addClass('warning');
-						fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
-							'<spring:message code="page.path.exists"/></span>'));
+		var pinPathButton = $('#pinPathButton');
+		if (!pinPathButton.hasClass('active')) {
+			var fieldset = $('#pathFieldset');
+			fieldset.removeClass('warning').removeClass('error');
+			$('#pathExistsWarning').remove();
+	
+			var value = el.val();
+			if (value.length > 0) {
+				$.ajax({
+					url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						title: value
+					},
+					success: function(result) {
+						$('#pageForm').find('#path').val(result.path);
+						if (result.exists) {
+							fieldset.addClass('warning');
+							fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
+								'<spring:message code="page.path.exists"/></span>'));
+						}
+						$('#pinPathButton').removeClass('disabled').removeClass('active');
 					}
-				}
-			});
+				});
+			}
 		}
 	});
 });
@@ -116,9 +120,12 @@ function showPreview() {
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 		</div>
 		<div id="pathFieldset" class="control-group">
+			<form:hidden path="path"/>
 			<form:label path="path" cssClass="control-label"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
 			<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
-			<form:hidden path="path"/>
+			<c:if test="${empty pageForm.path}">
+				<a id="pinPathButton" class="btn disabled" data-toggle="button" href="javascript:;" title="<spring:message code="button.pinPath"/>"><i class="icon-lock"></i></a>
+			</c:if>
 		</div>
 		<div class="control-group">
 			<form:label path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
