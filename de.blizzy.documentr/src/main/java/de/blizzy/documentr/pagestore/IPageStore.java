@@ -25,11 +25,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import de.blizzy.documentr.access.User;
 
 public interface IPageStore {
-	@CacheEvict(value="pageHTML", key="#p0 + \"/\" + #p1 + \"/\" + #p2")
+	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
 	void savePage(String projectName, String branchName, String path, Page page,
 			User user) throws IOException;
 
-	@CacheEvict(value="pageHTML", key="#p0 + \"/\" + #p1 + \"/\" + #p2")
+	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
 	void saveAttachment(String projectName, String branchName, String pagePath, String name,
 			Page attachment, User user) throws IOException;
 
@@ -47,7 +47,7 @@ public interface IPageStore {
 
 	List<String> listChildPagePaths(String projectName, String branchName, String path) throws IOException;
 
-	@CacheEvict(value="pageHTML", key="#p0 + \"/\" + #p1 + \"/\" + #p2")
+	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
 	void deletePage(String projectName, String branchName, String path, User user) throws IOException;
 	
 	PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException;

@@ -36,11 +36,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<ul>
 		<c:forEach var="project" items="${projects}">
-			<li><a href="<c:url value="/project/${project}"/>"><c:out value="${project}"/></a></li>
+			<sec:authorize access="hasProjectPermission(#project, 'VIEW')">
+				<li><a href="<c:url value="/project/${project}"/>"><c:out value="${project}"/></a></li>
+			</sec:authorize>
 		</c:forEach>
 		</ul>
 
-		<sec:authorize access="isAuthenticated()">
+		<sec:authorize access="hasApplicationPermission('EDIT_PROJECT')">
 			<p>
 			<a href="<c:url value="/project/create"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createProject"/></a>
 			</p>
@@ -55,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<sec:authorize access="isAnonymous()">
 						<a href="<c:url value="/access/login"/>" class="btn btn-primary btn-large"><spring:message code="button.login"/></a>
 					</sec:authorize>
-					<sec:authorize access="isAuthenticated()">
+					<sec:authorize access="hasApplicationPermission('EDIT_PROJECT')">
 						<a href="<c:url value="/project/create"/>" class="btn btn-primary btn-large"><spring:message code="button.createFirstProject"/></a>
 					</sec:authorize>
 				</p>

@@ -36,9 +36,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<intercept-url pattern="/**" access="permitAll"/>
 		<form-login login-page="/access/login"/>
 		<logout/>
+		<anonymous enabled="false"/>
+		<custom-filter ref="anonymousAuthFilter" position="ANONYMOUS_FILTER"/>
 	</http>
 
-	<authentication-manager>
+	<authentication-manager erase-credentials="true">
 		<authentication-provider user-service-ref="userDetailsService">
 			<password-encoder hash="sha">
 				<salt-source user-property="username"/>

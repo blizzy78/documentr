@@ -17,21 +17,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
-	public DocumentrSecurityExpressionRoot(Authentication authentication) {
+	public HttpServletRequest request;
+	
+	private Object target;
+	private GlobalRepositoryManager repoManager;
+
+	public DocumentrSecurityExpressionRoot(Authentication authentication, GlobalRepositoryManager repoManager) {
 		super(authentication);
+		this.repoManager = repoManager;
+	}
+
+	public boolean hasApplicationPermission(String permission) {
+		return hasPermission("application", Type.APPLICATION.name(), permission); //$NON-NLS-1$
 	}
 
 	public boolean hasProjectPermission(String projectName, String permission) {
-		return isAuthenticated() && hasPermission(projectName, Type.PROJECT.name(), permission);
+		return hasPermission(projectName, Type.PROJECT.name(), permission);
 	}
 	
-	public boolean hasApplicationPermission(String permission) {
-		return isAuthenticated() && hasPermission("application", Type.APPLICATION.name(), permission); //$NON-NLS-1$
+	public boolean hasAnyProjectPermission(String permission) {
+		return hasPermission(GrantedAuthorityTarget.ANY, Type.PROJECT.name(), permission);
+	}
+	
+	public boolean hasBranchPermission(String projectName, String branchName, String permission) {
+		return hasPermission(projectName + "/" + branchName, Type.BRANCH.name(), permission); //$NON-NLS-1$
+	}
+	
+	public boolean hasAnyBranchPermission(String projectName, String permission) {
+		return hasPermission(projectName + "/" + GrantedAuthorityTarget.ANY, Type.BRANCH.name(), permission); //$NON-NLS-1$
+	}
+	
+	public boolean hasPagePermission(String projectName, String branchName, String path, String permission) {
+		return hasPermission(projectName + "/" + branchName + "/" + path, Type.PAGE.name(), permission); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	public boolean projectExists(String projectName) {
+		return repoManager.listProjects().contains(StringUtils.defaultString(projectName));
+	}
+
+	void setThis(Object target) {
+		this.target = target;
+	}
+	
+	public Object getThis() {
+		return target;
+	}
+	
+	public void setRequest(HttpServletRequest request) {
+		this.request = request;
+	}
+	
+	public HttpServletRequest getRequest() {
+		return request;
 	}
 }

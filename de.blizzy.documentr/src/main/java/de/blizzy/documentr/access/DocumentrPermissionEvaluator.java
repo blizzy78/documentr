@@ -19,10 +19,12 @@ package de.blizzy.documentr.access;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
@@ -30,6 +32,10 @@ import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	@Override
 	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+		Assert.notNull(authentication);
+		Assert.notNull(targetDomainObject);
+		Assert.notNull(permission);
+
 		return false;
 	}
 
@@ -37,28 +43,56 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
 			Object permission) {
 
+		Assert.notNull(authentication);
+		Assert.notNull(targetId);
+		Assert.hasLength(targetType);
+		Assert.notNull(permission);
+		
 		return hasPermission(authentication, targetId.toString(), Type.valueOf(targetType),
 				Permission.valueOf(permission.toString()));
 	}
 	
 	private boolean hasPermission(Authentication authentication, String targetId, Type targetType, Permission permission) {
+		Assert.hasLength(targetId);
+		
 		switch (targetType) {
-			case PROJECT:
-				return hasProjectPermission(authentication, targetId, permission);
 			case APPLICATION:
 				return hasApplicationPermission(authentication, permission);
+			case PROJECT:
+				if (targetId.equals(GrantedAuthorityTarget.ANY)) {
+					return hasAnyProjectPermission(authentication, permission);
+				}
+				return hasProjectPermission(authentication, targetId, permission);
+			case BRANCH:
+				{
+					String projectName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+					String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
+					if (branchName.equals(GrantedAuthorityTarget.ANY)) {
+						return hasAnyBranchPermission(authentication, projectName, permission);
+					}
+					return hasBranchPermission(authentication, projectName, branchName, permission);
+				}
+			case PAGE:
+				{
+					String projectName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+					String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
+					String path = StringUtils.substringAfter(branchName, "/"); //$NON-NLS-1$
+					branchName = StringUtils.substringBefore(branchName, "/"); //$NON-NLS-1$
+					return hasPagePermission(authentication, projectName, branchName, path, permission);
+				}
 			default:
 				return false;
 		}
 	}
 
-	private boolean hasProjectPermission(Authentication authentication, String projectName, Permission permission) {
+	private boolean hasApplicationPermission(Authentication authentication, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
 				GrantedAuthorityTarget target = pga.getTarget();
-				if ((target.getType() == Type.PROJECT) && target.getTargetId().equals(projectName) &&
-						(pga.getPermission() == permission)) {
+				Type type = target.getType();
+				if ((type == Type.APPLICATION) &&
+					hasPermission(pga, permission)) {
 					
 					return true;
 				}
@@ -66,16 +100,104 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
-	
-	private boolean hasApplicationPermission(Authentication authentication, Permission permission) {
+
+	private boolean hasProjectPermission(Authentication authentication, String projectName, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
-				if ((pga.getTarget().getType() == Type.APPLICATION) && (pga.getPermission() == permission)) {
+				GrantedAuthorityTarget target = pga.getTarget();
+				Type type = target.getType();
+				String id = target.getTargetId();
+				if ((type == Type.PROJECT) &&
+					id.equals(projectName) &&
+					hasPermission(pga, permission)) {
+					
 					return true;
 				}
 			}
 		}
-		return false;
+		return hasApplicationPermission(authentication, permission);
+	}
+	
+	private boolean hasAnyProjectPermission(Authentication authentication, Permission permission) {
+		for (GrantedAuthority authority : authentication.getAuthorities()) {
+			if (authority instanceof PermissionGrantedAuthority) {
+				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
+				GrantedAuthorityTarget target = pga.getTarget();
+				Type type = target.getType();
+				if ((type == Type.PROJECT) &&
+					hasPermission(pga, permission)) {
+					
+					return true;
+				}
+			}
+		}
+		return hasApplicationPermission(authentication, permission);
+	}
+	
+	private boolean hasBranchPermission(Authentication authentication, String projectName, String branchName,
+			Permission permission) {
+
+		String targetId = projectName + "/" + branchName; //$NON-NLS-1$
+		for (GrantedAuthority authority : authentication.getAuthorities()) {
+			if (authority instanceof PermissionGrantedAuthority) {
+				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
+				GrantedAuthorityTarget target = pga.getTarget();
+				Type type = target.getType();
+				String id = target.getTargetId();
+				if ((type == Type.BRANCH) &&
+					id.equals(targetId) &&
+					hasPermission(pga, permission)) {
+					
+					return true;
+				}
+			}
+		}
+		return hasProjectPermission(authentication, projectName, permission);
+	}
+	
+	private boolean hasAnyBranchPermission(Authentication authentication, String projectName, Permission permission) {
+		String targetIdPrefix = projectName + "/"; //$NON-NLS-1$
+		for (GrantedAuthority authority : authentication.getAuthorities()) {
+			if (authority instanceof PermissionGrantedAuthority) {
+				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
+				GrantedAuthorityTarget target = pga.getTarget();
+				Type type = target.getType();
+				String id = target.getTargetId();
+				if ((type == Type.BRANCH) &&
+					id.startsWith(targetIdPrefix) &&
+					hasPermission(pga, permission)) {
+					
+					return true;
+				}
+			}
+		}
+		return hasProjectPermission(authentication, projectName, permission);
+	}
+	
+	private boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
+			String path, Permission permission) {
+		
+		String targetId = projectName + "/" + branchName + "/" + path; //$NON-NLS-1$ //$NON-NLS-2$
+		for (GrantedAuthority authority : authentication.getAuthorities()) {
+			if (authority instanceof PermissionGrantedAuthority) {
+				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
+				GrantedAuthorityTarget target = pga.getTarget();
+				Type type = target.getType();
+				String id = target.getTargetId();
+				if ((type == Type.PAGE) &&
+					id.equals(targetId) &&
+					hasPermission(pga, permission)) {
+					
+					return true;
+				}
+			}
+		}
+		return hasBranchPermission(authentication, projectName, branchName, permission);
+	}
+
+	private boolean hasPermission(PermissionGrantedAuthority authority, Permission permission) {
+		Permission p = authority.getPermission();
+		return (p == Permission.ADMIN) || (p == permission);
 	}
 }

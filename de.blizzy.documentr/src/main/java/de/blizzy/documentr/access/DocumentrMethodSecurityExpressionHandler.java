@@ -17,17 +17,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import javax.annotation.PostConstruct;
+
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
+
+@Component("expressionHandler")
 public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
+	@Autowired
+	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private PermissionEvaluator permissionEvaluator;
+	
+	@PostConstruct
+	public void init() {
+		setPermissionEvaluator(permissionEvaluator);
+	}
+
 	@Override
-	protected SecurityExpressionRoot createSecurityExpressionRoot(
-			Authentication authentication, MethodInvocation invocation) {
+	protected SecurityExpressionRoot createSecurityExpressionRoot(Authentication authentication,
+			MethodInvocation invocation) {
 		
-		SecurityExpressionRoot root = new DocumentrSecurityExpressionRoot(authentication);
+		DocumentrSecurityExpressionRoot root =
+				new DocumentrSecurityExpressionRoot(authentication, repoManager);
+		root.setThis(invocation.getThis());
 		root.setPermissionEvaluator(getPermissionEvaluator());
 
 		return root;

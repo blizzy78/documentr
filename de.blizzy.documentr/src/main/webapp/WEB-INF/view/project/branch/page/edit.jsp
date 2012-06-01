@@ -24,7 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="(#pageForm.path == null) ?
+	hasBranchPermission(#pageForm.projectName, #pageForm.branchName, 'EDIT_PAGE') :
+	hasPagePermission(#pageForm.projectName, #pageForm.branchName, #pageForm.path, 'EDIT_PAGE')">
 
 <c:choose>
 	<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>

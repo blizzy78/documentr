@@ -64,7 +64,7 @@ public class PageController {
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("permitAll")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException {
 
@@ -85,12 +85,12 @@ public class PageController {
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
 	public String createPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String parentPagePath, Model model) {
 
-		PageForm form = new PageForm(projectName, branchName, StringUtils.EMPTY,
-				Util.toRealPagePath(parentPagePath), StringUtils.EMPTY, StringUtils.EMPTY);
+		PageForm form = new PageForm(projectName, branchName, null,
+				Util.toRealPagePath(parentPagePath), null, null);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -98,7 +98,7 @@ public class PageController {
 	@RequestMapping(value="/edit/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException {
 		
@@ -117,7 +117,7 @@ public class PageController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		
@@ -169,7 +169,7 @@ public class PageController {
 			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@PreAuthorize("permitAll")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'VIEW')")
 	public Map<String, Object> generateName(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String parentPagePath, @RequestParam String title) throws IOException {
 
@@ -206,7 +206,8 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW') and " +
+			"hasBranchPermission(#projectName, #targetBranchName, 'EDIT_PAGE')")
 	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String targetBranchName, Authentication authentication)
 			throws IOException {
@@ -223,7 +224,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
 	public String deletePage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Authentication authentication) throws IOException {
 		

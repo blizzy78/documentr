@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
 
 <c:set var="pagePathUrl" value="${d:toURLPagePath(pagePath)}"/>
 <dt:breadcrumbs>

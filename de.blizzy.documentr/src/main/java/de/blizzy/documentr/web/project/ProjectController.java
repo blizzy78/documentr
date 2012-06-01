@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,22 +50,24 @@ public class ProjectController {
 	private UserStore userStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("permitAll")
+	@PreAuthorize("hasProjectPermission(#name, 'VIEW')")
 	public String getProject(@PathVariable String name, Model model) {
 		model.addAttribute("name", name); //$NON-NLS-1$
 		return "/project/view"; //$NON-NLS-1$
 	}
 
 	@RequestMapping(value="/create", method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasApplicationPermission('EDIT_PROJECT')")
 	public String createProject(Model model) {
-		ProjectForm form = new ProjectForm(StringUtils.EMPTY);
+		ProjectForm form = new ProjectForm(null);
 		model.addAttribute("projectForm", form); //$NON-NLS-1$
 		return "/project/edit"; //$NON-NLS-1$
 	}
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("projectExists(#form.name) ? " +
+			"hasProjectPermission(#form.name, 'EDIT_PROJECT') : " +
+			"hasApplicationPermission('EDIT_PROJECT')")
 	public String saveProject(@ModelAttribute @Valid ProjectForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 		

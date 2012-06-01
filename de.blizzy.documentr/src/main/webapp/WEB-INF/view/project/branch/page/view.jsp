@@ -29,8 +29,11 @@ long random = (long) (Math.random() * Long.MAX_VALUE);
 pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
 %>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'VIEW')">
+
 <dt:headerJS>
+
+<sec:authorize access="hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
 
 function showCopyToBranchDialog() {
 	$('#copy-dialog').showModal({backdrop: true, keyboard: true});
@@ -65,12 +68,17 @@ function copyToBranchSelected() {
 	});
 }
 
+</sec:authorize>
+
+<sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
+
 function showDeleteDialog() {
 	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
 }
 
-</dt:headerJS>
 </sec:authorize>
+
+</dt:headerJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
@@ -94,35 +102,50 @@ function showDeleteDialog() {
 
 <dt:page>
 
-<sec:authorize access="isAuthenticated()">
-	<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
-	
-	<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
+<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE') or
+	hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE') or
+	hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
+
 	<div class="btn-toolbar pull-right page-toolbar">
-		<div class="btn-group">
-			<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
-		</div>
+		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+			<div class="btn-group">
+				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
+			</div>
+		</sec:authorize>
 		<div class="btn-group">
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.tools"/> <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
-				<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>
-						<c:choose>
-							<c:when test="${!empty attachments}"><spring:message code="button.attachmentsX" arguments="${fn:length(attachments)}"/></c:when>
-							<c:otherwise><spring:message code="button.attachments"/></c:otherwise>
-						</c:choose>
-					</a></li>
-				<li class="divider"></li>
-				<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
+				<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+					<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
+				</sec:authorize>
+				<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+					<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
+					<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>
+							<c:choose>
+								<c:when test="${!empty attachments}"><spring:message code="button.attachmentsX" arguments="${fn:length(attachments)}"/></c:when>
+								<c:otherwise><spring:message code="button.attachments"/></c:otherwise>
+							</c:choose>
+						</a></li>
+				</sec:authorize>
+				<sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
+					<li class="divider"></li>
+					<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
+				</sec:authorize>
 				
 				<c:if test="${path ne 'home'}">
 					<li class="divider"></li>
-					<c:if test="${fn:length(branches) ge 2}">
-						<%-- doesn't work correctly for "home" page --%>
-						<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
-					</c:if>
+					<sec:authorize access="hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
+						<c:if test="${fn:length(branches) ge 2}">
+							<%-- doesn't work correctly for "home" page --%>
+							<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+						</c:if>
+					</sec:authorize>
 					<%-- "home" page must not be deleted --%>
-					<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
+					<sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
+						<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
+					</sec:authorize>
 				</c:if>
 			</ul>
 		</div>
@@ -137,9 +160,9 @@ function showDeleteDialog() {
 	<c:otherwise><c:set var="lastEdit" value="${lastEdited}"/></c:otherwise>
 </c:choose>
 <sec:authorize access="isAuthenticated()">
-	<c:set var="branches" value="${d:getBranchesPageIsSharedWith(projectName, branchName, path)}"/>
-	<c:if test="${fn:length(branches) ge 2}">
-		<c:set var="branchNames" value="${d:join(branches, ', ')}"/>
+	<c:set var="branchesSharedWith" value="${d:getBranchesPageIsSharedWith(projectName, branchName, path)}"/>
+	<c:if test="${fn:length(branchesSharedWith) ge 2}">
+		<c:set var="branchNames" value="${d:join(branchesSharedWith, ', ')}"/>
 	</c:if>
 </sec:authorize>
 <span class="page-metadata">(<spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
@@ -150,11 +173,13 @@ function showDeleteDialog() {
 
 <c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
 	<p class="spacer">
 	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 	</p>
+</sec:authorize>
 
+<sec:authorize access="hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
 	<div class="modal" id="copy-dialog" style="display: none;">
 		<div class="modal-header">
 			<button class="close" onclick="$('#copy-dialog').modal('hide');">×</button>
@@ -167,7 +192,14 @@ function showDeleteDialog() {
 					<select name="targetBranchName" onchange="copyToBranchSelected();">
 						<c:forEach var="branch" items="${branches}">
 							<c:if test="${branch ne branchName}">
-								<option value="<c:out value="${branch}"/>"><c:out value="${branch}"/></option>
+								<sec:authorize access="hasBranchPermission(#projectName, #branch, 'EDIT_PAGE')">
+									<option value="<c:out value="${branch}"/>"><c:out value="${branch}"/></option>
+								</sec:authorize>
+								<sec:authorize access="!hasBranchPermission(#projectName, #branch, 'EDIT_PAGE') and
+									hasBranchPermission(#projectName, #branch, 'VIEW')">
+									
+									<option value="<c:out value="${branch}"/>" disabled="disabled"><c:out value="${branch}"/></option>
+								</sec:authorize>
 							</c:if>
 						</c:forEach>
 					</select>
@@ -179,7 +211,9 @@ function showDeleteDialog() {
 			<a href="javascript:void($('#copy-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
+</sec:authorize>
 
+<sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
 	<div class="modal" id="delete-dialog" style="display: none;">
 		<div class="modal-header">
 			<button class="close" onclick="$('#delete-dialog').modal('hide');">×</button>
@@ -196,3 +230,5 @@ function showDeleteDialog() {
 </sec:authorize>
 
 </dt:page>
+
+</sec:authorize>

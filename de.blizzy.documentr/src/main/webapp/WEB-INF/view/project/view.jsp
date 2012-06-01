@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<sec:authorize access="hasProjectPermission(#name, 'VIEW')">
+
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li class="active"><c:out value="${name}"/></li>
@@ -45,10 +47,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<c:otherwise><p>No branches found.</p></c:otherwise>
 </c:choose>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasProjectPermission(#name, 'EDIT_BRANCH')">
 	<p>
 	<a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
 	</p>
 </sec:authorize>
 
 </dt:page>
+
+</sec:authorize>

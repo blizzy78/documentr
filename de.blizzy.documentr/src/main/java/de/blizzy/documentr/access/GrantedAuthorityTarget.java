@@ -23,9 +23,10 @@ import org.springframework.util.Assert;
 
 class GrantedAuthorityTarget {
 	static enum Type {
-		APPLICATION, PROJECT;
+		APPLICATION, PROJECT, BRANCH, PAGE;
 	}
 	
+	static final String ANY = "*"; //$NON-NLS-1$
 	static final GrantedAuthorityTarget APPLICATION =
 			new GrantedAuthorityTarget("application", Type.APPLICATION); //$NON-NLS-1$
 	
@@ -33,7 +34,9 @@ class GrantedAuthorityTarget {
 	private Type type;
 
 	GrantedAuthorityTarget(String targetId, Type type) {
-		Assert.notNull(targetId);
+		Assert.hasLength(targetId);
+		Assert.isTrue(!targetId.equals(ANY));
+		Assert.isTrue(!targetId.endsWith("/" + ANY)); //$NON-NLS-1$
 		Assert.notNull(type);
 
 		this.targetId = targetId;

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/projects")
 public class ProjectsController {
 	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("permitAll")
+	@PreAuthorize("hasAnyProjectPermission('VIEW')")
 	public String getProjects() {
 		return "/project/index"; //$NON-NLS-1$
 	}

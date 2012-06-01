@@ -56,15 +56,15 @@ public class BranchController {
 	private UserStore userStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasProjectPermission(#projectName, 'EDIT_BRANCH')")
 	public String createBranch(@PathVariable String projectName, Model model) {
-		BranchForm form = new BranchForm(projectName, StringUtils.EMPTY, null);
+		BranchForm form = new BranchForm(projectName, null, null);
 		model.addAttribute("branchForm", form); //$NON-NLS-1$
 		return "/project/branch/edit"; //$NON-NLS-1$
 	}
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.POST)
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasBranchPermission(#form.projectName, #form.name, 'EDIT_BRANCH')")
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 		

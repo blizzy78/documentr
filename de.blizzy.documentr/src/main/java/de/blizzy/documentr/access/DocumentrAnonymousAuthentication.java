@@ -17,29 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-enum Permission {
-	// ===== VALID TARGET TYPES: all =====
+import java.util.Arrays;
+import java.util.List;
 
-	// can do anything (implies all other permissions on same target)
-	ADMIN,
-	
-	// simple viewing
-	VIEW,
-	
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
-	// ===== VALID TARGET TYPES: application, project =====
-	
-	// application: create/edit/delete projects
-	// project: edit details
-	EDIT_PROJECT,
+import de.blizzy.documentr.DocumentrConstants;
 
+public class DocumentrAnonymousAuthentication extends AnonymousAuthenticationToken {
+	private static final List<? extends GrantedAuthority> AUTHORITIES = Arrays.asList(
+			new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW)
+	);
 	
-	// ===== VALID TARGET TYPES: application, project, branch =====
-	
-	// application/project: create/edit/delete branches
-	// branch: edit details
-	EDIT_BRANCH,
-	
-	// application/project/branch: create/edit/delete pages
-	EDIT_PAGE;
+	public DocumentrAnonymousAuthentication(Object principal) {
+		super(DocumentrConstants.ANONYMOUS_AUTH_KEY, principal, AUTHORITIES);
+	}
 }

@@ -39,5 +39,7 @@ public final class DocumentrConstants {
 	
 	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	
+	public static final String ANONYMOUS_AUTH_KEY = String.valueOf((long) Math.random() * Long.MAX_VALUE);
+	
 	private DocumentrConstants() {}
 }

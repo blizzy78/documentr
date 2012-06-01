@@ -43,7 +43,11 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			if (user.isAdmin()) {
 				authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.ADMIN));
 			}
-
+			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
+			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_PROJECT));
+			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_BRANCH));
+			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_PAGE));
+			
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
 		} catch (UserNotFoundException e) {

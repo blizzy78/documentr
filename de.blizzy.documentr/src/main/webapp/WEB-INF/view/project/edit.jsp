@@ -22,7 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="projectExists(#projectForm.name) ?
+	hasProjectPermission(#projectForm.name, 'EDIT_PROJECT') :
+	hasApplicationPermission('EDIT_PROJECT')">
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

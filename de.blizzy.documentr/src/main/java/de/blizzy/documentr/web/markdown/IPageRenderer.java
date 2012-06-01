@@ -22,6 +22,6 @@ import java.io.IOException;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface IPageRenderer {
-	@Cacheable(value="pageHTML", key="#p0 + \"/\" + #p1 + \"/\" + #p2")
+	@Cacheable(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
 	String getHTML(String projectName, String branchName, String path) throws IOException;
 }
