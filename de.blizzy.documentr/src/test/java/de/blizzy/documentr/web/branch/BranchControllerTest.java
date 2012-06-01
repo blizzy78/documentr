@@ -75,7 +75,7 @@ public class BranchControllerTest {
 		assertEquals("/project/branch/edit", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute(eq("branchForm"), //$NON-NLS-1$
-				argBranchForm(PROJECT, StringUtils.EMPTY, null));
+				argBranchForm(PROJECT, null, null));
 	}
 	
 	@Test

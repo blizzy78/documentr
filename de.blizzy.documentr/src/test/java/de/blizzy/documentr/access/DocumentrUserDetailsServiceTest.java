@@ -21,10 +21,11 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -58,9 +59,9 @@ public class DocumentrUserDetailsServiceTest {
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
 		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, Permission.ADMIN);
-		assertEquals(Collections.singleton(authority), details.getAuthorities());
+		assertTrue(contains(details.getAuthorities(), authority));
 	}
-
+	
 	@Test
 	public void loadUserByUsernameDisabled() throws IOException {
 		User user = new User("user", "pw", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -75,5 +76,16 @@ public class DocumentrUserDetailsServiceTest {
 		when(userStore.getUser("nonexistent")).thenThrow(new UserNotFoundException("nonexistent")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		userDetailsService.loadUserByUsername("nonexistent"); //$NON-NLS-1$
+	}
+	
+	private boolean contains(Collection<? extends GrantedAuthority> authorities, GrantedAuthority expected) {
+		boolean contained = false;
+		for (GrantedAuthority authority : authorities) {
+			if (authority.equals(expected)) {
+				contained = true;
+				break;
+			}
+		}
+		return contained;
 	}
 }

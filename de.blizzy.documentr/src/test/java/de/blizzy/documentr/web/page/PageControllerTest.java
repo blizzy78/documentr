@@ -112,8 +112,7 @@ public class PageControllerTest {
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute(eq("pageForm"), //$NON-NLS-1$
-				argPageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, StringUtils.EMPTY,
-						StringUtils.EMPTY));
+				argPageForm(PROJECT, BRANCH, null, PARENT_PAGE, null, null));
 	}
 	
 	@Test

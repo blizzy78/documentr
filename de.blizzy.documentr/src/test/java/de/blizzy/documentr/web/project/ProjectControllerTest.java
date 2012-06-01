@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +75,7 @@ public class ProjectControllerTest {
 		String view = projectController.createProject(model);
 		assertEquals("/project/edit", view); //$NON-NLS-1$
 		
-		verify(model).addAttribute(eq("projectForm"), argProjectForm(StringUtils.EMPTY)); //$NON-NLS-1$
+		verify(model).addAttribute(eq("projectForm"), argProjectForm(null)); //$NON-NLS-1$
 	}
 	
 	@Test
