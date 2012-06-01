@@ -17,27 +17,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.stereotype.Component;
+import org.junit.Test;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthentication;
 
-@Component("anonymousAuthFilter")
-public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticationFilter {
-	public DocumentrAnonymousAuthenticationFilter() {
-		super(DocumentrConstants.ANONYMOUS_AUTH_KEY);
-	}
-	
-	@Override
-	protected Authentication createAuthentication(HttpServletRequest request) {
-		Authentication auth = super.createAuthentication(request);
+public class DocumentrAnonymousAuthenticationFilterTest {
+	@Test
+	public void createAuthentication() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		DocumentrAnonymousAuthenticationFilter filter = new DocumentrAnonymousAuthenticationFilter();
+
 		DocumentrAnonymousAuthentication authentication =
-				new DocumentrAnonymousAuthentication(DocumentrConstants.ANONYMOUS_AUTH_KEY, auth.getPrincipal());
-		authentication.setDetails(auth.getDetails());
-		return authentication;
+				(DocumentrAnonymousAuthentication) filter.createAuthentication(request);
+		assertEquals(DocumentrConstants.ANONYMOUS_AUTH_KEY.hashCode(), authentication.getKeyHash());
 	}
 }

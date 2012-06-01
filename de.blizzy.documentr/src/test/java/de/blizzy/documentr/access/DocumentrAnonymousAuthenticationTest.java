@@ -21,17 +21,33 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
 
-import de.blizzy.documentr.DocumentrConstants;
-
 public class DocumentrAnonymousAuthenticationTest {
+	private static final String USER = "user"; //$NON-NLS-1$
+	private static final String KEY = "key"; //$NON-NLS-1$
+	
+	private DocumentrAnonymousAuthentication authentication;
+	
+	@Before
+	public void setUp() {
+		authentication = new DocumentrAnonymousAuthentication(KEY, USER);
+	}
+	
 	@Test
-	public void constructor() {
-		DocumentrAnonymousAuthentication authentication = new DocumentrAnonymousAuthentication("admin"); //$NON-NLS-1$
-		assertEquals(DocumentrConstants.ANONYMOUS_AUTH_KEY.hashCode(), authentication.getKeyHash());
-		assertEquals("admin", authentication.getPrincipal()); //$NON-NLS-1$
+	public void getKeyHash() {
+		assertEquals(KEY.hashCode(), authentication.getKeyHash());
+	}
+
+	@Test
+	public void getPrincipal() {
+		assertEquals(USER, authentication.getPrincipal());
+	}
+	
+	@Test
+	public void getAuthorities() {
 		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, Permission.VIEW);
 		assertTrue(new HashSet<GrantedAuthority>(authentication.getAuthorities()).contains(authority));

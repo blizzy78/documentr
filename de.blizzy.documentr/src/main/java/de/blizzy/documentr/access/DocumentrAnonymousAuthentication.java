@@ -17,20 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
-import de.blizzy.documentr.DocumentrConstants;
-
 public class DocumentrAnonymousAuthentication extends AnonymousAuthenticationToken {
-	private static final List<? extends GrantedAuthority> AUTHORITIES = Arrays.asList(
-			new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW)
-	);
+	private static final List<? extends GrantedAuthority> AUTHORITIES =
+			Collections.unmodifiableList(Arrays.asList(
+					new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW)
+			));
 	
-	public DocumentrAnonymousAuthentication(Object principal) {
-		super(DocumentrConstants.ANONYMOUS_AUTH_KEY, principal, AUTHORITIES);
+	public DocumentrAnonymousAuthentication(String key, Object principal) {
+		super(key, principal, new ArrayList<GrantedAuthority>(AUTHORITIES));
 	}
 }
