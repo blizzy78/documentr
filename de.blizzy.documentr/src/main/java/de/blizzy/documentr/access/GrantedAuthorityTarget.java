@@ -17,15 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
-class GrantedAuthorityTarget {
+class GrantedAuthorityTarget implements Serializable {
 	static enum Type {
 		APPLICATION, PROJECT, BRANCH, PAGE;
 	}
 	
+	private static final long serialVersionUID = -8582662031330649292L;
+
 	static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$
 	static final String ANY = "*"; //$NON-NLS-1$
 	static final GrantedAuthorityTarget APPLICATION =

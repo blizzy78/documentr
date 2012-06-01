@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
 class PermissionGrantedAuthority implements GrantedAuthority {
+	private static final long serialVersionUID = 4837778771482591248L;
+	
 	private GrantedAuthorityTarget target;
 	private Permission permission;
 
