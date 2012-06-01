@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
@@ -38,7 +39,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
 	}
 
 	public boolean hasApplicationPermission(String permission) {
-		return hasPermission("application", Type.APPLICATION.name(), permission); //$NON-NLS-1$
+		return hasPermission(GrantedAuthorityTarget.APPLICATION_TARGET_ID, Type.APPLICATION.name(), permission);
 	}
 
 	public boolean hasProjectPermission(String projectName, String permission) {
@@ -58,7 +59,8 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
 	}
 	
 	public boolean hasPagePermission(String projectName, String branchName, String path, String permission) {
-		return hasPermission(projectName + "/" + branchName + "/" + path, Type.PAGE.name(), permission); //$NON-NLS-1$ //$NON-NLS-2$
+		return hasPermission(projectName + "/" + branchName + "/" + Util.toURLPagePath(path), //$NON-NLS-1$ //$NON-NLS-2$
+				Type.PAGE.name(), permission);
 	}
 	
 	public boolean projectExists(String projectName) {

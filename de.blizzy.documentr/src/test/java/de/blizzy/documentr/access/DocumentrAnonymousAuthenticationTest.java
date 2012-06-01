@@ -18,23 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
-import org.aopalliance.intercept.MethodInvocation;
+import java.util.HashSet;
+
 import org.junit.Test;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
-public class DocumentrMethodSecurityExpressionHandlerTest {
+import de.blizzy.documentr.DocumentrConstants;
+
+public class DocumentrAnonymousAuthenticationTest {
 	@Test
-	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
-		MethodInvocation methodInvocation = mock(MethodInvocation.class);
-		Object target = "this"; //$NON-NLS-1$
-		when(methodInvocation.getThis()).thenReturn(target);
-		DocumentrMethodSecurityExpressionHandler expressionHandler = new DocumentrMethodSecurityExpressionHandler();
-
-		DocumentrSecurityExpressionRoot root =
-				(DocumentrSecurityExpressionRoot) expressionHandler.createSecurityExpressionRoot(
-						mock(Authentication.class), methodInvocation);
-		assertSame(target, root.getThis());
+	public void constructor() {
+		DocumentrAnonymousAuthentication authentication = new DocumentrAnonymousAuthentication("admin"); //$NON-NLS-1$
+		assertEquals(DocumentrConstants.ANONYMOUS_AUTH_KEY.hashCode(), authentication.getKeyHash());
+		assertEquals("admin", authentication.getPrincipal()); //$NON-NLS-1$
+		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, Permission.VIEW);
+		assertTrue(new HashSet<GrantedAuthority>(authentication.getAuthorities()).contains(authority));
 	}
 }

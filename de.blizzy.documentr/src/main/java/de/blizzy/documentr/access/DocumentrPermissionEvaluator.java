@@ -26,6 +26,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
 @Component
@@ -76,7 +77,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				{
 					String projectName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
 					String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
-					String path = StringUtils.substringAfter(branchName, "/"); //$NON-NLS-1$
+					String path = Util.toRealPagePath(StringUtils.substringAfter(branchName, "/")); //$NON-NLS-1$
 					branchName = StringUtils.substringBefore(branchName, "/"); //$NON-NLS-1$
 					return hasPagePermission(authentication, projectName, branchName, path, permission);
 				}

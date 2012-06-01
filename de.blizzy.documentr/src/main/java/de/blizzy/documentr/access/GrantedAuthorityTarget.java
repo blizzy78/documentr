@@ -26,9 +26,10 @@ class GrantedAuthorityTarget {
 		APPLICATION, PROJECT, BRANCH, PAGE;
 	}
 	
+	static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$
 	static final String ANY = "*"; //$NON-NLS-1$
 	static final GrantedAuthorityTarget APPLICATION =
-			new GrantedAuthorityTarget("application", Type.APPLICATION); //$NON-NLS-1$
+			new GrantedAuthorityTarget(APPLICATION_TARGET_ID, Type.APPLICATION);
 	
 	private String targetId;
 	private Type type;
