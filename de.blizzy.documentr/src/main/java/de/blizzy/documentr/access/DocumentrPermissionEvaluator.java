@@ -37,6 +37,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		Assert.notNull(targetDomainObject);
 		Assert.notNull(permission);
 
+		// not used
 		return false;
 	}
 
@@ -177,23 +178,10 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	}
 	
 	private boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
-			String path, Permission permission) {
+			@SuppressWarnings("unused") String path, Permission permission) {
+
+		// TODO: check page to see whom it is restricted to
 		
-		String targetId = projectName + "/" + branchName + "/" + path; //$NON-NLS-1$ //$NON-NLS-2$
-		for (GrantedAuthority authority : authentication.getAuthorities()) {
-			if (authority instanceof PermissionGrantedAuthority) {
-				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
-				GrantedAuthorityTarget target = pga.getTarget();
-				Type type = target.getType();
-				String id = target.getTargetId();
-				if ((type == Type.PAGE) &&
-					id.equals(targetId) &&
-					hasPermission(pga, permission)) {
-					
-					return true;
-				}
-			}
-		}
 		return hasBranchPermission(authentication, projectName, branchName, permission);
 	}
 

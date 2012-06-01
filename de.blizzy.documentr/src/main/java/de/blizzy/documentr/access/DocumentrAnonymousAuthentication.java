@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,9 +26,9 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class DocumentrAnonymousAuthentication extends AnonymousAuthenticationToken {
 	private static final List<? extends GrantedAuthority> AUTHORITIES =
-			Collections.unmodifiableList(Arrays.asList(
+			Collections.singletonList(
 					new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW)
-			));
+			);
 	
 	public DocumentrAnonymousAuthentication(String key, Object principal) {
 		super(key, principal, new ArrayList<GrantedAuthority>(AUTHORITIES));

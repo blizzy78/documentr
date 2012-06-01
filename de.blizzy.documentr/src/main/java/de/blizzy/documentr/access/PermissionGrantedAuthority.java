@@ -20,12 +20,17 @@ package de.blizzy.documentr.access;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.Assert;
+
+import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
 class PermissionGrantedAuthority implements GrantedAuthority {
 	private GrantedAuthorityTarget target;
 	private Permission permission;
 
 	PermissionGrantedAuthority(GrantedAuthorityTarget target, Permission permission) {
+		Assert.isTrue(target.getType() != Type.PAGE);
+		
 		this.target = target;
 		this.permission = permission;
 	}
