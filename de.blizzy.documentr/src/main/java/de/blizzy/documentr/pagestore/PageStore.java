@@ -168,7 +168,7 @@ public class PageStore implements IPageStore {
 		Assert.hasLength(path);
 
 		try {
-			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGE_SUFFIX, PAGES_DIR_NAME, loadData);
+			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGES_DIR_NAME, loadData);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
@@ -179,10 +179,8 @@ public class PageStore implements IPageStore {
 		}
 	}
 
-	private Map<String, Object> getPageData(String projectName, String branchName, String path, String suffix, String rootDir,
+	private Map<String, Object> getPageData(String projectName, String branchName, String path, String rootDir,
 		boolean loadData) throws IOException, GitAPIException {
-		
-		suffix = StringUtils.defaultString(suffix);
 		
 		ILockedRepository repo = null;
 		try {
@@ -228,7 +226,7 @@ public class PageStore implements IPageStore {
 		Assert.hasLength(name);
 
 		try {
-			Map<String, Object> pageMap = getPageData(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, //$NON-NLS-1$
+			Map<String, Object> pageMap = getPageData(projectName, branchName, pagePath + "/" + name, //$NON-NLS-1$
 					ATTACHMENTS_DIR_NAME, true);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
