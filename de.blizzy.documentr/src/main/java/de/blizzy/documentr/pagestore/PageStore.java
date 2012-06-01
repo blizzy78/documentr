@@ -449,15 +449,28 @@ public class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File file = toFile(new File(workingDir, PAGES_DIR_NAME), path + PAGE_SUFFIX);
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			
+			boolean deleted = false;
+			File file = toFile(pagesDir, path + PAGE_SUFFIX);
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			file = toFile(pagesDir, path + META_SUFFIX);
+			if (file.isFile()) {
+				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			
+			if (deleted) {
 				Git git = Git.wrap(repo.r());
 				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 				git.commit()
 					.setAuthor(ident)
 					.setCommitter(ident)
-					.setMessage("delete " + path).call(); //$NON-NLS-1$
+					.setMessage("delete " + path) //$NON-NLS-1$
+					.call();
 				git.push().call();
 			}
 		} catch (GitAPIException e) {

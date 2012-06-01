@@ -40,8 +40,10 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
+import de.blizzy.documentr.repository.RepositoryUtil;
 
 public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -236,11 +238,19 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void deletePage() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
+		File pageFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.page"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(pageFile.isFile());
+		File metaFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.meta"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(metaFile.isFile());
+		
 		pageStore.deletePage(PROJECT, BRANCH_1, "foo", USER); //$NON-NLS-1$
 		List<String> result = pageStore.listPagePaths(PROJECT, BRANCH_1);
 		assertEquals(Collections.emptySet(), new HashSet<String>(result));
+		assertFalse(pageFile.isFile());
+		assertFalse(metaFile.isFile());
 	}
 	
 	@Test
