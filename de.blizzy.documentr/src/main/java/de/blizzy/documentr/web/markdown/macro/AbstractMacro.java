@@ -17,12 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 public abstract class AbstractMacro implements IMacro {
 	private HtmlSerializerContext context;
-	private IPageStore pageStore;
 	private String params;
 
 	@Override
@@ -51,14 +49,5 @@ public abstract class AbstractMacro implements IMacro {
 	@Override
 	public boolean isCacheable() {
 		return true;
-	}
-	
-	@Override
-	public void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-	
-	protected IPageStore getPageStore() {
-		return pageStore;
 	}
 }

@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
@@ -34,10 +33,7 @@ public class MacroFactoryTest {
 
 	@Before
 	public void setUp() {
-		PageStore pageStore = mock(PageStore.class);
-		
 		macroFactory = new MacroFactory();
-		macroFactory.setPageStore(pageStore);
 		
 		context = mock(HtmlSerializerContext.class);
 	}

@@ -30,6 +30,7 @@ import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
@@ -47,13 +48,15 @@ public class MarkdownProcessor {
 	
 	@Autowired
 	private MacroFactory macroFactory;
+	@Autowired
+	private PageStore pageStore;
 
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path) {
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
 
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, pageStore);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
 		
@@ -76,7 +79,7 @@ public class MarkdownProcessor {
 	}
 	
 	public String processNonCacheableMacros(String html, String projectName, String branchName, String path) {
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, pageStore);
 		for (;;) {
 			int start = html.indexOf("{{") + 2; //$NON-NLS-1$
 			if (start < 0) {
@@ -129,5 +132,9 @@ public class MarkdownProcessor {
 
 	void setMacroFactory(MacroFactory macroFactory) {
 		this.macroFactory = macroFactory;
+	}
+
+	public void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
 	}
 }

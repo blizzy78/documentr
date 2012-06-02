@@ -33,6 +33,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContextTest {
@@ -42,13 +43,15 @@ public class HtmlSerializerContextTest {
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	
 	private MarkdownProcessor markdownProcessor;
+	private PageStore pageStore;
 	private HtmlSerializerContext htmlSerializerContext;
 	private HttpServletRequest request;
 
 	@Before
 	public void setUp() {
 		markdownProcessor = mock(MarkdownProcessor.class);
-		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor);
+		pageStore = mock(PageStore.class);
+		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, pageStore);
 		
 		request = mock(HttpServletRequest.class);
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
@@ -77,6 +80,11 @@ public class HtmlSerializerContextTest {
 	@Test
 	public void getPagePath() {
 		assertEquals(PAGE, htmlSerializerContext.getPagePath());
+	}
+	
+	@Test
+	public void getPageStore() {
+		assertSame(pageStore, htmlSerializerContext.getPageStore());
 	}
 	
 	@Test

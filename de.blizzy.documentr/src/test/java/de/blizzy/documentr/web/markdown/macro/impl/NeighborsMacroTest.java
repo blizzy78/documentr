@@ -35,7 +35,6 @@ import org.mockito.stubbing.Answer;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
 
 public class NeighborsMacroTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -47,7 +46,7 @@ public class NeighborsMacroTest {
 		"home/foo/aaa",
 		"home/foo/aaa/a1",
 		"home/foo/aaa/a2",
-		"home/foo/bar",
+		"home/foo/bar", // <-- page under test
 		"home/foo/bar/x",
 		"home/foo/bar/x/x1",
 		"home/foo/bar/x/x2",
@@ -71,6 +70,7 @@ public class NeighborsMacroTest {
 		setupPages();
 		
 		context = mock(HtmlSerializerContext.class);
+		when(context.getPageStore()).thenReturn(pageStore);
 		when(context.getPageURI(anyString())).then(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
@@ -106,7 +106,6 @@ public class NeighborsMacroTest {
 		
 		NeighborsMacro macro = new NeighborsMacro();
 		macro.setHtmlSerializerContext(context);
-		macro.setPageStore(pageStore);
 		
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")

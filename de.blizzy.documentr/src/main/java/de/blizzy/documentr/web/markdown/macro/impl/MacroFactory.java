@@ -20,10 +20,8 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 
@@ -32,9 +30,6 @@ public class MacroFactory {
 	private static final Map<String, Class<? extends IMacro>> MACRO_CLASSES =
 			new HashMap<String, Class<? extends IMacro>>();
 	
-	@Autowired
-	private IPageStore pageStore;
-
 	static {
 		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("neighbours", NeighborsMacro.class); //$NON-NLS-1$
@@ -52,16 +47,11 @@ public class MacroFactory {
 			}
 			macro.setParameters(params);
 			macro.setHtmlSerializerContext(context);
-			macro.setPageStore(pageStore);
 			return macro;
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
 	}
 }
