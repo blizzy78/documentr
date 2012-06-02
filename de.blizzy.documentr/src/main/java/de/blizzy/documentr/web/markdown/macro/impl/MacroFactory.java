@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
@@ -41,7 +41,7 @@ public class MacroFactory {
 	}
 	
 	@Autowired
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	
@@ -66,7 +66,7 @@ public class MacroFactory {
 		}
 	}
 	
-	void setPageStore(PageStore pageStore) {
+	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
 

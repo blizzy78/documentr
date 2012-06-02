@@ -20,14 +20,14 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
 class MacroContext implements IMacroContext {
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
-	MacroContext(PageStore pageStore, DocumentrPermissionEvaluator permissionEvaluator) {
+	MacroContext(IPageStore pageStore, DocumentrPermissionEvaluator permissionEvaluator) {
 		Assert.notNull(pageStore);
 		Assert.notNull(permissionEvaluator);
 
@@ -36,7 +36,7 @@ class MacroContext implements IMacroContext {
 	}
 
 	@Override
-	public PageStore getPageStore() {
+	public IPageStore getPageStore() {
 		return pageStore;
 	}
 
