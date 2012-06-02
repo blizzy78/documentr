@@ -109,6 +109,8 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 
 	@PreDestroy
 	public void destroy() {
-		ehCacheManager.shutdown();
+		if (ehCacheManager != null) {
+			ehCacheManager.shutdown();
+		}
 	}
 }
