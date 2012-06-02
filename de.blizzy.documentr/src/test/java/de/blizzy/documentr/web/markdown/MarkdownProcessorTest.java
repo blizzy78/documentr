@@ -21,16 +21,19 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
-import de.blizzy.documentr.FirstParameter;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class MarkdownProcessorTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
+	private static final String PARAMS = "params"; //$NON-NLS-1$
 	
 	private MacroFactory macroFactory;
 	private MarkdownProcessor markdownProcessor;
@@ -47,17 +50,63 @@ public class MarkdownProcessorTest {
 	@SuppressWarnings("boxing")
 	public void markdownToHTML() {
 		IMacro macro = mock(IMacro.class);
-		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
+		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
 		when(macro.isCacheable()).thenReturn(true);
 		when(macro.getHtml()).thenReturn(macroHtml);
-		when(macro.cleanupHTML(anyString())).thenAnswer(new FirstParameter<String>());
+		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
+		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				String html = (String) invocation.getArguments()[0];
+				return StringUtils.replace(html, macroHtml, cleanedMacroHtml);
+			}
+		});
 		
 		when(macroFactory.get(eq(MACRO), (String) isNull(), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 		
 		String markdown = "**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHTML(markdown, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
-		String expectedHTML = "<p><strong>foo</strong></p>" + macroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+		String expectedHTML = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(expectedHTML, result);
+	}
+
+	@Test
+	@SuppressWarnings("boxing")
+	public void markdownToHTMLMustNotRenderNonCacheableMacros() {
+		IMacro macro = mock(IMacro.class);
+		when(macro.isCacheable()).thenReturn(false);
+		
+		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
+		
+		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = markdownProcessor.markdownToHTML(markdown, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		
+		String expectedHTML = "<p><strong>foo</strong></p><p>{{" + MACRO + " " + PARAMS + "/}}</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals(expectedHTML, result);
+	}
+	
+	@Test
+	@SuppressWarnings("boxing")
+	public void processNonCacheableMacros() {
+		IMacro macro = mock(IMacro.class);
+		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
+		when(macro.isCacheable()).thenReturn(false);
+		when(macro.getHtml()).thenReturn(macroHtml);
+		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
+		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				String html = (String) invocation.getArguments()[0];
+				return StringUtils.replace(html, macroHtml, cleanedMacroHtml);
+			}
+		});
+		
+		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
+
+		String html = "<p>{{" + MACRO + " " + PARAMS + "/}}</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = markdownProcessor.processNonCacheableMacros(html, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String expectedHTML = cleanedMacroHtml;
 		assertEquals(expectedHTML, result);
 	}
 }

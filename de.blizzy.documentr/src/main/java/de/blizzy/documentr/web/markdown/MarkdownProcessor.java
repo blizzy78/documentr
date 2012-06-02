@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,7 @@ public class MarkdownProcessor {
 						"{{" + macroName + " " + StringUtils.defaultString(params) + "/}}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
-		html = cleanupHTML(html, macroInvocations);
+		html = cleanupHTML(html, macroInvocations, true);
 		return html;
 	}
 	
@@ -90,19 +91,26 @@ public class MarkdownProcessor {
 			String macroName = StringUtils.substringBefore(macroCall, " "); //$NON-NLS-1$
 			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
 			IMacro macro = macroFactory.get(macroName, params, context);
+
 			html = StringUtils.replace(html, "{{" + macroCall + "/}}", macro.getHtml()); //$NON-NLS-1$ //$NON-NLS-2$
+
+			MacroInvocation invocation = new MacroInvocation(macro, macroName, params);
+			html = cleanupHTML(html, Collections.singletonList(invocation), false);
 		}
 		return html;
 	}
 
-	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations) {
+	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations, boolean cacheable) {
 		for (;;) {
 			String newHtml = html;
 			for (Pattern pattern : CLEANUP_RE) {
 				newHtml = pattern.matcher(newHtml).replaceAll(CLEANUP_REPLACE_WITH);
 			}
 			for (MacroInvocation macroInvocation : macroInvocations) {
-				newHtml = macroInvocation.getMacro().cleanupHTML(newHtml);
+				IMacro macro = macroInvocation.getMacro();
+				if (macro.isCacheable() == cacheable) {
+					newHtml = macro.cleanupHTML(newHtml);
+				}
 			}
 			
 			if (newHtml.equals(html)) {
