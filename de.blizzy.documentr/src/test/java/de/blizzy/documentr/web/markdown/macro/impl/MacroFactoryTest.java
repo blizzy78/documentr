@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
@@ -32,13 +33,16 @@ public class MacroFactoryTest {
 	private PageStore pageStore;
 	private MacroFactory macroFactory;
 	private HtmlSerializerContext htmlSerializerContext;
+	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@Before
 	public void setUp() {
 		pageStore = mock(PageStore.class);
+		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
 		
 		macroFactory = new MacroFactory();
 		macroFactory.setPageStore(pageStore);
+		macroFactory.setPermissionEvaluator(permissionEvaluator);
 		
 		htmlSerializerContext = mock(HtmlSerializerContext.class);
 	}

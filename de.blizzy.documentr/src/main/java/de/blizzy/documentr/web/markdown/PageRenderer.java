@@ -20,6 +20,7 @@ package de.blizzy.documentr.web.markdown;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.pagestore.IPageStore;
@@ -34,10 +35,12 @@ public class PageRenderer implements IPageRenderer {
 	private MarkdownProcessor markdownProcessor;
 	
 	@Override
-	public String getHtml(String projectName, String branchName, String path) throws IOException {
+	public String getHtml(String projectName, String branchName, String path, Authentication authentication)
+			throws IOException {
+		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path, authentication);
 	}
 	
 	void setPageStore(IPageStore pageStore) {

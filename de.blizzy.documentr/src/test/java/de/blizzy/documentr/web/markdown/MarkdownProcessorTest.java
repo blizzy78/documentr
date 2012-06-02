@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
@@ -37,6 +38,7 @@ public class MarkdownProcessorTest {
 	
 	private MacroFactory macroFactory;
 	private MarkdownProcessor markdownProcessor;
+	private Authentication authentication;
 
 	@Before
 	public void setUp() {
@@ -44,6 +46,8 @@ public class MarkdownProcessorTest {
 
 		markdownProcessor = new MarkdownProcessor();
 		markdownProcessor.setMacroFactory(macroFactory);
+		
+		authentication = mock(Authentication.class);
 	}
 	
 	@Test
@@ -65,7 +69,8 @@ public class MarkdownProcessorTest {
 		when(macroFactory.get(eq(MACRO), (String) isNull(), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 		
 		String markdown = "**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
-		String result = markdownProcessor.markdownToHTML(markdown, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = markdownProcessor.markdownToHTML(
+				markdown, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(expectedHTML, result);
@@ -80,7 +85,8 @@ public class MarkdownProcessorTest {
 		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 		
 		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String result = markdownProcessor.markdownToHTML(markdown, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = markdownProcessor.markdownToHTML(
+				markdown, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p><p>{{" + MACRO + " " + PARAMS + "/}}</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals(expectedHTML, result);
@@ -105,7 +111,8 @@ public class MarkdownProcessorTest {
 		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 
 		String html = "<p>{{" + MACRO + " " + PARAMS + "/}}</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String result = markdownProcessor.processNonCacheableMacros(html, "project", "branch", "home/bar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = markdownProcessor.processNonCacheableMacros(
+				html, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String expectedHTML = cleanedMacroHtml;
 		assertEquals(expectedHTML, result);
 	}

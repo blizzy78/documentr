@@ -42,13 +42,13 @@ public class PageRendererTest {
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE, true)).thenReturn(page); 
 
 		MarkdownProcessor markdownProcessor = mock(MarkdownProcessor.class);
-		when(markdownProcessor.markdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE)).thenReturn(HTML); 
+		when(markdownProcessor.markdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE, null)).thenReturn(HTML); 
 		
 		PageRenderer pageRenderer = new PageRenderer();
 		pageRenderer.setPageStore(pageStore);
 		pageRenderer.setMarkdownProcessor(markdownProcessor);
 		
-		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE);
+		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE, null);
 		assertEquals(HTML, result);
 	}
 }

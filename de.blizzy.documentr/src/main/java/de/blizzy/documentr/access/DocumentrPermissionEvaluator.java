@@ -87,7 +87,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 	}
 
-	private boolean hasApplicationPermission(Authentication authentication, Permission permission) {
+	public boolean hasApplicationPermission(Authentication authentication, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
@@ -103,7 +103,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return false;
 	}
 
-	private boolean hasProjectPermission(Authentication authentication, String projectName, Permission permission) {
+	public boolean hasProjectPermission(Authentication authentication, String projectName, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
@@ -121,7 +121,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return hasApplicationPermission(authentication, permission);
 	}
 	
-	private boolean hasAnyProjectPermission(Authentication authentication, Permission permission) {
+	public boolean hasAnyProjectPermission(Authentication authentication, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
@@ -137,7 +137,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return hasApplicationPermission(authentication, permission);
 	}
 	
-	private boolean hasBranchPermission(Authentication authentication, String projectName, String branchName,
+	public boolean hasBranchPermission(Authentication authentication, String projectName, String branchName,
 			Permission permission) {
 
 		String targetId = projectName + "/" + branchName; //$NON-NLS-1$
@@ -158,7 +158,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return hasProjectPermission(authentication, projectName, permission);
 	}
 	
-	private boolean hasAnyBranchPermission(Authentication authentication, String projectName, Permission permission) {
+	public boolean hasAnyBranchPermission(Authentication authentication, String projectName, Permission permission) {
 		String targetIdPrefix = projectName + "/"; //$NON-NLS-1$
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
@@ -177,7 +177,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return hasProjectPermission(authentication, projectName, permission);
 	}
 	
-	private boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
+	public boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
 			@SuppressWarnings("unused") String path, Permission permission) {
 
 		// TODO: check page to see whom it is restricted to

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -37,19 +38,22 @@ public class HtmlSerializerContext {
 	private MarkdownProcessor markdownProcessor;
 	private List<Header> headers = new ArrayList<Header>();
 	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
+	private Authentication authentication;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
-			MarkdownProcessor markdownProcessor) {
+			MarkdownProcessor markdownProcessor, Authentication authentication) {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
 		Assert.notNull(markdownProcessor);
+		Assert.notNull(authentication);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;
 		this.markdownProcessor = markdownProcessor;
+		this.authentication = authentication;
 	}
 
 	public String getProjectName() {
@@ -62,6 +66,10 @@ public class HtmlSerializerContext {
 	
 	public String getPagePath() {
 		return pagePath;
+	}
+	
+	public Authentication getAuthentication() {
+		return authentication;
 	}
 	
 	public String getAttachmentURI(String name) {
@@ -96,7 +104,7 @@ public class HtmlSerializerContext {
 	}
 
 	public String markdownToHTML(String markdown) {
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication);
 	}
 
 	void addHeader(String text, int level) {

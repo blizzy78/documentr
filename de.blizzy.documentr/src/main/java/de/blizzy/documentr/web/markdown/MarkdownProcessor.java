@@ -28,6 +28,7 @@ import org.pegdown.Parser;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.web.markdown.macro.IMacro;
@@ -48,12 +49,14 @@ public class MarkdownProcessor {
 	@Autowired
 	private MacroFactory macroFactory;
 
-	public String markdownToHTML(String markdown, String projectName, String branchName, String path) {
+	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
+			Authentication authentication) {
+		
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
 
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
 		
@@ -75,8 +78,10 @@ public class MarkdownProcessor {
 		return html;
 	}
 	
-	public String processNonCacheableMacros(String html, String projectName, String branchName, String path) {
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
+	public String processNonCacheableMacros(String html, String projectName, String branchName, String path,
+			Authentication authentication) {
+		
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		for (;;) {
 			int start = html.indexOf("{{") + 2; //$NON-NLS-1$
 			if (start < 0) {

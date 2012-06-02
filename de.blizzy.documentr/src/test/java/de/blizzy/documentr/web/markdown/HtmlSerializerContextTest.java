@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -42,13 +43,15 @@ public class HtmlSerializerContextTest {
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	
 	private MarkdownProcessor markdownProcessor;
+	private Authentication authentication;
 	private HtmlSerializerContext htmlSerializerContext;
 	private HttpServletRequest request;
 
 	@Before
 	public void setUp() {
 		markdownProcessor = mock(MarkdownProcessor.class);
-		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor);
+		authentication = mock(Authentication.class);
+		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, authentication);
 		
 		request = mock(HttpServletRequest.class);
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
@@ -80,6 +83,11 @@ public class HtmlSerializerContextTest {
 	}
 	
 	@Test
+	public void getAuthentication() {
+		assertSame(authentication, htmlSerializerContext.getAuthentication());
+	}
+	
+	@Test
 	public void getAttachmentURI() {
 		String uri = htmlSerializerContext.getAttachmentURI("test.png"); //$NON-NLS-1$
 		assertEquals(CONTEXT + "/attachment/" + PROJECT + "/" + BRANCH + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -98,7 +106,7 @@ public class HtmlSerializerContextTest {
 	
 	@Test
 	public void markdownToHTML() {
-		when(markdownProcessor.markdownToHTML("md", PROJECT, BRANCH, PAGE)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(markdownProcessor.markdownToHTML("md", PROJECT, BRANCH, PAGE, authentication)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("html", htmlSerializerContext.markdownToHTML("md")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

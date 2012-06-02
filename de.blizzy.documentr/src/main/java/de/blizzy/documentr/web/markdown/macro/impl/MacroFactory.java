@@ -23,6 +23,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
@@ -41,6 +42,8 @@ public class MacroFactory {
 	
 	@Autowired
 	private PageStore pageStore;
+	@Autowired
+	private DocumentrPermissionEvaluator permissionEvaluator;
 	
 	public IMacro get(String macroName, String params, HtmlSerializerContext context) {
 		try {
@@ -53,7 +56,8 @@ public class MacroFactory {
 			}
 			macro.setParameters(params);
 			macro.setHtmlSerializerContext(context);
-			macro.setMacroContext(createMacroContext());
+			IMacroContext macroContext = new MacroContext(pageStore, permissionEvaluator);
+			macro.setMacroContext(macroContext);
 			return macro;
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
@@ -62,16 +66,11 @@ public class MacroFactory {
 		}
 	}
 	
-	private IMacroContext createMacroContext() {
-		return new IMacroContext() {
-			@Override
-			public PageStore getPageStore() {
-				return pageStore;
-			}
-		};
-	}
-
 	void setPageStore(PageStore pageStore) {
 		this.pageStore = pageStore;
+	}
+
+	void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator) {
+		this.permissionEvaluator = permissionEvaluator;
 	}
 }

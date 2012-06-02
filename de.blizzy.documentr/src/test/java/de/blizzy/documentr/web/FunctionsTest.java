@@ -28,6 +28,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.google.common.collect.Lists;
 
@@ -50,6 +53,7 @@ public class FunctionsTest {
 	private UserStore userStore;
 	private IPageRenderer pageRenderer;
 	private MarkdownProcessor markdownProcessor;
+	private Authentication authentication;
 
 	@Before
 	public void setUp() {
@@ -63,6 +67,13 @@ public class FunctionsTest {
 		Functions.setPageRenderer(pageRenderer);
 		markdownProcessor = mock(MarkdownProcessor.class);
 		Functions.setMarkdownProcessor(markdownProcessor);
+		
+		authentication = mock(Authentication.class);
+		
+		SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		
+		SecurityContextHolder.setContext(securityContext);
 	}
 
 	@After
@@ -72,6 +83,7 @@ public class FunctionsTest {
 		Functions.setUserStore(null);
 		Functions.setPageRenderer(null);
 		Functions.setMarkdownProcessor(null);
+		SecurityContextHolder.clearContext();
 	}
 	
 	@Test
@@ -118,8 +130,9 @@ public class FunctionsTest {
 
 	@Test
 	public void getPageHTML() throws IOException {
-		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE)).thenReturn("html"); //$NON-NLS-1$
-		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE)).thenReturn("htmlWithMacros"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE, authentication)).thenReturn("html"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE, authentication)) //$NON-NLS-1$
+			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		assertEquals("htmlWithMacros", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	

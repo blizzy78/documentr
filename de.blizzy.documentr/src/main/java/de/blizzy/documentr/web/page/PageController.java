@@ -195,10 +195,11 @@ public class PageController {
 	@ResponseBody
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
-			@RequestParam String markdown, @RequestParam(required=false) String pagePath) {
+			@RequestParam String markdown, @RequestParam(required=false) String pagePath, Authentication authentication) {
 
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("html", markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath)); //$NON-NLS-1$
+		result.put("html", markdownProcessor.markdownToHTML( //$NON-NLS-1$
+				markdown, projectName, branchName, pagePath, authentication));
 		return result;
 	}
 	

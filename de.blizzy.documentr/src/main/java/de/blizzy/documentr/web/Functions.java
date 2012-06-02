@@ -23,6 +23,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.UserStore;
@@ -93,8 +95,9 @@ public final class Functions {
 	}
 	
 	public static String getPageHTML(String projectName, String branchName, String path) throws IOException {
-		String html = pageRenderer.getHtml(projectName, branchName, path);
-		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
+		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
 	}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)

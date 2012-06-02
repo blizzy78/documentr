@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
@@ -64,30 +67,36 @@ class NeighborsMacro extends AbstractMacro {
 		IPageStore pageStore = getMacroContext().getPageStore();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (page.getParentPagePath() != null) {
-			StringBuilder parentBuf = new StringBuilder();
-			Page parentPage = pageStore.getPage(context.getProjectName(), context.getBranchName(),
-				page.getParentPagePath(), false);
-			String uri = context.getPageURI(page.getParentPagePath());
-			parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(parentPage.getTitle())
-				.append("</a>") //$NON-NLS-1$
-				.append("<ul>"); //$NON-NLS-1$
-			
-			if (path.equals(currentPagePath)) {
-				List<String> siblingPaths = pageStore.listChildPagePaths(
-						context.getProjectName(), context.getBranchName(), page.getParentPagePath());
-				for (String siblingPath : siblingPaths) {
-					parentBuf.append(siblingPath.equals(path) ?
-							inner :
-							printLinkListItem(siblingPath, currentPagePath));
+			Authentication authentication = context.getAuthentication();
+			DocumentrPermissionEvaluator permissionEvaluator = getMacroContext().getPermissionEvaluator();
+			if (permissionEvaluator.hasPagePermission(authentication, context.getProjectName(),
+					context.getBranchName(), page.getParentPagePath(), Permission.VIEW)) {
+				
+				StringBuilder parentBuf = new StringBuilder();
+				Page parentPage = pageStore.getPage(context.getProjectName(), context.getBranchName(),
+					page.getParentPagePath(), false);
+				String uri = context.getPageURI(page.getParentPagePath());
+				parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
+					.append(parentPage.getTitle())
+					.append("</a>") //$NON-NLS-1$
+					.append("<ul>"); //$NON-NLS-1$
+				
+				if (path.equals(currentPagePath)) {
+					List<String> siblingPaths = pageStore.listChildPagePaths(
+							context.getProjectName(), context.getBranchName(), page.getParentPagePath());
+					for (String siblingPath : siblingPaths) {
+						parentBuf.append(siblingPath.equals(path) ?
+								inner :
+								printLinkListItem(siblingPath, currentPagePath));
+					}
+				} else {
+					parentBuf.append(inner);
 				}
-			} else {
-				parentBuf.append(inner);
+				parentBuf.append("</ul>") //$NON-NLS-1$
+					.append("</li>"); //$NON-NLS-1$
+				
+				buf.append(printParent(parentBuf, page.getParentPagePath(), currentPagePath));
 			}
-			parentBuf.append("</ul>") //$NON-NLS-1$
-				.append("</li>"); //$NON-NLS-1$
-			
-			buf.append(printParent(parentBuf, page.getParentPagePath(), currentPagePath));
 		} else {
 			buf.append(inner);
 		}
@@ -104,10 +113,16 @@ class NeighborsMacro extends AbstractMacro {
 			buf.append(printChildren(path, currentPagePath));
 			buf.append("</li>"); //$NON-NLS-1$
 		} else {
-			String uri = context.getPageURI(path);
-			buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(page.getTitle())
-				.append("</a></li>"); //$NON-NLS-1$
+			Authentication authentication = context.getAuthentication();
+			DocumentrPermissionEvaluator permissionEvaluator = getMacroContext().getPermissionEvaluator();
+			if (permissionEvaluator.hasPagePermission(authentication, context.getProjectName(),
+					context.getBranchName(), path, Permission.VIEW)) {
+
+				String uri = context.getPageURI(path);
+				buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
+					.append(page.getTitle())
+					.append("</a></li>"); //$NON-NLS-1$
+			}
 		}
 		return buf;
 	}

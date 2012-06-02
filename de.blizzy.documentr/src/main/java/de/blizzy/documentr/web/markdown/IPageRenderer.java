@@ -20,8 +20,9 @@ package de.blizzy.documentr.web.markdown;
 import java.io.IOException;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
 
 public interface IPageRenderer {
 	@Cacheable(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHtml(String projectName, String branchName, String path) throws IOException;
+	String getHtml(String projectName, String branchName, String path, Authentication authentication) throws IOException;
 }

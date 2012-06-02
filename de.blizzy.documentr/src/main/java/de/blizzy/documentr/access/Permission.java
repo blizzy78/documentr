@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-enum Permission {
+public enum Permission {
 	// ===== VALID TARGET TYPES: all =====
 
 	// can do anything (implies all other permissions on same target)

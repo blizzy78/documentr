@@ -15,12 +15,33 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
+
+import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
-public interface IMacroContext {
-	PageStore getPageStore();
-	DocumentrPermissionEvaluator getPermissionEvaluator();
+class MacroContext implements IMacroContext {
+	private PageStore pageStore;
+	private DocumentrPermissionEvaluator permissionEvaluator;
+
+	MacroContext(PageStore pageStore, DocumentrPermissionEvaluator permissionEvaluator) {
+		Assert.notNull(pageStore);
+		Assert.notNull(permissionEvaluator);
+
+		this.pageStore = pageStore;
+		this.permissionEvaluator = permissionEvaluator;
+	}
+
+	@Override
+	public PageStore getPageStore() {
+		return pageStore;
+	}
+
+	@Override
+	public DocumentrPermissionEvaluator getPermissionEvaluator() {
+		return permissionEvaluator;
+	}
 }

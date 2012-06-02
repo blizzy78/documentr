@@ -240,7 +240,7 @@ public class PageControllerTest {
 	
 	@Test
 	public void markdownToHTML() {
-		Map<String, String> result = pageController.markdownToHTML(PROJECT, BRANCH, "**foo**", PAGE_PATH); //$NON-NLS-1$
+		Map<String, String> result = pageController.markdownToHTML(PROJECT, BRANCH, "**foo**", PAGE_PATH, authentication); //$NON-NLS-1$
 		assertEquals("<p><strong>foo</strong></p>", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

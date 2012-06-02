@@ -29,9 +29,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.internal.matchers.Equals;
+import org.mockito.internal.matchers.Not;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
@@ -40,6 +46,7 @@ import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 public class NeighborsMacroTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
+	private static final String INACCESSIBLE_PAGE_PATH = "home/foo/inaccessible"; //$NON-NLS-1$
 	@SuppressWarnings("nls")
 	private static final String[] PAGES = {
 		"home",
@@ -59,12 +66,13 @@ public class NeighborsMacroTest {
 		"home/foo/bar/z/z2",
 		"home/foo/bbb",
 		"home/foo/bbb/b1",
-		"home/foo/bbb/b2"
+		INACCESSIBLE_PAGE_PATH
 	};
 	
 	private PageStore pageStore;
 	private HtmlSerializerContext htmlSerializerContext;
 	private IMacroContext macroContext;
+	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@Before
 	public void setUp() throws IOException {
@@ -79,8 +87,12 @@ public class NeighborsMacroTest {
 		pageStore = mock(PageStore.class);
 		setupPages();
 
+		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
+		setupPagePermissions();
+		
 		macroContext = mock(IMacroContext.class);
 		when(macroContext.getPageStore()).thenReturn(pageStore);
+		when(macroContext.getPermissionEvaluator()).thenReturn(permissionEvaluator);
 	}
 	
 	private void setupPages() throws IOException {
@@ -100,6 +112,18 @@ public class NeighborsMacroTest {
 			Collections.sort(childPages);
 			when(pageStore.listChildPagePaths(PROJECT, BRANCH, page)).thenReturn(childPages);
 		}
+	}
+	
+	@SuppressWarnings({ "boxing", "unchecked" })
+	private void setupPagePermissions() {
+		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
+				eq(PROJECT), eq(BRANCH), Matchers.<String>argThat(new Not(new Equals(INACCESSIBLE_PAGE_PATH))),
+				same(Permission.VIEW)))
+				.thenReturn(true);
+		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
+				eq(PROJECT), eq(BRANCH), eq(INACCESSIBLE_PAGE_PATH),
+				same(Permission.VIEW)))
+				.thenReturn(false);
 	}
 	
 	@Test
