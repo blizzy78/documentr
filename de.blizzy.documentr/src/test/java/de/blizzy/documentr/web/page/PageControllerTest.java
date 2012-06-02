@@ -41,9 +41,9 @@ import org.springframework.validation.BindingResult;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageNotFoundException;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
@@ -56,14 +56,14 @@ public class PageControllerTest {
 	private static final String PARENT_PAGE = "home"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	private GlobalRepositoryManager repoManager;
 	private PageController pageController;
 	private Authentication authentication;
 
 	@Before
 	public void setUp() throws IOException {
-		pageStore = mock(PageStore.class);
+		pageStore = mock(IPageStore.class);
 		repoManager = mock(GlobalRepositoryManager.class);
 		
 		UserStore userStore = mock(UserStore.class);

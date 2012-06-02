@@ -38,7 +38,7 @@ import org.springframework.validation.BindingResult;
 
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class BranchControllerTest {
@@ -48,13 +48,13 @@ public class BranchControllerTest {
 	
 	private BranchController branchController;
 	private GlobalRepositoryManager repoManager;
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	private Authentication authentication;
 
 	@Before
 	public void setUp() throws IOException {
 		repoManager = mock(GlobalRepositoryManager.class);
-		pageStore = mock(PageStore.class);
+		pageStore = mock(IPageStore.class);
 		
 		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);

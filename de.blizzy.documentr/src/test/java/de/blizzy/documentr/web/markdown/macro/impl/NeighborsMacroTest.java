@@ -38,8 +38,8 @@ import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
@@ -69,7 +69,7 @@ public class NeighborsMacroTest {
 		INACCESSIBLE_PAGE_PATH
 	};
 	
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	private HtmlSerializerContext htmlSerializerContext;
 	private IMacroContext macroContext;
 	private DocumentrPermissionEvaluator permissionEvaluator;
@@ -84,7 +84,7 @@ public class NeighborsMacroTest {
 			}
 		});
 		
-		pageStore = mock(PageStore.class);
+		pageStore = mock(IPageStore.class);
 		setupPages();
 
 		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);

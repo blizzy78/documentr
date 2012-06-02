@@ -61,7 +61,7 @@ import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Component
-public class PageStore implements IPageStore {
+class PageStore implements IPageStore {
 	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$

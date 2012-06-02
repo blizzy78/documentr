@@ -24,20 +24,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.PageStore;
+import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 
 public class MacroFactoryTest {
-	private PageStore pageStore;
+	private IPageStore pageStore;
 	private MacroFactory macroFactory;
 	private HtmlSerializerContext htmlSerializerContext;
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@Before
 	public void setUp() {
-		pageStore = mock(PageStore.class);
+		pageStore = mock(IPageStore.class);
 		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
 		
 		macroFactory = new MacroFactory();
