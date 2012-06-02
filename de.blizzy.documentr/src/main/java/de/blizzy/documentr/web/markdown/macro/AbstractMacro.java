@@ -49,6 +49,11 @@ public abstract class AbstractMacro implements IMacro {
 	}
 	
 	@Override
+	public boolean isCacheable() {
+		return true;
+	}
+	
+	@Override
 	public void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}

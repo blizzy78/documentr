@@ -58,10 +58,36 @@ public class MarkdownProcessor {
 		
 		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
 		for (MacroInvocation invocation : macroInvocations) {
-			String macroHtml = StringUtils.defaultString(invocation.getMacro().getHtml());
-			html = StringUtils.replace(html, invocation.getMarker(), macroHtml);
+			if (invocation.getMacro().isCacheable()) {
+				String macroHtml = StringUtils.defaultString(invocation.getMacro().getHtml());
+				html = StringUtils.replace(html, invocation.getMarker(), macroHtml);
+			} else {
+				html = StringUtils.replace(html, invocation.getMarker(),
+						"{{" + invocation.getMacroName() + " " + invocation.getParameters() + "/}}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 		}
 		html = cleanupHTML(html, macroInvocations);
+		return html;
+	}
+	
+	public String processNonCacheableMacros(String html, String projectName, String branchName, String path) {
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this);
+		for (;;) {
+			int start = html.indexOf("{{") + 2; //$NON-NLS-1$
+			if (start < 0) {
+				break;
+			}
+			int end = html.indexOf("/}}", start); //$NON-NLS-1$
+			if (end < 0) {
+				break;
+			}
+
+			String macroCall = html.substring(start, end);
+			String macroName = StringUtils.substringBefore(macroCall, " "); //$NON-NLS-1$
+			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
+			IMacro macro = macroFactory.get(macroName, params, context);
+			html = StringUtils.replace(html, "{{" + macroCall + "/}}", macro.getHtml()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		return html;
 	}
 
@@ -86,7 +112,7 @@ public class MarkdownProcessor {
 	
 	public MacroInvocation getMacroInvocation(String macroName, String params, HtmlSerializerContext context) {
 		IMacro macro = macroFactory.get(macroName, params, context);
-		return new MacroInvocation(macro);
+		return new MacroInvocation(macro, macroName, params);
 	}
 
 	void setMacroFactory(MacroFactory macroFactory) {

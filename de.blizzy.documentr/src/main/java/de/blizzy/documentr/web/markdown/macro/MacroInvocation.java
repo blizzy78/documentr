@@ -19,10 +19,14 @@ package de.blizzy.documentr.web.markdown.macro;
 
 public class MacroInvocation {
 	private IMacro macro;
+	private String macroName;
+	private String params;
 	private String marker;
 
-	public MacroInvocation(IMacro macro) {
+	public MacroInvocation(IMacro macro, String macroName, String params) {
 		this.macro = macro;
+		this.macroName = macroName;
+		this.params = params;
 		
 		long random = (long) (Math.random() * Long.MAX_VALUE);
 		marker = "__" + macro.getClass().getName() + "_" + String.valueOf(random) + "__"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -30,6 +34,14 @@ public class MacroInvocation {
 	
 	public IMacro getMacro() {
 		return macro;
+	}
+
+	public String getMacroName() {
+		return macroName;
+	}
+	
+	public String getParameters() {
+		return params;
 	}
 	
 	public String getMarker() {

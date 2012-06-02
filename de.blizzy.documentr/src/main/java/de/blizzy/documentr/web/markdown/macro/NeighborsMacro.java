@@ -130,4 +130,9 @@ class NeighborsMacro extends AbstractMacro {
 	public String cleanupHTML(String html) {
 		return CLEANUP_RE.matcher(html).replaceAll(CLEANUP_REPLACE_WITH);
 	}
+	
+	@Override
+	public boolean isCacheable() {
+		return false;
+	}
 }

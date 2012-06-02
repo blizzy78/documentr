@@ -32,6 +32,7 @@ import de.blizzy.documentr.pagestore.PageMetadata;
 import de.blizzy.documentr.pagestore.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
 public final class Functions {
@@ -39,6 +40,7 @@ public final class Functions {
 	private static GlobalRepositoryManager repoManager;
 	private static UserStore userStore;
 	private static IPageRenderer pageRenderer;
+	private static MarkdownProcessor markdownProcessor;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
@@ -48,6 +50,9 @@ public final class Functions {
 	private UserStore _userStore;
 	@Autowired
 	private IPageRenderer _pageRenderer;
+	@Autowired
+	private MarkdownProcessor _markdownProcessor;
+	
 	
 	@PostConstruct
 	public void init() {
@@ -55,6 +60,7 @@ public final class Functions {
 		repoManager = _repoManager;
 		userStore = _userStore;
 		pageRenderer = _pageRenderer;
+		markdownProcessor = _markdownProcessor;
 	}
 
 	public static List<String> listProjects() {
@@ -87,7 +93,8 @@ public final class Functions {
 	}
 	
 	public static String getPageHTML(String projectName, String branchName, String path) throws IOException {
-		return pageRenderer.getHTML(projectName, branchName, path);
+		String html = pageRenderer.getHtml(projectName, branchName, path);
+		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path);
 	}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)
@@ -114,5 +121,9 @@ public final class Functions {
 
 	static void setPageRenderer(IPageRenderer pageRenderer) {
 		Functions.pageRenderer = pageRenderer;
+	}
+
+	static void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
+		Functions.markdownProcessor = markdownProcessor;
 	}
 }

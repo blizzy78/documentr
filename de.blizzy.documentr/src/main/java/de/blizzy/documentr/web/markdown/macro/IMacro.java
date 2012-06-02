@@ -26,4 +26,5 @@ public interface IMacro {
 	void setPageStore(IPageStore pageStore);
 	String getHtml();
 	String cleanupHTML(String html);
+	boolean isCacheable();
 }

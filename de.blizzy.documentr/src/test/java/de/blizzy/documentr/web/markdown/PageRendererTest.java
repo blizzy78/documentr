@@ -48,7 +48,7 @@ public class PageRendererTest {
 		pageRenderer.setPageStore(pageStore);
 		pageRenderer.setMarkdownProcessor(markdownProcessor);
 		
-		String result = pageRenderer.getHTML(PROJECT, BRANCH, PAGE);
+		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE);
 		assertEquals(HTML, result);
 	}
 }

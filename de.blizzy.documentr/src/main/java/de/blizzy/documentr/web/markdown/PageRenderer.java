@@ -34,12 +34,12 @@ public class PageRenderer implements IPageRenderer {
 	private MarkdownProcessor markdownProcessor;
 	
 	@Override
-	public String getHTML(String projectName, String branchName, String path) throws IOException {
+	public String getHtml(String projectName, String branchName, String path) throws IOException {
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
 		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path);
 	}
-
+	
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}

@@ -44,9 +44,11 @@ public class MarkdownProcessorTest {
 	}
 	
 	@Test
+	@SuppressWarnings("boxing")
 	public void markdownToHTML() {
 		IMacro macro = mock(IMacro.class);
 		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
+		when(macro.isCacheable()).thenReturn(true);
 		when(macro.getHtml()).thenReturn(macroHtml);
 		when(macro.cleanupHTML(anyString())).thenAnswer(new FirstParameter<String>());
 		

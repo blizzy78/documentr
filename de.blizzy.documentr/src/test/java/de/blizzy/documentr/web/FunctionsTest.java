@@ -38,6 +38,7 @@ import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageMetadata;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 public class FunctionsTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -48,6 +49,7 @@ public class FunctionsTest {
 	private IPageStore pageStore;
 	private UserStore userStore;
 	private IPageRenderer pageRenderer;
+	private MarkdownProcessor markdownProcessor;
 
 	@Before
 	public void setUp() {
@@ -59,12 +61,17 @@ public class FunctionsTest {
 		Functions.setUserStore(userStore);
 		pageRenderer = mock(IPageRenderer.class);
 		Functions.setPageRenderer(pageRenderer);
+		markdownProcessor = mock(MarkdownProcessor.class);
+		Functions.setMarkdownProcessor(markdownProcessor);
 	}
 
 	@After
 	public void tearDown() {
 		Functions.setGlobalRepositoryManager(null);
 		Functions.setPageStore(null);
+		Functions.setUserStore(null);
+		Functions.setPageRenderer(null);
+		Functions.setMarkdownProcessor(null);
 	}
 	
 	@Test
@@ -111,8 +118,9 @@ public class FunctionsTest {
 
 	@Test
 	public void getPageHTML() throws IOException {
-		when(pageRenderer.getHTML(PROJECT, BRANCH, PAGE)).thenReturn("html"); //$NON-NLS-1$
-		assertEquals("html", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
+		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE)).thenReturn("html"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE)).thenReturn("htmlWithMacros"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("htmlWithMacros", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test

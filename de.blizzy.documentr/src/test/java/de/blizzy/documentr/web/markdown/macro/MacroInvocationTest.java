@@ -27,14 +27,28 @@ public class MacroInvocationTest {
 	@Test
 	public void getMacro() {
 		IMacro macro = mock(IMacro.class);
-		MacroInvocation invocation = new MacroInvocation(macro);
+		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertSame(macro, invocation.getMacro());
 	}
 
 	@Test
+	public void getMacroName() {
+		IMacro macro = mock(IMacro.class);
+		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("macro", invocation.getMacroName()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getParameters() {
+		IMacro macro = mock(IMacro.class);
+		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("params", invocation.getParameters()); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void getMarker() {
 		IMacro macro = mock(IMacro.class);
-		MacroInvocation invocation = new MacroInvocation(macro);
+		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertTrue(StringUtils.isNotBlank(invocation.getMarker()));
 	}
 }
