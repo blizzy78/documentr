@@ -58,12 +58,16 @@ public class MarkdownProcessor {
 		
 		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
 		for (MacroInvocation invocation : macroInvocations) {
-			if (invocation.getMacro().isCacheable()) {
-				String macroHtml = StringUtils.defaultString(invocation.getMacro().getHtml());
-				html = StringUtils.replace(html, invocation.getMarker(), macroHtml);
+			IMacro macro = invocation.getMacro();
+			String marker = invocation.getMarker();
+			if (macro.isCacheable()) {
+				String macroHtml = StringUtils.defaultString(macro.getHtml());
+				html = StringUtils.replace(html, marker, macroHtml);
 			} else {
-				html = StringUtils.replace(html, invocation.getMarker(),
-						"{{" + invocation.getMacroName() + " " + invocation.getParameters() + "/}}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				String macroName = invocation.getMacroName();
+				String params = invocation.getParameters();
+				html = StringUtils.replace(html, marker,
+						"{{" + macroName + " " + StringUtils.defaultString(params) + "/}}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 		html = cleanupHTML(html, macroInvocations);
