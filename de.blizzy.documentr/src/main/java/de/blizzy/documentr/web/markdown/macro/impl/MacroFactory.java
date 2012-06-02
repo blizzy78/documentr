@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
 
 @Component
 public class MacroFactory {

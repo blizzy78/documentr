@@ -29,7 +29,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 
 public class MarkdownProcessorTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$

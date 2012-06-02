@@ -30,7 +30,7 @@ public abstract class AbstractMacro implements IMacro {
 		this.params = params;
 	}
 	
-	protected String getParameters() {
+	public String getParameters() {
 		return params;
 	}
 
@@ -39,7 +39,7 @@ public abstract class AbstractMacro implements IMacro {
 		this.context = context;
 	}
 	
-	protected HtmlSerializerContext getHtmlSerializerContext() {
+	public HtmlSerializerContext getHtmlSerializerContext() {
 		return context;
 	}
 

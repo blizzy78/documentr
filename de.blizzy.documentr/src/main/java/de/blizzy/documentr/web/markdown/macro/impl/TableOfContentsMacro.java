@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.AbstractMarkdownMacro;
 
 class TableOfContentsMacro extends AbstractMarkdownMacro {
 	@Override

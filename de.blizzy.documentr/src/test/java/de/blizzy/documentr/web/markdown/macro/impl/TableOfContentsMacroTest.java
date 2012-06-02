@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 
 public class TableOfContentsMacroTest {
 	@Test

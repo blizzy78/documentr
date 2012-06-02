@@ -15,17 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
-class UnknownMacroMacro extends AbstractMacro {
-	private String macroName;
+import static org.junit.Assert.*;
 
-	public UnknownMacroMacro(String macroName) {
-		this.macroName = macroName;
-	}
+import org.junit.Test;
 
-	@Override
-	public String getHtml() {
-		return "<span class=\"unknown-macro\">!" + macroName + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
+import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
+
+public class UnknownMacroMacroTest {
+	@Test
+	public void getHtml() {
+		UnknownMacroMacro macro = new UnknownMacroMacro("nonexistent"); //$NON-NLS-1$
+		String html = macro.getHtml();
+		assertEquals("<span class=\"unknown-macro\">!nonexistent!</span>", html); //$NON-NLS-1$
 	}
 }

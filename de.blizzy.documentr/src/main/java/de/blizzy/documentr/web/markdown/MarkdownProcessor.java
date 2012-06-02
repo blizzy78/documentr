@@ -31,8 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
+import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 
 @Component
 public class MarkdownProcessor {

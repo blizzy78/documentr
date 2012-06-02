@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 
 class NeighborsMacro extends AbstractMacro {
 	@SuppressWarnings("nls")
