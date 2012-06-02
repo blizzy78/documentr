@@ -76,7 +76,15 @@ function updatePasswordStrengthIndicator() {
 		<c:set var="errorText"><form:errors path="loginName"/></c:set>
 		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="loginName" cssClass="control-label"><spring:message code="label.loginName"/>:</form:label>
-			<form:input path="loginName" cssClass="input-xlarge"/>
+			<c:choose>
+				<c:when test="${(!empty userForm.loginName) && (empty errorText)}">
+					<form:hidden path="loginName"/>
+					<form:input path="loginName" cssClass="input-xlarge disabled" disabled="true"/>
+				</c:when>
+				<c:otherwise>
+					<form:input path="loginName" cssClass="input-xlarge"/>
+				</c:otherwise>
+			</c:choose>
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 		</div>
 		<c:set var="errorText1"><form:errors path="password1"/></c:set>
