@@ -15,30 +15,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.web.access;
 
-import de.blizzy.documentr.NotFoundException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
+import javax.validation.Constraint;
 
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
-	}
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy=RoleNameValidator.class)
+public @interface ValidRoleName {
+	String message() default "{role.name.invalid}";
+	Class<?>[] groups() default {};
+	Class<?>[] payload() default {};
 }

@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="hasApplicationPermission('ADMIN')">
 
 <dt:breadcrumbs>
-	<li class="active"><spring:message code="title.users"/></li>
+	<li class="active"><spring:message code="title.roles"/></li>
 </dt:breadcrumbs>
 
 <dt:page>
@@ -33,21 +33,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <div class="page-header"><h1><spring:message code="title.accountManagement"/></h1></div>
 
 <ul class="nav nav-tabs">
-	<li class="active"><a href="<c:url value="/users"/>"><spring:message code="title.users"/></a></li>
-	<li><a href="<c:url value="/roles"/>"><spring:message code="title.roles"/></a></li>
+	<li><a href="<c:url value="/users"/>"><spring:message code="title.users"/></a></li>
+	<li class="active"><a href="<c:url value="/roles"/>"><spring:message code="title.roles"/></a></li>
 </ul>
 
-<h2><spring:message code="title.users"/></h2>
+<h2><spring:message code="title.roles"/></h2>
 
-<c:set var="users" value="${d:listUsers()}"/>
+<c:set var="roles" value="${d:listRoles()}"/>
 <ul>
-<c:forEach var="user" items="${users}">
-	<li><a href="<c:url value="/user/edit/${user}"/>"><c:out value="${user}"/></a></li>
+<c:forEach var="role" items="${roles}">
+	<li><a href="<c:url value="/role/edit/${role}"/>"><c:out value="${role}"/></a></li>
 </c:forEach>
 </ul>
 
 <p>
-<a href="<c:url value="/user/add"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addUser"/></a>
+<a href="<c:url value="/role/add"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addRole"/></a>
 </p>
 
 </dt:page>

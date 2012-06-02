@@ -22,7 +22,7 @@ import de.blizzy.documentr.NotFoundException;
 public class UserNotFoundException extends NotFoundException {
 	private String loginName;
 
-	public UserNotFoundException(String loginName) {
+	UserNotFoundException(String loginName) {
 		this.loginName = loginName;
 	}
 	

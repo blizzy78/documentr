@@ -15,30 +15,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.access;
 
-import de.blizzy.documentr.NotFoundException;
+import java.util.EnumSet;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
+public class Role {
+	private String name;
+	private EnumSet<Permission> permissions;
 
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
+	public Role(String name, EnumSet<Permission> permissions) {
+		this.name = name;
+		this.permissions = permissions;
 	}
 	
-	public String getProjectName() {
-		return projectName;
+	public String getName() {
+		return name;
 	}
 	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
+	public EnumSet<Permission> getPermissions() {
+		return permissions;
 	}
 }

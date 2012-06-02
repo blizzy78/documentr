@@ -60,7 +60,14 @@ function updatePasswordStrengthIndicator() {
 
 <dt:page>
 
-<div class="page-header"><h1><spring:message code="title.editUser"/></h1></div>
+<div class="page-header"><h1><spring:message code="title.accountManagement"/></h1></div>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="<c:url value="/users"/>"><spring:message code="title.users"/></a></li>
+	<li><a href="<c:url value="/roles"/>"><spring:message code="title.roles"/></a></li>
+</ul>
+
+<h2><spring:message code="title.editUser"/></h2>
 
 <p>
 <c:set var="action"><c:url value="/user/save"/></c:set>

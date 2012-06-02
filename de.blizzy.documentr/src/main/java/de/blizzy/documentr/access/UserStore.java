@@ -22,10 +22,14 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -55,6 +59,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 public class UserStore {
 	private static final String REPOSITORY_NAME = "_users"; //$NON-NLS-1$
 	private static final String USER_SUFFIX = ".user"; //$NON-NLS-1$
+	private static final String ROLE_SUFFIX = ".role"; //$NON-NLS-1$
+	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
@@ -78,11 +84,18 @@ public class UserStore {
 		
 		if (created) {
 			createInitialAdmin(adminUser);
+			createInitialRoles(adminUser);
 		}
 	}
 
 	private void createInitialAdmin(User adminUser) throws IOException {
 		saveUser(adminUser, adminUser);
+	}
+	
+	private void createInitialRoles(User adminUser) throws IOException {
+		saveRole(new Role("Administrator", EnumSet.of(Permission.ADMIN)), adminUser); //$NON-NLS-1$
+		saveRole(new Role("Editor", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)), adminUser); //$NON-NLS-1$
+		saveRole(new Role("Reader", EnumSet.of(Permission.VIEW)), adminUser); //$NON-NLS-1$
 	}
 
 	public void saveUser(User user, User currentUser) throws IOException {
@@ -111,7 +124,8 @@ public class UserStore {
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
-				.setMessage(user.getLoginName()).call();
+				.setMessage(user.getLoginName())
+				.call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
@@ -164,6 +178,95 @@ public class UserStore {
 			List<String> users = new ArrayList<String>(Lists.transform(files, function));
 			Collections.sort(users);
 			return users;
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public void saveRole(Role role, User currentUser) throws IOException {
+		Assert.notNull(role);
+		Assert.notNull(currentUser);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			
+			Map<String, Object> roleMap = new HashMap<String, Object>();
+			roleMap.put("name", role.getName()); //$NON-NLS-1$
+			Set<String> permissions = new HashSet<String>();
+			for (Permission permission : role.getPermissions()) {
+				permissions.add(permission.name());
+			}
+			roleMap.put("permissions", permissions); //$NON-NLS-1$
+			
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			String json = gson.toJson(roleMap);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File workingFile = new File(workingDir, role.getName() + ROLE_SUFFIX);
+			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+
+			Git git = Git.wrap(repo.r());
+			git.add().addFilepattern(role.getName() + ROLE_SUFFIX).call();
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(role.getName())
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public List<String> listRoles() throws IOException {
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			FileFilter filter = new FileFilter() {
+				@Override
+				public boolean accept(File file) {
+					return file.isFile() && file.getName().endsWith(ROLE_SUFFIX);
+				}
+			};
+			List<File> files = Arrays.asList(workingDir.listFiles(filter));
+			Function<File, String> function = new Function<File, String>() {
+				@Override
+				public String apply(File file) {
+					return StringUtils.substringBeforeLast(file.getName(), ROLE_SUFFIX);
+				}
+			};
+			List<String> users = new ArrayList<String>(Lists.transform(files, function));
+			Collections.sort(users);
+			return users;
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public Role getRole(String roleName) throws IOException {
+		Assert.notNull(roleName);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			String json = BlobUtils.getHeadContent(repo.r(), roleName + ROLE_SUFFIX);
+			if (json == null) {
+				throw new RoleNotFoundException(roleName);
+			}
+			
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			Map<String, Object> roleMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
+			@SuppressWarnings("unchecked")
+			Collection<String> permissions = (Collection<String>) roleMap.get("permissions"); //$NON-NLS-1$
+			EnumSet<Permission> rolePermissions = EnumSet.noneOf(Permission.class);
+			for (String permission : permissions) {
+				rolePermissions.add(Permission.valueOf(permission));
+			}
+			Role role = new Role(roleName, rolePermissions);
+			return role;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}

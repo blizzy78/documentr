@@ -15,30 +15,28 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.web.access;
 
-import de.blizzy.documentr.NotFoundException;
+import java.util.regex.Pattern;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
+import org.apache.commons.lang3.StringUtils;
+
+import de.blizzy.documentr.DocumentrConstants;
+
+public class RoleNameValidator implements ConstraintValidator<ValidRoleName, String> {
+	@Override
+	public void initialize(ValidRoleName annotation) {
 	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
+
+	@Override
+	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (StringUtils.isBlank(value)) {
+			return true;
+		}
+		
+		return Pattern.matches("^" + DocumentrConstants.ROLE_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

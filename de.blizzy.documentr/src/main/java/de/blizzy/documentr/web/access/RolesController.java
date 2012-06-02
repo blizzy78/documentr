@@ -15,30 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.web.access;
 
-import de.blizzy.documentr.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
-
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
+@Controller
+@RequestMapping("/roles")
+public class RolesController {
+	@RequestMapping(method=RequestMethod.GET)
+	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	public String getUsers() {
+		return "/user/role/index"; //$NON-NLS-1$
 	}
 }

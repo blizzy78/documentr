@@ -55,7 +55,6 @@ public final class Functions {
 	@Autowired
 	private MarkdownProcessor _markdownProcessor;
 	
-	
 	@PostConstruct
 	public void init() {
 		pageStore = _pageStore;
@@ -108,6 +107,10 @@ public final class Functions {
 	
 	public static PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
 		return pageStore.getPageMetadata(projectName, branchName, path);
+	}
+	
+	public static List<String> listRoles() throws IOException {
+		return userStore.listRoles();
 	}
 
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

@@ -15,30 +15,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.access;
 
 import de.blizzy.documentr.NotFoundException;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
+public class RoleNotFoundException extends NotFoundException {
+	private String roleName;
 
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
+	RoleNotFoundException(String roleName) {
+		this.roleName = roleName;
 	}
 	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
+	public String getRoleName() {
+		return roleName;
 	}
 }

@@ -15,30 +15,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.web.access;
 
-import de.blizzy.documentr.NotFoundException;
+import java.util.Set;
 
-public class PageNotFoundException extends NotFoundException {
-	private String projectName;
-	private String branchName;
-	private String path;
+import javax.validation.constraints.NotNull;
 
-	PageNotFoundException(String projectName, String branchName, String path) {
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
+import org.hibernate.validator.constraints.NotBlank;
+
+public class RoleForm {
+	@NotNull(message="{role.name.blank}")
+	@NotBlank(message="{role.name.blank}")
+	@ValidRoleName
+	private String name;
+	private Set<String> permissions;
+
+	public RoleForm(String name, Set<String> permissions) {
+		this.name = name;
+		this.permissions = permissions;
 	}
 	
-	public String getProjectName() {
-		return projectName;
+	public String getName() {
+		return name;
 	}
 	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
+	public Set<String> getPermissions() {
+		return permissions;
 	}
 }
