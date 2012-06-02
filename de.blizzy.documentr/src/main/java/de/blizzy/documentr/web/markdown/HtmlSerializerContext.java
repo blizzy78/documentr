@@ -28,7 +28,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContext {
@@ -36,24 +35,21 @@ public class HtmlSerializerContext {
 	private String branchName;
 	private String pagePath;
 	private MarkdownProcessor markdownProcessor;
-	private PageStore pageStore;
 	private List<Header> headers = new ArrayList<Header>();
 	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
-			MarkdownProcessor markdownProcessor, PageStore pageStore) {
+			MarkdownProcessor markdownProcessor) {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
 		Assert.notNull(markdownProcessor);
-		Assert.notNull(pageStore);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;
 		this.markdownProcessor = markdownProcessor;
-		this.pageStore = pageStore;
 	}
 
 	public String getProjectName() {
@@ -66,10 +62,6 @@ public class HtmlSerializerContext {
 	
 	public String getPagePath() {
 		return pagePath;
-	}
-	
-	public PageStore getPageStore() {
-		return pageStore;
 	}
 	
 	public String getAttachmentURI(String name) {

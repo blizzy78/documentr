@@ -20,8 +20,9 @@ package de.blizzy.documentr.web.markdown.macro;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 public abstract class AbstractMacro implements IMacro {
-	private HtmlSerializerContext context;
 	private String params;
+	private HtmlSerializerContext htmlSerializerContext;
+	private IMacroContext macroContext;
 
 	@Override
 	public void setParameters(String params) {
@@ -33,12 +34,21 @@ public abstract class AbstractMacro implements IMacro {
 	}
 
 	@Override
-	public void setHtmlSerializerContext(HtmlSerializerContext context) {
-		this.context = context;
+	public void setHtmlSerializerContext(HtmlSerializerContext htmlSerializerContext) {
+		this.htmlSerializerContext = htmlSerializerContext;
 	}
 	
 	public HtmlSerializerContext getHtmlSerializerContext() {
-		return context;
+		return htmlSerializerContext;
+	}
+	
+	@Override
+	public void setMacroContext(IMacroContext macroContext) {
+		this.macroContext = macroContext;
+	}
+	
+	public IMacroContext getMacroContext() {
+		return macroContext;
 	}
 
 	@Override

@@ -17,13 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro;
 
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.pagestore.PageStore;
 
-public interface IMacro {
-	void setParameters(String params);
-	void setHtmlSerializerContext(HtmlSerializerContext htmlSerializerContext);
-	void setMacroContext(IMacroContext macroContext);
-	String getHtml();
-	String cleanupHTML(String html);
-	boolean isCacheable();
+public interface IMacroContext {
+	PageStore getPageStore();
 }

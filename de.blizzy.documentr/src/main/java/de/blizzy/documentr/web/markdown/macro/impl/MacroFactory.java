@@ -20,10 +20,13 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
 @Component
 public class MacroFactory {
@@ -36,6 +39,9 @@ public class MacroFactory {
 		MACRO_CLASSES.put("toc", TableOfContentsMacro.class); //$NON-NLS-1$
 	}
 	
+	@Autowired
+	private PageStore pageStore;
+	
 	public IMacro get(String macroName, String params, HtmlSerializerContext context) {
 		try {
 			Class<? extends IMacro> clazz = MACRO_CLASSES.get(macroName);
@@ -47,11 +53,25 @@ public class MacroFactory {
 			}
 			macro.setParameters(params);
 			macro.setHtmlSerializerContext(context);
+			macro.setMacroContext(createMacroContext());
 			return macro;
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private IMacroContext createMacroContext() {
+		return new IMacroContext() {
+			@Override
+			public PageStore getPageStore() {
+				return pageStore;
+			}
+		};
+	}
+
+	void setPageStore(PageStore pageStore) {
+		this.pageStore = pageStore;
 	}
 }

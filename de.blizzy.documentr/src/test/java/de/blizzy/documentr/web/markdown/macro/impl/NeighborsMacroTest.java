@@ -35,6 +35,7 @@ import org.mockito.stubbing.Answer;
 import de.blizzy.documentr.pagestore.Page;
 import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
 public class NeighborsMacroTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -62,21 +63,24 @@ public class NeighborsMacroTest {
 	};
 	
 	private PageStore pageStore;
-	private HtmlSerializerContext context;
+	private HtmlSerializerContext htmlSerializerContext;
+	private IMacroContext macroContext;
 
 	@Before
 	public void setUp() throws IOException {
-		pageStore = mock(PageStore.class);
-		setupPages();
-		
-		context = mock(HtmlSerializerContext.class);
-		when(context.getPageStore()).thenReturn(pageStore);
-		when(context.getPageURI(anyString())).then(new Answer<String>() {
+		htmlSerializerContext = mock(HtmlSerializerContext.class);
+		when(htmlSerializerContext.getPageURI(anyString())).then(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				return "/" + invocation.getArguments()[0]; //$NON-NLS-1$
 			}
 		});
+		
+		pageStore = mock(PageStore.class);
+		setupPages();
+
+		macroContext = mock(IMacroContext.class);
+		when(macroContext.getPageStore()).thenReturn(pageStore);
 	}
 	
 	private void setupPages() throws IOException {
@@ -100,12 +104,13 @@ public class NeighborsMacroTest {
 	
 	@Test
 	public void getHtml() {
-		when(context.getProjectName()).thenReturn(PROJECT);
-		when(context.getBranchName()).thenReturn(BRANCH);
-		when(context.getPagePath()).thenReturn("home/foo/bar"); //$NON-NLS-1$
+		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
+		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
+		when(htmlSerializerContext.getPagePath()).thenReturn("home/foo/bar"); //$NON-NLS-1$
 		
 		NeighborsMacro macro = new NeighborsMacro();
-		macro.setHtmlSerializerContext(context);
+		macro.setHtmlSerializerContext(htmlSerializerContext);
+		macro.setMacroContext(macroContext);
 		
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")

@@ -23,19 +23,24 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 
 public class MacroFactoryTest {
+	private PageStore pageStore;
 	private MacroFactory macroFactory;
-	private HtmlSerializerContext context;
+	private HtmlSerializerContext htmlSerializerContext;
 
 	@Before
 	public void setUp() {
-		macroFactory = new MacroFactory();
+		pageStore = mock(PageStore.class);
 		
-		context = mock(HtmlSerializerContext.class);
+		macroFactory = new MacroFactory();
+		macroFactory.setPageStore(pageStore);
+		
+		htmlSerializerContext = mock(HtmlSerializerContext.class);
 	}
 	
 	@Test
@@ -47,10 +52,11 @@ public class MacroFactoryTest {
 	}
 
 	private void assertMacro(String macroName, Class<? extends IMacro> macroClass) {
-		IMacro macro = macroFactory.get(macroName, "params", context); //$NON-NLS-1$
+		IMacro macro = macroFactory.get(macroName, "params", htmlSerializerContext); //$NON-NLS-1$
 		assertTrue(macroClass.isInstance(macro));
 		if (macro instanceof AbstractMacro) {
-			assertSame(context, ((AbstractMacro) macro).getHtmlSerializerContext());
+			assertSame(htmlSerializerContext, ((AbstractMacro) macro).getHtmlSerializerContext());
+			assertSame(pageStore, ((AbstractMacro) macro).getMacroContext().getPageStore());
 			assertEquals("params", ((AbstractMacro) macro).getParameters()); //$NON-NLS-1$
 		}
 	}

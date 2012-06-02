@@ -28,7 +28,6 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.blizzy.documentr.pagestore.PageStore;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 
@@ -42,11 +41,9 @@ public class MarkdownProcessorTest {
 	@Before
 	public void setUp() {
 		macroFactory = mock(MacroFactory.class);
-		PageStore pageStore = mock(PageStore.class);
 
 		markdownProcessor = new MarkdownProcessor();
 		markdownProcessor.setMacroFactory(macroFactory);
-		markdownProcessor.setPageStore(pageStore);
 	}
 	
 	@Test

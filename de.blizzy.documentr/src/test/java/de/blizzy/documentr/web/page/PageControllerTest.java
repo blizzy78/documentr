@@ -69,13 +69,10 @@ public class PageControllerTest {
 		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		MarkdownProcessor markdownProcessor = new MarkdownProcessor();
-		markdownProcessor.setPageStore(pageStore);
-		
 		pageController = new PageController();
 		pageController.setPageStore(pageStore);
 		pageController.setGlobalRepositoryManager(repoManager);
-		pageController.setMarkdownProcessor(markdownProcessor);
+		pageController.setMarkdownProcessor(new MarkdownProcessor());
 		pageController.setUserStore(userStore);
 
 		authentication = mock(Authentication.class);

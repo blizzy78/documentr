@@ -61,7 +61,7 @@ class NeighborsMacro extends AbstractMacro {
 	private StringBuilder printParent(CharSequence inner, String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		IPageStore pageStore = context.getPageStore();
+		IPageStore pageStore = getMacroContext().getPageStore();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (page.getParentPagePath() != null) {
 			StringBuilder parentBuf = new StringBuilder();
@@ -97,7 +97,7 @@ class NeighborsMacro extends AbstractMacro {
 	private StringBuilder printLinkListItem(String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		IPageStore pageStore = context.getPageStore();
+		IPageStore pageStore = getMacroContext().getPageStore();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
 		if (path.equals(currentPagePath)) {
 			buf.append("<li class=\"active\">").append(page.getTitle()); //$NON-NLS-1$
@@ -115,7 +115,7 @@ class NeighborsMacro extends AbstractMacro {
 	private StringBuilder printChildren(String path, String currentPagePath) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		HtmlSerializerContext context = getHtmlSerializerContext();
-		IPageStore pageStore = context.getPageStore();
+		IPageStore pageStore = getMacroContext().getPageStore();
 		List<String> childPaths = pageStore.listChildPagePaths(context.getProjectName(), context.getBranchName(), path);
 		if (!childPaths.isEmpty()) {
 			buf.append("<ul>"); //$NON-NLS-1$
