@@ -70,7 +70,7 @@ public final class DocumentrMatchers {
 	}
 
 	public static User argUser(final String loginName, final String password, final String email,
-			final boolean disabled, final boolean admin) {
+			final boolean disabled) {
 		
 		Matcher<User> matcher = new ArgumentMatcher<User>() {
 			@Override
@@ -79,15 +79,14 @@ public final class DocumentrMatchers {
 				return StringUtils.equals(user.getLoginName(), loginName) &&
 						StringUtils.equals(user.getPassword(), password) &&
 						StringUtils.equals(user.getEmail(), email) &&
-						(user.isDisabled() == disabled) &&
-						(user.isAdmin() == admin);
+						(user.isDisabled() == disabled);
 			}
 		};
 		return argThat(matcher);
 	}
 	
 	public static UserForm argUserForm(final String loginName, final String password1, final String password2,
-			final boolean disabled, final boolean admin) {
+			final boolean disabled) {
 		
 		Matcher<UserForm> matcher = new ArgumentMatcher<UserForm>() {
 			@Override
@@ -96,8 +95,7 @@ public final class DocumentrMatchers {
 				return StringUtils.equals(form.getLoginName(), loginName) &&
 						StringUtils.equals(form.getPassword1(), password1) &&
 						StringUtils.equals(form.getPassword2(), password2) &&
-						(form.isDisabled() == disabled) &&
-						(form.isAdmin() == admin);
+						(form.isDisabled() == disabled);
 			}
 		};
 		return argThat(matcher);

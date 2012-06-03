@@ -54,7 +54,7 @@ public class PageControllerTest {
 	private static final String PAGE_PATH_URL = "home,page"; //$NON-NLS-1$
 	private static final String PAGE_NAME = "page"; //$NON-NLS-1$
 	private static final String PARENT_PAGE = "home"; //$NON-NLS-1$
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private IPageStore pageStore;
 	private GlobalRepositoryManager repoManager;

@@ -25,6 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission('ADMIN')">
 
+<c:set var="projects" value="${d:listProjects()}"/>
+<c:set var="roles" value="${d:listRoles()}"/>
+
 <dt:headerJSFile uri="/js/zxcvbn-20120527.js"/>
 
 <dt:headerJS>
@@ -51,6 +54,169 @@ function updatePasswordStrengthIndicator() {
 	}
 }
 
+function createAuthority(type, targetId, roleName) {
+	return {
+		type: type,
+		targetId: targetId,
+		roleName: roleName
+	};
+}
+
+function updateAuthoritiesInForm() {
+	var authoritiesStr = '';
+	for (var i = 0; i < authorities.length; i++) {
+		if (i > 0) {
+			authoritiesStr = authoritiesStr + '|';
+		}
+		authoritiesStr = authoritiesStr + authorities[i].type + ':' + authorities[i].targetId + ':' + authorities[i].roleName;
+	}
+	$('#userForm').find('input:hidden[name="authorities"]').val(authoritiesStr);
+}
+
+function updateAuthorities() {
+	updateAuthoritiesInForm();
+
+	var newEls = new Array();
+
+	var authorities = getAuthoritiesByType('APPLICATION');
+	if (authorities.length > 0) {
+		newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.application"/></h4>'));
+		var ulEl = $('<ul data-documentr-role="true"></ul>');
+		for (var i = 0; i < authorities.length; i++) {
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+		}
+		newEls.push(ulEl);
+	}
+	
+	var authorities = getAuthoritiesByType('PROJECT');
+	if (authorities.length > 0) {
+		var targetId = null;
+		var ulEl = null;
+		for (var i = 0; i < authorities.length; i++) {
+			if (authorities[i].targetId != targetId) {
+				newEls.push(ulEl);
+			
+				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.project"/>: ' + authorities[i].targetId + '</h4>'));
+				ulEl = $('<ul data-documentr-role="true"></ul>');
+			}
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+			
+			targetId = authorities[i].targetId;
+		}
+		newEls.push(ulEl);
+	}
+	
+	var authorities = getAuthoritiesByType('BRANCH');
+	if (authorities.length > 0) {
+		var targetId = null;
+		var ulEl = null;
+		for (var i = 0; i < authorities.length; i++) {
+			if (authorities[i].targetId != targetId) {
+				newEls.push(ulEl);
+			
+				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.branch"/>: ' + authorities[i].targetId + '</h4>'));
+				ulEl = $('<ul data-documentr-role="true"></ul>');
+			}
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+			
+			targetId = authorities[i].targetId;
+		}
+		newEls.push(ulEl);
+	}
+	
+	if (newEls.length == 0) {
+		newEls.push($('<p data-documentr-role="true"><spring:message code="noRolesAssigned"/></p>'));
+	}
+	
+	var permissionsEl = $('#userPermissions');
+
+	$('[data-documentr-role]').remove();
+
+	var restEls = permissionsEl.contents();
+	restEls.detach();
+	for (var i = 0; i < newEls.length; i++) {
+		permissionsEl.append(newEls[i]);
+	}
+	permissionsEl.append(restEls);
+}
+
+function getAuthoritiesByType(type) {
+	var result = new Array();
+	for (var i = 0; i < authorities.length; i++) {
+		if (authorities[i].type == type) {
+			result.push(authorities[i]);
+		}
+	}
+	return result;
+}
+
+function showAddRoleDialog() {
+	<c:choose>
+		<c:when test="${(!empty projects) and (!empty roles)}">
+			$('#addRoleForm').each(function() {
+				this.reset();
+			});
+			$('#addRoleDialog').showModal({backdrop: true, keyboard: true});
+		</c:when>
+		<c:otherwise>
+			window.alert('<spring:message code="noProjectsOrRoles"/>');
+		</c:otherwise>
+	</c:choose>
+}
+
+function addRole() {
+	var formEl = $('#addRoleForm');
+	var type = formEl.find('input:radio:checked').val();
+	var targetId;
+	if (type == 'APPLICATION') {
+		targetId = 'application';
+	} else if (type == 'PROJECT') {
+		targetId = formEl.find('select[name="projectName"]').val();
+	} else if (type == 'BRANCH') {
+		targetId = formEl.find('select[name="branchName"]').val();
+	}
+	var roleName = formEl.find('select[name="roleName"]').val();
+
+	$('#addRoleDialog').modal('hide');
+
+	authorities.push(createAuthority(type, targetId, roleName));
+	<%-- TODO: sort authorities again like UserStore does --%>
+	
+	updateAuthorities();
+}
+
+function removeRole(type, targetId, roleName) {
+	var newAuthorities = new Array();
+	for (var i = 0; i < authorities.length; i++) {
+		if ((authorities[i].type != type) ||
+			(authorities[i].targetId != targetId) ||
+			(authorities[i].roleName != roleName)) {
+		
+			newAuthorities.push(authorities[i]);
+		}
+	}
+	authorities = newAuthorities;
+	updateAuthorities();
+}
+
+var authorities = new Array();
+
+<c:if test="${!empty userForm.loginName}">
+	<c:set var="authorities" value="${d:getUserAuthorities(userForm.loginName)}"/>
+	<c:forEach var="rga" items="${authorities}">
+		authorities.push(createAuthority('<c:out value="${rga.target.type}"/>', '<c:out value="${rga.target.targetId}"/>', '<c:out value="${rga.roleName}"/>'));
+	</c:forEach>
+</c:if>
+
+$(function() {
+	$('#userDetailsTabs a').click(function(e) {
+		e.preventDefault();
+		$(this).tab('show');
+	});
+	
+	updateAuthorities();
+});
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -72,58 +238,127 @@ function updatePasswordStrengthIndicator() {
 <p>
 <c:set var="action"><c:url value="/user/save"/></c:set>
 <form:form commandName="userForm" action="${action}" method="POST" cssClass="well form-horizontal">
-	<fieldset>
-		<c:set var="errorText"><form:errors path="loginName"/></c:set>
-		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
-			<form:label path="loginName" cssClass="control-label"><spring:message code="label.loginName"/>:</form:label>
-			<c:choose>
-				<c:when test="${(!empty userForm.loginName) && (empty errorText)}">
-					<form:hidden path="loginName"/>
-					<form:input path="loginName" cssClass="input-xlarge disabled" disabled="true"/>
-				</c:when>
-				<c:otherwise>
-					<form:input path="loginName" cssClass="input-xlarge"/>
-				</c:otherwise>
-			</c:choose>
-			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+	<ul id="userDetailsTabs" class="nav nav-tabs">
+		<li class="active"><a href="#userDetails"><spring:message code="title.details"/></a></li>
+		<li><a href="#userPermissions"><spring:message code="title.roles"/></a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div class="tab-pane active" id="userDetails">
+			<fieldset>
+				<c:set var="errorText"><form:errors path="loginName"/></c:set>
+				<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+					<form:label path="loginName" cssClass="control-label"><spring:message code="label.loginName"/>:</form:label>
+					<c:choose>
+						<c:when test="${(!empty userForm.loginName) && (empty errorText)}">
+							<form:hidden path="loginName"/>
+							<form:input path="loginName" cssClass="input-xlarge disabled" disabled="true"/>
+						</c:when>
+						<c:otherwise>
+							<form:input path="loginName" cssClass="input-xlarge"/>
+						</c:otherwise>
+					</c:choose>
+					<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+				</div>
+				<c:set var="errorText1"><form:errors path="password1"/></c:set>
+				<c:set var="errorText2"><form:errors path="password2"/></c:set>
+				<div id="password1Fieldset" class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
+					<form:label path="password1" cssClass="control-label"><spring:message code="label.password"/>:</form:label>
+					<form:password path="password1" cssClass="input-xlarge" autocomplete="off" onkeyup="updatePasswordStrengthIndicator()"/>
+					<c:if test="${!empty errorText1}"><span class="help-inline" id="password1Error"><c:out value="${errorText1}" escapeXml="false"/></span></c:if>
+				</div>
+				<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
+					<form:label path="password2" cssClass="control-label"><spring:message code="label.repeatPassword"/>:</form:label>
+					<form:password path="password2" cssClass="input-xlarge" autocomplete="off"/>
+					<c:if test="${!empty errorText2}"><span class="help-inline"><c:out value="${errorText2}" escapeXml="false"/></span></c:if>
+				</div>
+				<c:set var="errorText"><form:errors path="email"/></c:set>
+				<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+					<form:label path="email" cssClass="control-label"><spring:message code="label.email"/>:</form:label>
+					<form:input path="email" cssClass="input-xlarge"/>
+					<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+				</div>
+				<div class="control-group">
+					<form:label path="disabled" cssClass="checkbox">
+						<form:checkbox path="disabled"/>
+						<spring:message code="label.accountDisabled"/>
+					</form:label>
+				</div>
+			</fieldset>
 		</div>
-		<c:set var="errorText1"><form:errors path="password1"/></c:set>
-		<c:set var="errorText2"><form:errors path="password2"/></c:set>
-		<div id="password1Fieldset" class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
-			<form:label path="password1" cssClass="control-label"><spring:message code="label.password"/>:</form:label>
-			<form:password path="password1" cssClass="input-xlarge" autocomplete="off" onkeyup="updatePasswordStrengthIndicator()"/>
-			<c:if test="${!empty errorText1}"><span class="help-inline" id="password1Error"><c:out value="${errorText1}" escapeXml="false"/></span></c:if>
+		
+		<div class="tab-pane" id="userPermissions">
+			<input type="hidden" name="authorities"/>
+			<p>
+				<a href="javascript:void(showAddRoleDialog());" class="btn"><spring:message code="button.addRole"/></a>
+			</p>
 		</div>
-		<div class="control-group <c:if test="${!empty errorText1 or !empty errorText2}">error</c:if>">
-			<form:label path="password2" cssClass="control-label"><spring:message code="label.repeatPassword"/>:</form:label>
-			<form:password path="password2" cssClass="input-xlarge" autocomplete="off"/>
-			<c:if test="${!empty errorText2}"><span class="help-inline"><c:out value="${errorText2}" escapeXml="false"/></span></c:if>
-		</div>
-		<c:set var="errorText"><form:errors path="email"/></c:set>
-		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
-			<form:label path="email" cssClass="control-label"><spring:message code="label.email"/>:</form:label>
-			<form:input path="email" cssClass="input-xlarge"/>
-			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
-		</div>
-		<div class="control-group">
-			<form:label path="disabled" cssClass="checkbox">
-				<form:checkbox path="disabled"/>
-				<spring:message code="label.accountDisabled"/>
-			</form:label>
-		</div>
-		<div class="control-group">
-			<form:label path="admin" cssClass="checkbox">
-				<form:checkbox path="admin"/>
-				<spring:message code="label.adminPermissions"/>
-			</form:label>
-		</div>
-		<div class="form-actions">
-			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-			<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
-		</div>
-	</fieldset>
+	</div>
+
+	<div class="form-actions">
+		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
 </form:form>
 </p>
+
+<div class="modal" id="addRoleDialog" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="$('#addRoleDialog').modal('hide');">×</button>
+		<h3><spring:message code="title.addRole"/></h3>
+	</div>
+	<div class="modal-body">
+		<form id="addRoleForm" class="form-horizontal">
+			<fieldset class="control-group">
+				<label class="control-label"><spring:message code="label.targetObject"/>:</label>
+				<div class="controls">
+					<label class="radio">
+						<input type="radio" name="targetType" value="APPLICATION" checked="checked"/>
+						<spring:message code="label.roleTarget.application"/>
+					</label>
+					<span class="radio-label">
+						<label class="inline">
+							<input type="radio" name="targetType" value="PROJECT"/>
+							<spring:message code="label.roleTarget.project"/>:
+						</label>
+						<select name="projectName" onmousedown="$('#addRoleForm').find('input:radio[value=&quot;PROJECT&quot;]').each(function() { this.checked = 'checked'; });">
+							<c:forEach var="project" items="${projects}">
+								<option value="<c:out value="${project}"/>"><c:out value="${project}"/></option>
+							</c:forEach>
+						</select>
+					</span>
+					<span class="radio-label">
+						<label class="inline">
+							<input type="radio" name="targetType" value="BRANCH"/>
+							<spring:message code="label.roleTarget.branch"/>:
+						</label>
+						<select name="branchName" onmousedown="$('#addRoleForm').find('input:radio[value=&quot;BRANCH&quot;]').each(function() { this.checked = 'checked'; });">
+							<c:forEach var="project" items="${projects}">
+								<c:set var="branches" value="${d:listProjectBranches(project)}"/>
+								<c:forEach var="branch" items="${branches}">
+									<option value="<c:out value="${project}/${branch}"/>"><c:out value="${project}/${branch}"/></option>
+								</c:forEach>
+							</c:forEach>
+						</select>
+					</span>
+				</div>
+				
+				<label class="control-label"><spring:message code="label.role"/>:</label>
+				<div class="controls">
+					<select name="roleName">
+						<c:forEach var="role" items="${roles}">
+							<option value="<c:out value="${role}"/>"><c:out value="${role}"/></option>
+						</c:forEach>
+					</select>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(addRole());" class="btn btn-primary"><spring:message code="button.add"/></a>
+		<a href="javascript:void($('#addRoleDialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</div>
 
 </dt:page>
 

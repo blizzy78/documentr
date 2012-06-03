@@ -38,7 +38,7 @@ import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
 
 public class UserControllerTest {
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private UserStore userStore;
 	private ShaPasswordEncoder passwordEncoder;
@@ -67,12 +67,12 @@ public class UserControllerTest {
 		assertEquals("/user/edit", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute(eq("userForm"), //$NON-NLS-1$
-				argUserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, false, false));
+				argUserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, false));
 	}
 	
 	@Test
 	public void saveUser() throws IOException {
-		UserForm user = new UserForm("user", "pw", "pw", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "pw", "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		when(userStore.getUser("user")).thenThrow(new UserNotFoundException("user")); //$NON-NLS-1$ //$NON-NLS-2$
 		
@@ -82,15 +82,15 @@ public class UserControllerTest {
 		assertFalse(bindingResult.hasErrors());
 
 		String passwordHash = passwordEncoder.encodePassword("pw", "user"); //$NON-NLS-1$ //$NON-NLS-2$
-		verify(userStore).saveUser(argUser("user", passwordHash, "email", true, false), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+		verify(userStore).saveUser(argUser("user", passwordHash, "email", true), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
 	public void saveExistingUser() throws IOException {
-		UserForm user = new UserForm("user", "newPW", "newPW", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "newPW", "newPW", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 
-		User oldUser = new User("user", "oldPW", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		User oldUser = new User("user", "oldPW", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(oldUser); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -99,15 +99,15 @@ public class UserControllerTest {
 		assertFalse(bindingResult.hasErrors());
 		
 		String passwordHash = passwordEncoder.encodePassword("newPW", "user"); //$NON-NLS-1$ //$NON-NLS-2$
-		verify(userStore).saveUser(argUser("user", passwordHash, "email", true, false), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+		verify(userStore).saveUser(argUser("user", passwordHash, "email", true), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
 	public void saveExistingUserButKeepPassword() throws IOException {
-		UserForm user = new UserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$
+		UserForm user = new UserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
-		User oldUser = new User("user", "oldPW", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		User oldUser = new User("user", "oldPW", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(oldUser); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -115,12 +115,12 @@ public class UserControllerTest {
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		
-		verify(userStore).saveUser(argUser("user", "oldPW", "email", true, false), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		verify(userStore).saveUser(argUser("user", "oldPW", "email", true), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
 	@Test
 	public void saveUserPassword1Blank() throws IOException {
-		UserForm user = new UserForm("user", StringUtils.EMPTY, "pw", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		UserForm user = new UserForm("user", StringUtils.EMPTY, "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -131,7 +131,7 @@ public class UserControllerTest {
 
 	@Test
 	public void saveUserPassword2Blank() throws IOException {
-		UserForm user = new UserForm("user", "pw", StringUtils.EMPTY, "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		UserForm user = new UserForm("user", "pw", StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -142,7 +142,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void saveUserPasswordsDiffer() throws IOException {
-		UserForm user = new UserForm("user", "pw", "pw2", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "pw", "pw2", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -154,7 +154,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void editUser() throws IOException {
-		User user = new User("user", "pw", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		User user = new User("user", "pw", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 
 		Model model = mock(Model.class);
@@ -162,6 +162,6 @@ public class UserControllerTest {
 		assertEquals("/user/edit", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute(eq("userForm"), //$NON-NLS-1$
-				argUserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, false, false)); //$NON-NLS-1$
+				argUserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, false)); //$NON-NLS-1$
 	}
 }

@@ -76,10 +76,11 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				}
 			case PAGE:
 				{
-					String projectName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
-					String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
-					String path = Util.toRealPagePath(StringUtils.substringAfter(branchName, "/")); //$NON-NLS-1$
-					branchName = StringUtils.substringBefore(branchName, "/"); //$NON-NLS-1$
+					String[] parts = targetId.split("/"); //$NON-NLS-1$
+					Assert.isTrue(parts.length == 3);
+					String projectName = parts[0];
+					String branchName = parts[1];
+					String path = Util.toRealPagePath(parts[2]);
 					return hasPagePermission(authentication, projectName, branchName, path, permission);
 				}
 			default:

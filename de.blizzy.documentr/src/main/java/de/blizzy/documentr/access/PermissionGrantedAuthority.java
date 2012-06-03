@@ -31,12 +31,14 @@ class PermissionGrantedAuthority implements GrantedAuthority {
 	private Permission permission;
 
 	PermissionGrantedAuthority(GrantedAuthorityTarget target, Permission permission) {
+		Assert.notNull(target);
 		Assert.isTrue(target.getType() != Type.PAGE);
+		Assert.notNull(permission);
 		
 		this.target = target;
 		this.permission = permission;
 	}
-
+	
 	GrantedAuthorityTarget getTarget() {
 		return target;
 	}

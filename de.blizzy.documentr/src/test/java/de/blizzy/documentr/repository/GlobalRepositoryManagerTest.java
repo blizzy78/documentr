@@ -35,7 +35,7 @@ import de.blizzy.documentr.access.User;
 
 public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private File allReposDir;
 	private GlobalRepositoryManager globalRepoManager;

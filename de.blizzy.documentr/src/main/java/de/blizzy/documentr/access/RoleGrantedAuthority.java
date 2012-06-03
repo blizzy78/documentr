@@ -17,44 +17,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 
-public class GrantedAuthorityTarget implements Serializable {
-	public static enum Type {
-		APPLICATION, PROJECT, BRANCH, PAGE;
+public class RoleGrantedAuthority implements GrantedAuthority {
+	private static final long serialVersionUID = 4837778771482591248L;
+	
+	private GrantedAuthorityTarget target;
+	private String roleName;
+
+	public RoleGrantedAuthority(GrantedAuthorityTarget target, String roleName) {
+		Assert.notNull(target);
+		Assert.hasLength(roleName);
+		
+		this.target = target;
+		this.roleName = roleName;
 	}
 	
-	public static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$
+	public GrantedAuthorityTarget getTarget() {
+		return target;
+	}
 
-	private static final long serialVersionUID = -8582662031330649292L;
-
-	static final String ANY = "*"; //$NON-NLS-1$
-	static final GrantedAuthorityTarget APPLICATION =
-			new GrantedAuthorityTarget(APPLICATION_TARGET_ID, Type.APPLICATION);
-	
-	private String targetId;
-	private Type type;
-
-	public GrantedAuthorityTarget(String targetId, Type type) {
-		Assert.hasLength(targetId);
-		Assert.isTrue(!targetId.equals(ANY));
-		Assert.isTrue(!targetId.endsWith("/" + ANY)); //$NON-NLS-1$
-		Assert.notNull(type);
-
-		this.targetId = targetId;
-		this.type = type;
+	public String getRoleName() {
+		return roleName;
 	}
 	
-	public String getTargetId() {
-		return targetId;
-	}
-	
-	public Type getType() {
-		return type;
+	@Override
+	public String getAuthority() {
+		return null;
 	}
 	
 	@Override
@@ -62,10 +54,10 @@ public class GrantedAuthorityTarget implements Serializable {
 		if (o == this) {
 			return true;
 		} else if ((o != null) && o.getClass().equals(getClass())) {
-			GrantedAuthorityTarget other = (GrantedAuthorityTarget) o;
+			RoleGrantedAuthority other = (RoleGrantedAuthority) o;
 			return new EqualsBuilder()
-				.append(other.targetId, targetId)
-				.append(other.type, type)
+				.append(other.target, target)
+				.append(other.roleName, roleName)
 				.isEquals();
 		}
 		return false;
@@ -74,8 +66,8 @@ public class GrantedAuthorityTarget implements Serializable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-			.append(targetId)
-			.append(type)
+			.append(target)
+			.append(roleName)
 			.toHashCode();
 	}
 }

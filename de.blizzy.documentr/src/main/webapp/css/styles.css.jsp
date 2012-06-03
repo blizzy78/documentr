@@ -121,3 +121,12 @@ table.table-documentr {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+.radio-label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+label.inline {
+	display: inline;
+}

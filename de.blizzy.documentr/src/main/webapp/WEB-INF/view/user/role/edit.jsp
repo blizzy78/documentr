@@ -86,27 +86,27 @@ $(function() {
 				<label class="checkbox">
 					<form:checkbox path="permissions" value="ADMIN" onchange="updatePermissions()"/>
 					<strong><spring:message code="permission.admin.name"/></strong>
-					<p><spring:message code="permission.admin.description.html" htmlEscape="false"/></p>
+					<p class="help-block"><spring:message code="permission.admin.description.html" htmlEscape="false"/></p>
 				</label>
 				<label class="checkbox">
 					<form:checkbox path="permissions" value="VIEW"/>
 					<strong><spring:message code="permission.view.name"/></strong>
-					<p><spring:message code="permission.view.description.html" htmlEscape="false"/></p>
+					<p class="help-block"><spring:message code="permission.view.description.html" htmlEscape="false"/></p>
 				</label>
 				<label class="checkbox">
 					<form:checkbox path="permissions" value="EDIT_PROJECT"/>
 					<strong><spring:message code="permission.editProject.name"/></strong>
-					<p><spring:message code="permission.editProject.description.html" htmlEscape="false"/></p>
+					<p class="help-block"><spring:message code="permission.editProject.description.html" htmlEscape="false"/></p>
 				</label>
 				<label class="checkbox">
 					<form:checkbox path="permissions" value="EDIT_BRANCH"/>
 					<strong><spring:message code="permission.editBranch.name"/></strong>
-					<p><spring:message code="permission.editBranch.description.html" htmlEscape="false"/></p>
+					<p class="help-block"><spring:message code="permission.editBranch.description.html" htmlEscape="false"/></p>
 				</label>
 				<label class="checkbox">
 					<form:checkbox path="permissions" value="EDIT_PAGE"/>
 					<strong><spring:message code="permission.editPage.name"/></strong>
-					<p><spring:message code="permission.editPage.description.html" htmlEscape="false"/></p>
+					<p class="help-block"><spring:message code="permission.editPage.description.html" htmlEscape="false"/></p>
 				</label>
 			</div>
 		</div>

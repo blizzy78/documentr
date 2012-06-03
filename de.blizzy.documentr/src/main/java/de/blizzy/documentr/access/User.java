@@ -28,14 +28,12 @@ public class User {
 	private String password;
 	private String email;
 	private boolean disabled;
-	private boolean admin;
 
-	public User(String loginName, String password, String email, boolean disabled, boolean admin) {
+	public User(String loginName, String password, String email, boolean disabled) {
 		this.loginName = loginName;
 		this.password = password;
 		this.email = email;
 		this.disabled = disabled;
-		this.admin = admin;
 	}
 	
 	public String getLoginName() {
@@ -52,10 +50,6 @@ public class User {
 
 	public boolean isDisabled() {
 		return disabled;
-	}
-	
-	public boolean isAdmin() {
-		return admin;
 	}
 	
 	public static String hashPassword(String password, String salt) {

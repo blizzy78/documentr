@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 
 import org.junit.Before;
@@ -42,21 +44,16 @@ public class DocumentrUserDetailsServiceTest {
 	}
 	
 	@Test
-	public void loadUserByUsername() throws IOException {
-		User user = new User("user", "pw", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public void loadUserByUsernameAdmin() throws IOException {
+		User user = new User("user", "pw", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
+		when(userStore.getUserAuthorities("user")).thenReturn(Collections.singletonList( //$NON-NLS-1$
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "administrator"))); //$NON-NLS-1$
+		when(userStore.getRole("administrator")).thenReturn(new Role("administrator", EnumSet.of(Permission.ADMIN))); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
 		assertEquals("user", details.getUsername()); //$NON-NLS-1$
 		assertTrue(details.isEnabled());
-	}
-	
-	@Test
-	public void loadUserByUsernameAdmin() throws IOException {
-		User user = new User("user", "pw", "email", false, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
-		
-		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
 		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, Permission.ADMIN);
 		assertTrue(new HashSet<GrantedAuthority>(details.getAuthorities()).contains(authority));
@@ -64,7 +61,7 @@ public class DocumentrUserDetailsServiceTest {
 	
 	@Test
 	public void loadUserByUsernameDisabled() throws IOException {
-		User user = new User("user", "pw", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		User user = new User("user", "pw", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$

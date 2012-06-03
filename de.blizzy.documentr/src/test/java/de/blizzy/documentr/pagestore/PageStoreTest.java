@@ -51,7 +51,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String BRANCH_2 = "branch_2"; //$NON-NLS-1$
 	private static final String BRANCH_3 = "branch_3"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private GlobalRepositoryManager globalRepoManager;
 	private PageStore pageStore;

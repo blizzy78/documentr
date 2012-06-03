@@ -32,17 +32,17 @@ public class UserForm {
 	@NotBlank(message="{user.email.blank}")
 	private String email;
 	private boolean disabled;
-	private boolean admin;
+	private String authorities;
 
 	public UserForm(String loginName, String password1, String password2, String email,
-			boolean disabled, boolean admin) {
+			boolean disabled, String authorities) {
 		
 		this.loginName = loginName;
 		this.password1 = password1;
 		this.password2 = password2;
 		this.email = email;
 		this.disabled = disabled;
-		this.admin = admin;
+		this.authorities = authorities;
 	}
 	
 	public String getLoginName() {
@@ -65,7 +65,7 @@ public class UserForm {
 		return disabled;
 	}
 	
-	public boolean isAdmin() {
-		return admin;
+	public String getAuthorities() {
+		return authorities;
 	}
 }

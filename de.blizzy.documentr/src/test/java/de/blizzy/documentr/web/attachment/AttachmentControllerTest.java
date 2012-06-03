@@ -48,7 +48,7 @@ public class AttachmentControllerTest {
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE_PATH_URL = "home,foo"; //$NON-NLS-1$
 	private static final String PAGE_PATH = "home/foo"; //$NON-NLS-1$
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private AttachmentController attachmentController;
 	private IPageStore pageStore;

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.access.RoleGrantedAuthority;
+import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
@@ -111,6 +114,14 @@ public final class Functions {
 	
 	public static List<String> listRoles() throws IOException {
 		return userStore.listRoles();
+	}
+
+	public static List<RoleGrantedAuthority> getUserAuthorities(String loginName) throws IOException {
+		try {
+			return userStore.getUserAuthorities(loginName);
+		} catch (UserNotFoundException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

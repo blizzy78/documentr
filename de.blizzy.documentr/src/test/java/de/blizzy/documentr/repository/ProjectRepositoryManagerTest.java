@@ -38,7 +38,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
 
 public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
-	private static final User USER = new User("currentUser", "pw", "admin@example.com", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	private LockManager lockManager;
 

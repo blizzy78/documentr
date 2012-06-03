@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +52,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -60,6 +62,7 @@ public class UserStore {
 	private static final String REPOSITORY_NAME = "_users"; //$NON-NLS-1$
 	private static final String USER_SUFFIX = ".user"; //$NON-NLS-1$
 	private static final String ROLE_SUFFIX = ".role"; //$NON-NLS-1$
+	private static final String AUTHORITIES_SUFFIX = ".authorities"; //$NON-NLS-1$
 	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
@@ -69,7 +72,7 @@ public class UserStore {
 	@PostConstruct
 	public void init() throws IOException, GitAPIException {
 		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
-		User adminUser = new User("admin", passwordHash, "admin@example.com", false, true); //$NON-NLS-1$ //$NON-NLS-2$
+		User adminUser = new User("admin", passwordHash, "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$
 
 		ILockedRepository repo = null;
 		boolean created = false;
@@ -96,6 +99,10 @@ public class UserStore {
 		saveRole(new Role("Administrator", EnumSet.of(Permission.ADMIN)), adminUser); //$NON-NLS-1$
 		saveRole(new Role("Editor", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)), adminUser); //$NON-NLS-1$
 		saveRole(new Role("Reader", EnumSet.of(Permission.VIEW)), adminUser); //$NON-NLS-1$
+
+		Set<RoleGrantedAuthority> authorities = Collections.singleton(
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Administrator")); //$NON-NLS-1$
+		saveUserAuthorities(adminUser.getLoginName(), authorities, adminUser);
 	}
 
 	public void saveUser(User user, User currentUser) throws IOException {
@@ -110,7 +117,6 @@ public class UserStore {
 			userMap.put("password", user.getPassword()); //$NON-NLS-1$
 			userMap.put("email", user.getEmail()); //$NON-NLS-1$
 			userMap.put("disabled", Boolean.valueOf(user.isDisabled())); //$NON-NLS-1$
-			userMap.put("admin", Boolean.valueOf(user.isAdmin())); //$NON-NLS-1$
 
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			String json = gson.toJson(userMap);
@@ -149,8 +155,7 @@ public class UserStore {
 			String password = (String) userMap.get("password"); //$NON-NLS-1$
 			String email = (String) userMap.get("email"); //$NON-NLS-1$
 			boolean disabled = ((Boolean) userMap.get("disabled")).booleanValue(); //$NON-NLS-1$
-			boolean admin = ((Boolean) userMap.get("admin")).booleanValue(); //$NON-NLS-1$
-			User user = new User(loginName, password, email, disabled, admin);
+			User user = new User(loginName, password, email, disabled);
 			return user;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
@@ -267,6 +272,103 @@ public class UserStore {
 			}
 			Role role = new Role(roleName, rolePermissions);
 			return role;
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+	
+	public void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities, User currentUser)
+			throws IOException {
+		
+		Assert.notNull(loginName);
+		Assert.notNull(authorities);
+		Assert.notNull(currentUser);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+
+			Map<String, Set<String>> authoritiesMap = new HashMap<String, Set<String>>();
+			for (RoleGrantedAuthority rga : authorities) {
+				GrantedAuthorityTarget target = rga.getTarget();
+				String targetStr = target.getType().name() + ":" + target.getTargetId(); //$NON-NLS-1$
+				Set<String> roleNames = authoritiesMap.get(targetStr);
+				if (roleNames == null) {
+					roleNames = new HashSet<String>();
+					authoritiesMap.put(targetStr, roleNames);
+				}
+				roleNames.add(rga.getRoleName());
+			}
+			
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			String json = gson.toJson(authoritiesMap);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File workingFile = new File(workingDir, loginName + AUTHORITIES_SUFFIX);
+			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+
+			Git git = Git.wrap(repo.r());
+			git.add().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(loginName)
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public List<RoleGrantedAuthority> getUserAuthorities(String loginName) throws IOException {
+		Assert.notNull(loginName);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			String json = BlobUtils.getHeadContent(repo.r(), loginName + AUTHORITIES_SUFFIX);
+			if (json == null) {
+				throw new UserNotFoundException(loginName);
+			}
+			
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			Map<String, Set<String>> authoritiesMap = gson.fromJson(
+					json, new TypeToken<Map<String, Set<String>>>(){}.getType());
+			List<RoleGrantedAuthority> authorities = new ArrayList<RoleGrantedAuthority>();
+			for (Map.Entry<String, Set<String>> entry : authoritiesMap.entrySet()) {
+				String targetStr = entry.getKey();
+				Type type = Type.valueOf(StringUtils.substringBefore(targetStr, ":")); //$NON-NLS-1$
+				String targetId = StringUtils.substringAfter(targetStr, ":"); //$NON-NLS-1$
+				for (String roleName : entry.getValue()) {
+					authorities.add(new RoleGrantedAuthority(new GrantedAuthorityTarget(targetId, type), roleName));
+				}
+			}
+			
+			Collections.sort(authorities, new Comparator<RoleGrantedAuthority>() {
+				@Override
+				public int compare(RoleGrantedAuthority rga1, RoleGrantedAuthority rga2) {
+					GrantedAuthorityTarget target1 = rga1.getTarget();
+					GrantedAuthorityTarget target2 = rga2.getTarget();
+					Type type1 = target1.getType();
+					Type type2 = target2.getType();
+					int result = Integer.valueOf(type1.ordinal()).compareTo(Integer.valueOf(type2.ordinal()));
+					if (result != 0) {
+						return result;
+					}
+					
+					String targetId1 = target1.getTargetId();
+					String targetId2 = target2.getTargetId();
+					result = targetId1.compareToIgnoreCase(targetId2);
+					if (result != 0) {
+						return result;
+					}
+					
+					return rga1.getRoleName().compareToIgnoreCase(rga2.getRoleName());
+				}
+			});
+			
+			return authorities;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}

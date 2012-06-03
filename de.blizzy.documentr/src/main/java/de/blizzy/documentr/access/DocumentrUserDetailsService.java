@@ -19,6 +19,7 @@ package de.blizzy.documentr.access;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,15 +39,12 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
 		try {
 			User user = userStore.getUser(loginName);
+			List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(loginName);
 
 			Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-			if (user.isAdmin()) {
-				authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.ADMIN));
+			for (RoleGrantedAuthority rga : userAuthorities) {
+				authorities.addAll(toPermissionGrantedAuthorities(rga));
 			}
-			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
-			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_PROJECT));
-			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_BRANCH));
-			authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.EDIT_PAGE));
 			
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
@@ -57,6 +55,20 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 		}
 	}
 
+	private Set<PermissionGrantedAuthority> toPermissionGrantedAuthorities(RoleGrantedAuthority rga) throws IOException {
+		Set<PermissionGrantedAuthority> result = new HashSet<PermissionGrantedAuthority>();
+		try {
+			Role role = userStore.getRole(rga.getRoleName());
+			GrantedAuthorityTarget target = rga.getTarget();
+			for (Permission permission : role.getPermissions()) {
+				result.add(new PermissionGrantedAuthority(target, permission));
+			}
+		} catch (RoleNotFoundException e) {
+			// role might have been deleted
+		}
+		return result;
+	}
+	
 	void setUserStore(UserStore userStore) {
 		this.userStore = userStore;
 	}

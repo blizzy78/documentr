@@ -24,41 +24,33 @@ import org.junit.Test;
 public class UserFormTest {
 	@Test
 	public void getLoginName() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertEquals("user", form.getLoginName()); //$NON-NLS-1$
 	}
 
 	@Test
 	public void getPassword1() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertEquals("pw", form.getPassword1()); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void getPassword2() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertEquals("pw2", form.getPassword2()); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void getEmail() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertEquals("email", form.getEmail()); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void isDisabled() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm form = new UserForm("user", "pw", "pw2", "email", false, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertFalse(form.isDisabled());
-		form = new UserForm("user", "pw", "pw2", "email", true, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		form = new UserForm("user", "pw", "pw2", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertTrue(form.isDisabled());
-	}
-	
-	@Test
-	public void isAdmin() {
-		UserForm form = new UserForm("user", "pw", "pw2", "email", false, false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		assertFalse(form.isAdmin());
-		form = new UserForm("user", "pw", "pw2", "email", false, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		assertTrue(form.isAdmin());
 	}
 }
