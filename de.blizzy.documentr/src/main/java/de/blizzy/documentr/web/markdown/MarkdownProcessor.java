@@ -37,6 +37,8 @@ import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 
 @Component
 public class MarkdownProcessor {
+	static final String NON_CACHEABLE_MACRO_MARKER = "__NON_CACHEABLE_MACRO__"; //$NON-NLS-1$
+
 	@SuppressWarnings("nls")
 	private static final Pattern[] CLEANUP_RE = {
 		Pattern.compile("<p>(<p.*?</p>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
@@ -71,7 +73,8 @@ public class MarkdownProcessor {
 				String macroName = invocation.getMacroName();
 				String params = invocation.getParameters();
 				html = StringUtils.replace(html, marker,
-						"{{" + macroName + " " + StringUtils.defaultString(params) + "/}}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						NON_CACHEABLE_MACRO_MARKER + macroName + " " + //$NON-NLS-1$
+						StringUtils.defaultString(params) + "/" + NON_CACHEABLE_MACRO_MARKER); //$NON-NLS-1$
 			}
 		}
 		html = cleanupHTML(html, macroInvocations, true);
@@ -83,11 +86,11 @@ public class MarkdownProcessor {
 		
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		for (;;) {
-			int start = html.indexOf("{{") + 2; //$NON-NLS-1$
+			int start = html.indexOf(NON_CACHEABLE_MACRO_MARKER) + NON_CACHEABLE_MACRO_MARKER.length();
 			if (start < 0) {
 				break;
 			}
-			int end = html.indexOf("/}}", start); //$NON-NLS-1$
+			int end = html.indexOf("/" + NON_CACHEABLE_MACRO_MARKER, start); //$NON-NLS-1$
 			if (end < 0) {
 				break;
 			}
@@ -97,7 +100,8 @@ public class MarkdownProcessor {
 			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
 			IMacro macro = macroFactory.get(macroName, params, context);
 
-			html = StringUtils.replace(html, "{{" + macroCall + "/}}", macro.getHtml()); //$NON-NLS-1$ //$NON-NLS-2$
+			html = StringUtils.replace(html, NON_CACHEABLE_MACRO_MARKER + macroCall + "/" + //$NON-NLS-1$
+					NON_CACHEABLE_MACRO_MARKER, macro.getHtml());
 
 			MacroInvocation invocation = new MacroInvocation(macro, macroName, params);
 			html = cleanupHTML(html, Collections.singletonList(invocation), false);

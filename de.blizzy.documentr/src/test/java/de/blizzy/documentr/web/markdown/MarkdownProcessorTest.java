@@ -88,7 +88,9 @@ public class MarkdownProcessorTest {
 		String result = markdownProcessor.markdownToHTML(
 				markdown, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
-		String expectedHTML = "<p><strong>foo</strong></p><p>{{" + MACRO + " " + PARAMS + "/}}</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String expectedHTML = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
+				MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + PARAMS + //$NON-NLS-1$
+				"/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(expectedHTML, result);
 	}
 	
@@ -110,7 +112,8 @@ public class MarkdownProcessorTest {
 		
 		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 
-		String html = "<p>{{" + MACRO + " " + PARAMS + "/}}</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String html = "<p>" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$
+				PARAMS + "/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.processNonCacheableMacros(
 				html, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String expectedHTML = cleanedMacroHtml;
