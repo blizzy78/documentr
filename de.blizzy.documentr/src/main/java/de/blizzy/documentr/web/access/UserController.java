@@ -68,51 +68,54 @@ public class UserController {
 	public String saveUser(@ModelAttribute @Valid UserForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		
-		if (StringUtils.isBlank(form.getPassword1()) && StringUtils.isNotBlank(form.getPassword2())) {
-			bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		if (StringUtils.isNotBlank(form.getPassword1()) && StringUtils.isBlank(form.getPassword2())) {
-			bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		if (StringUtils.isNotBlank(form.getPassword1()) &&
-			StringUtils.isNotBlank(form.getPassword2()) &&
-			!StringUtils.equals(form.getPassword1(), form.getPassword2())) {
-			
-			bindingResult.rejectValue("password1", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
-			bindingResult.rejectValue("password2", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		if (bindingResult.hasErrors()) {
-			return "/user/edit"; //$NON-NLS-1$
-		}
-
-		User existingUser = null;
-		String password = null;
-		try {
-			existingUser = userStore.getUser(form.getLoginName());
-			password = existingUser.getPassword();
-		} catch (UserNotFoundException e) {
-			// okay
-		}
-
-		if (StringUtils.isNotBlank(form.getPassword1())) {
-			password = passwordEncoder.encodePassword(form.getPassword1(), form.getLoginName());
-		}
-
-		if (StringUtils.isBlank(password)) {
-			bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
-			bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		if (bindingResult.hasErrors()) {
-			return "/user/edit"; //$NON-NLS-1$
-		}
-
-		User newUser = new User(form.getLoginName(), password, form.getEmail(), form.isDisabled());
 		User user = userStore.getUser(authentication.getName());
-		userStore.saveUser(newUser, user);
+
+		if (!form.getLoginName().equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
+			if (StringUtils.isBlank(form.getPassword1()) && StringUtils.isNotBlank(form.getPassword2())) {
+				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+			if (StringUtils.isNotBlank(form.getPassword1()) && StringUtils.isBlank(form.getPassword2())) {
+				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+	
+			if (StringUtils.isNotBlank(form.getPassword1()) &&
+				StringUtils.isNotBlank(form.getPassword2()) &&
+				!StringUtils.equals(form.getPassword1(), form.getPassword2())) {
+				
+				bindingResult.rejectValue("password1", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
+				bindingResult.rejectValue("password2", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+	
+			if (bindingResult.hasErrors()) {
+				return "/user/edit"; //$NON-NLS-1$
+			}
+	
+			User existingUser = null;
+			String password = null;
+			try {
+				existingUser = userStore.getUser(form.getLoginName());
+				password = existingUser.getPassword();
+			} catch (UserNotFoundException e) {
+				// okay
+			}
+	
+			if (StringUtils.isNotBlank(form.getPassword1())) {
+				password = passwordEncoder.encodePassword(form.getPassword1(), form.getLoginName());
+			}
+	
+			if (StringUtils.isBlank(password)) {
+				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+			if (bindingResult.hasErrors()) {
+				return "/user/edit"; //$NON-NLS-1$
+			}
+	
+			User newUser = new User(form.getLoginName(), password, form.getEmail(), form.isDisabled());
+			userStore.saveUser(newUser, user);
+		}
 		
 		String[] authorityStrs = StringUtils.defaultString(form.getAuthorities()).split("\\|"); //$NON-NLS-1$
 		Set<RoleGrantedAuthority> authorities = new HashSet<RoleGrantedAuthority>();
@@ -134,7 +137,12 @@ public class UserController {
 	@RequestMapping(value="/edit/{loginName:" + DocumentrConstants.USER_LOGIN_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission('ADMIN')")
 	public String editUser(@PathVariable String loginName, Model model) throws IOException {
-		User user = userStore.getUser(loginName);
+		User user;
+		if (loginName.equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
+			user = new User(UserStore.ANONYMOUS_USER_LOGIN_NAME, null, "anonymous@example.com", false); //$NON-NLS-1$
+		} else {
+			user = userStore.getUser(loginName);
+		}
 		UserForm form = new UserForm(loginName, StringUtils.EMPTY, StringUtils.EMPTY,
 				user.getEmail(), user.isDisabled(), null);
 		model.addAttribute("userForm", form); //$NON-NLS-1$

@@ -17,27 +17,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.access.DocumentrAnonymousAuthentication;
+import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 
 @Component("anonymousAuthFilter")
 public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticationFilter {
+	@Autowired
+	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
+	
 	public DocumentrAnonymousAuthenticationFilter() {
 		super(DocumentrConstants.ANONYMOUS_AUTH_KEY);
 	}
 	
 	@Override
 	protected Authentication createAuthentication(HttpServletRequest request) {
-		Authentication auth = super.createAuthentication(request);
-		DocumentrAnonymousAuthentication authentication =
-				new DocumentrAnonymousAuthentication(DocumentrConstants.ANONYMOUS_AUTH_KEY, auth.getPrincipal());
-		authentication.setDetails(auth.getDetails());
-		return authentication;
+		try {
+			Authentication auth = super.createAuthentication(request);
+			AbstractAuthenticationToken authentication =
+					authenticationFactory.create(DocumentrConstants.ANONYMOUS_AUTH_KEY, auth.getPrincipal());
+			authentication.setDetails(auth.getDetails());
+			return authentication;
+		} catch (IOException e) {
+			throw new AuthenticationServiceException(e.getMessage(), e);
+		}
+	}
+
+	void setAnonymousAuthenticationFactory(DocumentrAnonymousAuthenticationFactory authenticationFactory) {
+		this.authenticationFactory = authenticationFactory;
 	}
 }

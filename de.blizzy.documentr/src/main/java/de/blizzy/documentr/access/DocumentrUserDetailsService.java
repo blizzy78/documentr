@@ -43,7 +43,7 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 
 			Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
 			for (RoleGrantedAuthority rga : userAuthorities) {
-				authorities.addAll(toPermissionGrantedAuthorities(rga));
+				authorities.addAll(userStore.toPermissionGrantedAuthorities(rga));
 			}
 			
 			return new org.springframework.security.core.userdetails.User(
@@ -53,20 +53,6 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private Set<PermissionGrantedAuthority> toPermissionGrantedAuthorities(RoleGrantedAuthority rga) throws IOException {
-		Set<PermissionGrantedAuthority> result = new HashSet<PermissionGrantedAuthority>();
-		try {
-			Role role = userStore.getRole(rga.getRoleName());
-			GrantedAuthorityTarget target = rga.getTarget();
-			for (Permission permission : role.getPermissions()) {
-				result.add(new PermissionGrantedAuthority(target, permission));
-			}
-		} catch (RoleNotFoundException e) {
-			// role might have been deleted
-		}
-		return result;
 	}
 	
 	void setUserStore(UserStore userStore) {

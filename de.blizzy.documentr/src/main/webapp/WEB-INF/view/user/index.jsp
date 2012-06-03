@@ -41,9 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <c:set var="users" value="${d:listUsers()}"/>
 <ul>
-<c:forEach var="user" items="${users}">
-	<li><a href="<c:url value="/user/edit/${user}"/>"><c:out value="${user}"/></a></li>
-</c:forEach>
+	<li><a href="<c:url value="/user/edit/_anonymous"/>">(<spring:message code="label.anonymousUser"/>)</a></li>
+	<c:forEach var="user" items="${users}">
+		<li><a href="<c:url value="/user/edit/${user}"/>"><c:out value="${user}"/></a></li>
+	</c:forEach>
 </ul>
 
 <p>

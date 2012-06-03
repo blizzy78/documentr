@@ -152,14 +152,14 @@ function getAuthoritiesByType(type) {
 
 function showAddRoleDialog() {
 	<c:choose>
-		<c:when test="${(!empty projects) and (!empty roles)}">
+		<c:when test="${!empty roles}">
 			$('#addRoleForm').each(function() {
 				this.reset();
 			});
 			$('#addRoleDialog').showModal({backdrop: true, keyboard: true});
 		</c:when>
 		<c:otherwise>
-			window.alert('<spring:message code="noProjectsOrRoles"/>');
+			window.alert('<spring:message code="noRolesConfigured"/>');
 		</c:otherwise>
 	</c:choose>
 }
@@ -215,6 +215,22 @@ $(function() {
 	});
 	
 	updateAuthorities();
+	
+	<c:if test="${empty projects}">
+		var addRoleFormEl = $('#addRoleForm');
+		addRoleFormEl.find('input:radio[value="PROJECT"]').attr('disabled', 'true');
+		addRoleFormEl.find('select[name="projectName"]').attr('disabled', 'true');
+		addRoleFormEl.find('input:radio[value="BRANCH"]').attr('disabled', 'true');
+		addRoleFormEl.find('select[name="branchName"]').attr('disabled', 'true');
+	</c:if>
+	
+	<c:if test="${userForm.loginName eq '_anonymous'}">
+		var userFormEl = $('#userForm');
+		userFormEl.find('input[name="password1"]').attr('disabled', 'true');
+		userFormEl.find('input[name="password2"]').attr('disabled', 'true');
+		userFormEl.find('input[name="email"]').attr('disabled', 'true');
+		userFormEl.find('input[name="disabled"]').attr('disabled', 'true');
+	</c:if>
 });
 
 </dt:headerJS>

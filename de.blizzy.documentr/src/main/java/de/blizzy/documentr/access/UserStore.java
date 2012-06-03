@@ -59,6 +59,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Component
 public class UserStore {
+	public static final String ANONYMOUS_USER_LOGIN_NAME = "_anonymous"; //$NON-NLS-1$
+	
 	private static final String REPOSITORY_NAME = "_users"; //$NON-NLS-1$
 	private static final String USER_SUFFIX = ".user"; //$NON-NLS-1$
 	private static final String ROLE_SUFFIX = ".role"; //$NON-NLS-1$
@@ -103,6 +105,10 @@ public class UserStore {
 		Set<RoleGrantedAuthority> authorities = Collections.singleton(
 				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Administrator")); //$NON-NLS-1$
 		saveUserAuthorities(adminUser.getLoginName(), authorities, adminUser);
+		
+		authorities = Collections.singleton(
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Reader")); //$NON-NLS-1$
+		saveUserAuthorities(ANONYMOUS_USER_LOGIN_NAME, authorities, adminUser);
 	}
 
 	public void saveUser(User user, User currentUser) throws IOException {
@@ -372,6 +378,20 @@ public class UserStore {
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+
+	Set<PermissionGrantedAuthority> toPermissionGrantedAuthorities(RoleGrantedAuthority rga) throws IOException {
+		Set<PermissionGrantedAuthority> result = new HashSet<PermissionGrantedAuthority>();
+		try {
+			Role role = getRole(rga.getRoleName());
+			GrantedAuthorityTarget target = rga.getTarget();
+			for (Permission permission : role.getPermissions()) {
+				result.add(new PermissionGrantedAuthority(target, permission));
+			}
+		} catch (RoleNotFoundException e) {
+			// role might have been deleted
+		}
+		return result;
 	}
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

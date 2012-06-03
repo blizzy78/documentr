@@ -20,6 +20,7 @@ package de.blizzy.documentr.access;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +30,15 @@ public class DocumentrAnonymousAuthenticationTest {
 	private static final String USER = "user"; //$NON-NLS-1$
 	private static final String KEY = "key"; //$NON-NLS-1$
 	
+	private Set<GrantedAuthority> authorities;
 	private DocumentrAnonymousAuthentication authentication;
 	
 	@Before
 	public void setUp() {
-		authentication = new DocumentrAnonymousAuthentication(KEY, USER);
+		authorities = new HashSet<GrantedAuthority>();
+		authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
+		
+		authentication = new DocumentrAnonymousAuthentication(KEY, USER, authorities);
 	}
 	
 	@Test
@@ -48,8 +53,6 @@ public class DocumentrAnonymousAuthenticationTest {
 	
 	@Test
 	public void getAuthorities() {
-		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(
-				GrantedAuthorityTarget.APPLICATION, Permission.VIEW);
-		assertTrue(new HashSet<GrantedAuthority>(authentication.getAuthorities()).contains(authority));
+		assertTrue(new HashSet<GrantedAuthority>(authentication.getAuthorities()).containsAll(authorities));
 	}
 }
