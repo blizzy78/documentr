@@ -198,8 +198,9 @@ public class PageController {
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath, Authentication authentication) {
 
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("html", markdownProcessor.markdownToHTML( //$NON-NLS-1$
-				markdown, projectName, branchName, pagePath, authentication));
+		String html = markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication);
+		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, pagePath, authentication);
+		result.put("html", html); //$NON-NLS-1$
 		return result;
 	}
 	
