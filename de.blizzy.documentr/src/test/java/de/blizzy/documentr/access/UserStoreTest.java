@@ -22,8 +22,9 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -32,8 +33,11 @@ import org.junit.Test;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
+import com.google.common.collect.Sets;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
@@ -72,6 +76,31 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		assertEquals(passwordHash, user.getPassword());
 		assertFalse(user.isDisabled());
 	}
+	
+	@Test
+	public void createInitialRoles() throws IOException {
+		Role role = userStore.getRole("Administrator"); //$NON-NLS-1$
+		assertEquals("Administrator", role.getName()); //$NON-NLS-1$
+		assertEquals(EnumSet.of(Permission.ADMIN), role.getPermissions());
+
+		role = userStore.getRole("Editor"); //$NON-NLS-1$
+		assertEquals("Editor", role.getName()); //$NON-NLS-1$
+		assertEquals(EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE), role.getPermissions());
+		
+		role = userStore.getRole("Reader"); //$NON-NLS-1$
+		assertEquals("Reader", role.getName()); //$NON-NLS-1$
+		assertEquals(EnumSet.of(Permission.VIEW), role.getPermissions());
+		
+		List<RoleGrantedAuthority> authorities = userStore.getUserAuthorities("admin"); //$NON-NLS-1$
+		assertEquals(Collections.singletonList(
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Administrator")), //$NON-NLS-1$
+				authorities);
+
+		authorities = userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME);
+		assertEquals(Collections.singletonList(
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Reader")), //$NON-NLS-1$
+				authorities);
+	}
 
 	@Test
 	@SuppressWarnings("boxing")
@@ -89,8 +118,54 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		userStore.saveUser(new User("u1", "pw", "email", false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		userStore.saveUser(new User("u2", "pw", "email", false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		userStore.saveUser(new User("u3", "pw", "email", false), USER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		Set<String> expected = new HashSet<String>(Arrays.asList("admin", "u1", "u2", "u3")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		Set<String> result = new HashSet<String>(userStore.listUsers());
+		List<String> result = userStore.listUsers();
+		assertTrue(result.contains("u1")); //$NON-NLS-1$
+		assertTrue(result.contains("u2")); //$NON-NLS-1$
+		assertTrue(result.contains("u3")); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void listRoles() throws IOException {
+		userStore.saveRole(new Role("r1", EnumSet.of(Permission.VIEW)), USER); //$NON-NLS-1$
+		userStore.saveRole(new Role("r2", EnumSet.of(Permission.VIEW)), USER); //$NON-NLS-1$
+		userStore.saveRole(new Role("r3", EnumSet.of(Permission.VIEW)), USER); //$NON-NLS-1$
+		List<String> result = userStore.listRoles();
+		assertTrue(result.contains("r1")); //$NON-NLS-1$
+		assertTrue(result.contains("r2")); //$NON-NLS-1$
+		assertTrue(result.contains("r3")); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void saveAndGetRole() throws IOException {
+		Role role = new Role("role", EnumSet.of(Permission.VIEW)); //$NON-NLS-1$
+		userStore.saveRole(role, USER);
+		Role result = userStore.getRole("role"); //$NON-NLS-1$
+		assertEquals(result.getName(), role.getName());
+		assertEquals(result.getPermissions(), role.getPermissions());
+	}
+	
+	@Test
+	public void saveAndGetUserAuthorities() throws IOException {
+		RoleGrantedAuthority rga1 = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		RoleGrantedAuthority rga2 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project", Type.PROJECT), "Administrator"); //$NON-NLS-1$ //$NON-NLS-2$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga1, rga2), USER); //$NON-NLS-1$
+		List<RoleGrantedAuthority> result = userStore.getUserAuthorities("user"); //$NON-NLS-1$
+		assertEquals(Sets.newHashSet(rga1, rga2), Sets.newHashSet(result));
+	}
+	
+	@Test
+	public void toPermissionGrantedAuthorities() throws IOException {
+		Role role = new Role("role", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)); //$NON-NLS-1$
+		userStore.saveRole(role, USER);
+		
+		RoleGrantedAuthority rga = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project", Type.PROJECT), "role"); //$NON-NLS-1$ //$NON-NLS-2$
+		Set<PermissionGrantedAuthority> result = userStore.toPermissionGrantedAuthorities(rga);
+		Set<PermissionGrantedAuthority> expected = Sets.newHashSet(
+				new PermissionGrantedAuthority(rga.getTarget(), Permission.EDIT_BRANCH),
+				new PermissionGrantedAuthority(rga.getTarget(), Permission.EDIT_PAGE));
 		assertEquals(expected, result);
 	}
 }
