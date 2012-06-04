@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +28,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Sets;
 
 @Component("userDetailsService")
 public class DocumentrUserDetailsService implements UserDetailsService {
@@ -41,7 +42,7 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			User user = userStore.getUser(loginName);
 			List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(loginName);
 
-			Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+			Set<GrantedAuthority> authorities = Sets.newHashSet();
 			for (RoleGrantedAuthority rga : userAuthorities) {
 				authorities.addAll(userStore.toPermissionGrantedAuthorities(rga));
 			}

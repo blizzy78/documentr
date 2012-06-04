@@ -20,14 +20,11 @@ package de.blizzy.documentr.access;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +44,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -179,14 +177,14 @@ public class UserStore {
 					return file.isFile() && file.getName().endsWith(USER_SUFFIX);
 				}
 			};
-			List<File> files = Arrays.asList(workingDir.listFiles(filter));
+			List<File> files = Lists.newArrayList(workingDir.listFiles(filter));
 			Function<File, String> function = new Function<File, String>() {
 				@Override
 				public String apply(File file) {
 					return StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
 				}
 			};
-			List<String> users = new ArrayList<String>(Lists.transform(files, function));
+			List<String> users = Lists.newArrayList(Lists.transform(files, function));
 			Collections.sort(users);
 			return users;
 		} finally {
@@ -204,7 +202,7 @@ public class UserStore {
 			
 			Map<String, Object> roleMap = new HashMap<String, Object>();
 			roleMap.put("name", role.getName()); //$NON-NLS-1$
-			Set<String> permissions = new HashSet<String>();
+			Set<String> permissions = Sets.newHashSet();
 			for (Permission permission : role.getPermissions()) {
 				permissions.add(permission.name());
 			}
@@ -242,14 +240,14 @@ public class UserStore {
 					return file.isFile() && file.getName().endsWith(ROLE_SUFFIX);
 				}
 			};
-			List<File> files = Arrays.asList(workingDir.listFiles(filter));
+			List<File> files = Lists.newArrayList(workingDir.listFiles(filter));
 			Function<File, String> function = new Function<File, String>() {
 				@Override
 				public String apply(File file) {
 					return StringUtils.substringBeforeLast(file.getName(), ROLE_SUFFIX);
 				}
 			};
-			List<String> users = new ArrayList<String>(Lists.transform(files, function));
+			List<String> users = Lists.newArrayList(Lists.transform(files, function));
 			Collections.sort(users);
 			return users;
 		} finally {
@@ -300,7 +298,7 @@ public class UserStore {
 				String targetStr = target.getType().name() + ":" + target.getTargetId(); //$NON-NLS-1$
 				Set<String> roleNames = authoritiesMap.get(targetStr);
 				if (roleNames == null) {
-					roleNames = new HashSet<String>();
+					roleNames = Sets.newHashSet();
 					authoritiesMap.put(targetStr, roleNames);
 				}
 				roleNames.add(rga.getRoleName());
@@ -341,7 +339,7 @@ public class UserStore {
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Set<String>> authoritiesMap = gson.fromJson(
 					json, new TypeToken<Map<String, Set<String>>>(){}.getType());
-			List<RoleGrantedAuthority> authorities = new ArrayList<RoleGrantedAuthority>();
+			List<RoleGrantedAuthority> authorities = Lists.newArrayList();
 			for (Map.Entry<String, Set<String>> entry : authoritiesMap.entrySet()) {
 				String targetStr = entry.getKey();
 				Type type = Type.valueOf(StringUtils.substringBefore(targetStr, ":")); //$NON-NLS-1$
@@ -381,7 +379,7 @@ public class UserStore {
 	}
 
 	Set<PermissionGrantedAuthority> toPermissionGrantedAuthorities(RoleGrantedAuthority rga) throws IOException {
-		Set<PermissionGrantedAuthority> result = new HashSet<PermissionGrantedAuthority>();
+		Set<PermissionGrantedAuthority> result = Sets.newHashSet();
 		try {
 			Role role = getRole(rga.getRoleName());
 			GrantedAuthorityTarget target = rga.getTarget();

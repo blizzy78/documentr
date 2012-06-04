@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +27,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Sets;
+
 @Component
 public class DocumentrAnonymousAuthenticationFactory {
 	@Autowired
@@ -35,7 +36,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 	
 	public AbstractAuthenticationToken create(String key, Object principal) throws IOException {
 		List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME);
-		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+		Set<GrantedAuthority> authorities = Sets.newHashSet();
 		for (RoleGrantedAuthority rga : userAuthorities) {
 			authorities.addAll(userStore.toPermissionGrantedAuthorities(rga));
 		}

@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.web.page.PagePathValidator;
 
@@ -81,7 +82,7 @@ public final class Util {
 		if (o instanceof Collection) {
 			c = (Collection<?>) o;
 		} else if (o.getClass().isArray()) {
-			c = Arrays.asList((Object[]) o);
+			c = Lists.newArrayList((Object[]) o);
 		} else {
 			c = Collections.singleton(o);
 		}

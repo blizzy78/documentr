@@ -19,12 +19,14 @@ package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
+
+import com.google.common.collect.Sets;
 
 public class DocumentrAnonymousAuthenticationTest {
 	private static final String USER = "user"; //$NON-NLS-1$
@@ -35,8 +37,8 @@ public class DocumentrAnonymousAuthenticationTest {
 	
 	@Before
 	public void setUp() {
-		authorities = new HashSet<GrantedAuthority>();
-		authorities.add(new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
+		authorities = Collections.<GrantedAuthority>singleton(
+				new PermissionGrantedAuthority(GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
 		
 		authentication = new DocumentrAnonymousAuthentication(KEY, USER, authorities);
 	}
@@ -53,6 +55,6 @@ public class DocumentrAnonymousAuthenticationTest {
 	
 	@Test
 	public void getAuthorities() {
-		assertTrue(new HashSet<GrantedAuthority>(authentication.getAuthorities()).containsAll(authorities));
+		assertTrue(Sets.newHashSet(authentication.getAuthorities()).containsAll(authorities));
 	}
 }

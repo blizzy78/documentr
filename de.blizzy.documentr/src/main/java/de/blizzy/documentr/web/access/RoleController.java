@@ -20,7 +20,6 @@ package de.blizzy.documentr.web.access;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -36,6 +35,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.Permission;
@@ -61,7 +62,7 @@ public class RoleController {
 	@PreAuthorize("hasApplicationPermission('ADMIN')")
 	public String editRole(@PathVariable String roleName, Model model) throws IOException {
 		Role role = userStore.getRole(roleName);
-		Set<String> permissions = new HashSet<String>();
+		Set<String> permissions = Sets.newHashSet();
 		for (Permission permission : role.getPermissions()) {
 			permissions.add(permission.name());
 		}

@@ -21,7 +21,6 @@ import static junit.framework.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -29,14 +28,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 
+import com.google.common.collect.Sets;
+
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 
 public abstract class AbstractDocumentrTest {
 	private static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 	
-	private Set<File> tempDirs = new HashSet<File>();
-	private Set<ILockedRepository> repositories = new HashSet<ILockedRepository>();
+	private Set<File> tempDirs = Sets.newHashSet();
+	private Set<ILockedRepository> repositories = Sets.newHashSet();
 	
 	@Before
 	public void setUpTempDirs() {

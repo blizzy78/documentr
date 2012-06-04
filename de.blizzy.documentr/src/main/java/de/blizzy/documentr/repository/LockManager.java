@@ -17,15 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Sets;
+
 @Component
 public class LockManager {
-	private Set<LockKey> locks = new HashSet<LockKey>();
+	private Set<LockKey> locks = Sets.newHashSet();
 
 	ILock lockAll() {
 		return lock(new LockKey(null, null, false), true);

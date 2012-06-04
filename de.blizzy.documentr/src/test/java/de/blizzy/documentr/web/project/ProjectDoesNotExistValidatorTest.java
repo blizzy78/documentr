@@ -20,10 +20,10 @@ package de.blizzy.documentr.web.project;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
@@ -31,7 +31,7 @@ public class ProjectDoesNotExistValidatorTest {
 	@Test
 	public void isValid() {
 		GlobalRepositoryManager repoManager = mock(GlobalRepositoryManager.class);
-		when(repoManager.listProjects()).thenReturn(Arrays.asList("project")); //$NON-NLS-1$
+		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project")); //$NON-NLS-1$
 		
 		ProjectDoesNotExistValidator validator = new ProjectDoesNotExistValidator();
 		validator.setGlobalRepositoryManager(repoManager);

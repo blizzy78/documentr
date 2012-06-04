@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
@@ -36,8 +37,8 @@ public class HtmlSerializerContext {
 	private String branchName;
 	private String pagePath;
 	private MarkdownProcessor markdownProcessor;
-	private List<Header> headers = new ArrayList<Header>();
-	private List<MacroInvocation> macroInvocations = new ArrayList<MacroInvocation>();
+	private List<Header> headers = Lists.newArrayList();
+	private List<MacroInvocation> macroInvocations = Lists.newArrayList();
 	private Authentication authentication;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,

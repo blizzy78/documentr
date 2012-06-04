@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.access;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -37,6 +36,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.GrantedAuthorityTarget;
@@ -118,7 +119,7 @@ public class UserController {
 		}
 		
 		String[] authorityStrs = StringUtils.defaultString(form.getAuthorities()).split("\\|"); //$NON-NLS-1$
-		Set<RoleGrantedAuthority> authorities = new HashSet<RoleGrantedAuthority>();
+		Set<RoleGrantedAuthority> authorities = Sets.newHashSet();
 		for (String authorityStr : authorityStrs) {
 			if (StringUtils.isNotBlank(authorityStr)) {
 				String[] parts = authorityStr.split(":"); //$NON-NLS-1$

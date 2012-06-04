@@ -19,14 +19,14 @@ package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
@@ -167,7 +167,7 @@ public class DocumentrPermissionEvaluatorTest {
 	}
 	
 	private Authentication mockAuthentication(GrantedAuthority... authorities) {
-		return new AbstractAuthenticationToken(Arrays.asList(authorities)) {
+		return new AbstractAuthenticationToken(Sets.newHashSet(authorities)) {
 			@Override
 			public Object getPrincipal() {
 				return null;

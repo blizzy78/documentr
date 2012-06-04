@@ -24,7 +24,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +34,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -96,7 +97,7 @@ public class BranchControllerTest {
 
 	@Test
 	public void saveBranch() throws IOException, GitAPIException {
-		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Arrays.asList("old_branch")); //$NON-NLS-1$
+		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList("old_branch")); //$NON-NLS-1$
 		
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
@@ -110,7 +111,7 @@ public class BranchControllerTest {
 	
 	@Test
 	public void saveBranchButExists() throws IOException, GitAPIException {
-		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Arrays.asList(BRANCH));
+		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList(BRANCH));
 		
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$

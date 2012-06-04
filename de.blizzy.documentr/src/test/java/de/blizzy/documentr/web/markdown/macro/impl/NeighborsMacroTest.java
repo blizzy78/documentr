@@ -22,7 +22,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +34,8 @@ import org.mockito.internal.matchers.Not;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.security.core.Authentication;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -99,7 +100,7 @@ public class NeighborsMacroTest {
 		setupPages(PAGES);
 		
 		for (String page : PAGES) {
-			List<String> childPages = new ArrayList<String>();
+			List<String> childPages = Lists.newArrayList();
 			String childPagePrefix = page + "/"; //$NON-NLS-1$
 			for (String childPage : PAGES) {
 				if (childPage.startsWith(childPagePrefix)) {

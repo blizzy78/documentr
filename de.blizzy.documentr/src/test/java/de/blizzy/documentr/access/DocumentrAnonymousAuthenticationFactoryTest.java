@@ -21,13 +21,14 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
@@ -50,7 +51,7 @@ public class DocumentrAnonymousAuthenticationFactoryTest {
 		RoleGrantedAuthority projectAdminRoleAuthority =
 				new RoleGrantedAuthority(new GrantedAuthorityTarget("project", Type.PROJECT), "admin"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME))
-			.thenReturn(Arrays.asList(applicationReaderRoleAuthority, projectAdminRoleAuthority));
+			.thenReturn(Lists.newArrayList(applicationReaderRoleAuthority, projectAdminRoleAuthority));
 		
 		PermissionGrantedAuthority applicationViewAuthority =
 				new PermissionGrantedAuthority(applicationReaderRoleAuthority.getTarget(), Permission.VIEW);

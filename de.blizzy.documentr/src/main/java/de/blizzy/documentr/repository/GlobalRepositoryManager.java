@@ -20,8 +20,6 @@ package de.blizzy.documentr.repository;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -108,7 +106,7 @@ public class GlobalRepositoryManager {
 					return dir.getName();
 				}
 			};
-			result = new ArrayList<String>(Lists.transform(Arrays.asList(files), function));
+			result = Lists.newArrayList(Lists.transform(Lists.newArrayList(files), function));
 			for (Iterator<String> iter = result.iterator(); iter.hasNext();) {
 				String project = iter.next();
 				if (project.startsWith("_")) { //$NON-NLS-1$

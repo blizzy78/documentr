@@ -20,7 +20,6 @@ package de.blizzy.documentr.web.markdown;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +31,8 @@ import org.junit.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
@@ -144,6 +145,6 @@ public class HtmlSerializerContextTest {
 		htmlSerializerContext.addMacroInvocation("bar", "params2"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		List<MacroInvocation> result = htmlSerializerContext.getMacroInvocations();
-		assertEquals(Arrays.asList(invocation1, invocation2, invocation3), result);
+		assertEquals(Lists.newArrayList(invocation1, invocation2, invocation3), result);
 	}
 }

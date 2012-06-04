@@ -20,24 +20,24 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 
 public class TableOfContentsMacroTest {
 	@Test
 	public void getMarkdown() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new Header("foo", 1)); //$NON-NLS-1$
-		headers.add(new Header("bar", 2)); //$NON-NLS-1$
-		headers.add(new Header("baz", 3)); //$NON-NLS-1$
-		headers.add(new Header("qux", 1)); //$NON-NLS-1$
+		List<Header> headers = Lists.newArrayList(
+				new Header("foo", 1), //$NON-NLS-1$
+				new Header("bar", 2), //$NON-NLS-1$
+				new Header("baz", 3), //$NON-NLS-1$
+				new Header("qux", 1)); //$NON-NLS-1$
 		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
 		when(context.getHeaders()).thenReturn(headers);
 		

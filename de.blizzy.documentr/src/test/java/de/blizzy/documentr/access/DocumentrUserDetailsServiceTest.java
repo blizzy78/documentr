@@ -23,13 +23,13 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import com.google.common.collect.Sets;
 
 public class DocumentrUserDetailsServiceTest {
 	private UserStore userStore;
@@ -59,7 +59,7 @@ public class DocumentrUserDetailsServiceTest {
 		UserDetails details = userDetailsService.loadUserByUsername("user"); //$NON-NLS-1$
 		assertEquals("user", details.getUsername()); //$NON-NLS-1$
 		assertTrue(details.isEnabled());
-		assertTrue(new HashSet<GrantedAuthority>(details.getAuthorities()).contains(authority));
+		assertTrue(Sets.newHashSet(details.getAuthorities()).contains(authority));
 	}
 	
 	@Test

@@ -23,9 +23,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -226,12 +224,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		saveRandomPage(BRANCH_1, "home/foo/bar/baz"); //$NON-NLS-1$
 		saveRandomPage(BRANCH_1, "home/foo/qux"); //$NON-NLS-1$
 		
-		Set<String> expected = new HashSet<String>(
-				Arrays.asList("home/foo/bar", "home/foo/qux")); //$NON-NLS-1$ //$NON-NLS-2$
-		Set<String> result = new HashSet<String>(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo")); //$NON-NLS-1$
+		Set<String> expected = Sets.newHashSet("home/foo/bar", "home/foo/qux"); //$NON-NLS-1$ //$NON-NLS-2$
+		Set<String> result = Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo")); //$NON-NLS-1$
 		assertEquals(expected, result);
 		expected = Collections.singleton("home/foo/bar/baz"); //$NON-NLS-1$
-		result = new HashSet<String>(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo/bar")); //$NON-NLS-1$
+		result = Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo/bar")); //$NON-NLS-1$
 		assertEquals(expected, result);
 	}
 	
@@ -248,7 +245,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		
 		pageStore.deletePage(PROJECT, BRANCH_1, "foo", USER); //$NON-NLS-1$
 		List<String> result = pageStore.listPagePaths(PROJECT, BRANCH_1);
-		assertEquals(Collections.emptySet(), new HashSet<String>(result));
+		assertTrue(result.isEmpty());
 		assertFalse(pageFile.isFile());
 		assertFalse(metaFile.isFile());
 	}
@@ -268,7 +265,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		
 		List<String> branches = pageStore.getBranchesPageIsSharedWith(PROJECT, branchName, PAGE);
 		assertEquals(expectedBranches.length, branches.size());
-		assertEquals(Sets.newHashSet(expectedBranches), new HashSet<String>(branches));
+		assertEquals(Sets.newHashSet(expectedBranches), Sets.newHashSet(branches));
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {

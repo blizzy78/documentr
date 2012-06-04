@@ -20,14 +20,14 @@ package de.blizzy.documentr.access;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -98,7 +98,7 @@ public class DocumentrSecurityExpressionRootTest {
 
 	@Test
 	public void projectExists() {
-		when(repoManager.listProjects()).thenReturn(Arrays.asList("project1", "project2", "project3")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project1", "project2", "project3")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertTrue(root.projectExists("project1")); //$NON-NLS-1$
 	}
 	

@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -88,21 +87,21 @@ public class FunctionsTest {
 	
 	@Test
 	public void listProjects() {
-		List<String> projects = Arrays.asList("p1", "p2", "p3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		List<String> projects = Lists.newArrayList("p1", "p2", "p3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(repoManager.listProjects()).thenReturn(projects);
 		assertEquals(projects, Functions.listProjects());
 	}
 
 	@Test
 	public void listProjectBranches() throws IOException {
-		List<String> branches = Arrays.asList("b1", "b2", "b3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		List<String> branches = Lists.newArrayList("b1", "b2", "b3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(branches);
 		assertEquals(branches, Functions.listProjectBranches(PROJECT));
 	}
 
 	@Test
 	public void listPageAt() throws IOException {
-		List<String> attachments = Arrays.asList("test.txt", "foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<String> attachments = Lists.newArrayList("test.txt", "foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.listPageAttachments(PROJECT, BRANCH, PAGE)).thenReturn(attachments);
 		assertEquals(attachments, Functions.listPageAttachments(PROJECT, BRANCH, PAGE));
 	}
@@ -116,14 +115,14 @@ public class FunctionsTest {
 
 	@Test
 	public void getBranchesPageIsSharedWith() throws IOException {
-		List<String> branches = Arrays.asList("b1", "b2", "b3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		List<String> branches = Lists.newArrayList("b1", "b2", "b3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(pageStore.getBranchesPageIsSharedWith(PROJECT, BRANCH, PAGE)).thenReturn(branches);
 		assertEquals(branches, Functions.getBranchesPageIsSharedWith(PROJECT, BRANCH, PAGE));
 	}
 
 	@Test
 	public void listUsers() throws IOException {
-		List<String> users = Arrays.asList("u1", "u2", "u3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		List<String> users = Lists.newArrayList("u1", "u2", "u3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.listUsers()).thenReturn(users);
 		assertEquals(users, Functions.listUsers());
 	}

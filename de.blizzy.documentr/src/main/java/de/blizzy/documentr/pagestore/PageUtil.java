@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.pagestore;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public final class PageUtil {
 	private PageUtil() {}
@@ -27,8 +28,7 @@ public final class PageUtil {
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath,
 			IPageStore pageStore) throws IOException {
 		
-		List<String> result = new ArrayList<String>();
-		result.add(pagePath);
+		List<String> result = Lists.newArrayList(pagePath);
 		for (Page page = pageStore.getPage(projectName, branchName, pagePath, false);
 			page.getParentPagePath() != null;
 			page = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false)) {

@@ -24,6 +24,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 public class UtilTest {
 	@Test
 	public void toRealPagePath() {
@@ -49,7 +51,7 @@ public class UtilTest {
 	public void join() {
 		assertEquals("1, 2, 3", Util.join( //$NON-NLS-1$
 				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }, ", ")); //$NON-NLS-1$
-		assertEquals("1, 2, 3", Util.join(Arrays.asList( //$NON-NLS-1$
+		assertEquals("1, 2, 3", Util.join(Lists.newArrayList( //$NON-NLS-1$
 				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }), ", ")); //$NON-NLS-1$
 		assertEquals("123", Util.join(Integer.valueOf(123), ", ")); //$NON-NLS-1$ //$NON-NLS-2$
 	}

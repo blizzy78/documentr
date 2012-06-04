@@ -22,12 +22,13 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
@@ -89,7 +90,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void listProjectBranches() throws IOException {
-		List<String> branches = Arrays.asList("branch1", "branch2", "branch3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		List<String> branches = Lists.newArrayList("branch1", "branch2", "branch3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(repoManager.listBranches()).thenReturn(branches);
 		assertEquals(branches, globalRepoManager.listProjectBranches(PROJECT));
 	}

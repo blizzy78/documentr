@@ -20,12 +20,9 @@ package de.blizzy.documentr.pagestore;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +47,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -280,14 +278,14 @@ class PageStore implements IPageStore {
 						return file.isFile() && file.getName().endsWith(META_SUFFIX);
 					}
 				};
-				List<File> files = Arrays.asList(pageAttachmentsDir.listFiles(filter));
+				List<File> files = Lists.newArrayList(pageAttachmentsDir.listFiles(filter));
 				Function<File, String> function = new Function<File, String>() {
 					@Override
 					public String apply(File file) {
 						return StringUtils.substringBeforeLast(file.getName(), META_SUFFIX);
 					}
 				};
-				names = new ArrayList<String>(Lists.transform(files, function));
+				names = Lists.newArrayList(Lists.transform(files, function));
 				Collections.sort(names);
 			}
 			return names;
@@ -311,13 +309,13 @@ class PageStore implements IPageStore {
 				return path;
 			}
 		};
-		paths = new ArrayList<String>(Lists.transform(paths, function));
+		paths = Lists.newArrayList(Lists.transform(paths, function));
 		Collections.sort(paths);
 		return paths;
 	}
 
 	private List<String> listPagePathsInDir(File dir, boolean recursive) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = Lists.newArrayList();
 		if (dir.isDirectory()) {
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -378,7 +376,7 @@ class PageStore implements IPageStore {
 			RepositoryUtil.closeQuietly(centralRepo);
 		}
 		
-		List<String> branches = new ArrayList<String>(branchesWithCommit);
+		List<String> branches = Lists.newArrayList(branchesWithCommit);
 		if (!branches.contains(branchName)) {
 			branches.add(branchName);
 		}
@@ -387,7 +385,7 @@ class PageStore implements IPageStore {
 	}
 	
 	private Set<String> getBranchesWithCommit(final RevCommit commit, List<String> allBranches, Repository centralRepo) {
-		final Set<String> result = new HashSet<String>();
+		final Set<String> result = Sets.newHashSet();
 		for (final String branch : allBranches) {
 			CommitFilter matcher = new CommitFilter() {
 				@Override
@@ -421,7 +419,7 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = toFile(new File(workingDir, PAGES_DIR_NAME), path);
-			List<String> paths = new ArrayList<String>(listPagePaths(pagesDir, false));
+			List<String> paths = Lists.newArrayList(listPagePaths(pagesDir, false));
 			Function<String, String> function = new Function<String, String>() {
 				@Override
 				public String apply(String childName) {
