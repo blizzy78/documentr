@@ -44,4 +44,8 @@ public class DocumentrAnonymousAuthenticationFactory {
 		
 		return new DocumentrAnonymousAuthentication(key, principal, authorities);
 	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
+	}
 }

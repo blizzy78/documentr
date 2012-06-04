@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
 
@@ -33,10 +34,14 @@ public final class TestUtil {
 				String.valueOf(Math.random() * Long.MAX_VALUE));
 	}
 	
-	public static void assertEqualsContract(Object equal1, Object equal2, Object equal3, Object different) {
+	public static <T> void assertEqualsContract(T equal1, T equal2, T equal3, T different) {
 		assertNotSame(equal1, equal2);
 		assertNotSame(equal1, equal3);
 		assertNotSame(equal2, equal3);
+		Class<? extends Object> clazz = equal1.getClass();
+		assertEquals(clazz, equal2.getClass());
+		assertEquals(clazz, equal3.getClass());
+		assertEquals(clazz, different.getClass());
 
 		// same object
 		assertTrue(equal1.equals(equal1));
@@ -67,11 +72,19 @@ public final class TestUtil {
 		// difference
 		assertFalse(equal1.equals(different));
 		assertFalse(different.equals(equal1));
+
+		// subclass
+		T subclassed = spy(equal2);
+		assertFalse(subclassed.getClass().equals(clazz));
+		assertFalse(equal1.equals(subclassed));
+		assertFalse(subclassed.equals(equal1));
 	}
 
-	public static void assertHashCodeContract(Object equal1, Object equal2) {
+	public static <T> void assertHashCodeContract(T equal1, T equal2) {
 		assertNotSame(equal1, equal2);
 		assertEquals(equal1, equal2);
+		Class<? extends Object> clazz = equal1.getClass();
+		assertEquals(clazz, equal2.getClass());
 		
 		// consistent
 		int hashCode = equal1.hashCode();

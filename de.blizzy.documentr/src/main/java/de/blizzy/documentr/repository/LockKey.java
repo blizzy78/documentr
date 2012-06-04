@@ -20,7 +20,7 @@ package de.blizzy.documentr.repository;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-final class LockKey implements ILock {
+class LockKey implements ILock {
 	private String projectName;
 	private String branchName;
 	private boolean central;
