@@ -17,13 +17,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import java.io.File;
 
 import org.eclipse.jgit.lib.Repository;
 import org.junit.Test;
 import org.junit.Test.None;
 
 public class RepositoryUtilTest {
+	@Test(expected=None.class)
+	public void closeRepositoryQuietlyWithRepository() {
+		Repository repo = mock(Repository.class);
+		RepositoryUtil.closeQuietly(repo);
+		verify(repo).close();
+	}
+	
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyMustAcceptNull() {
 		RepositoryUtil.closeQuietly((Repository) null);
@@ -38,6 +48,13 @@ public class RepositoryUtilTest {
 	}
 	
 	@Test(expected=None.class)
+	public void closeRepositoryQuietlyWithLockedRepository() {
+		ILockedRepository repo = mock(ILockedRepository.class);
+		RepositoryUtil.closeQuietly(repo);
+		verify(repo).close();
+	}
+
+	@Test(expected=None.class)
 	public void closeLockedRepositoryQuietlyMustAcceptNull() {
 		RepositoryUtil.closeQuietly((ILockedRepository) null);
 	}
@@ -48,5 +65,13 @@ public class RepositoryUtilTest {
 		doThrow(new RuntimeException()).when(repo).close();
 		
 		RepositoryUtil.closeQuietly(repo);
+	}
+	
+	@Test
+	public void getWorkingDir() {
+		Repository repo = mock(Repository.class);
+		File dir = new File("."); //$NON-NLS-1$
+		when(repo.getDirectory()).thenReturn(dir);
+		assertEquals(dir.getParentFile(), RepositoryUtil.getWorkingDir(repo));
 	}
 }
