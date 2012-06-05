@@ -32,8 +32,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.TestUtil;
+import de.blizzy.documentr.access.GrantedAuthorityTarget;
+import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
+import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.pagestore.IPageStore;
 import de.blizzy.documentr.pagestore.Page;
@@ -153,7 +157,29 @@ public class FunctionsTest {
 		Date date = new Date();
 		PageMetadata metadata = new PageMetadata("user", date); //$NON-NLS-1$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(metadata);
-		assertEquals("user", metadata.getLastEditedBy()); //$NON-NLS-1$
-		assertEquals(date, metadata.getLastEdited());
+		
+		PageMetadata result = Functions.getPageMetadata(PROJECT, BRANCH, PAGE);
+		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
+		assertEquals(metadata.getLastEdited(), result.getLastEdited());
+	}
+	
+	@Test
+	public void listRoles() throws IOException {
+		List<String> roles = Lists.newArrayList("role1", "role2", "role3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		when(userStore.listRoles()).thenReturn(roles);
+		
+		List<String> result = Functions.listRoles();
+		assertTrue(result.containsAll(roles));
+	}
+	
+	@Test
+	public void getUserAuthorities() throws IOException {
+		List<RoleGrantedAuthority> authorities = Lists.newArrayList(
+				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "role1"), //$NON-NLS-1$
+				new RoleGrantedAuthority(new GrantedAuthorityTarget("project", Type.PROJECT), "role2")); //$NON-NLS-1$ //$NON-NLS-2$
+		when(userStore.getUserAuthorities("user")).thenReturn(authorities); //$NON-NLS-1$
+		
+		List<RoleGrantedAuthority> result = Functions.getUserAuthorities("user"); //$NON-NLS-1$
+		assertEquals(Sets.newHashSet(authorities), Sets.newHashSet(result));
 	}
 }

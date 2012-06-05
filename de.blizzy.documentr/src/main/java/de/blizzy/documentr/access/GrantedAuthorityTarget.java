@@ -29,12 +29,12 @@ public class GrantedAuthorityTarget implements Serializable {
 	}
 	
 	public static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$
+	public static final GrantedAuthorityTarget APPLICATION =
+			new GrantedAuthorityTarget(APPLICATION_TARGET_ID, Type.APPLICATION);
 
 	private static final long serialVersionUID = -8582662031330649292L;
 
 	static final String ANY = "*"; //$NON-NLS-1$
-	static final GrantedAuthorityTarget APPLICATION =
-			new GrantedAuthorityTarget(APPLICATION_TARGET_ID, Type.APPLICATION);
 	
 	private String targetId;
 	private Type type;
