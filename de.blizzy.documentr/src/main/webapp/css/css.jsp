@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%><%@ page contentType="text/css; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<jsp:include page="/css/bootstrap-2.0.3.min.css.jsp"/>
-<jsp:include page="/css/bootstrap-responsive-2.0.3.min.css.jsp"/>
-<jsp:include page="/css/prettify.css.jsp"/>
+<jsp:include page="/css/bootstrap-2.0.4.min.css.jsp"/>
+<jsp:include page="/css/bootstrap-responsive-2.0.4.min.css.jsp"/>
+<jsp:include page="/css/prettify-20110601.css.jsp"/>
 <jsp:include page="/css/lightbox-2.51.css.jsp"/>
 
 <jsp:include page="/css/styles.css.jsp"/>

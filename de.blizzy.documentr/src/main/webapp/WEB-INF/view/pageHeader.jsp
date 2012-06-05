@@ -28,12 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="<c:url value="/css/css.jsp"/>" media="all"/>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.19.custom.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-modal.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-button.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.20.custom.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-modal-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-button-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-tab-2.0.4.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/google-code-prettify/prettify.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
 
 <c:if test="${!empty requestScope._headerJSFiles}">

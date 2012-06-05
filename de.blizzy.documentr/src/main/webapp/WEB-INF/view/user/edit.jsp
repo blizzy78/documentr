@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="projects" value="${d:listProjects()}"/>
 <c:set var="roles" value="${d:listRoles()}"/>
 
-<dt:headerJSFile uri="/js/zxcvbn-20120527.js"/>
+<dt:headerJSFile uri="/js/zxcvbn-20120416.js"/>
 
 <dt:headerJS>
 
