@@ -124,7 +124,6 @@ class PageStore implements IPageStore {
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
 			File workingFile = toFile(pagesDir, path + META_SUFFIX);
-			FileUtils.forceMkdir(workingFile.getParentFile());
 			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
 
 			PageData pageData = page.getData();
