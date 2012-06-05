@@ -302,6 +302,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</reportPlugins>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>0.27</version>
+				<configuration>
+					<targetClasses>
+						<param>de.blizzy.documentr.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>de.blizzy.documentr.*</param>
+					</targetTests>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	
