@@ -34,13 +34,14 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContextTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
-	private static final String PAGE = "home/foo"; //$NON-NLS-1$
+	private static final String PAGE = DocumentrConstants.HOME_PAGE_NAME + "/foo"; //$NON-NLS-1$
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	
 	private MarkdownProcessor markdownProcessor;

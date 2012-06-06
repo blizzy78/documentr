@@ -28,6 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
 public class DocumentrPermissionEvaluatorTest {
@@ -163,7 +164,8 @@ public class DocumentrPermissionEvaluatorTest {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
 				new GrantedAuthorityTarget("project/branch", Type.BRANCH), Permission.EDIT_PAGE)); //$NON-NLS-1$
 		assertTrue(documentrPermissionEvaluator.hasPermission(
-				authentication, "project/branch/home,foo", Type.PAGE.name(), Permission.EDIT_PAGE.name())); //$NON-NLS-1$
+				authentication, "project/branch/" + DocumentrConstants.HOME_PAGE_NAME + ",foo", //$NON-NLS-1$ //$NON-NLS-2$
+				Type.PAGE.name(), Permission.EDIT_PAGE.name()));
 	}
 	
 	private Authentication mockAuthentication(GrantedAuthority... authorities) {

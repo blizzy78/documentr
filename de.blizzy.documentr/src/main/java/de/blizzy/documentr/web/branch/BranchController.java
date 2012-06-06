@@ -88,11 +88,14 @@ public class BranchController {
 		if (firstBranch) {
 			Page page = Page.fromText(null, "Home", StringUtils.EMPTY); //$NON-NLS-1$
 			User user = userStore.getUser(authentication.getName());
-			pageStore.savePage(form.getProjectName(), form.getName(), "home", page, user); //$NON-NLS-1$
-			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			pageStore.savePage(form.getProjectName(), form.getName(),
+					DocumentrConstants.HOME_PAGE_NAME, page, user);
+			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
+					"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 		}
 		
-		return "redirect:/page/" + form.getProjectName() + "/" + form.getName() + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "redirect:/page/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
+				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 	}
 	
 	@ModelAttribute

@@ -42,5 +42,7 @@ public final class DocumentrConstants {
 	
 	public static final String ANONYMOUS_AUTH_KEY = String.valueOf((long) Math.random() * Long.MAX_VALUE);
 	
+	public static final String HOME_PAGE_NAME = "home"; //$NON-NLS-1$
+
 	private DocumentrConstants() {}
 }

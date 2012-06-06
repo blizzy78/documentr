@@ -37,6 +37,7 @@ import org.springframework.validation.BindingResult;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -86,12 +87,12 @@ public class BranchControllerTest {
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
-		assertEquals("/page/edit/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/page/edit/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		
 		verify(repoManager).createProjectBranchRepository(PROJECT, BRANCH, null);
-		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq("home"), //$NON-NLS-1$
+		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(DocumentrConstants.HOME_PAGE_NAME),
 				argPage(null, "Home", StringUtils.EMPTY), same(USER)); //$NON-NLS-1$
 	}
 
@@ -102,7 +103,7 @@ public class BranchControllerTest {
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
-		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 		

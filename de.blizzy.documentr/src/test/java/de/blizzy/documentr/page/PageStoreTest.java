@@ -35,12 +35,9 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
-import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.page.PageMetadata;
-import de.blizzy.documentr.page.PageStore;
-import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;
@@ -223,16 +220,19 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	public void listChildPagePaths() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
-		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
-		saveRandomPage(BRANCH_1, "home/foo/bar"); //$NON-NLS-1$
-		saveRandomPage(BRANCH_1, "home/foo/bar/baz"); //$NON-NLS-1$
-		saveRandomPage(BRANCH_1, "home/foo/qux"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo/bar"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/baz"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo/qux"); //$NON-NLS-1$
 		
-		Set<String> expected = Sets.newHashSet("home/foo/bar", "home/foo/qux"); //$NON-NLS-1$ //$NON-NLS-2$
-		Set<String> result = Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo")); //$NON-NLS-1$
+		Set<String> expected = Sets.newHashSet(DocumentrConstants.HOME_PAGE_NAME + "/foo/bar", //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/foo/qux"); //$NON-NLS-1$
+		Set<String> result = Sets.newHashSet(pageStore.listChildPagePaths(
+				PROJECT, BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo")); //$NON-NLS-1$
 		assertEquals(expected, result);
-		expected = Collections.singleton("home/foo/bar/baz"); //$NON-NLS-1$
-		result = Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo/bar")); //$NON-NLS-1$
+		expected = Collections.singleton(DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/baz"); //$NON-NLS-1$
+		result = Sets.newHashSet(pageStore.listChildPagePaths(
+				PROJECT, BRANCH_1, DocumentrConstants.HOME_PAGE_NAME + "/foo/bar")); //$NON-NLS-1$
 		assertEquals(expected, result);
 	}
 	

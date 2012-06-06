@@ -233,7 +233,8 @@ public class PageController {
 		path = Util.toRealPagePath(path);
 		User user = userStore.getUser(authentication.getName());
 		pageStore.deletePage(projectName, branchName, path, user);
-		return "redirect:/page/" + projectName + "/" + branchName + "/home"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
+				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 	}
 
 	void setPageStore(IPageStore pageStore) {

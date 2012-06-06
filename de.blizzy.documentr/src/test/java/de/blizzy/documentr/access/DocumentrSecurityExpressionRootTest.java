@@ -29,6 +29,7 @@ import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
@@ -91,9 +92,11 @@ public class DocumentrSecurityExpressionRootTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasPagePermission() {
-		when(permissionEvaluator.hasPermission(authentication, "project/branch/home,foo", //$NON-NLS-1$
+		when(permissionEvaluator.hasPermission(authentication,
+				"project/branch/" + DocumentrConstants.HOME_PAGE_NAME + ",foo", //$NON-NLS-1$ //$NON-NLS-2$
 				Type.PAGE.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasPagePermission("project", "branch", "home/foo", Permission.EDIT_PAGE.name())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertTrue(root.hasPagePermission("project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
+				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE.name())); //$NON-NLS-1$
 	}
 
 	@Test

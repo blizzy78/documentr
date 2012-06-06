@@ -38,6 +38,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -50,10 +51,10 @@ import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 public class PageControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
-	private static final String PAGE_PATH = "home/page"; //$NON-NLS-1$
-	private static final String PAGE_PATH_URL = "home,page"; //$NON-NLS-1$
+	private static final String PAGE_PATH = DocumentrConstants.HOME_PAGE_NAME + "/page"; //$NON-NLS-1$
+	private static final String PAGE_PATH_URL = DocumentrConstants.HOME_PAGE_NAME + ",page"; //$NON-NLS-1$
 	private static final String PAGE_NAME = "page"; //$NON-NLS-1$
-	private static final String PARENT_PAGE = "home"; //$NON-NLS-1$
+	private static final String PARENT_PAGE = DocumentrConstants.HOME_PAGE_NAME;
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private IPageStore pageStore;
@@ -260,7 +261,7 @@ public class PageControllerTest {
 	@Test
 	public void deletePage() throws IOException {
 		String view = pageController.deletePage(PROJECT, BRANCH, PAGE_PATH_URL, authentication);
-		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
 		verify(pageStore).deletePage(PROJECT, BRANCH, PAGE_PATH, USER);

@@ -37,6 +37,7 @@ import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
@@ -47,26 +48,26 @@ import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 public class NeighborsMacroTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
-	private static final String INACCESSIBLE_PAGE_PATH = "home/foo/inaccessible"; //$NON-NLS-1$
+	private static final String INACCESSIBLE_PAGE_PATH = DocumentrConstants.HOME_PAGE_NAME + "/foo/inaccessible"; //$NON-NLS-1$
 	@SuppressWarnings("nls")
 	private static final String[] PAGES = {
-		"home",
-		"home/foo",
-		"home/foo/aaa",
-		"home/foo/aaa/a1",
-		"home/foo/aaa/a2",
-		"home/foo/bar", // <-- page under test
-		"home/foo/bar/x",
-		"home/foo/bar/x/x1",
-		"home/foo/bar/x/x2",
-		"home/foo/bar/y",
-		"home/foo/bar/y/y1",
-		"home/foo/bar/y/y2",
-		"home/foo/bar/z",
-		"home/foo/bar/z/z1",
-		"home/foo/bar/z/z2",
-		"home/foo/bbb",
-		"home/foo/bbb/b1",
+		DocumentrConstants.HOME_PAGE_NAME,
+		DocumentrConstants.HOME_PAGE_NAME + "/foo",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa/a1",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa/a2",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar", // <-- page under test
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb",
+		DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb/b1",
 		INACCESSIBLE_PAGE_PATH
 	};
 	
@@ -131,7 +132,7 @@ public class NeighborsMacroTest {
 	public void getHtml() {
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
-		when(htmlSerializerContext.getPagePath()).thenReturn("home/foo/bar"); //$NON-NLS-1$
+		when(htmlSerializerContext.getPagePath()).thenReturn(DocumentrConstants.HOME_PAGE_NAME + "/foo/bar"); //$NON-NLS-1$
 		
 		NeighborsMacro macro = new NeighborsMacro();
 		macro.setHtmlSerializerContext(htmlSerializerContext);
@@ -143,21 +144,21 @@ public class NeighborsMacroTest {
 				"<div class=\"neighbors-box\">" +
 					"<ul class=\"neighbors\">" +
 						"<li>" +
-							"<a href=\"/home\">home</a>" +
+							"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "\">" + DocumentrConstants.HOME_PAGE_NAME + "</a>" +
 							"<ul>" +
 								"<li>" +
-									"<a href=\"/home/foo\">home/foo</a>" +
+									"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo</a>" +
 									"<ul>" +
-										"<li><a href=\"/home/foo/aaa\">home/foo/aaa</a></li>" +
+										"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa</a></li>" +
 										"<li class=\"active\">" +
-											"home/foo/bar" +
+											DocumentrConstants.HOME_PAGE_NAME + "/foo/bar" +
 											"<ul>" +
-												"<li><a href=\"/home/foo/bar/x\">home/foo/bar/x</a></li>" +
-												"<li><a href=\"/home/foo/bar/y\">home/foo/bar/y</a></li>" +
-												"<li><a href=\"/home/foo/bar/z\">home/foo/bar/z</a></li>" +
+												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" +
+												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" +
+												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>" +
 											"</ul>" +
 										"</li>" +
-										"<li><a href=\"/home/foo/bbb\">home/foo/bbb</a></li>" +
+										"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb</a></li>" +
 									"</ul>" +
 								"</li>" +
 							"</ul>" +

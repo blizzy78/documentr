@@ -29,6 +29,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 
@@ -70,7 +71,7 @@ public class MarkdownProcessorTest {
 		
 		String markdown = "**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHTML(
-				markdown, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(expectedHTML, result);
@@ -86,7 +87,7 @@ public class MarkdownProcessorTest {
 		
 		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String result = markdownProcessor.markdownToHTML(
-				markdown, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
 				MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + PARAMS + //$NON-NLS-1$
@@ -115,7 +116,7 @@ public class MarkdownProcessorTest {
 		String html = "<p>" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$
 				PARAMS + "/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.processNonCacheableMacros(
-				html, "project", "branch", "home/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				html, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String expectedHTML = cleanedMacroHtml;
 		assertEquals(expectedHTML, result);
 	}
