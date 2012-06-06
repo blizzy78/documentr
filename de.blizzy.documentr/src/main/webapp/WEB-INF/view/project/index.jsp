@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<li class="active"><spring:message code="title.projects"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.projects"/></dt:pageTitle>
+
 <dt:page>
 
 <c:set var="projects" value="${d:listProjects()}"/>

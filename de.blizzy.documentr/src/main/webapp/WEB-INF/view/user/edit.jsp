@@ -240,6 +240,8 @@ $(function() {
 	<li class="active"><spring:message code="title.editUser"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.editUser"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.accountManagement"/></h1></div>

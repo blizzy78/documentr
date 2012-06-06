@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<li class="active"><spring:message code="title.editProject"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.editProject"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.editProject"/></h1></div>

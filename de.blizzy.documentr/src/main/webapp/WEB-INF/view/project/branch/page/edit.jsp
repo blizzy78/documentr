@@ -106,6 +106,8 @@ function showPreview() {
 	<li class="active"><spring:message code="title.editPage"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.editPage"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.editPage"/></h1></div>

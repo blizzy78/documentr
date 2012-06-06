@@ -100,6 +100,8 @@ function showDeleteDialog() {
 	</c:choose>
 </dt:breadcrumbs>
 
+<dt:pageTitle><c:out value="${title}"/></dt:pageTitle>
+
 <dt:page>
 
 <c:set var="branches" value="${d:listProjectBranches(projectName)}"/>

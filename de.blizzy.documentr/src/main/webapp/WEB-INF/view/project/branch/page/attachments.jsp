@@ -37,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<li class="active"><spring:message code="title.attachments"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.attachments"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.attachments"/></h1></div>

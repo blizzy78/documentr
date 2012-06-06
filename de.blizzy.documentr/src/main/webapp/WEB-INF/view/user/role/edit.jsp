@@ -49,6 +49,8 @@ $(function() {
 	<li class="active"><spring:message code="title.editRole"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.editRole"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.accountManagement"/></h1></div>

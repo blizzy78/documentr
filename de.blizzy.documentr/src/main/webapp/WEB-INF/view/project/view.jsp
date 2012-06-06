@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<li class="active"><c:out value="${name}"/></li>
 </dt:breadcrumbs>
 
+<dt:pageTitle><spring:message code="title.projectX" arguments="${name}"/></dt:pageTitle>
+
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.projectX" arguments="${name}"/></h1></div>

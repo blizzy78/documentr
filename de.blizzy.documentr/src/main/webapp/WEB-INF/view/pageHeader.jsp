@@ -24,6 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <html>
 
 <head>
+<c:if test="${!empty requestScope._pageTitle}">
+	<title><c:out value="${requestScope._pageTitle}" escapeXml="false"/> &ndash; documentr</title>
+</c:if>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="<c:url value="/css/css.jsp"/>" media="all"/>
