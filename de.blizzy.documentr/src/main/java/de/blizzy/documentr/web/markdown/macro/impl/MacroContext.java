@@ -20,7 +20,7 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
 class MacroContext implements IMacroContext {

@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class BranchControllerTest {

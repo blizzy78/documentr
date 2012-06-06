@@ -24,7 +24,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.page.Page;
 
 public final class TestUtil {
 	private TestUtil() {}

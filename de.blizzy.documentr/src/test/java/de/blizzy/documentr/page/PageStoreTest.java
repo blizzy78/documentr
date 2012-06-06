@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.page;
 
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
@@ -37,6 +37,10 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageMetadata;
+import de.blizzy.documentr.page.PageStore;
+import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;

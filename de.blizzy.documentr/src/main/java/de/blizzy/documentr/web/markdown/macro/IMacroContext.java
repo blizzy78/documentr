@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 
 public interface IMacroContext {
 	IPageStore getPageStore();

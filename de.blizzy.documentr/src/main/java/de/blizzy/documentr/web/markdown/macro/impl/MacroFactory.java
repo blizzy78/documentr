@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;

@@ -42,9 +42,9 @@ import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.pagestore.IPageStore;
-import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageNotFoundException;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageNotFoundException;
 
 @Controller
 @RequestMapping("/attachment")

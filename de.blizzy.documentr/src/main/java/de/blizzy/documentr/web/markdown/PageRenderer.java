@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.pagestore.IPageStore;
-import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageTextData;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageTextData;
 
 @Component
 public class PageRenderer implements IPageRenderer {

@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacro;

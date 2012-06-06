@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.pagestore.IPageStore;
-import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
 
 public class PageRendererTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$

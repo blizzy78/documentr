@@ -39,9 +39,9 @@ import org.springframework.web.multipart.MultipartFile;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.pagestore.IPageStore;
-import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageNotFoundException;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageNotFoundException;
 
 public class AttachmentControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$

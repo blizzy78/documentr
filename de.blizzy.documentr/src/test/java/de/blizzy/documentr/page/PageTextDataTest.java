@@ -15,22 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.pagestore;
+package de.blizzy.documentr.page;
+
+import static de.blizzy.documentr.TestUtil.*;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.page.PageTextData;
 
-public class PageTextData extends PageData {
-	static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
-	
-	public PageTextData(String text) {
-		super(Util.toBytes(text), CONTENT_TYPE);
+public class PageTextDataTest {
+	@Test
+	public void getText() {
+		assertEquals("foo", new PageTextData("foo").getText()); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("foo", PageTextData.fromBytes(Util.toBytes("foo")).getText()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	static PageTextData fromBytes(byte[] data) {
-		return new PageTextData(Util.fromBytes(data));
-	}
-	
-	public String getText() {
-		return Util.fromBytes(getData());
+	@Test
+	public void testEquals() {
+		assertEqualsContract(
+			new PageTextData("foo"), //$NON-NLS-1$
+			new PageTextData("foo"), //$NON-NLS-1$
+			new PageTextData("foo"), //$NON-NLS-1$
+			new PageTextData("bar")); //$NON-NLS-1$
 	}
 }

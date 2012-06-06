@@ -39,8 +39,8 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
-import de.blizzy.documentr.pagestore.IPageStore;
-import de.blizzy.documentr.pagestore.Page;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 

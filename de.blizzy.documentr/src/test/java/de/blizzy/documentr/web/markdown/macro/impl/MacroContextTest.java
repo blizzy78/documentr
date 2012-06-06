@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 import org.junit.Test;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.pagestore.IPageStore;
+import de.blizzy.documentr.page.IPageStore;
 
 public class MacroContextTest {
 	@Test

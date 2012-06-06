@@ -24,8 +24,8 @@ import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 
 import de.blizzy.documentr.access.User;
-import de.blizzy.documentr.pagestore.Page;
-import de.blizzy.documentr.pagestore.PageTextData;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.web.access.UserForm;
 import de.blizzy.documentr.web.branch.BranchForm;
 import de.blizzy.documentr.web.page.PageForm;
