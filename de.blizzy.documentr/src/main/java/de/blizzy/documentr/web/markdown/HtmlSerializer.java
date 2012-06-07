@@ -25,7 +25,6 @@ import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.Node;
 import org.pegdown.ast.SuperNode;
-import org.pegdown.ast.TextNode;
 import org.pegdown.ast.VerbatimNode;
 
 import de.blizzy.documentr.Util;
@@ -81,8 +80,11 @@ public class HtmlSerializer extends ToHtmlSerializer {
 				.print(context.getAttachmentURI(url)).print("\">"); //$NON-NLS-1$
 		}
 		
-		printer.print("<img src=\"").print(context.getAttachmentURI(url)) //$NON-NLS-1$
-			.print("\" alt=\"").printEncoded(printChildrenToString(imageNode)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+		String altText = printChildrenToString(imageNode);
+		printer.print("<img src=\"").print(context.getAttachmentURI(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+		if (StringUtils.isNotBlank(altText)) {
+			printer.print(" alt=\"").printEncoded(altText).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		if (imageNode instanceof ExpImageNode) {
 			String title = ((ExpImageNode) imageNode).title;
 			if (StringUtils.isNotBlank(title)) {
@@ -103,10 +105,8 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	public void visit(HeaderNode node) {
 		List<Node> children = node.getChildren();
 		if (!children.isEmpty()) {
-			Node childNode = children.get(0);
-			if (childNode instanceof TextNode) {
-				TextNode textNode = (TextNode) childNode;
-				String text = textNode.getText();
+			String text = printChildrenToString(node);
+			if (StringUtils.isNotBlank(text)) {
 				String anchor = Util.simplifyForURL(text);
 				printer.print("<a name=\"").print(anchor).print("\"></a>"); //$NON-NLS-1$ //$NON-NLS-2$
 				context.addHeader(text, node.getLevel());
