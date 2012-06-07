@@ -17,17 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import static org.junit.Assert.*;
 
-@Controller
-@RequestMapping("/roles")
-public class RolesController {
-	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
-	public String getRoles() {
-		return "/user/role/index"; //$NON-NLS-1$
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+
+public class RoleNameValidatorTest {
+	@Test
+	public void isValid() {
+		RoleNameValidator validator = new RoleNameValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("role", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("Role 123", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("role.123", null)); //$NON-NLS-1$
 	}
 }

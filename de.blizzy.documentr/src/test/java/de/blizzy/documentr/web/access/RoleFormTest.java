@@ -17,17 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import static org.junit.Assert.*;
 
-@Controller
-@RequestMapping("/roles")
-public class RolesController {
-	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
-	public String getRoles() {
-		return "/user/role/index"; //$NON-NLS-1$
+import java.util.Set;
+
+import org.junit.Test;
+
+import com.google.common.collect.Sets;
+
+public class RoleFormTest {
+	@Test
+	public void getName() {
+		Set<String> permissions = Sets.newHashSet("p1", "p2", "p3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		RoleForm form = new RoleForm("role", permissions); //$NON-NLS-1$
+		assertEquals("role", form.getName()); //$NON-NLS-1$
+	}
+
+	@Test
+	public void getPermissions() {
+		Set<String> permissions = Sets.newHashSet("p1", "p2", "p3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		RoleForm form = new RoleForm("role", permissions); //$NON-NLS-1$
+		assertEquals(permissions, form.getPermissions());
 	}
 }

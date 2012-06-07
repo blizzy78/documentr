@@ -30,7 +30,7 @@ public final class DocumentrConstants {
 	public static final String PAGE_PATH_PATTERN =
 			"(?:" + PAGE_PATH_REAL_PATTERN + "|" + PAGE_PATH_URL_PATTERN + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	public static final String USER_LOGIN_NAME_PATTERN = "[a-zA-Z0-9_\\.\\-]+"; //$NON-NLS-1$
-	public static final String ROLE_NAME_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$
+	public static final String ROLE_NAME_PATTERN = "[a-zA-Z0-9_\\- ]+"; //$NON-NLS-1$
 
 	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|_.*)"; //$NON-NLS-1$
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
