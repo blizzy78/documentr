@@ -49,6 +49,7 @@ public class MacroFactoryTest {
 	
 	@Test
 	public void getMacro() {
+		assertMacro("label", LabelMacro.class); //$NON-NLS-1$
 		assertMacro("neighbors", NeighborsMacro.class); //$NON-NLS-1$
 		assertMacro("neighbours", NeighborsMacro.class); //$NON-NLS-1$
 		assertMacro("toc", TableOfContentsMacro.class); //$NON-NLS-1$

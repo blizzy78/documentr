@@ -35,6 +35,7 @@ public class MacroFactory {
 			new HashMap<String, Class<? extends IMacro>>();
 	
 	static {
+		MACRO_CLASSES.put("label", LabelMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("neighbours", NeighborsMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("toc", TableOfContentsMacro.class); //$NON-NLS-1$
