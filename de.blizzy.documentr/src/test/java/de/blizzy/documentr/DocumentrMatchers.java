@@ -19,13 +19,19 @@ package de.blizzy.documentr;
 
 import static org.mockito.Matchers.*;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 
+import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.access.Role;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageTextData;
+import de.blizzy.documentr.web.access.RoleForm;
 import de.blizzy.documentr.web.access.UserForm;
 import de.blizzy.documentr.web.branch.BranchForm;
 import de.blizzy.documentr.web.page.PageForm;
@@ -120,6 +126,30 @@ public final class DocumentrMatchers {
 			public boolean matches(Object argument) {
 				ProjectForm form = (ProjectForm) argument;
 				return StringUtils.equals(form.getName(), name);
+			}
+		};
+		return argThat(matcher);
+	}
+
+	public static RoleForm argRoleForm(final String name, final Set<String> permissions) {
+		Matcher<RoleForm> matcher = new ArgumentMatcher<RoleForm>() {
+			@Override
+			public boolean matches(Object argument) {
+				RoleForm form = (RoleForm) argument;
+				return StringUtils.equals(form.getName(), name) &&
+					form.getPermissions().equals(permissions);
+			}
+		};
+		return argThat(matcher);
+	}
+
+	public static Role argRole(final String name, final EnumSet<Permission> permissions) {
+		Matcher<Role> matcher = new ArgumentMatcher<Role>() {
+			@Override
+			public boolean matches(Object argument) {
+				Role role = (Role) argument;
+				return StringUtils.equals(role.getName(), name) &&
+					role.getPermissions().equals(permissions);
 			}
 		};
 		return argThat(matcher);
