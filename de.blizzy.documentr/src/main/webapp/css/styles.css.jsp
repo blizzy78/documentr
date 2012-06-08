@@ -130,3 +130,7 @@ table.table-documentr {
 label.inline {
 	display: inline;
 }
+
+dd {
+	margin-left: 25px;
+}
