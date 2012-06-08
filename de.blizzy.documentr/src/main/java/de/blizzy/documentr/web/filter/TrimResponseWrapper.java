@@ -51,7 +51,7 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 			if (outputStream == null) {
 				outputStream = new ServletOutputStream() {
 					@Override
-					public void write(int b) throws IOException {
+					public void write(int b) {
 						buffer.write(b);
 					}
 				};

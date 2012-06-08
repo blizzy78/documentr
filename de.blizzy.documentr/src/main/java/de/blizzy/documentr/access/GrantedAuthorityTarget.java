@@ -25,7 +25,11 @@ import org.springframework.util.Assert;
 
 public class GrantedAuthorityTarget implements Serializable {
 	public static enum Type {
-		APPLICATION, PROJECT, BRANCH, PAGE;
+		@SuppressWarnings("hiding")
+		APPLICATION,
+		PROJECT,
+		BRANCH,
+		PAGE;
 	}
 	
 	public static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$

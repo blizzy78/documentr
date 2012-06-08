@@ -19,7 +19,6 @@ package de.blizzy.documentr.web;
 
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import org.springframework.web.WebApplicationInitializer;
@@ -34,7 +33,7 @@ import de.blizzy.documentr.web.filter.TrimFilter;
 
 public class WebappInitializer implements WebApplicationInitializer {
 	@Override
-	public void onStartup(ServletContext context) throws ServletException {
+	public void onStartup(ServletContext context) {
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
 		appContext.setServletContext(context);
 		appContext.setConfigLocation(ContextConfig.class.getName());

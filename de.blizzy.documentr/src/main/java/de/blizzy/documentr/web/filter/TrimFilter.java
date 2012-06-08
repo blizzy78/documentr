@@ -36,7 +36,7 @@ public class TrimFilter implements Filter {
 	private TrimWriter writer = new TrimWriter();
 	
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) {
 	}
 
 	@Override
