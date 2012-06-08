@@ -1,0 +1,6 @@
+- jquery-1.7.2.min.js
+- jquery-ui-1.8.20.custom.min.js
+- bootstrap-modal-2.0.4.js
+- bootstrap-dropdown-2.0.4.js
+- bootstrap-button-2.0.4.js
+- bootstrap-tab-2.0.4.js

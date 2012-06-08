@@ -29,13 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 </c:if>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="<c:url value="/css/css.jsp"/>" media="all"/>
-<script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.20.custom.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-modal-2.0.4.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-button-2.0.4.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-tab-2.0.4.js"/>"></script>
+<link rel="stylesheet" href="<c:url value="/css/all-css.css"/>" media="all"/>
+<link rel="stylesheet" href="<c:url value="/css/lightbox-2.51.css.jsp"/>" media="all"/>
+<script type="text/javascript" src="<c:url value="/js/all-js.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
 
