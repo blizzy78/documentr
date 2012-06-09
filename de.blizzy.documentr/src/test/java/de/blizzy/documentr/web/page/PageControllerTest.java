@@ -24,9 +24,13 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +48,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
@@ -81,12 +86,34 @@ public class PageControllerTest {
 	}
 	
 	@Test
+	@SuppressWarnings("boxing")
 	public void getPage() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		
+		getPage(request);
+	}
+
+	@Test
+	@SuppressWarnings("boxing")
+	public void getPageMustReturnNormallyIfModified() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
+		
+		getPage(request);
+	}
+	
+	private void getPage(HttpServletRequest request) throws IOException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", new Date())); //$NON-NLS-1$
+		
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model);
+		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response);
 		assertEquals("/project/branch/page/view", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
@@ -96,13 +123,37 @@ public class PageControllerTest {
 	}
 	
 	@Test
-	public void getPageButNonexistent() throws IOException {
-		when(pageStore.getPage(eq(PROJECT), eq(BRANCH), eq("nonexistent"), anyBoolean())) //$NON-NLS-1$
+	@SuppressWarnings("boxing")
+	public void getPageMustReturn404IfNotFound() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		
+		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model); //$NON-NLS-1$
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
+		assertForward(view);
+	}
+	
+	@Test
+	@SuppressWarnings("boxing")
+	public void getPageMustReturn304IfNotModified() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
+		
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		
+		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
+		
+		Model model = mock(Model.class);
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
+		assertTrue(removeViewPrefix(view).startsWith("/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
 	

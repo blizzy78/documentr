@@ -51,4 +51,7 @@ public interface IPageStore {
 	void deletePage(String projectName, String branchName, String path, User user) throws IOException;
 	
 	PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException;
+
+	PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath, String name)
+			throws IOException;
 }

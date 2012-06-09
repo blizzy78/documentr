@@ -264,6 +264,18 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertSecondsAgo(metadata.getLastEdited(), 5);
 	}
 
+	@Test
+	public void getAttachmentMetadata() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, PAGE);
+		Page attachment = Page.fromData(PAGE, new byte[] { 1, 2, 3 }, "image/png"); //$NON-NLS-1$
+		pageStore.saveAttachment(PROJECT, BRANCH_1, PAGE, "test.png", attachment, USER); //$NON-NLS-1$
+		PageMetadata metadata = pageStore.getAttachmentMetadata(PROJECT, BRANCH_1, PAGE, "test.png"); //$NON-NLS-1$
+		assertEquals(USER.getLoginName(), metadata.getLastEditedBy());
+		assertSecondsAgo(metadata.getLastEdited(), 5);
+	}
+	
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
 		

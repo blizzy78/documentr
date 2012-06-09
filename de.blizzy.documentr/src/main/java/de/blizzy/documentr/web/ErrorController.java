@@ -42,4 +42,8 @@ public class ErrorController {
 		
 		return "forward:/error/" + HttpServletResponse.SC_NOT_FOUND + "/" + messageKey; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	public static String notModified() {
+		return "forward:/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/dummy"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

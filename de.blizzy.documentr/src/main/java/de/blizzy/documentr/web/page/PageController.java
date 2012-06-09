@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -66,14 +69,24 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model) throws IOException {
+			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 
 		try {
 			path = Util.toRealPagePath(path);
+			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
+			
+			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
+			if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
+				return ErrorController.notModified();
+			}
+
+			response.setDateHeader("Last-Modified", metadata.getLastEdited().getTime()); //$NON-NLS-1$
+
+			Page page = pageStore.getPage(projectName, branchName, path, false);
 			model.addAttribute("path", path); //$NON-NLS-1$
 			model.addAttribute("pageName", //$NON-NLS-1$
 					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
-			Page page = pageStore.getPage(projectName, branchName, path, false);
 			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$

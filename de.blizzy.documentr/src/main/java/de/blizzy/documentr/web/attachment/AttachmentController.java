@@ -20,6 +20,7 @@ package de.blizzy.documentr.web.attachment;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 
 @Controller
@@ -75,12 +77,21 @@ public class AttachmentController {
 			"{name:.*}", method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @PathVariable String name) throws IOException {
+			@PathVariable String pagePath, @PathVariable String name, HttpServletRequest request) throws IOException {
 		
 		try {
 			pagePath = Util.toRealPagePath(pagePath);
-			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
+			PageMetadata metadata = pageStore.getAttachmentMetadata(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
+			
+			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
+			if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
+				return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
+			}
+
+			headers.setLastModified(metadata.getLastEdited().getTime());
+
+			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
 			return new ResponseEntity<byte[]>(attachment.getData().getData(), headers, HttpStatus.OK);
 		} catch (PageNotFoundException e) {

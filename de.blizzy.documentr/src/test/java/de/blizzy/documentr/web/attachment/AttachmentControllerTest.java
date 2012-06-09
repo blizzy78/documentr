@@ -18,14 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.attachment;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +46,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 
 public class AttachmentControllerTest {
@@ -85,29 +91,69 @@ public class AttachmentControllerTest {
 	}
 	
 	@Test
+	@SuppressWarnings("boxing")
 	public void getAttachment() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		
+		getAttachment(request);
+	}
+
+	@Test
+	@SuppressWarnings("boxing")
+	public void getAttachmentMustReturnNormallyIfModified() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
+		
+		getAttachment(request);
+	}
+	
+	private void getAttachment(HttpServletRequest request) throws IOException {
+		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new Date())); //$NON-NLS-1$
+
 		byte[] data = { 1, 2, 3 };
 		String contentType = "image/png"; //$NON-NLS-1$
 		Page attachment = Page.fromData(null, data, contentType);
 		when(pageStore.getAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png")).thenReturn(attachment); //$NON-NLS-1$
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
-				PROJECT, BRANCH, PAGE_PATH_URL, "test.png"); //$NON-NLS-1$
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
 		assertTrue(Arrays.equals(data, result.getBody()));
 		assertEquals(MediaType.parseMediaType(contentType), result.getHeaders().getContentType());
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 
 	@Test
+	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturn404IfNotFound() throws IOException {
-		when(pageStore.getAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader(anyString())).thenReturn(-1L);
+
+		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, PAGE_PATH + "/test.png")); //$NON-NLS-1$
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
-				PROJECT, BRANCH, PAGE_PATH_URL, "test.png"); //$NON-NLS-1$
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
 	}
 
+	@Test
+	@SuppressWarnings("boxing")
+	public void getAttachmentMustReturn304IfNotModified() throws IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
+		
+		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
+		
+		ResponseEntity<byte[]> result = attachmentController.getAttachment(
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
+		assertEquals(HttpStatus.NOT_MODIFIED, result.getStatusCode());
+	}
+	
 	@Test
 	public void createAttachment() {
 		Model model = mock(Model.class);

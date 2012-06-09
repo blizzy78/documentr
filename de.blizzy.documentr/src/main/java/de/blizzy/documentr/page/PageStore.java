@@ -477,6 +477,19 @@ class PageStore implements IPageStore {
 	
 	@Override
 	public PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
+		return getPageMetadataInternal(projectName, branchName, path, PAGES_DIR_NAME);
+	}
+
+	@Override
+	public PageMetadata getAttachmentMetadata(String projectName, String branchName, String path, String name)
+			throws IOException {
+		
+		return getPageMetadataInternal(projectName, branchName, path + "/" + name, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+	}
+	
+	private PageMetadata getPageMetadataInternal(String projectName, String branchName, String path, String rootDir)
+			throws IOException {
+		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -487,8 +500,8 @@ class PageStore implements IPageStore {
 
 			// FIXME: would love to use author details instead of committer, but JGit doesn't have getAuthoredTime()
 			
-			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
-			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
+			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
 			RevCommit commit = getNewestCommit(metaCommit, pageCommit);
 			
 			PersonIdent committer = commit.getCommitterIdent();
