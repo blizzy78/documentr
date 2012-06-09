@@ -31,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,7 +90,11 @@ public class AttachmentController {
 				return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
 			}
 
-			headers.setLastModified(metadata.getLastEdited().getTime());
+			long lastEdited = metadata.getLastEdited().getTime();
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			long authenticationCreated = Util.getAuthenticationCreationTime(authentication);
+			long lastModified = Math.max(lastEdited, authenticationCreated);
+			headers.setLastModified(lastModified);
 			headers.setExpires(0);
 			headers.setCacheControl("must-revalidate, private"); //$NON-NLS-1$
 

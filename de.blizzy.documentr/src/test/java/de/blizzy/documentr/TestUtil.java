@@ -23,6 +23,9 @@ import static org.mockito.Mockito.*;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 
 import de.blizzy.documentr.page.Page;
 
@@ -110,5 +113,11 @@ public final class TestUtil {
 		long time = d.getTime();
 		long now = System.currentTimeMillis();
 		assertTrue((now - time) <= (seconds * 1000L));
+	}
+
+	public static SecurityContext createSecurityContext(Authentication authentication) {
+		SecurityContextImpl context = new SecurityContextImpl();
+		context.setAuthentication(authentication);
+		return context;
 	}
 }

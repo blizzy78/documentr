@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -69,21 +70,25 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException {
+			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 
 		try {
 			path = Util.toRealPagePath(path);
 			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
 
-			if ((authentication == null) || !authentication.isAuthenticated()) {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (!authentication.isAuthenticated()) {
 				long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
 				if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
 					return ErrorController.notModified();
 				}
 			}
 
-			response.setDateHeader("Last-Modified", metadata.getLastEdited().getTime()); //$NON-NLS-1$
+			long lastEdited = metadata.getLastEdited().getTime();
+			long authenticationCreated = Util.getAuthenticationCreationTime(authentication);
+			long lastModified = Math.max(lastEdited, authenticationCreated);
+			response.setDateHeader("Last-Modified", lastModified); //$NON-NLS-1$
 			response.setDateHeader("Expires", 0); //$NON-NLS-1$
 			response.setHeader("Cache-Control", "must-revalidate, private"); //$NON-NLS-1$ //$NON-NLS-2$
 

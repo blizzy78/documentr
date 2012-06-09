@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -120,8 +121,9 @@ public class PageControllerTest {
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response,
-				anonymousAuthentication);
+		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
+		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response);
+		SecurityContextHolder.clearContext();
 		assertEquals("/project/branch/page/view", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
@@ -143,8 +145,9 @@ public class PageControllerTest {
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response, //$NON-NLS-1$
-				authenticatedAuthentication);
+		SecurityContextHolder.setContext(createSecurityContext(authenticatedAuthentication));
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
+		SecurityContextHolder.clearContext();
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
@@ -162,8 +165,9 @@ public class PageControllerTest {
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response, //$NON-NLS-1$
-				anonymousAuthentication);
+		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
+		SecurityContextHolder.clearContext();
 		assertTrue(removeViewPrefix(view).startsWith("/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}

@@ -22,13 +22,17 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.web.page.PagePathValidator;
 
-
 public final class Util {
+	private static final String AUTHENTICATION_CREATION_TIME_PREFIX = "authenticationCreationTime:"; //$NON-NLS-1$
+	
 	private Util() {}
 
 	public static String toRealPagePath(String pagePath) {
@@ -103,5 +107,22 @@ public final class Util {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static long getAuthenticationCreationTime(Authentication authentication) {
+		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		for (GrantedAuthority authority : authorities) {
+			if (authority instanceof SimpleGrantedAuthority) {
+				String auth = authority.getAuthority();
+				if (auth.startsWith(AUTHENTICATION_CREATION_TIME_PREFIX)) {
+					return Long.parseLong(StringUtils.substringAfter(auth, AUTHENTICATION_CREATION_TIME_PREFIX));
+				}
+			}
+		}
+		return -1;
+	}
+	
+	public static GrantedAuthority createAuthenticationCreationTime(long time) {
+		return new SimpleGrantedAuthority(AUTHENTICATION_CREATION_TIME_PREFIX + String.valueOf(time));
 	}
 }

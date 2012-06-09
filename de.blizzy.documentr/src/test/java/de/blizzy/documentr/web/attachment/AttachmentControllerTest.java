@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.attachment;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -38,10 +39,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.common.collect.Sets;
+
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -61,6 +66,7 @@ public class AttachmentControllerTest {
 	private Authentication authentication;
 
 	@Before
+	@SuppressWarnings("boxing")
 	public void setUp() throws IOException {
 		pageStore = mock(IPageStore.class);
 		
@@ -76,7 +82,9 @@ public class AttachmentControllerTest {
 		attachmentController.setUserStore(userStore);
 		
 		authentication = mock(Authentication.class);
+		when(authentication.isAuthenticated()).thenReturn(true);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
+		doReturn(Sets.newHashSet(Util.createAuthenticationCreationTime(System.currentTimeMillis()))).when(authentication).getAuthorities();
 	}
 	
 	@Test
@@ -118,8 +126,10 @@ public class AttachmentControllerTest {
 		Page attachment = Page.fromData(null, data, contentType);
 		when(pageStore.getAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png")).thenReturn(attachment); //$NON-NLS-1$
 		
+		SecurityContextHolder.setContext(createSecurityContext(authentication));
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
+		SecurityContextHolder.clearContext();
 		assertTrue(Arrays.equals(data, result.getBody()));
 		assertEquals(MediaType.parseMediaType(contentType), result.getHeaders().getContentType());
 		assertEquals(HttpStatus.OK, result.getStatusCode());
