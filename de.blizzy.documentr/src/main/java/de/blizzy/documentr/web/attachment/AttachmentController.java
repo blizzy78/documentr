@@ -90,6 +90,8 @@ public class AttachmentController {
 			}
 
 			headers.setLastModified(metadata.getLastEdited().getTime());
+			headers.setExpires(0);
+			headers.setCacheControl("no-cache, no-store"); //$NON-NLS-1$
 
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
