@@ -257,11 +257,15 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void getPageMetadata() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		saveRandomPage(BRANCH_1, PAGE);
+		File file = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), PAGE + ".page"); //$NON-NLS-1$ //$NON-NLS-2$
+		long size = file.length();
 		PageMetadata metadata = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE);
 		assertEquals(USER.getLoginName(), metadata.getLastEditedBy());
 		assertSecondsAgo(metadata.getLastEdited(), 5);
+		assertEquals(size, metadata.getSize());
 	}
 
 	@Test

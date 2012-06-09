@@ -124,7 +124,7 @@ public class AttachmentControllerTest {
 	
 	private void getAttachment(HttpServletRequest request) throws IOException {
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
-			.thenReturn(new PageMetadata("user", new Date())); //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new Date(), 123)); //$NON-NLS-1$
 
 		byte[] data = { 1, 2, 3 };
 		String contentType = "image/png"; //$NON-NLS-1$
@@ -167,7 +167,7 @@ public class AttachmentControllerTest {
 		when(request.getSession()).thenReturn(session);
 		
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
-			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
@@ -192,10 +192,10 @@ public class AttachmentControllerTest {
 		MultipartFile file = mock(MultipartFile.class);
 		when(file.getInputStream()).thenReturn(inputStream);
 		when(file.getOriginalFilename()).thenReturn("test.png"); //$NON-NLS-1$
-		Model model = mock(Model.class);
 
-		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model, authentication);
-		assertEquals("/project/branch/page/attachments", view); //$NON-NLS-1$
+		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, authentication);
+		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
 		
 		Page attachment = Page.fromData(null, data, "image/png"); //$NON-NLS-1$
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png", attachment, USER); //$NON-NLS-1$
@@ -208,10 +208,10 @@ public class AttachmentControllerTest {
 		MultipartFile file = mock(MultipartFile.class);
 		when(file.getInputStream()).thenReturn(inputStream);
 		when(file.getOriginalFilename()).thenReturn("test.dat"); //$NON-NLS-1$
-		Model model = mock(Model.class);
 		
-		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, model, authentication);
-		assertEquals("/project/branch/page/attachments", view); //$NON-NLS-1$
+		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, authentication);
+		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
 		
 		Page attachment = Page.fromData(null, data, DocumentrConstants.DEFAULT_MIME_TYPE);
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment, USER); //$NON-NLS-1$

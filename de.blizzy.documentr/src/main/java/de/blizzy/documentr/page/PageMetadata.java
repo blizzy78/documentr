@@ -22,10 +22,12 @@ import java.util.Date;
 public class PageMetadata {
 	private String lastEditedBy;
 	private Date lastEdited;
+	private long size;
 
-	public PageMetadata(String lastEditedBy, Date lastEdited) {
+	public PageMetadata(String lastEditedBy, Date lastEdited, long size) {
 		this.lastEditedBy = lastEditedBy;
 		this.lastEdited = lastEdited;
+		this.size = size;
 	}
 	
 	public String getLastEditedBy() {
@@ -34,5 +36,9 @@ public class PageMetadata {
 	
 	public Date getLastEdited() {
 		return lastEdited;
+	}
+	
+	public long getSize() {
+		return size;
 	}
 }

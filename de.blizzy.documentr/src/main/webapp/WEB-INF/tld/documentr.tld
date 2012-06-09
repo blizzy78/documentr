@@ -30,25 +30,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<function>
 		<name>listProjects</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listProjects()</function-signature>
+		<function-signature>java.util.List listProjects()</function-signature>
 	</function>
 
 	<function>
 		<name>listProjectBranches</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listProjectBranches(java.lang.String)</function-signature>
+		<function-signature>java.util.List listProjectBranches(java.lang.String)</function-signature>
 	</function>
 
 	<function>
 		<name>listPageAttachments</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listPageAttachments(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.util.List listPageAttachments(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>
 		<name>getBranchesPageIsSharedWith</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List getBranchesPageIsSharedWith(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.util.List getBranchesPageIsSharedWith(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>
@@ -78,7 +78,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<function>
 		<name>listUsers</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listUsers()</function-signature>
+		<function-signature>java.util.List listUsers()</function-signature>
 	</function>
 
 	<function>
@@ -100,14 +100,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</function>
 
 	<function>
+		<name>getAttachmentMetadata</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String getAttachmentMetadata(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
 		<name>listRoles</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List listRoles()</function-signature>
+		<function-signature>java.util.List listRoles()</function-signature>
 	</function>
 
 	<function>
 		<name>getUserAuthorities</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>List getUserAuthorities(java.lang.String)</function-signature>
+		<function-signature>java.util.List getUserAuthorities(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>formatSize</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String formatSize(long)</function-signature>
 	</function>
 </taglib>

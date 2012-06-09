@@ -124,7 +124,7 @@ public class PageControllerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 
 		Date lastModified = new Date();
-		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", lastModified)); //$NON-NLS-1$
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", lastModified, 123)); //$NON-NLS-1$
 		
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
@@ -176,7 +176,7 @@ public class PageControllerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
-			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));

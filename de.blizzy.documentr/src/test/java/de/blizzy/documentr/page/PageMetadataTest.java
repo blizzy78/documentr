@@ -23,20 +23,25 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.page.PageMetadata;
-
 public class PageMetadataTest {
 	@Test
 	public void getLastEditedBy() {
 		Date lastEdited = new Date();
-		PageMetadata metadata = new PageMetadata("user", lastEdited); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
 		assertEquals("user", metadata.getLastEditedBy()); //$NON-NLS-1$
 	}
 
 	@Test
 	public void getLastEdited() {
 		Date lastEdited = new Date();
-		PageMetadata metadata = new PageMetadata("user", lastEdited); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
 		assertEquals(lastEdited, metadata.getLastEdited());
+	}
+	
+	@Test
+	public void getSize() {
+		Date lastEdited = new Date();
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
+		assertEquals(123, metadata.getSize());
 	}
 }

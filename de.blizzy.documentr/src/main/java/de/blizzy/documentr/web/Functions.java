@@ -20,14 +20,18 @@ package de.blizzy.documentr.web;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.FileLengthFormat;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
@@ -46,6 +50,7 @@ public final class Functions {
 	private static UserStore userStore;
 	private static IPageRenderer pageRenderer;
 	private static MarkdownProcessor markdownProcessor;
+	private static MessageSource messageSource;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
@@ -57,6 +62,8 @@ public final class Functions {
 	private IPageRenderer _pageRenderer;
 	@Autowired
 	private MarkdownProcessor _markdownProcessor;
+	@Autowired
+	private MessageSource _messageSource;
 	
 	@PostConstruct
 	public void init() {
@@ -65,6 +72,7 @@ public final class Functions {
 		userStore = _userStore;
 		pageRenderer = _pageRenderer;
 		markdownProcessor = _markdownProcessor;
+		messageSource = _messageSource;
 	}
 
 	public static List<String> listProjects() {
@@ -112,6 +120,12 @@ public final class Functions {
 		return pageStore.getPageMetadata(projectName, branchName, path);
 	}
 	
+	public static PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath,
+			String name) throws IOException {
+		
+		return pageStore.getAttachmentMetadata(projectName, branchName, pagePath, name);
+	}
+
 	public static List<String> listRoles() throws IOException {
 		return userStore.listRoles();
 	}
@@ -123,7 +137,13 @@ public final class Functions {
 			return Collections.emptyList();
 		}
 	}
-
+	
+	public static String formatSize(long size) {
+		Locale locale = LocaleContextHolder.getLocale();
+		FileLengthFormat format = new FileLengthFormat(messageSource, locale);
+		return format.format(size);
+	}
+	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

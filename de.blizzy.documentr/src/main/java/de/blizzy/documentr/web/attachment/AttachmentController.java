@@ -125,8 +125,8 @@ public class AttachmentController {
 			method=RequestMethod.POST)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @RequestParam MultipartFile file, Model model,
-			Authentication authentication) throws IOException {
+			@PathVariable String pagePath, @RequestParam MultipartFile file, Authentication authentication)
+			throws IOException {
 
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		String contentType = servletContext.getMimeType(file.getOriginalFilename());
@@ -138,7 +138,7 @@ public class AttachmentController {
 		User user = userStore.getUser(authentication.getName());
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);
 		
-		return getAttachments(projectName, branchName, pagePath, model);
+		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + pagePath; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	void setPageStore(IPageStore pageStore) {

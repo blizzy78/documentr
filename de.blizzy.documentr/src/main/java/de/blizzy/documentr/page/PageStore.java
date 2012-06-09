@@ -511,7 +511,11 @@ class PageStore implements IPageStore {
 			}
 			Date lastEdited = new Date(commit.getCommitTime() * 1000L);
 
-			return new PageMetadata(lastEditedBy, lastEdited);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File rootDirFile = new File(workingDir, rootDir);
+			File file = toFile(rootDirFile, path + PAGE_SUFFIX);
+			
+			return new PageMetadata(lastEditedBy, lastEdited, file.length());
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {

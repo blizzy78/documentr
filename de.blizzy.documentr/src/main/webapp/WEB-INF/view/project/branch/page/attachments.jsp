@@ -18,10 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'VIEW')">
 
 <c:set var="pagePathUrl" value="${d:toURLPagePath(pagePath)}"/>
 <dt:breadcrumbs>
@@ -46,15 +49,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, pagePath)}"/>
 <c:choose>
 	<c:when test="${!empty attachments}">
-		<ul>
-			<c:forEach var="attachment" items="${attachments}">
-				<li><c:out value="${attachment}"/></li>
-			</c:forEach>
-		</ul>
+		<table class="table table-documentr table-bordered table-striped">
+			<thead>
+				<tr>
+					<th><spring:message code="title.fileName"/></th>
+					<th><spring:message code="title.size"/></th>
+					<th colspan="2"><spring:message code="title.lastEdit"/></th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="attachment" items="${attachments}">
+					<c:set var="metadata" value="${d:getAttachmentMetadata(projectName, branchName, pagePath, attachment)}"/>
+					<tr>
+						<td><c:out value="${attachment}"/></td>
+						<td><c:out value="${d:formatSize(metadata.size)}"/></td>
+						<td><c:out value="${metadata.lastEditedBy}"/></td>
+						<td><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
 	</c:when>
 	<c:otherwise>
 		<p><spring:message code="noAttachmentsFound"/></p>
 	</c:otherwise>
 </c:choose>
 
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+	<p>
+	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
+	</p>
+</sec:authorize>
+
 </dt:page>
+
+</sec:authorize>

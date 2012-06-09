@@ -155,7 +155,7 @@ public class FunctionsTest {
 	@Test
 	public void getPageMetadata() throws IOException {
 		Date date = new Date();
-		PageMetadata metadata = new PageMetadata("user", date); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", date, 123); //$NON-NLS-1$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(metadata);
 		
 		PageMetadata result = Functions.getPageMetadata(PROJECT, BRANCH, PAGE);
