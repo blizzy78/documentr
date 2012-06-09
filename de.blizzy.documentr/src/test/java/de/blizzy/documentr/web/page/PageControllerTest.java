@@ -165,8 +165,8 @@ public class PageControllerTest {
 	@SuppressWarnings("boxing")
 	public void getPageMustReturn304IfNotModified() throws IOException {
 		HttpSession session = mock(HttpSession.class);
-		when(session.getAttribute("authenticationCreationTime")).thenReturn(
-				new GregorianCalendar(2012, Calendar.JUNE, 2).getTime().getTime()); //$NON-NLS-1$
+		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2012, Calendar.JUNE, 2).getTime().getTime());
 
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
