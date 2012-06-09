@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -28,6 +29,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import de.blizzy.documentr.ContextConfig;
+import de.blizzy.documentr.web.filter.AuthenticationCreationTimeFilter;
 import de.blizzy.documentr.web.filter.RequestEncodingFilter;
 import de.blizzy.documentr.web.filter.TrimFilter;
 
@@ -57,5 +59,10 @@ public class WebappInitializer implements WebApplicationInitializer {
 		FilterRegistration.Dynamic securityFilterConfig =
 				context.addFilter("springSecurityFilterChain", securityFilter); //$NON-NLS-1$
 		securityFilterConfig.addMappingForUrlPatterns(null, true, "/*");  //$NON-NLS-1$
+		
+		Filter authenticationCreationTimeFilter = new AuthenticationCreationTimeFilter();
+		FilterRegistration.Dynamic authenticationCreationTimeFilterConfig =
+				context.addFilter("authenticationCreationTimeFilter", authenticationCreationTimeFilter); //$NON-NLS-1$
+		authenticationCreationTimeFilterConfig.addMappingForUrlPatterns(null, true, "/*"); //$NON-NLS-1$
 	}
 }

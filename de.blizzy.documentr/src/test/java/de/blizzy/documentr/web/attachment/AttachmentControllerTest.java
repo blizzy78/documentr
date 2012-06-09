@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,10 +44,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.collect.Sets;
-
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -84,7 +82,6 @@ public class AttachmentControllerTest {
 		authentication = mock(Authentication.class);
 		when(authentication.isAuthenticated()).thenReturn(true);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
-		doReturn(Sets.newHashSet(Util.createAuthenticationCreationTime(System.currentTimeMillis()))).when(authentication).getAuthorities();
 	}
 	
 	@Test
@@ -101,8 +98,12 @@ public class AttachmentControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getAttachment() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		when(request.getSession()).thenReturn(session);
 		
 		getAttachment(request);
 	}
@@ -110,9 +111,13 @@ public class AttachmentControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturnNormallyIfModified() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
+		when(request.getSession()).thenReturn(session);
 		
 		getAttachment(request);
 	}

@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.AuthenticationUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -86,7 +87,7 @@ public class PageController {
 			}
 
 			long lastEdited = metadata.getLastEdited().getTime();
-			long authenticationCreated = Util.getAuthenticationCreationTime(authentication);
+			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
 			long lastModified = Math.max(lastEdited, authenticationCreated);
 			response.setDateHeader("Last-Modified", lastModified); //$NON-NLS-1$
 			response.setDateHeader("Expires", 0); //$NON-NLS-1$

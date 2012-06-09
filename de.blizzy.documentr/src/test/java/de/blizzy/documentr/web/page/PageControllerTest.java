@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -95,8 +96,12 @@ public class PageControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPage() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		when(request.getSession()).thenReturn(session);
 		
 		getPage(request);
 	}
@@ -104,9 +109,13 @@ public class PageControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPageMustReturnNormallyIfModified() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
+		when(request.getSession()).thenReturn(session);
 		
 		getPage(request);
 	}

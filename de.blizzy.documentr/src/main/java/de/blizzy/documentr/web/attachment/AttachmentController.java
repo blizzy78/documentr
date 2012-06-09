@@ -31,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.AuthenticationUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -91,8 +91,7 @@ public class AttachmentController {
 			}
 
 			long lastEdited = metadata.getLastEdited().getTime();
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			long authenticationCreated = Util.getAuthenticationCreationTime(authentication);
+			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
 			long lastModified = Math.max(lastEdited, authenticationCreated);
 			headers.setLastModified(lastModified);
 			headers.setExpires(0);

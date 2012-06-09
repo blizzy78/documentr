@@ -31,8 +31,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
-import de.blizzy.documentr.Util;
-
 @Component("userDetailsService")
 public class DocumentrUserDetailsService implements UserDetailsService {
 	@Autowired
@@ -48,8 +46,6 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			for (RoleGrantedAuthority rga : userAuthorities) {
 				authorities.addAll(userStore.toPermissionGrantedAuthorities(rga));
 			}
-			
-			authorities.add(Util.createAuthenticationCreationTime(System.currentTimeMillis()));
 			
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);

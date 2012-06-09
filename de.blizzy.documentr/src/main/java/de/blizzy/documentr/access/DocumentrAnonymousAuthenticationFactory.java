@@ -29,8 +29,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
-import de.blizzy.documentr.Util;
-
 @Component
 public class DocumentrAnonymousAuthenticationFactory {
 	@Autowired
@@ -42,10 +40,8 @@ public class DocumentrAnonymousAuthenticationFactory {
 		for (RoleGrantedAuthority rga : userAuthorities) {
 			authorities.addAll(userStore.toPermissionGrantedAuthorities(rga));
 		}
-
+		// must have at least one authority
 		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS")); //$NON-NLS-1$
-		
-		authorities.add(Util.createAuthenticationCreationTime(System.currentTimeMillis()));
 		
 		return new DocumentrAnonymousAuthentication(key, principal, authorities);
 	}
