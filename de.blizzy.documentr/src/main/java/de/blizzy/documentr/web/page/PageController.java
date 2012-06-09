@@ -76,7 +76,7 @@ public class PageController {
 			path = Util.toRealPagePath(path);
 			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
 
-			if (!authentication.isAuthenticated()) {
+			if ((authentication == null) || !authentication.isAuthenticated()) {
 				long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
 				if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
 					return ErrorController.notModified();
