@@ -157,9 +157,14 @@ public class AttachmentControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturn304IfNotModified() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
+				new GregorianCalendar(2012, Calendar.JUNE, 1).getTime().getTime());
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
+		when(request.getSession()).thenReturn(session);
 		
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$

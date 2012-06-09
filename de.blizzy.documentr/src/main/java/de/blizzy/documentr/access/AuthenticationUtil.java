@@ -30,6 +30,6 @@ public final class AuthenticationUtil {
 	
 	public static long getAuthenticationCreationTime(HttpSession session) {
 		Long time = (Long) session.getAttribute(AUTHENTICATION_CREATION_TIME);
-		return (time != null) ? time.longValue() : 0;
+		return (time != null) ? time.longValue() / 1000L * 1000L : 0;
 	}
 }

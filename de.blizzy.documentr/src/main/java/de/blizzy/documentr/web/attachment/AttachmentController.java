@@ -85,14 +85,15 @@ public class AttachmentController {
 			PageMetadata metadata = pageStore.getAttachmentMetadata(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
 			
-			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
-			if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
-				return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
-			}
-
 			long lastEdited = metadata.getLastEdited().getTime();
 			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
 			long lastModified = Math.max(lastEdited, authenticationCreated);
+
+			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
+			if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
+				return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
+			}
+
 			headers.setLastModified(lastModified);
 			headers.setExpires(0);
 			headers.setCacheControl("must-revalidate, private"); //$NON-NLS-1$
