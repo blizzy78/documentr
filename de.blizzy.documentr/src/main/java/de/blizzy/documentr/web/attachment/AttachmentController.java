@@ -91,7 +91,7 @@ public class AttachmentController {
 
 			headers.setLastModified(metadata.getLastEdited().getTime());
 			headers.setExpires(0);
-			headers.setCacheControl("must-revalidate"); //$NON-NLS-1$
+			headers.setCacheControl("must-revalidate, private"); //$NON-NLS-1$
 
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));

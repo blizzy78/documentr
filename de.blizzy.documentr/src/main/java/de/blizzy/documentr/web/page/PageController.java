@@ -85,9 +85,7 @@ public class PageController {
 
 			response.setDateHeader("Last-Modified", metadata.getLastEdited().getTime()); //$NON-NLS-1$
 			response.setDateHeader("Expires", 0); //$NON-NLS-1$
-			response.setHeader("Cache-Control", //$NON-NLS-1$
-					((authentication == null) || !authentication.isAuthenticated()) ?
-							"must-revalidate" : "must-revalidate, private"); //$NON-NLS-1$ //$NON-NLS-2$
+			response.setHeader("Cache-Control", "must-revalidate, private"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			Page page = pageStore.getPage(projectName, branchName, path, false);
 			model.addAttribute("path", path); //$NON-NLS-1$
