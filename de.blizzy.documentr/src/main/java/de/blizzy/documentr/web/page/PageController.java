@@ -69,16 +69,18 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException {
 
 		try {
 			path = Util.toRealPagePath(path);
 			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
-			
-			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
-			if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
-				return ErrorController.notModified();
+
+			if (!authentication.isAuthenticated()) {
+				long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
+				if ((modifiedSince >= 0) && (metadata.getLastEdited().getTime() <= modifiedSince)) {
+					return ErrorController.notModified();
+				}
 			}
 
 			response.setDateHeader("Last-Modified", metadata.getLastEdited().getTime()); //$NON-NLS-1$

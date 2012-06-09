@@ -65,9 +65,11 @@ public class PageControllerTest {
 	private IPageStore pageStore;
 	private GlobalRepositoryManager repoManager;
 	private PageController pageController;
-	private Authentication authentication;
+	private Authentication authenticatedAuthentication;
+	private Authentication anonymousAuthentication;
 
 	@Before
+	@SuppressWarnings("boxing")
 	public void setUp() throws IOException {
 		pageStore = mock(IPageStore.class);
 		repoManager = mock(GlobalRepositoryManager.class);
@@ -81,8 +83,12 @@ public class PageControllerTest {
 		pageController.setMarkdownProcessor(new MarkdownProcessor());
 		pageController.setUserStore(userStore);
 
-		authentication = mock(Authentication.class);
-		when(authentication.getName()).thenReturn(USER.getLoginName());
+		authenticatedAuthentication = mock(Authentication.class);
+		when(authenticatedAuthentication.isAuthenticated()).thenReturn(true);
+		when(authenticatedAuthentication.getName()).thenReturn(USER.getLoginName());
+
+		anonymousAuthentication = mock(Authentication.class);
+		when(authenticatedAuthentication.isAuthenticated()).thenReturn(false);
 	}
 	
 	@Test
@@ -107,19 +113,22 @@ public class PageControllerTest {
 	private void getPage(HttpServletRequest request) throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 
-		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", new Date())); //$NON-NLS-1$
+		Date lastModified = new Date();
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", lastModified)); //$NON-NLS-1$
 		
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response);
+		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response,
+				anonymousAuthentication);
 		assertEquals("/project/branch/page/view", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
 		verify(model).addAttribute("pageName", PAGE_NAME); //$NON-NLS-1$
 		verify(model).addAttribute("parentPagePath", PARENT_PAGE); //$NON-NLS-1$
 		verify(model).addAttribute("title", page.getTitle()); //$NON-NLS-1$
+		verify(response).setDateHeader("Last-Modified", lastModified.getTime()); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -134,7 +143,8 @@ public class PageControllerTest {
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response, //$NON-NLS-1$
+				authenticatedAuthentication);
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
@@ -152,7 +162,8 @@ public class PageControllerTest {
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime())); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
+		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response, //$NON-NLS-1$
+				anonymousAuthentication);
 		assertTrue(removeViewPrefix(view).startsWith("/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
@@ -197,7 +208,7 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authentication);
+		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -211,14 +222,14 @@ public class PageControllerTest {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		pageController.savePage(pageForm, bindingResult, authentication);
+		pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2"); //$NON-NLS-1$ //$NON-NLS-2$
 		bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
-		String view = pageController.savePage(pageForm, bindingResult, authentication);
+		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -234,7 +245,7 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authentication);
+		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
 		String pathUrl = Util.toURLPagePath(path);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + pathUrl, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -253,7 +264,7 @@ public class PageControllerTest {
 		
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		pageController.savePage(pageForm, bindingResult, authentication);
+		pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 
 		verify(pageStore, never()).savePage(
 				anyString(), anyString(), anyString(), Matchers.<Page>any(), Matchers.<User>any());
@@ -265,7 +276,7 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authentication);
+		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("branchName")); //$NON-NLS-1$
@@ -292,7 +303,8 @@ public class PageControllerTest {
 	
 	@Test
 	public void markdownToHTML() {
-		Map<String, String> result = pageController.markdownToHTML(PROJECT, BRANCH, "**foo**", PAGE_PATH, authentication); //$NON-NLS-1$
+		Map<String, String> result = pageController.markdownToHTML(PROJECT, BRANCH, "**foo**", PAGE_PATH, //$NON-NLS-1$
+				authenticatedAuthentication);
 		assertEquals("<p><strong>foo</strong></p>", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
@@ -301,7 +313,8 @@ public class PageControllerTest {
 		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		
-		String view = pageController.copyToBranch(PROJECT, BRANCH, PAGE_PATH_URL, "targetBranch", authentication); //$NON-NLS-1$
+		String view = pageController.copyToBranch(PROJECT, BRANCH, PAGE_PATH_URL, "targetBranch", //$NON-NLS-1$
+				authenticatedAuthentication);
 		assertEquals("/page/edit/" + PROJECT + "/targetBranch/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertRedirect(view);
 		
@@ -311,7 +324,7 @@ public class PageControllerTest {
 	
 	@Test
 	public void deletePage() throws IOException {
-		String view = pageController.deletePage(PROJECT, BRANCH, PAGE_PATH_URL, authentication);
+		String view = pageController.deletePage(PROJECT, BRANCH, PAGE_PATH_URL, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
