@@ -32,9 +32,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.AuthenticationUtil;
 
+@Component("authCreationTimeFilter")
 public class AuthenticationCreationTimeFilter implements Filter {
 	private static final String AUTHENTICATION_HASH_CODE = "authenticationHashCode"; //$NON-NLS-1$
 
@@ -51,15 +53,13 @@ public class AuthenticationCreationTimeFilter implements Filter {
 			throws IOException, ServletException {
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null) {
-			int hashCode = getHashCode(authentication);
-	
-			HttpSession session = ((HttpServletRequest) request).getSession();
-			Integer lastAuthenticationHashCode = (Integer) session.getAttribute(AUTHENTICATION_HASH_CODE);
-			if ((lastAuthenticationHashCode == null) || (lastAuthenticationHashCode.intValue() != hashCode)) {
-				session.setAttribute(AUTHENTICATION_HASH_CODE, Integer.valueOf(hashCode));
-				AuthenticationUtil.setAuthenticationCreationTime(session, System.currentTimeMillis());
-			}
+		int hashCode = getHashCode(authentication);
+
+		HttpSession session = ((HttpServletRequest) request).getSession();
+		Integer lastAuthenticationHashCode = (Integer) session.getAttribute(AUTHENTICATION_HASH_CODE);
+		if ((lastAuthenticationHashCode == null) || (lastAuthenticationHashCode.intValue() != hashCode)) {
+			session.setAttribute(AUTHENTICATION_HASH_CODE, Integer.valueOf(hashCode));
+			AuthenticationUtil.setAuthenticationCreationTime(session, System.currentTimeMillis());
 		}
 		
 		chain.doFilter(request, response);
