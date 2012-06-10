@@ -64,6 +64,25 @@ public class TrimResponseWrapperTest {
 	}
 
 	@Test
+	public void getOutputStreamAndGetDataButGetStreamFirst() throws IOException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
+
+		byte[] data = Util.toBytes("hello \u20AC"); //$NON-NLS-1$
+		
+		ServletOutputStream out = null;
+		try {
+			out = wrapper.getOutputStream();
+			wrapper.setContentType("text/plain"); //$NON-NLS-1$
+			out.write(data);
+		} finally {
+			IOUtils.closeQuietly(out);
+		}
+		
+		assertTrue(Arrays.equals(data, wrapper.getData()));
+	}
+
+	@Test
 	public void getWriterAndGetData() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getCharacterEncoding()).thenReturn(DocumentrConstants.ENCODING);

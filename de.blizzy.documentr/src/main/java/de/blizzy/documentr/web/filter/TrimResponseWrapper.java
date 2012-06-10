@@ -19,8 +19,10 @@ package de.blizzy.documentr.web.filter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -36,8 +38,12 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 	};
 
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	private PrintWriter writer;
-	private ServletOutputStream outputStream;
+	private OutputStream bufferOutputStream = buffer;
+	private PrintWriter bufferWriter;
+	private ServletOutputStream superOutputStream;
+	private PrintWriter superWriter;
+	private SwitchableServletOutputStream outputStream;
+	private SwitchablePrintWriter writer;
 	private Boolean trimmable;
 	private Integer contentLength;
 	
@@ -47,32 +53,59 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-		if ((trimmable != null) && trimmable.booleanValue()) {
-			if (outputStream == null) {
-				outputStream = new ServletOutputStream() {
-					@Override
-					public void write(int b) {
-						buffer.write(b);
+		if (outputStream == null) {
+			outputStream = new SwitchableServletOutputStream() {
+				@Override
+				OutputStream getOutputStream() throws IOException {
+					if ((trimmable != null) && trimmable.booleanValue()) {
+						if (bufferOutputStream == null) {
+							bufferOutputStream = buffer;
+						}
+						return bufferOutputStream;
+					} else {
+						setContentLengthIfNecessary();
+						if (superOutputStream == null) {
+							superOutputStream = getSuperOutputStream();
+						}
+						return superOutputStream;
 					}
-				};
-			}
-			return outputStream;
+				}
+			};
 		}
 		
-		setContentLengthIfNecessary();
+		return outputStream;
+	}
+	
+	private ServletOutputStream getSuperOutputStream() throws IOException {
 		return super.getOutputStream();
 	}
 	
 	@Override
 	public PrintWriter getWriter() throws IOException {
-		if ((trimmable != null) && trimmable.booleanValue()) {
-			if (writer == null) {
-				writer = new PrintWriter(new OutputStreamWriter(buffer, getCharacterEncoding()));
-			}
-			return writer;
+		if (writer == null) {
+			writer = new SwitchablePrintWriter() {
+				@Override
+				Writer getWriter() throws IOException {
+					if ((trimmable != null) && trimmable.booleanValue()) {
+						if (bufferWriter == null) {
+							bufferWriter = new PrintWriter(new OutputStreamWriter(buffer, getCharacterEncoding()));
+						}
+						return bufferWriter;
+					} else {
+						setContentLengthIfNecessary();
+						if (superWriter == null) {
+							superWriter = getSuperWriter();
+						}
+						return superWriter;
+					}
+				}
+			};
 		}
 		
-		setContentLengthIfNecessary();
+		return writer;
+	}
+	
+	private PrintWriter getSuperWriter() throws IOException {
 		return super.getWriter();
 	}
 	
