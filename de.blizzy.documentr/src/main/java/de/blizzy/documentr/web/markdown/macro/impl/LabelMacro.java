@@ -24,8 +24,8 @@ import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 public class LabelMacro extends AbstractMacro {
 	@Override
 	public String getHtml() {
-		String type = StringUtils.substringBefore(getParameters(), " "); //$NON-NLS-1$
-		String text = StringUtils.substringAfter(getParameters(), " "); //$NON-NLS-1$
+		String type = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
+		String text = StringUtils.substringAfter(getParameters(), " ").trim(); //$NON-NLS-1$
 		return "<span class=\"label label-" + type + "\">" + text + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }
