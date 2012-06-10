@@ -163,4 +163,8 @@ public final class Functions {
 	static void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
 		Functions.markdownProcessor = markdownProcessor;
 	}
+
+	static void setMessageSource(MessageSource messageSource) {
+		Functions.messageSource = messageSource;
+	}
 }

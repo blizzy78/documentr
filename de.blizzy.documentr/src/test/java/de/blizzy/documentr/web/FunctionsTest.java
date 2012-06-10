@@ -23,10 +23,13 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,6 +60,7 @@ public class FunctionsTest {
 	private IPageRenderer pageRenderer;
 	private MarkdownProcessor markdownProcessor;
 	private Authentication authentication;
+	private MessageSource messageSource;
 
 	@Before
 	public void setUp() {
@@ -70,6 +74,8 @@ public class FunctionsTest {
 		Functions.setPageRenderer(pageRenderer);
 		markdownProcessor = mock(MarkdownProcessor.class);
 		Functions.setMarkdownProcessor(markdownProcessor);
+		messageSource = mock(MessageSource.class);
+		Functions.setMessageSource(messageSource);
 		
 		authentication = mock(Authentication.class);
 		
@@ -86,6 +92,7 @@ public class FunctionsTest {
 		Functions.setUserStore(null);
 		Functions.setPageRenderer(null);
 		Functions.setMarkdownProcessor(null);
+		Functions.setMessageSource(null);
 		SecurityContextHolder.clearContext();
 	}
 	
@@ -161,6 +168,19 @@ public class FunctionsTest {
 		PageMetadata result = Functions.getPageMetadata(PROJECT, BRANCH, PAGE);
 		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
 		assertEquals(metadata.getLastEdited(), result.getLastEdited());
+		assertEquals(metadata.getSize(), result.getSize());
+	}
+	
+	@Test
+	public void getAttachmentMetadata() throws IOException {
+		Date date = new Date();
+		PageMetadata metadata = new PageMetadata("user", date, 123); //$NON-NLS-1$
+		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png")).thenReturn(metadata); //$NON-NLS-1$
+		
+		PageMetadata result = Functions.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png"); //$NON-NLS-1$
+		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
+		assertEquals(metadata.getLastEdited(), result.getLastEdited());
+		assertEquals(metadata.getSize(), result.getSize());
 	}
 	
 	@Test
@@ -181,5 +201,16 @@ public class FunctionsTest {
 		
 		List<RoleGrantedAuthority> result = Functions.getUserAuthorities("user"); //$NON-NLS-1$
 		assertEquals(Sets.newHashSet(authorities), Sets.newHashSet(result));
+	}
+	
+	@Test
+	public void formatSize() {
+		when(messageSource.getMessage("sizeX.kb", new Object[] { "1.21" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn("1.21 KB"); //$NON-NLS-1$
+		
+		LocaleContextHolder.setLocale(Locale.US);
+		String result = Functions.formatSize(1234);
+		LocaleContextHolder.resetLocaleContext();
+		assertEquals("1.21 KB", result); //$NON-NLS-1$
 	}
 }
