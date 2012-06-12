@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="<c:url value="/js/all-js.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <c:if test="${!empty requestScope._headerJSFiles}">
 	<c:forTokens var="uri" items="${requestScope._headerJSFiles}" delims="|">
@@ -42,21 +43,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 </c:if>
 
 <script type="text/javascript">
-
-$.fn.extend({
-	showModal: function(options) {
-		this.modal(options);
-		this.position({
-			my: 'center center',
-			at: 'center center',
-			of: window
-		});
-	},
-	
-	hideModal: function() {
-		this.modal('hide');
-	}
-});
 
 $(function() {
 	$.ajaxSetup({

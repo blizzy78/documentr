@@ -42,7 +42,7 @@ function showCopyToBranchDialog() {
 
 function copyToBranchSelected() {
 	var button = $('#copyToBranchButton');
-	button.addClass('disabled');
+	button.setButtonDisabled(true);
 	
 	var el = $('#copyToBranchForm').find('select');
 	var branch = el.val();
@@ -63,7 +63,7 @@ function copyToBranchSelected() {
 			}
 		},
 		complete: function() {
-			button.removeClass('disabled');
+			button.setButtonDisabled(false);
 		}
 	});
 }
