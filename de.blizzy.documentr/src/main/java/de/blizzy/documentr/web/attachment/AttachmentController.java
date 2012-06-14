@@ -48,6 +48,7 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
+import de.blizzy.documentr.page.PageUtil;
 
 @Controller
 @RequestMapping("/attachment")
@@ -60,7 +61,8 @@ public class AttachmentController {
 	private UserStore userStore;
 	
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
 	public String getAttachments(@PathVariable String projectName, @PathVariable String branchName,
@@ -74,7 +76,8 @@ public class AttachmentController {
 	}
 
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
 			"{name:.*}", method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
@@ -87,7 +90,11 @@ public class AttachmentController {
 			
 			long lastEdited = metadata.getLastEdited().getTime();
 			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
+			long projectEditTime = PageUtil.getProjectEditTime(projectName);
 			long lastModified = Math.max(lastEdited, authenticationCreated);
+			if (projectEditTime >= 0) {
+				lastModified = Math.max(lastModified, projectEditTime);
+			}
 
 			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
 			if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
@@ -107,7 +114,8 @@ public class AttachmentController {
 	}
 	
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
 	public String createAttachment(@PathVariable String projectName, @PathVariable String branchName,
@@ -121,7 +129,8 @@ public class AttachmentController {
 	}
 
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
@@ -138,7 +147,8 @@ public class AttachmentController {
 		User user = userStore.getUser(authentication.getName());
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);
 		
-		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + pagePath; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Util.toURLPagePath(pagePath);
 	}
 
 	void setPageStore(IPageStore pageStore) {

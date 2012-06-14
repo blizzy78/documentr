@@ -24,16 +24,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <html>
 
 <head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
 <c:if test="${!empty requestScope._pageTitle}">
 	<title><c:out value="${requestScope._pageTitle}" escapeXml="false"/> &ndash; documentr</title>
 </c:if>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="<c:url value="/css/all-css.css"/>" media="all"/>
+
+<link rel="stylesheet" href="<c:url value="/css/bootstrap-2.0.4.min.css"/>" media="all"/>
+<link rel="stylesheet" href="<c:url value="/css/bootstrap-responsive-2.0.4.min.css"/>" media="all"/>
+<link rel="stylesheet" href="<c:url value="/css/prettify-20110601.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/lightbox-2.51.css.jsp"/>" media="all"/>
-<script type="text/javascript" src="<c:url value="/js/all-js.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
+<link rel="stylesheet" href="<c:url value="/css/macros.css"/>" media="all"/>
+<link rel="stylesheet" href="<c:url value="/css/styles.css"/>" media="all"/>
+
+<script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.20.custom.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-button-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-modal-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-tab-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <c:if test="${!empty requestScope._headerJSFiles}">
@@ -44,6 +58,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <script type="text/javascript">
 
+<sec:authorize access="isAuthenticated()">
+
+documentr.pageTreeOptions = {
+	applicationUrl: '<c:url value="/pageTree/application/json"/>',
+	projectUrl: '<c:url value="/pageTree/project/_PROJECTNAME_/json"/>',
+	branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
+	pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
+	projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
+	branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>"
+};
+
+</sec:authorize>
+
 $(function() {
 	$.ajaxSetup({
 		cache: false
@@ -52,13 +79,9 @@ $(function() {
 	prettyPrint();
 });
 
-</script>
-
-<c:if test="${!empty requestScope._headerJS}">
-<script type="text/javascript">
 <c:out value="${requestScope._headerJS}" escapeXml="false"/>
+
 </script>
-</c:if>
 
 </head>
 

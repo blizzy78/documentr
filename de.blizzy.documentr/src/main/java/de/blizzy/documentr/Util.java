@@ -17,10 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -102,6 +105,16 @@ public final class Util {
 			return StringUtils.toString(b, DocumentrConstants.ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public static void deleteQuietly(File f) {
+		if ((f != null) && f.exists()) {
+			try {
+				FileUtils.forceDelete(f);
+			} catch (IOException e) {
+				// ignore
+			}
 		}
 	}
 }

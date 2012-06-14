@@ -76,6 +76,71 @@ function showDeleteDialog() {
 	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
 }
 
+function showRelocateDialog() {
+	function showDialog() {
+		$('#relocate-dialog').showModal({backdrop: true, keyboard: true});
+	}
+
+	var treeEl = $('#relocate-target-tree');
+	if (treeEl.children().length == 0) {
+		documentr.createPageTree(treeEl, {
+				start: {
+					type: 'branch',
+					projectName: '<c:out value="${projectName}"/>',
+					branchName: '<c:out value="${branchName}"/>'
+				},
+				checkBranchPermissions: 'EDIT_PAGE',
+				filterPage: '<c:out value="${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
+			})
+			.bind('loaded.jstree', function() {
+				showDialog();
+			})
+			.bind('select_node.jstree', function(event, data) {
+				var node = data.rslt.obj;
+				var button = $('#relocate-button');
+				if ((node.data('type') == 'page') && node.data('hasBranchPermissions') &&
+					(node.data('path') != '<c:out value="${parentPagePath}"/>')) {
+					button.setButtonDisabled(true);
+					
+					$.ajax({
+						url: '<c:url value="/page/generateName/"/>' + node.data('projectName') + '/' + node.data('branchName') + '/' + node.data('path').replace(/\//g, ',') + '/json',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							title: '<c:out value="${pageName}"/>'
+						},
+						success: function(result) {
+							button.text(result.exists ? '<spring:message code="button.overwriteAndRelocate"/>' : '<spring:message code="button.relocate"/>');
+							if (result.exists) {
+								button.removeClass('btn-primary').addClass('btn-warning');
+							} else {
+								button.removeClass('btn-warning').addClass('btn-primary');
+							}
+							$('#relocateForm').find('input:hidden[name="newParentPagePath"]').val(node.data('path'));
+						},
+						complete: function() {
+							button.setButtonDisabled(false);
+						}
+					});
+				} else {
+					button.text('<spring:message code="button.relocate"/>');
+					button.removeClass('btn-warning').addClass('btn-primary');
+					button.setButtonDisabled(true);
+				}
+			})
+			.bind('deselect_node.jstree', function() {
+				var button = $('#relocate-button');
+				button.text('<spring:message code="button.relocate"/>');
+				button.removeClass('btn-warning').addClass('btn-primary');
+				button.setButtonDisabled(true);
+			});
+
+		$('#relocate-button').setButtonDisabled(true);
+	} else {
+		showDialog();
+	}
+}
+
 </sec:authorize>
 
 </dt:headerJS>
@@ -144,6 +209,7 @@ function showDeleteDialog() {
 							<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
 						</c:if>
 					</sec:authorize>
+					<li><a href="javascript:void(showRelocateDialog());"><i class="icon-arrow-right"></i> <spring:message code="button.relocate"/>...</a></li>
 					<%-- "home" page must not be deleted --%>
 					<sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
 						<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
@@ -154,7 +220,9 @@ function showDeleteDialog() {
 	</div>
 </sec:authorize>
 
-<div class="page-header"><h1><c:out value="${title}"/>
+<div class="page-header">
+<h1>
+<c:out value="${title}"/>
 <c:set var="metadata" value="${d:getPageMetadata(projectName, branchName, path)}"/>
 <c:set var="lastEdited"><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></c:set>
 <c:choose>
@@ -227,6 +295,31 @@ function showDeleteDialog() {
 		<div class="modal-footer">
 			<a href="<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-danger"><spring:message code="button.delete"/></a>
 			<a href="javascript:void($('#delete-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
+
+	<div class="modal" id="relocate-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#relocate-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.relocatePage"/></h3>
+		</div>
+		<div class="modal-body">
+			<form id="relocateForm" action="<c:url value="/page/relocate/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+				<fieldset>
+					<input type="hidden" name="newParentPagePath" value=""/>
+	
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.newParentPage"/>:</label>
+						<div class="controls">
+							<div id="relocate-target-tree"></div>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<a id="relocate-button" href="javascript:$('#relocateForm').submit();" class="btn btn-primary"><spring:message code="button.relocate"/></a>
+			<a href="javascript:void($('#relocate-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
 </sec:authorize>

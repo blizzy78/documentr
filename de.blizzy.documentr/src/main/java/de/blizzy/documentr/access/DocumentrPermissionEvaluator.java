@@ -185,7 +185,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		
 		return hasBranchPermission(authentication, projectName, branchName, permission);
 	}
-
+	
 	private boolean hasPermission(PermissionGrantedAuthority authority, Permission permission) {
 		Permission p = authority.getPermission();
 		return (p == Permission.ADMIN) || (p == permission);

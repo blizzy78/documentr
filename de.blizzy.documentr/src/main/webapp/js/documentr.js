@@ -16,6 +16,148 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var documentr = {};
+
+documentr.createPageTree = function(treeEl, options) {
+	function getApplicationUrl() {
+		return documentr.pageTreeOptions.applicationUrl;
+	}
+	
+	function getProjectUrl(name) {
+		return documentr.pageTreeOptions.projectUrl.replace(/_PROJECTNAME_/g, name);
+	}
+	
+	function getBranchUrl(projectName, name) {
+		return documentr.pageTreeOptions.branchUrl.replace(/_PROJECTNAME_/g, projectName).replace(/_BRANCHNAME_/g, name);
+	}
+	
+	function getPageUrl(projectName, branchName, path) {
+		return documentr.pageTreeOptions.pageUrl.replace(/_PROJECTNAME_/g, projectName).replace(/_BRANCHNAME_/g, branchName).replace(/_PAGEPATH_/g, path.replace(/\//g, ','));
+	}
+	
+	if (options == null) {
+		options = {
+			start: {
+				type: 'application'
+			}
+		};
+	}
+	
+	var startUrl;
+	if (typeof(options.start) != 'undefined') {
+		if (options.start.type == 'project') {
+			startUrl = getProjectUrl(options.start.projectName);
+		} else if (options.start.type == 'branch') {
+			startUrl = getBranchUrl(options.start.projectName, options.start.branchName);
+		} else if (options.start.type == 'page') {
+			startUrl = getPageUrl(options.start.projectName, options.start.branchName, options.start.pagePath);
+		} else {
+			startUrl = getApplicationUrl();
+		}
+	}
+	
+	var tree = treeEl.jstree({
+		plugins: ['themes', 'json_data', 'ui'],
+		core: {
+			animation: 0
+		},
+		themes: {
+			theme: 'documentr'
+		},
+		ui: {
+			select_limit: 1
+		},
+		json_data: {
+			ajax: {
+				url: function(node) {
+					var url = null;
+					if (node == -1) {
+						url = startUrl;
+					} else {
+						node = $(node);
+						var type = node.data('type');
+						if (type == 'project') {
+							url = getProjectUrl(node.data('name'));
+						} else if (type == 'branch') {
+							url = getBranchUrl(node.data('projectName'), node.data('name'));
+						} else if (type == 'page') {
+							url = getPageUrl(node.data('projectName'), node.data('branchName'), node.data('path'));
+						}
+					}
+					return url;
+				},
+				data: function(node) {
+					var d = {};
+					if (typeof(options.checkBranchPermissions) != 'undefined') {
+						d.checkBranchPermissions = options.checkBranchPermissions;
+					}
+					return d;
+				},
+				type: 'POST',
+				dataType: 'json',
+				success: function(nodes) {
+					var treeNodes = new Array();
+					if (nodes.length > 0) {
+						var type = nodes[0].type;
+						if (type == 'PROJECT') {
+							for (var i = 0; i < nodes.length; i++) {
+								var node = nodes[i];
+								treeNodes.push({
+									data: documentr.pageTreeOptions.projectTitle.replace(/_PROJECTNAME_/g, node.name),
+									metadata: {
+										type: 'project',
+										name: node.name
+									},
+									state: 'closed'
+								});
+							}
+						} else if (type == 'BRANCH') {
+							for (var i = 0; i < nodes.length; i++) {
+								var node = nodes[i];
+								treeNodes.push({
+									data: documentr.pageTreeOptions.branchTitle.replace(/_BRANCHNAME_/g, node.name),
+									metadata: {
+										type: 'branch',
+										projectName: node.projectName,
+										name: node.name
+									},
+									state: 'closed'
+								});
+							}
+						} else if (type == 'PAGE') {
+							for (var i = 0; i < nodes.length; i++) {
+								var node = nodes[i];
+								if ((typeof(options.filterPage) == 'undefined') ||
+									((node.projectName + '/' + node.branchName + '/' + node.path.replace(/\//g, ',')) !=
+										options.filterPage)) {
+									
+									treeNodes.push({
+										data: node.title,
+										metadata: {
+											type: 'page',
+											projectName: node.projectName,
+											branchName: node.branchName,
+											path: node.path,
+											hasBranchPermissions: node.hasBranchPermissions
+										},
+										state: 'closed'
+									});
+								}
+							}
+						}
+					}
+					return treeNodes;
+				}
+			}
+		}
+	})
+	.delegate('a', 'click', function(event) {
+		event.preventDefault();
+	});
+	return tree;
+};
+
+
 $.fn.extend({
 	showModal: function(options) {
 		this.modal(options);

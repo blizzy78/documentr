@@ -79,6 +79,7 @@ class PageStore implements IPageStore {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
+		Assert.notNull(user);
 		
 		try {
 			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME, user);
@@ -95,6 +96,8 @@ class PageStore implements IPageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
 		Assert.hasLength(name);
+		Assert.notNull(attachment);
+		Assert.notNull(user);
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, pagePath, false);
 		
@@ -114,9 +117,6 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
 			Map<String, Object> metaMap = new HashMap<String, Object>();
-			if (page.getParentPagePath() != null) {
-				metaMap.put(PARENT_PAGE_PATH, page.getParentPagePath());
-			}
 			metaMap.put(TITLE, page.getTitle());
 			metaMap.put(CONTENT_TYPE, page.getContentType());
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
@@ -145,6 +145,8 @@ class PageStore implements IPageStore {
 				.setCommitter(ident)
 				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 			git.push().call();
+			
+			PageUtil.updateProjectEditTime(projectName);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
@@ -207,10 +209,31 @@ class PageStore implements IPageStore {
 				pageMap.put(PAGE_DATA, pageData);
 			}
 			
+			String parentPagePath = getParentPagePath(path, repo.r());
+			if (parentPagePath != null) {
+				pageMap.put(PARENT_PAGE_PATH, parentPagePath);
+			}
+			
 			return pageMap;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+	
+	private String getParentPagePath(String path, Repository repo) {
+		File workingDir = RepositoryUtil.getWorkingDir(repo);
+		File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+		File pageFile = toFile(pagesDir, path + PAGE_SUFFIX);
+		File dir = pageFile.getParentFile();
+		StringBuilder buf = new StringBuilder();
+		while (!dir.equals(pagesDir)) {
+			if (buf.length() > 0) {
+				buf.insert(0, '/');
+			}
+			buf.insert(0, dir.getName());
+			dir = dir.getParentFile();
+		}
+		return (buf.length() > 0) ? buf.toString() : null;
 	}
 
 	@Override
@@ -339,12 +362,17 @@ class PageStore implements IPageStore {
 	
 	@Override
 	public boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		
 		List<String> branches = getBranchesPageIsSharedWith(projectName, branchName, path);
 		return branches.size() >= 2;
 	}
 
 	@Override
-	public List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) throws IOException {
+	public List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path)
+			throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -403,10 +431,6 @@ class PageStore implements IPageStore {
 		return result;
 	}
 	
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
 	@Override
 	public List<String> listChildPagePaths(String projectName, String branchName, final String path) throws IOException {
 		Assert.hasLength(projectName);
@@ -439,6 +463,7 @@ class PageStore implements IPageStore {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
+		Assert.notNull(user);
 		
 		ILockedRepository repo = null;
 		try {
@@ -468,6 +493,8 @@ class PageStore implements IPageStore {
 					.call();
 				git.push().call();
 			}
+
+			PageUtil.updateProjectEditTime(projectName);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
@@ -477,22 +504,27 @@ class PageStore implements IPageStore {
 	
 	@Override
 	public PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		
 		return getPageMetadataInternal(projectName, branchName, path, PAGES_DIR_NAME);
 	}
 
 	@Override
 	public PageMetadata getAttachmentMetadata(String projectName, String branchName, String path, String name)
 			throws IOException {
+
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		Assert.hasLength(name);
 		
 		return getPageMetadataInternal(projectName, branchName, path + "/" + name, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
 	}
 	
 	private PageMetadata getPageMetadataInternal(String projectName, String branchName, String path, String rootDir)
 			throws IOException {
-		
-		Assert.hasLength(projectName);
-		Assert.hasLength(branchName);
-		Assert.hasLength(path);
 		
 		ILockedRepository repo = null;
 		try {
@@ -535,5 +567,86 @@ class PageStore implements IPageStore {
 			}
 		}
 		return newestCommit;
+	}
+	
+	@Override
+	public void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
+			User user) throws IOException {
+		
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		Assert.hasLength(newParentPagePath);
+		Assert.notNull(user);
+		// check if pages exist by trying to load them
+		getPage(projectName, branchName, path, false);
+		getPage(projectName, branchName, newParentPagePath, false);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
+			String newPagePath = newParentPagePath + "/" + pageName; //$NON-NLS-1$
+			
+			Git git = Git.wrap(repo.r());
+			AddCommand addCommand = git.add();
+
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			for (String dirName : Sets.newHashSet(PAGES_DIR_NAME, ATTACHMENTS_DIR_NAME)) {
+				File dir = new File(workingDir, dirName);
+				
+				File newSubPagesDir = toFile(dir, newPagePath);
+				if (newSubPagesDir.exists()) {
+					git.rm().addFilepattern(dirName + "/" + newPagePath).call(); //$NON-NLS-1$
+				}
+				File newPageFile = toFile(dir, newPagePath + PAGE_SUFFIX);
+				if (newPageFile.exists()) {
+					git.rm().addFilepattern(dirName + "/" + newPagePath + PAGE_SUFFIX).call(); //$NON-NLS-1$
+				}
+				File newMetaFile = toFile(dir, newPagePath + META_SUFFIX);
+				if (newMetaFile.exists()) {
+					git.rm().addFilepattern(dirName + "/" + newPagePath + META_SUFFIX).call(); //$NON-NLS-1$
+				}
+				
+				File newParentPageDir = toFile(dir, newParentPagePath);
+				File subPagesDir = toFile(dir, path);
+				if (subPagesDir.exists()) {
+					FileUtils.copyDirectoryToDirectory(subPagesDir, newParentPageDir);
+					git.rm().addFilepattern(dirName + "/" + path).call(); //$NON-NLS-1$
+					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				File pageFile = toFile(dir, path + PAGE_SUFFIX);
+				if (pageFile.exists()) {
+					FileUtils.copyFileToDirectory(pageFile, newParentPageDir);
+					git.rm().addFilepattern(dirName + "/" + path + PAGE_SUFFIX).call(); //$NON-NLS-1$
+					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + PAGE_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				File metaFile = toFile(dir, path + META_SUFFIX);
+				if (metaFile.exists()) {
+					FileUtils.copyFileToDirectory(metaFile, newParentPageDir);
+					git.rm().addFilepattern(dirName + "/" + path + META_SUFFIX).call(); //$NON-NLS-1$
+					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + META_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+
+			addCommand.call();
+			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("move " + path + " to " + newParentPagePath + "/" + pageName) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				.call();
+			git.push().call();
+
+			PageUtil.updateProjectEditTime(projectName);
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
 	}
 }

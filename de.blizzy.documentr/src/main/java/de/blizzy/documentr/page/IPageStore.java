@@ -54,4 +54,8 @@ public interface IPageStore {
 
 	PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath, String name)
 			throws IOException;
+
+	@CacheEvict(value="pageHTML", allEntries=true)
+	void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
+			User user) throws IOException;
 }

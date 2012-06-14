@@ -49,6 +49,7 @@ import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageTextData;
+import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
@@ -66,7 +67,8 @@ public class PageController {
 	private UserStore userStore;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
@@ -79,7 +81,11 @@ public class PageController {
 
 			long lastEdited = metadata.getLastEdited().getTime();
 			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
+			long projectEditTime = PageUtil.getProjectEditTime(projectName);
 			long lastModified = Math.max(lastEdited, authenticationCreated);
+			if (projectEditTime >= 0) {
+				lastModified = Math.max(lastModified, projectEditTime);
+			}
 
 			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
 			if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
@@ -116,7 +122,8 @@ public class PageController {
 	}
 	
 	@RequestMapping(value="/edit/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
-			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
@@ -255,6 +262,25 @@ public class PageController {
 		pageStore.deletePage(projectName, branchName, path, user);
 		return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
 				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
+	}
+	
+	@RequestMapping(value="/relocate/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			method=RequestMethod.POST)
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
+	public String relocatePage(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam String newParentPagePath, Authentication authentication)
+			throws IOException {
+		
+		path = Util.toRealPagePath(path);
+		newParentPagePath = Util.toRealPagePath(newParentPagePath);
+		
+		User user = userStore.getUser(authentication.getName());
+		pageStore.relocatePage(projectName, branchName, path, newParentPagePath, user);
+		String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
+		return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
+				"/" + Util.toURLPagePath(newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	void setPageStore(IPageStore pageStore) {

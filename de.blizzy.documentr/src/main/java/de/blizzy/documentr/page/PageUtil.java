@@ -18,11 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.page;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class PageUtil {
+	private static Map<String, Long> projectEditTimes =
+			Collections.synchronizedMap(Maps.<String, Long>newHashMap());
+	
 	private PageUtil() {}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath,
@@ -36,5 +42,14 @@ public final class PageUtil {
 			result.add(0, page.getParentPagePath());
 		}
 		return result;
+	}
+	
+	static void updateProjectEditTime(String projectName) {
+		projectEditTimes.put(projectName, Long.valueOf(System.currentTimeMillis()));
+	}
+	
+	public static long getProjectEditTime(String projectName) {
+		Long time = projectEditTimes.get(projectName);
+		return (time != null) ? time.longValue() : -1;
 	}
 }

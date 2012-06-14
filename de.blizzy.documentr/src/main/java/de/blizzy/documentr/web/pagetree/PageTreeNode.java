@@ -15,24 +15,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.page;
+package de.blizzy.documentr.web.pagetree;
 
-import de.blizzy.documentr.NotFoundException;
-import de.blizzy.documentr.Util;
-
-public class PageNotFoundException extends NotFoundException {
+public class PageTreeNode extends TreeNode {
 	private String projectName;
 	private String branchName;
 	private String path;
+	private String title;
+	private boolean hasBranchPermissions;
 
-	public PageNotFoundException(String projectName, String branchName, String path) {
-		super("page not found: " + projectName + "/" + branchName + "/" + Util.toURLPagePath(path)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	PageTreeNode(String projectName, String branchName, String path, String title) {
+		super(Type.PAGE);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
+		this.title = title;
 	}
-	
+
 	public String getProjectName() {
 		return projectName;
 	}
@@ -43,5 +43,17 @@ public class PageNotFoundException extends NotFoundException {
 	
 	public String getPath() {
 		return path;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	void setHasBranchPermissions(boolean hasBranchPermissions) {
+		this.hasBranchPermissions = hasBranchPermissions;
+	}
+	
+	public boolean isHasBranchPermissions() {
+		return hasBranchPermissions;
 	}
 }

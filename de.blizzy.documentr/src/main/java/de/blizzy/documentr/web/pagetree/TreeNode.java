@@ -15,13 +15,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr;
+package de.blizzy.documentr.web.pagetree;
 
-public abstract class NotFoundException extends RuntimeException {
-	protected NotFoundException() {
+public abstract class TreeNode {
+	public static enum Type {
+		PROJECT, BRANCH, PAGE;
 	}
 	
-	protected NotFoundException(String msg) {
-		super(msg);
+	private Type type;
+
+	TreeNode(Type type) {
+		this.type = type;
+	}
+	
+	public Type getType() {
+		return type;
 	}
 }
