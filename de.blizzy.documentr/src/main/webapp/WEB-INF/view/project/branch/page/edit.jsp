@@ -87,6 +87,7 @@ function showPreview() {
 				backdrop: true,
 				keyboard: true
 			});
+			prettyPrint();
 		}
 	});
 }
