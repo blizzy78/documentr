@@ -28,17 +28,17 @@ h1 .page-metadata {
 	font-weight: normal;
 }
 
-textarea.code {
-	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+textarea.code, code, pre {
+	font-family: "Bitstream Vera Sans Mono", Menlo, Monaco, Consolas, "Courier New", "Lucida Console", monospace;
 	font-size: 12px;
+}
+
+code {
+	color: #c00f40;
 }
 
 .modal.modal-wide {
 	width: 800px;
-}
-
-code {
-	color: inherit;
 }
 
 table.table-documentr {
