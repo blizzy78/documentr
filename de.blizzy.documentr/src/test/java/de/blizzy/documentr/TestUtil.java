@@ -20,6 +20,8 @@ package de.blizzy.documentr;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +30,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageUtil;
 
 public final class TestUtil {
 	private TestUtil() {}
@@ -119,5 +122,19 @@ public final class TestUtil {
 		SecurityContextImpl context = new SecurityContextImpl();
 		context.setAuthentication(authentication);
 		return context;
+	}
+	
+	public static void clearProjectEditTimes() {
+		try {
+			Method method = PageUtil.class.getDeclaredMethod("clearProjectEditTimes"); //$NON-NLS-1$
+			method.setAccessible(true);
+			method.invoke(null);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -45,6 +45,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -178,6 +179,8 @@ public class PageControllerTest {
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
 		
+		TestUtil.clearProjectEditTimes();
+
 		Model model = mock(Model.class);
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$

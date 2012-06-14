@@ -45,6 +45,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
@@ -169,6 +170,8 @@ public class AttachmentControllerTest {
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
 		
+		TestUtil.clearProjectEditTimes();
+		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_MODIFIED, result.getStatusCode());
@@ -194,7 +197,7 @@ public class AttachmentControllerTest {
 		when(file.getOriginalFilename()).thenReturn("test.png"); //$NON-NLS-1$
 
 		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, authentication);
-		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
 		Page attachment = Page.fromData(null, data, "image/png"); //$NON-NLS-1$
@@ -210,7 +213,7 @@ public class AttachmentControllerTest {
 		when(file.getOriginalFilename()).thenReturn("test.dat"); //$NON-NLS-1$
 		
 		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, file, authentication);
-		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
 		Page attachment = Page.fromData(null, data, DocumentrConstants.DEFAULT_MIME_TYPE);

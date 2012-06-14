@@ -85,18 +85,6 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void saveAndGetPageWithParentPagePath() throws IOException, GitAPIException {
-		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
-		Page page = saveRandomPage(BRANCH_1, "foo/bar", "parent"); //$NON-NLS-1$ //$NON-NLS-2$
-		Page result = pageStore.getPage(PROJECT, BRANCH_1, "foo/bar", true); //$NON-NLS-1$
-		assertEquals(page.getTitle(), result.getTitle());
-		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
-		assertEquals(page.getContentType(), result.getContentType());
-		assertEquals(page.getParentPagePath(), result.getParentPagePath());
-	}
-	
-	@Test
 	public void getPageWithoutData() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
