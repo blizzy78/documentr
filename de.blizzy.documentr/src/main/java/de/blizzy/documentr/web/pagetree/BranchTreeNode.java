@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
-public class BranchTreeNode extends TreeNode {
+public class BranchTreeNode extends AbstractTreeNode {
 	private String projectName;
 	private String name;
 

@@ -17,14 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
-public abstract class TreeNode {
+public abstract class AbstractTreeNode {
 	public static enum Type {
 		PROJECT, BRANCH, PAGE;
 	}
 	
 	private Type type;
 
-	TreeNode(Type type) {
+	AbstractTreeNode(Type type) {
 		this.type = type;
 	}
 	
