@@ -20,19 +20,21 @@ body {
 	background-color: white;
 }
 
-.page-header .page-metadata {
-	color: #999999;
-	font-size: 11px;
-	line-height: 15px;
-}
-
-.page-header .page-metadata a {
-	color: #999999;
-	text-decoration: underline;
-}
-
-.page-header .page-metadata a:hover {
-	color: #666666;
+.page-header {
+	.page-metadata {
+		color: #999999;
+		font-size: 11px;
+		line-height: 15px;
+		
+		a {
+			color: #999999;
+			text-decoration: underline;
+			
+			&:hover {
+				color: #666666;
+			}
+		}
+	}
 }
 
 textarea.code,
@@ -46,28 +48,28 @@ pre.changes {
 	background-color: inherit;
 	border: 0;
 	padding: 0;
-}
-
-pre.changes ins,
-pre.changes del {
-	margin-left: 2px;
-	margin-right: 2px;
-	padding-left: 2px;
-	padding-right: 2px;
-	border-radius: 2px 2px 2px 2px;
-}
-
-pre.changes ins {
-	background-color: #e6ffe6;
-}
-
-pre.changes del {
-	background-color: #ffe6e6;
-}
-
-pre.changes del + ins,
-pre.changes ins + del {
-	margin-left: 0px;
+	
+	ins,
+	del {
+		margin-left: 2px;
+		margin-right: 2px;
+		padding-left: 2px;
+		padding-right: 2px;
+		border-radius: 2px 2px 2px 2px;
+	}
+	
+	ins {
+		background-color: #e6ffe6;
+	}
+	
+	del {
+		background-color: #ffe6e6;
+	}
+	
+	del + ins,
+	ins + del {
+		margin-left: 0px;
+	}
 }
 
 code {
@@ -91,30 +93,32 @@ table.table-documentr {
 	margin-top: 45px;
 }
 
-.securityHiddenUI * {
-	background-color: red !important;
+.securityHiddenUI {
+	* {
+		background-color: red !important;
+	}
 }
 
 .breadcrumb {
 	background-color: #f0f0f0;
 	background-image: -moz-linear-gradient(center top, #f5f5f5, #f0f0f0);
 	border-radius: 0;
-}
-
-.breadcrumb ul {
-	margin: 0;
-}
-
-.breadcrumb .btn-toolbar {
-	margin: 0;
-}
-
-.breadcrumb .dropdown-menu li {
-	display: list-item;
-}
-
-.breadcrumb li.btn-toolbar {
-	line-height: 1px;
+	
+	ul {
+		margin: 0;
+	}
+	
+	.btn-toolbar {
+		margin: 0;
+	}
+	
+	.dropdown-menu li {
+		display: list-item;
+	}
+	
+	li.btn-toolbar {
+		line-height: 1px;
+	}
 }
 
 .loginForm {
@@ -123,13 +127,17 @@ table.table-documentr {
 	float: none;
 }
 
-.form-horizontal .control-label {
-	text-align: left;
+.form-horizontal {
+	.control-label {
+		text-align: left;
+	}
 }
 
-.well .form-actions {
-	margin-bottom: 0;
-	padding: 17px 20px 0;
+.well {
+	.form-actions {
+		margin-bottom: 0;
+		padding: 17px 20px 0;
+	}
 }
 
 .form-horizontal .form-actions,
