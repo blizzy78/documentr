@@ -32,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.FileLengthFormat;
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
@@ -39,6 +40,7 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageUtil;
+import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
@@ -142,6 +144,10 @@ public final class Functions {
 		Locale locale = LocaleContextHolder.getLocale();
 		FileLengthFormat format = new FileLengthFormat(messageSource, locale);
 		return format.format(size);
+	}
+	
+	public static List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException {
+		return pageStore.listPageVersions(projectName, branchName, Util.toRealPagePath(path));
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

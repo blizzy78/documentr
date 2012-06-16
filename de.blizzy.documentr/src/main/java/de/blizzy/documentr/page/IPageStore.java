@@ -63,4 +63,6 @@ public interface IPageStore {
 
 	Map<String, String> getMarkdown(String projectName, String branchName, String path, Set<String> versions)
 			throws IOException;
+
+	List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException;
 }

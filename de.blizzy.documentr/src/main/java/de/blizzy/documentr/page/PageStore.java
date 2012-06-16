@@ -38,10 +38,15 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.gitective.core.BlobUtils;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.CommitUtils;
+import org.gitective.core.PathFilterUtils;
+import org.gitective.core.filter.commit.AndCommitFilter;
 import org.gitective.core.filter.commit.CommitFilter;
+import org.gitective.core.filter.commit.CommitLimitFilter;
+import org.gitective.core.filter.commit.CommitListFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -657,6 +662,8 @@ class PageStore implements IPageStore {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
+		// check if page exists by trying to load it
+		getPage(projectName, branchName, path, false);
 		Assert.notNull(versions);
 		Assert.isTrue(!versions.isEmpty());
 
@@ -680,6 +687,8 @@ class PageStore implements IPageStore {
 							markdown = BlobUtils.getContent(repo.r(), previousCommit, filePath);
 						}
 					}
+				} else {
+					markdown = BlobUtils.getContent(repo.r(), version, filePath);
 				}
 				if (markdown != null) {
 					result.put(version, markdown);
@@ -693,6 +702,50 @@ class PageStore implements IPageStore {
 		return result;
 	}
 
+	@Override
+	public List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		// check if page exists by trying to load it
+		getPage(projectName, branchName, path, false);
+		
+		ILockedRepository repo = null;
+		List<PageVersion> result = Lists.newArrayList();
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+
+			CommitFinder finder = new CommitFinder(repo.r());
+			TreeFilter pathFilter = PathFilterUtils.or(
+					PAGES_DIR_NAME + "/" + path + META_SUFFIX, //$NON-NLS-1$
+					PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			finder.setFilter(pathFilter);
+			CommitListFilter commits = new CommitListFilter();
+			finder.setMatcher(new AndCommitFilter(new CommitLimitFilter(50), commits));
+			finder.find();
+			
+			for (RevCommit commit : commits.getCommits()) {
+				result.add(toPageVersion(commit));
+			}
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+		return result;
+	}
+	
+	private PageVersion toPageVersion(RevCommit commit) {
+		PersonIdent committer = commit.getCommitterIdent();
+		String lastEditedBy = null;
+		if (committer != null) {
+			lastEditedBy = committer.getName();
+		}
+		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+		String commitName = commit.getName();
+		return new PageVersion(commitName, lastEditedBy, lastEdited);
+	}
+	
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		this.repoManager = repoManager;
 	}

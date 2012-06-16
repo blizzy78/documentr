@@ -122,4 +122,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.lang.String formatSize(long)</function-signature>
 	</function>
+
+	<function>
+		<name>listPageVersions</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.util.List listPageVersions(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
 </taglib>

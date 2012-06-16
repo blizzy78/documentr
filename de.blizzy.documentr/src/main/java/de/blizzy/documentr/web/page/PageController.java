@@ -296,6 +296,21 @@ public class PageController {
 		return pageStore.getMarkdown(projectName, branchName, Util.toRealPagePath(path), versions);
 	}
 
+	@RequestMapping(value="/changes/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			method=RequestMethod.GET)
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	public String getPageChanges(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, Model model) {
+
+		model.addAttribute("projectName", projectName); //$NON-NLS-1$
+		model.addAttribute("branchName", branchName); //$NON-NLS-1$
+		path = Util.toRealPagePath(path);
+		model.addAttribute("path", path); //$NON-NLS-1$
+		return "/project/branch/page/changes"; //$NON-NLS-1$
+	}
+
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}
