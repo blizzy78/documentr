@@ -347,6 +347,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<outputDirectory>${project.basedir}/src/main/webapp/css</outputDirectory>
 					<compress>true</compress>
 					<encoding>UTF-8</encoding>
+					<includes>
+						<include>documentr.less</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
@@ -362,7 +365,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<packagingExcludes>less/**</packagingExcludes>
+					<packagingExcludes>**/.gitignore, less/**</packagingExcludes>
 				</configuration>
 			</plugin>
 		</plugins>

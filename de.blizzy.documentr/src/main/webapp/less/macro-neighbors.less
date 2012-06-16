@@ -16,4 +16,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "macro-neighbors.less";
+.neighbors-box {
+	background-color: #e5f3fa;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	border-radius: 4px 4px 4px 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+	padding: 10px;
+	float: right;
+	margin-left: 20px;
+	margin-bottom: 20px;
+
+	ul.neighbors {
+		margin: 0 0 0 16px;
+
+		li.active {
+			font-weight: bold;
+
+			ul {
+				font-weight: normal;
+			}
+		}
+	}
+}
