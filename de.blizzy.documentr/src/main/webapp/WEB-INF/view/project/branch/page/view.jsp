@@ -151,10 +151,7 @@ function showChangesDialog() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var dmp = new diff_match_patch();
-			var diffs = dmp.diff_main(result.previous, result.latest);
-			dmp.diff_cleanupSemantic(diffs);
-			var html = documentr.diffsToHtml(diffs);
+			var html = documentr.diffMarkdownAndGetHtml(result.previous, result.latest);
 			$('#changes-dialog-body').html(html);
 			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
 		}
