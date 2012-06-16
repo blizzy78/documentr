@@ -300,7 +300,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
 	public String getPageChanges(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) {
 
