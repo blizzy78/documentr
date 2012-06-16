@@ -38,6 +38,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.gitective.core.BlobUtils;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.CommitUtils;
 import org.gitective.core.filter.commit.CommitFilter;
@@ -47,6 +48,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -68,6 +70,8 @@ class PageStore implements IPageStore {
 	private static final String PAGE_SUFFIX = ".page"; //$NON-NLS-1$
 	private static final String PAGES_DIR_NAME = "pages"; //$NON-NLS-1$
 	private static final String ATTACHMENTS_DIR_NAME = "attachments"; //$NON-NLS-1$
+	private static final String VERSION_LATEST = "latest"; //$NON-NLS-1$
+	private static final String VERSION_PREVIOUS = "previous"; //$NON-NLS-1$
 	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
@@ -644,6 +648,45 @@ class PageStore implements IPageStore {
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+	
+	@Override
+	public Map<String, String> getMarkdown(String projectName, String branchName, String path, Set<String> versions)
+			throws IOException {
+		
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		Assert.notNull(versions);
+		Assert.isTrue(!versions.isEmpty());
+
+		Map<String, String> result = Maps.newHashMap();
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			String filePath = PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX; //$NON-NLS-1$
+			for (String version : versions) {
+				String markdown = null;
+				if (version.equals(VERSION_LATEST)) {
+					File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+					File file = toFile(workingDir, filePath);
+					markdown = FileUtils.readFileToString(file, DocumentrConstants.ENCODING);
+				} else if (version.equals(VERSION_PREVIOUS)) {
+					RevCommit latestCommit = CommitUtils.getLastCommit(repo.r(), filePath);
+					RevCommit parentCommit = latestCommit.getParent(0);
+					RevCommit previousCommit = CommitUtils.getLastCommit(repo.r(), parentCommit.getName(), filePath);
+					markdown = BlobUtils.getContent(repo.r(), previousCommit, filePath);
+				}
+				if (markdown != null) {
+					result.put(version, markdown);
+				}
+			}
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+		return result;
 	}
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

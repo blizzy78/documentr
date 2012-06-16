@@ -157,6 +157,32 @@ documentr.createPageTree = function(treeEl, options) {
 	return tree;
 };
 
+documentr.diffsToHtml = function(diffs) {
+	var html = [];
+	var pattern_amp = /&/g;
+	var pattern_lt = /</g;
+	var pattern_gt = />/g;
+	var pattern_para = /\n/g;
+	for (var x = 0; x < diffs.length; x++) {
+		var op = diffs[x][0]; // Operation (insert, delete, equal)
+		var data = diffs[x][1]; // Text of change.
+		var text = data.replace(pattern_amp, '&amp;').replace(pattern_lt, '&lt;')
+			.replace(pattern_gt, '&gt;').replace(pattern_para, '\n');
+		switch (op) {
+			case DIFF_INSERT:
+				html[x] = '<ins>' + text + '</ins>';
+				break;
+			case DIFF_DELETE:
+				html[x] = '<del>' + text + '</del>';
+				break;
+			case DIFF_EQUAL:
+				html[x] = text;
+				break;
+		}
+	}
+	return '<pre class="changes"><code>' + html.join('') + '</code></pre>';
+};
+
 
 $.fn.extend({
 	showModal: function(options) {

@@ -20,17 +20,54 @@ body {
 	background-color: white;
 }
 
-h1 .page-metadata {
+.page-header .page-metadata {
 	color: #999999;
-	display: block;
 	font-size: 11px;
-	margin-top: 2pt;
-	font-weight: normal;
+	line-height: 15px;
 }
 
-textarea.code, code, pre {
+.page-header .page-metadata a {
+	color: #999999;
+	text-decoration: underline;
+}
+
+.page-header .page-metadata a:hover {
+	color: #666666;
+}
+
+textarea.code,
+code,
+pre {
 	font-family: "Bitstream Vera Sans Mono", Menlo, Monaco, Consolas, "Courier New", "Lucida Console", monospace;
 	font-size: 12px;
+}
+
+pre.changes {
+	background-color: inherit;
+	border: 0;
+	padding: 0;
+}
+
+pre.changes ins,
+pre.changes del {
+	margin-left: 2px;
+	margin-right: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	border-radius: 2px 2px 2px 2px;
+}
+
+pre.changes ins {
+	background-color: #e6ffe6;
+}
+
+pre.changes del {
+	background-color: #ffe6e6;
+}
+
+pre.changes del + ins,
+pre.changes ins + del {
+	margin-left: 0px;
 }
 
 code {
@@ -38,7 +75,7 @@ code {
 }
 
 .modal.modal-wide {
-	width: 800px;
+	width: 960px;
 }
 
 table.table-documentr {
@@ -110,7 +147,8 @@ table.table-documentr {
 	padding: 35px 0 36px;
 }
 
-.footer, .footer p {
+.footer,
+.footer p {
 	font-size: 11px;
 	line-height: 16px;
 	color: #606060;

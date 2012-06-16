@@ -19,6 +19,8 @@ package de.blizzy.documentr.page;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
 
@@ -58,4 +60,7 @@ public interface IPageStore {
 	@CacheEvict(value="pageHTML", allEntries=true)
 	void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
 			User user) throws IOException;
+
+	Map<String, String> getMarkdown(String projectName, String branchName, String path, Set<String> versions)
+			throws IOException;
 }

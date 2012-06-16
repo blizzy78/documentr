@@ -143,6 +143,26 @@ function showRelocateDialog() {
 
 </sec:authorize>
 
+<sec:authorize access="isAuthenticated()">
+
+function showChangesDialog() {
+	$.ajax({
+		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions=latest,previous"/>',
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			var dmp = new diff_match_patch();
+			var diffs = dmp.diff_main(result.previous, result.latest);
+			dmp.diff_cleanupSemantic(diffs);
+			var html = documentr.diffsToHtml(diffs);
+			$('#changes-dialog-body').html(html);
+			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
+		}
+	});
+}
+
+</sec:authorize>
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -223,6 +243,7 @@ function showRelocateDialog() {
 <div class="page-header">
 <h1>
 <c:out value="${title}"/>
+</h1>
 <c:set var="metadata" value="${d:getPageMetadata(projectName, branchName, path)}"/>
 <c:set var="lastEdited"><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></c:set>
 <c:choose>
@@ -235,10 +256,13 @@ function showRelocateDialog() {
 		<c:set var="branchNames" value="${d:join(branchesSharedWith, ', ')}"/>
 	</c:if>
 </sec:authorize>
-<span class="page-metadata">(<spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
+<div class="page-metadata"><spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
+--%><sec:authorize access="isAuthenticated()"><%--
+--%> (<a href="javascript:void(showChangesDialog());"><spring:message code="button.showChanges"/></a>)<%--
+--%></sec:authorize><%--
 --%><c:if test="${!empty branchNames}"> &ndash; <spring:message code="sharedWithX" arguments="${branchNames}" argumentSeparator="|"/></c:if><%--
---%>)</span>
-</h1>
+--%></div>
+
 </div>
 
 <c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/>
@@ -320,6 +344,19 @@ function showRelocateDialog() {
 		<div class="modal-footer">
 			<a id="relocate-button" href="javascript:$('#relocateForm').submit();" class="btn btn-primary"><spring:message code="button.relocate"/></a>
 			<a href="javascript:void($('#relocate-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
+</sec:authorize>
+
+<sec:authorize access="isAuthenticated()">
+	<div class="modal modal-wide" id="changes-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#changes-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.changes"/></h3>
+		</div>
+		<div class="modal-body" id="changes-dialog-body"></div>
+		<div class="modal-footer">
+			<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn"><spring:message code="button.close"/></a>
 		</div>
 	</div>
 </sec:authorize>

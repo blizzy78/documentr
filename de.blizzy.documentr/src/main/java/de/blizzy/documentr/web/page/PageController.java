@@ -20,6 +20,7 @@ package de.blizzy.documentr.web.page;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -281,6 +282,18 @@ public class PageController {
 		String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
 		return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
 				"/" + Util.toURLPagePath(newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@RequestMapping(value="/markdown/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
+			method=RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	public Map<String, String> getPageMarkdown(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam Set<String> versions) throws IOException {
+
+		return pageStore.getMarkdown(projectName, branchName, Util.toRealPagePath(path), versions);
 	}
 
 	void setPageStore(IPageStore pageStore) {
