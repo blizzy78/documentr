@@ -673,9 +673,13 @@ class PageStore implements IPageStore {
 					markdown = FileUtils.readFileToString(file, DocumentrConstants.ENCODING);
 				} else if (version.equals(VERSION_PREVIOUS)) {
 					RevCommit latestCommit = CommitUtils.getLastCommit(repo.r(), filePath);
-					RevCommit parentCommit = latestCommit.getParent(0);
-					RevCommit previousCommit = CommitUtils.getLastCommit(repo.r(), parentCommit.getName(), filePath);
-					markdown = BlobUtils.getContent(repo.r(), previousCommit, filePath);
+					if (latestCommit.getParentCount() > 0) {
+						RevCommit parentCommit = latestCommit.getParent(0);
+						RevCommit previousCommit = CommitUtils.getLastCommit(repo.r(), parentCommit.getName(), filePath);
+						if (previousCommit != null) {
+							markdown = BlobUtils.getContent(repo.r(), previousCommit, filePath);
+						}
+					}
 				}
 				if (markdown != null) {
 					result.put(version, markdown);

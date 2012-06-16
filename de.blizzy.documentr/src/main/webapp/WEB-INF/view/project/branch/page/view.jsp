@@ -151,7 +151,8 @@ function showChangesDialog() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var html = documentr.diffMarkdownAndGetHtml(result.previous, result.latest);
+			var previous = (typeof(result.previous) != 'undefined') ? result.previous : '';
+			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
 			$('#changes-dialog-body').html(html);
 			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
 		}
