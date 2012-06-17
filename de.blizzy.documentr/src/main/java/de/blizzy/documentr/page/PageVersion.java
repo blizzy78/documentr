@@ -24,7 +24,7 @@ public class PageVersion {
 	private String lastEditedBy;
 	private Date lastEdited;
 
-	PageVersion(String commitName, String lastEditedBy, Date lastEdited) {
+	public PageVersion(String commitName, String lastEditedBy, Date lastEdited) {
 		this.commitName = commitName;
 		this.lastEditedBy = lastEditedBy;
 		this.lastEdited = lastEdited;

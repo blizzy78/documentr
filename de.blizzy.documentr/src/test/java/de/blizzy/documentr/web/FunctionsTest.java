@@ -45,6 +45,7 @@ import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
+import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
@@ -212,5 +213,12 @@ public class FunctionsTest {
 		String result = Functions.formatSize(1234);
 		LocaleContextHolder.resetLocaleContext();
 		assertEquals("1.21 KB", result); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void listPageVersions() throws IOException {
+		List<PageVersion> versions = Lists.newArrayList(new PageVersion("commit", "user", new Date())); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE)).thenReturn(versions);
+		assertEquals(versions, Functions.listPageVersions(PROJECT, BRANCH, PAGE));
 	}
 }
