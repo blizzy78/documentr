@@ -19,14 +19,19 @@ package de.blizzy.documentr;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.junit.Test.None;
 
 import com.google.common.collect.Lists;
 
-public class UtilTest {
+public class UtilTest extends AbstractDocumentrTest {
 	@Test
 	public void toRealPagePath() {
 		assertEquals("x/y/z", Util.toRealPagePath("x,y,z")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -67,5 +72,36 @@ public class UtilTest {
 		String text = "hello \u20AC"; //$NON-NLS-1$
 		byte[] bytes = text.getBytes(DocumentrConstants.ENCODING);
 		assertEquals(text, Util.fromBytes(bytes));
+	}
+	
+	@Test(expected=None.class)
+	public void deleteQuietly() throws IOException {
+		File dir = createTempDir();
+		File file = new File(dir, "test.txt"); //$NON-NLS-1$
+		FileUtils.touch(file);
+		// check that file actually exists
+		assertTrue(file.isFile());
+		
+		Util.deleteQuietly(file);
+		assertFalse(file.exists());
+		
+		Util.deleteQuietly(dir);
+		assertFalse(dir.exists());
+	}
+	
+	@Test(expected=None.class)
+	public void deleteQuietlyMustAcceptNull() {
+		Util.deleteQuietly(null);
+	}
+	
+	@Test(expected=None.class)
+	public void deleteQuietlyMustCatchExceptions() throws IOException {
+		File dir = createTempDir();
+		File file = new File(dir, "test.txt"); //$NON-NLS-1$
+		FileOutputStream out = new FileOutputStream(file);
+		
+		Util.deleteQuietly(dir);
+		
+		out.close();
 	}
 }

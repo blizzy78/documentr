@@ -55,7 +55,7 @@ public abstract class AbstractDocumentrTest {
 			try {
 				FileUtils.forceDelete(dir);
 			} catch (IOException e) {
-				System.out.println(getClass().getName());
+				// ignore
 			}
 		}
 		tempDirs.clear();

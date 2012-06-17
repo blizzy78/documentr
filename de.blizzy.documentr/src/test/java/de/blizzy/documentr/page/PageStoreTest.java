@@ -23,12 +23,18 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.gitective.core.CommitUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -268,6 +274,86 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertSecondsAgo(metadata.getLastEdited(), 5);
 	}
 	
+	@Test
+	public void relocatePage() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
+		Page page = saveRandomPage(BRANCH_1, "home/foo/bar"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo/bar/quuux"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo/quux"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/baz"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/baz/bar"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/baz/qux"); //$NON-NLS-1$
+		Page attachment = saveRandomAttachment(BRANCH_1, "home/foo/bar", "test.txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		saveRandomAttachment(BRANCH_1, "home/baz/bar", "test.txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		pageStore.relocatePage(PROJECT, BRANCH_1, "home/foo/bar", "home/baz", USER); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(Sets.newHashSet("home/foo/quux"), //$NON-NLS-1$
+				Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/foo"))); //$NON-NLS-1$
+		assertEquals(Sets.newHashSet("home/baz/bar", "home/baz/qux"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/baz"))); //$NON-NLS-1$
+		assertEquals(Sets.newHashSet("home/baz/bar/quuux"), //$NON-NLS-1$
+				Sets.newHashSet(pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home/baz/bar"))); //$NON-NLS-1$
+		assertEquals(page.getData(),
+				pageStore.getPage(PROJECT, BRANCH_1, "home/baz/bar", true).getData()); //$NON-NLS-1$
+		assertEquals(attachment.getData(),
+				pageStore.getAttachment(PROJECT, BRANCH_1, "home/baz/bar", "test.txt").getData()); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Test
+	public void getMarkdown() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
+		
+		Page page1 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page1, USER); //$NON-NLS-1$
+		RevCommit commit1 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
+		Page page2 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page2, USER); //$NON-NLS-1$
+		RevCommit commit2 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
+		Page page3 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page3, USER); //$NON-NLS-1$
+		
+		Map<String, String> result = pageStore.getMarkdown(PROJECT, BRANCH_1, "home", //$NON-NLS-1$
+				Sets.newHashSet("latest", "previous", commit2.getName(), commit1.getName())); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(((PageTextData) page3.getData()).getText(), result.get("latest")); //$NON-NLS-1$
+		assertEquals(((PageTextData) page2.getData()).getText(), result.get("previous")); //$NON-NLS-1$
+		assertEquals(((PageTextData) page2.getData()).getText(), result.get(commit2.getName()));
+		assertEquals(((PageTextData) page1.getData()).getText(), result.get(commit1.getName()));
+	}
+	
+	@Test
+	public void listPageVersions() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
+		
+		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		RevCommit commit1 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		RevCommit commit2 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/bar"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		RevCommit commit3 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/baz"); //$NON-NLS-1$
+
+		List<PageVersion> versions = pageStore.listPageVersions(PROJECT, BRANCH_1, "home"); //$NON-NLS-1$
+		assertEquals(3, versions.size());
+		assertPageVersion(commit3, versions.get(0));
+		assertPageVersion(commit2, versions.get(1));
+		assertPageVersion(commit1, versions.get(2));
+	}
+	
+	private void assertPageVersion(RevCommit commit, PageVersion version) {
+		assertEquals(commit.getName(), version.getCommitName());
+		assertEquals(commit.getCommitterIdent().getName(), version.getLastEditedBy());
+		assertEquals(new Date(commit.getCommitTime() * 1000L), version.getLastEdited());
+	}
+
 	private void assertBranchesPageIsSharedWith(String branchName, String... expectedBranches)
 			throws IOException {
 		
@@ -284,5 +370,16 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		Page page = createRandomPage(parentPagePath);
 		pageStore.savePage(PROJECT, branchName, path, page, USER);
 		return page;
+	}
+	
+	private Page saveRandomAttachment(String branchName, String pagePath, String fileName) throws IOException {
+		try {
+			byte[] data = UUID.randomUUID().toString().getBytes("UTF-8"); //$NON-NLS-1$
+			Page attachment = Page.fromData(pagePath, data, "application/octet-stream"); //$NON-NLS-1$
+			pageStore.saveAttachment(PROJECT, branchName, pagePath, fileName, attachment, USER);
+			return attachment;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
