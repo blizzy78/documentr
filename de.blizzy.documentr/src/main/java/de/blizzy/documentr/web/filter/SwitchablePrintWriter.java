@@ -26,7 +26,7 @@ import org.apache.commons.io.output.NullWriter;
 
 abstract class SwitchablePrintWriter extends PrintWriter {
 	SwitchablePrintWriter() {
-		super(new NullWriter());
+		super(NullWriter.NULL_WRITER);
 	}
 	
 	abstract Writer getWriter() throws IOException;
