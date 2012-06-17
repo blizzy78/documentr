@@ -35,9 +35,15 @@ import de.blizzy.documentr.page.PageUtil;
 public final class TestUtil {
 	private TestUtil() {}
 
+	public static Page createRandomPage() {
+		return createRandomPage(null);
+	}
+	
 	public static Page createRandomPage(String parentPagePath) {
-		return Page.fromText(parentPagePath, String.valueOf(Math.random() * Long.MAX_VALUE),
+		Page page = Page.fromText(String.valueOf(Math.random() * Long.MAX_VALUE),
 				String.valueOf(Math.random() * Long.MAX_VALUE));
+		page.setParentPagePath(parentPagePath);
+		return page;
 	}
 	
 	public static <T> void assertEqualsContract(T equal1, T equal2, T equal3, T different) {

@@ -38,8 +38,14 @@ import de.blizzy.documentr.web.page.PageForm;
 import de.blizzy.documentr.web.project.ProjectForm;
 
 public final class DocumentrMatchers {
+	private static final String ANY = DocumentrMatchers.class.getName() + "_ANY"; //$NON-NLS-1$
+	
 	private DocumentrMatchers() {}
 
+	public static Page argPage(String title, String text) {
+		return argPage(ANY, title, text);
+	}
+	
 	public static Page argPage(final String parentPagePath, final String title, final String text) {
 		Matcher<Page> matcher = new ArgumentMatcher<Page>() {
 			@Override
@@ -49,7 +55,8 @@ public final class DocumentrMatchers {
 				if (page.getData() instanceof PageTextData) {
 					pageText = ((PageTextData) page.getData()).getText();
 				}
-				return StringUtils.equals(page.getParentPagePath(), parentPagePath) &&
+				return (StringUtils.equals(parentPagePath, ANY) ||
+							StringUtils.equals(page.getParentPagePath(), parentPagePath)) &&
 						StringUtils.equals(page.getTitle(), title) &&
 						StringUtils.equals(pageText, text);
 			}

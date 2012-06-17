@@ -129,7 +129,7 @@ public class AttachmentControllerTest {
 
 		byte[] data = { 1, 2, 3 };
 		String contentType = "image/png"; //$NON-NLS-1$
-		Page attachment = Page.fromData(null, data, contentType);
+		Page attachment = Page.fromData(data, contentType);
 		when(pageStore.getAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png")).thenReturn(attachment); //$NON-NLS-1$
 		
 		SecurityContextHolder.setContext(createSecurityContext(authentication));
@@ -200,7 +200,7 @@ public class AttachmentControllerTest {
 		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
-		Page attachment = Page.fromData(null, data, "image/png"); //$NON-NLS-1$
+		Page attachment = Page.fromData(data, "image/png"); //$NON-NLS-1$
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png", attachment, USER); //$NON-NLS-1$
 	}
 
@@ -216,7 +216,7 @@ public class AttachmentControllerTest {
 		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		
-		Page attachment = Page.fromData(null, data, DocumentrConstants.DEFAULT_MIME_TYPE);
+		Page attachment = Page.fromData(data, DocumentrConstants.DEFAULT_MIME_TYPE);
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment, USER); //$NON-NLS-1$
 	}
 }

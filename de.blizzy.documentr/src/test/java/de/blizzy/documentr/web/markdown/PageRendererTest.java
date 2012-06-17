@@ -36,7 +36,7 @@ public class PageRendererTest {
 
 	@Test
 	public void getHTML() throws IOException {
-		Page page = Page.fromText("parent", "title", MARKDOWN); //$NON-NLS-1$ //$NON-NLS-2$ 
+		Page page = Page.fromText("title", MARKDOWN); //$NON-NLS-1$
 		
 		IPageStore pageStore = mock(IPageStore.class);
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE, true)).thenReturn(page); 

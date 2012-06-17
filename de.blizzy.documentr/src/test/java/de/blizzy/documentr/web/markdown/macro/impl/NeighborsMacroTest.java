@@ -178,7 +178,8 @@ public class NeighborsMacroTest {
 		String parentPagePath = pagePath.contains("/") ? //$NON-NLS-1$
 				StringUtils.substringBeforeLast(pagePath, "/") : //$NON-NLS-1$
 				null;
-		Page page = Page.fromText(parentPagePath, pagePath, "text"); //$NON-NLS-1$
+		Page page = Page.fromText(pagePath, "text"); //$NON-NLS-1$
+		page.setParentPagePath(parentPagePath);
 		when(pageStore.getPage(PROJECT, BRANCH, pagePath, false)).thenReturn(page);
 	}
 }

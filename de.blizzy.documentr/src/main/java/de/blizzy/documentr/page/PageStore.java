@@ -155,6 +155,8 @@ class PageStore implements IPageStore {
 				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 			git.push().call();
 			
+			page.setParentPagePath(getParentPagePath(path, repo.r()));
+			
 			PageUtil.updateProjectEditTime(projectName);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
@@ -181,7 +183,9 @@ class PageStore implements IPageStore {
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
-			return new Page(parentPagePath, title, contentType, pageData);
+			Page page = new Page(title, contentType, pageData);
+			page.setParentPagePath(parentPagePath);
+			return page;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -260,7 +264,9 @@ class PageStore implements IPageStore {
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
-			return new Page(parentPagePath, null, contentType, pageData);
+			Page page = new Page(null, contentType, pageData);
+			page.setParentPagePath(parentPagePath);
+			return page;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}

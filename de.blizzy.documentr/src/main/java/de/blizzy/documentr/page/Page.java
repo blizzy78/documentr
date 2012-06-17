@@ -26,27 +26,30 @@ public class Page {
 	private String contentType;
 	private PageData data;
 
-	Page(String parentPagePath, String title, String contentType, PageData data) {
-		this.parentPagePath = parentPagePath;
+	Page(String title, String contentType, PageData data) {
 		this.title = title;
 		this.contentType = contentType;
 		this.data = data;
 	}
 
-	public static Page fromText(String parentPagePath, String title, String text) {
+	public static Page fromText(String title, String text) {
 		PageTextData pageData = new PageTextData(text);
-		return new Page(parentPagePath, title, pageData.getContentType(), pageData);
+		return new Page(title, pageData.getContentType(), pageData);
 	}
 	
-	public static Page fromData(String parentPagePath, byte[] data, String contentType) {
+	public static Page fromData(byte[] data, String contentType) {
 		PageData pageData = new PageData(data, contentType);
-		return new Page(parentPagePath, null, contentType, pageData);
+		return new Page(null, contentType, pageData);
 	}
 	
-	public static Page fromMeta(String parentPagePath, String title, String contentType) {
-		return new Page(parentPagePath, title, contentType, null);
+	public static Page fromMeta(String title, String contentType) {
+		return new Page(title, contentType, null);
 	}
 
+	public void setParentPagePath(String parentPagePath) {
+		this.parentPagePath = parentPagePath;
+	}
+	
 	public String getParentPagePath() {
 		return parentPagePath;
 	}

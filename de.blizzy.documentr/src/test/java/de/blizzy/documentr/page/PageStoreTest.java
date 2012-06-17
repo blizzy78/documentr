@@ -82,7 +82,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	public void saveAndGetPage() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
-		Page page = saveRandomPage(BRANCH_1, "home/foo", "home"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, "home/foo", true); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
 		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
@@ -184,7 +184,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
-		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment, USER); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Page result = pageStore.getAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -198,7 +198,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		saveRandomPage(BRANCH_1, "foo/bar/baz/qux"); //$NON-NLS-1$
-		Page attachment = Page.fromData(null, new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment, USER); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz/qux", "test2.dat", attachment, USER); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -267,7 +267,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		saveRandomPage(BRANCH_1, PAGE);
-		Page attachment = Page.fromData(PAGE, new byte[] { 1, 2, 3 }, "image/png"); //$NON-NLS-1$
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "image/png"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, PAGE, "test.png", attachment, USER); //$NON-NLS-1$
 		PageMetadata metadata = pageStore.getAttachmentMetadata(PROJECT, BRANCH_1, PAGE, "test.png"); //$NON-NLS-1$
 		assertEquals(USER.getLoginName(), metadata.getLastEditedBy());
@@ -308,13 +308,13 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		register(repo);
 		
-		Page page1 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		Page page1 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home", page1, USER); //$NON-NLS-1$
 		RevCommit commit1 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
-		Page page2 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		Page page2 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home", page2, USER); //$NON-NLS-1$
 		RevCommit commit2 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
-		Page page3 = Page.fromText(null, "title", UUID.randomUUID().toString()); //$NON-NLS-1$
+		Page page3 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home", page3, USER); //$NON-NLS-1$
 		
 		Map<String, String> result = pageStore.getMarkdown(PROJECT, BRANCH_1, "home", //$NON-NLS-1$
@@ -363,11 +363,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {
-		return saveRandomPage(branchName, path, null);
-	}
-	
-	private Page saveRandomPage(String branchName, String path, String parentPagePath) throws IOException {
-		Page page = createRandomPage(parentPagePath);
+		Page page = createRandomPage();
 		pageStore.savePage(PROJECT, branchName, path, page, USER);
 		return page;
 	}
@@ -375,7 +371,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	private Page saveRandomAttachment(String branchName, String pagePath, String fileName) throws IOException {
 		try {
 			byte[] data = UUID.randomUUID().toString().getBytes("UTF-8"); //$NON-NLS-1$
-			Page attachment = Page.fromData(pagePath, data, "application/octet-stream"); //$NON-NLS-1$
+			Page attachment = Page.fromData(data, "application/octet-stream"); //$NON-NLS-1$
 			pageStore.saveAttachment(PROJECT, branchName, pagePath, fileName, attachment, USER);
 			return attachment;
 		} catch (UnsupportedEncodingException e) {

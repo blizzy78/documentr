@@ -22,76 +22,63 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.page.PageTextData;
-
 public class PageTest {
-	private static final String PARENT = "parent"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
 	private static final String IMAGE_PNG = "image/png"; //$NON-NLS-1$
 
 	@Test
-	public void getParentPagePath() {
-		PageTextData pageData = new PageTextData(TEXT); 
-		Page page = new Page(PARENT, TITLE, pageData.getContentType(), pageData); 
-		assertEquals(PARENT, page.getParentPagePath()); 
-		
-		page = Page.fromData(PARENT, new byte[] { 1, 2, 3 }, IMAGE_PNG); 
-		assertEquals(PARENT, page.getParentPagePath()); 
-		
-		page = Page.fromText(PARENT, TITLE, TEXT); 
-		assertEquals(PARENT, page.getParentPagePath()); 
-		
-		page = Page.fromMeta(PARENT, TITLE, IMAGE_PNG); 
-		assertEquals(PARENT, page.getParentPagePath()); 
+	public void setAndGetParentPagePath() {
+		Page page = Page.fromText(TITLE, TEXT);
+		page.setParentPagePath("parent"); //$NON-NLS-1$
+		assertEquals("parent", page.getParentPagePath()); //$NON-NLS-1$
 	}
 
 	@Test
 	public void getTitle() {
 		PageTextData pageData = new PageTextData(TEXT); 
-		Page page = new Page(PARENT, TITLE, pageData.getContentType(), pageData); 
+		Page page = new Page(TITLE, pageData.getContentType(), pageData); 
 		assertEquals(TITLE, page.getTitle()); 
 		
-		page = Page.fromData(PARENT, new byte[] { 1, 2, 3 }, IMAGE_PNG); 
+		page = Page.fromData(new byte[] { 1, 2, 3 }, IMAGE_PNG); 
 		assertNull(page.getTitle());
 		
-		page = Page.fromText(PARENT, TITLE, TEXT); 
+		page = Page.fromText(TITLE, TEXT); 
 		assertEquals(TITLE, page.getTitle()); 
 		
-		page = Page.fromMeta(PARENT, TITLE, IMAGE_PNG); 
+		page = Page.fromMeta(TITLE, IMAGE_PNG); 
 		assertEquals(TITLE, page.getTitle()); 
 	}
 	
 	@Test
 	public void getContentType() {
 		PageTextData pageData = new PageTextData(TEXT); 
-		Page page = new Page(PARENT, TITLE, pageData.getContentType(), pageData); 
+		Page page = new Page(TITLE, pageData.getContentType(), pageData); 
 		assertEquals(pageData.getContentType(), page.getContentType());
 		
-		page = Page.fromData(PARENT, new byte[] { 1, 2, 3 }, IMAGE_PNG); 
+		page = Page.fromData(new byte[] { 1, 2, 3 }, IMAGE_PNG); 
 		assertEquals(IMAGE_PNG, page.getContentType()); 
 		
-		page = Page.fromText(PARENT, TITLE, TEXT); 
+		page = Page.fromText(TITLE, TEXT); 
 		assertEquals(PageTextData.CONTENT_TYPE, page.getContentType());
 		
-		page = Page.fromMeta(PARENT, TITLE, IMAGE_PNG); 
+		page = Page.fromMeta(TITLE, IMAGE_PNG); 
 		assertEquals(IMAGE_PNG, page.getContentType()); 
 	}
 	
 	@Test
 	public void testEquals() {
 		assertEqualsContract(
-				Page.fromText(PARENT, TITLE, TEXT),
-				Page.fromText(PARENT, TITLE, TEXT),
-				Page.fromText(PARENT, TITLE, TEXT),
-				Page.fromText(PARENT, TITLE, "bleh")); //$NON-NLS-1$
+				Page.fromText(TITLE, TEXT),
+				Page.fromText(TITLE, TEXT),
+				Page.fromText(TITLE, TEXT),
+				Page.fromText(TITLE, "bleh")); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void testHashCode() {
 		assertHashCodeContract(
-				Page.fromText(PARENT, TITLE, TEXT),
-				Page.fromText(PARENT, TITLE, TEXT));
+				Page.fromText(TITLE, TEXT),
+				Page.fromText(TITLE, TEXT));
 	}
 }

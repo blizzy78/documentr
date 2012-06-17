@@ -86,7 +86,7 @@ public class BranchController {
 		}
 		
 		if (firstBranch) {
-			Page page = Page.fromText(null, "Home", StringUtils.EMPTY); //$NON-NLS-1$
+			Page page = Page.fromText("Home", StringUtils.EMPTY); //$NON-NLS-1$
 			User user = userStore.getUser(authentication.getName());
 			pageStore.savePage(form.getProjectName(), form.getName(),
 					DocumentrConstants.HOME_PAGE_NAME, page, user);

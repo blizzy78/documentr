@@ -119,7 +119,7 @@ public class FunctionsTest {
 	
 	@Test
 	public void getPageTitle() throws IOException {
-		Page page = Page.fromText("parent", "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE, false)).thenReturn(page);
 		assertEquals(page.getTitle(), Functions.getPageTitle(PROJECT, BRANCH, PAGE));
 	}

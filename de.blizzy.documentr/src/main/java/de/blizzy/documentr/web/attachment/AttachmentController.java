@@ -142,7 +142,7 @@ public class AttachmentController {
 		if (StringUtils.isBlank(contentType)) {
 			contentType = DocumentrConstants.DEFAULT_MIME_TYPE;
 		}
-		Page attachment = Page.fromData(null, data, contentType);
+		Page attachment = Page.fromData(data, contentType);
 		pagePath = Util.toRealPagePath(pagePath);
 		User user = userStore.getUser(authentication.getName());
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);

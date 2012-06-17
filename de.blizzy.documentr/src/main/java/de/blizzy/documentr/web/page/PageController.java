@@ -162,7 +162,7 @@ public class PageController {
 			parentPagePath = null;
 		}
 		parentPagePath = Util.toRealPagePath(parentPagePath);
-		Page page = Page.fromText(parentPagePath, form.getTitle(), form.getText());
+		Page page = Page.fromText(form.getTitle(), form.getText());
 		String path = form.getPath();
 		if (StringUtils.isBlank(path)) {
 			path = parentPagePath + "/" + Util.simplifyForURL(form.getTitle()); //$NON-NLS-1$

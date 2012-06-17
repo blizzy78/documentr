@@ -27,9 +27,6 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.TestUtil;
-import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.page.PageStore;
-import de.blizzy.documentr.page.PageUtil;
 
 public class PageUtilTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$

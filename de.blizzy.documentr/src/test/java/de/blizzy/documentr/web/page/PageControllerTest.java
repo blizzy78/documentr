@@ -127,7 +127,8 @@ public class PageControllerTest {
 		Date lastModified = new Date();
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(new PageMetadata("user", lastModified, 123)); //$NON-NLS-1$
 		
-		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		page.setParentPagePath(PARENT_PAGE);
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
 		Model model = mock(Model.class);
@@ -201,7 +202,8 @@ public class PageControllerTest {
 	
 	@Test
 	public void editPage() throws IOException {
-		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		page.setParentPagePath(PARENT_PAGE);
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		
 		Model model = mock(Model.class);
@@ -235,7 +237,7 @@ public class PageControllerTest {
 		assertFalse(bindingResult.hasErrors());
 		
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
-				argPage(PARENT_PAGE, "title", "text"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+				argPage("title", "text"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
@@ -245,7 +247,7 @@ public class PageControllerTest {
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
 		
-		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2"); //$NON-NLS-1$ //$NON-NLS-2$
 		bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
@@ -256,7 +258,7 @@ public class PageControllerTest {
 		assertFalse(bindingResult.hasErrors());
 
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
-				argPage(PARENT_PAGE, "title2", "text2"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+				argPage("title2", "text2"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
@@ -274,13 +276,13 @@ public class PageControllerTest {
 		assertFalse(bindingResult.hasErrors());
 		
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(path),
-				argPage(PARENT_PAGE, title, "text"), same(USER)); //$NON-NLS-1$
+				argPage(title, "text"), same(USER)); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void savePageShouldDoNothingIfNoChanges() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
-		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -315,7 +317,7 @@ public class PageControllerTest {
 
 		title = "title"; //$NON-NLS-1$
 		path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
-		Page page = Page.fromText(PARENT_PAGE, title, "text"); //$NON-NLS-1$
+		Page page = Page.fromText(title, "text"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, path, false)).thenReturn(page);
 		result = pageController.generateName(PROJECT, BRANCH, PARENT_PAGE, title);
 		assertEquals(path, result.get("path")); //$NON-NLS-1$
@@ -331,7 +333,7 @@ public class PageControllerTest {
 	
 	@Test
 	public void copyToBranch() throws IOException {
-		Page page = Page.fromText(PARENT_PAGE, "title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		
 		String view = pageController.copyToBranch(PROJECT, BRANCH, PAGE_PATH_URL, "targetBranch", //$NON-NLS-1$
@@ -340,7 +342,7 @@ public class PageControllerTest {
 		assertRedirect(view);
 		
 		verify(pageStore).savePage(eq(PROJECT), eq("targetBranch"), eq(PAGE_PATH), //$NON-NLS-1$
-				argPage(PARENT_PAGE, "title", "text"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+				argPage("title", "text"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
