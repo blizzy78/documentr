@@ -484,8 +484,8 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
 			
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
 			boolean deleted = false;
 			File file = toFile(pagesDir, path + PAGE_SUFFIX);
 			if (file.isFile()) {
@@ -494,6 +494,18 @@ class PageStore implements IPageStore {
 			}
 			file = toFile(pagesDir, path + META_SUFFIX);
 			if (file.isFile()) {
+				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			file = toFile(pagesDir, path);
+			if (file.isDirectory()) {
+				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			
+			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
+			file = toFile(attachmentsDir, path);
+			if (file.isDirectory()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
 			}
@@ -507,9 +519,9 @@ class PageStore implements IPageStore {
 					.setMessage("delete " + path) //$NON-NLS-1$
 					.call();
 				git.push().call();
-			}
 
-			PageUtil.updateProjectEditTime(projectName);
+				PageUtil.updateProjectEditTime(projectName);
+			}
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {

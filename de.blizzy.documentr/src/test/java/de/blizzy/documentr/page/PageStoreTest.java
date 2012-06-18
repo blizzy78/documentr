@@ -236,16 +236,24 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		register(repo);
 		saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
+		saveRandomAttachment(BRANCH_1, "foo", "test.txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		saveRandomPage(BRANCH_1, "foo/bar"); //$NON-NLS-1$
 		File pageFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.page"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertTrue(pageFile.isFile());
 		File metaFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.meta"); //$NON-NLS-1$ //$NON-NLS-2$
+		File subPagesDir = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$
+		File attachmentsDir = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "attachments"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(pageFile.isFile());
 		assertTrue(metaFile.isFile());
+		assertTrue(subPagesDir.isDirectory());
+		assertTrue(attachmentsDir.isDirectory());
 		
 		pageStore.deletePage(PROJECT, BRANCH_1, "foo", USER); //$NON-NLS-1$
 		List<String> result = pageStore.listPagePaths(PROJECT, BRANCH_1);
 		assertTrue(result.isEmpty());
-		assertFalse(pageFile.isFile());
-		assertFalse(metaFile.isFile());
+		assertFalse(pageFile.exists());
+		assertFalse(metaFile.exists());
+		assertFalse(subPagesDir.exists());
+		assertFalse(attachmentsDir.exists());
 	}
 	
 	@Test
