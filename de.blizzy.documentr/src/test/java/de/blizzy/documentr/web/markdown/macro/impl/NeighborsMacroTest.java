@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import static de.blizzy.documentr.DocumentrMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -29,8 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.mockito.internal.matchers.Equals;
-import org.mockito.internal.matchers.Not;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.security.core.Authentication;
@@ -116,15 +115,13 @@ public class NeighborsMacroTest {
 		}
 	}
 	
-	@SuppressWarnings({ "boxing", "unchecked" })
+	@SuppressWarnings("boxing")
 	private void setupPagePermissions() {
 		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
-				eq(PROJECT), eq(BRANCH), Matchers.<String>argThat(new Not(new Equals(INACCESSIBLE_PAGE_PATH))),
-				same(Permission.VIEW)))
+					eq(PROJECT), eq(BRANCH), notEq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
 				.thenReturn(true);
 		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
-				eq(PROJECT), eq(BRANCH), eq(INACCESSIBLE_PAGE_PATH),
-				same(Permission.VIEW)))
+					eq(PROJECT), eq(BRANCH), eq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
 				.thenReturn(false);
 	}
 	

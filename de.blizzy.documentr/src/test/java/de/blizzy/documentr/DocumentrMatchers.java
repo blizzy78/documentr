@@ -25,6 +25,8 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
+import org.mockito.internal.matchers.Equals;
+import org.mockito.internal.matchers.Not;
 
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.Role;
@@ -160,5 +162,10 @@ public final class DocumentrMatchers {
 			}
 		};
 		return argThat(matcher);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static String notEq(String s) {
+		return argThat(new Not(new Equals(s)));
 	}
 }

@@ -137,4 +137,16 @@ public class PageTreeController {
 		}
 		return result;
 	}
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
+
+	void setPageStore(IPageStore pageStore) {
+		this.pageStore = pageStore;
+	}
+
+	void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator) {
+		this.permissionEvaluator = permissionEvaluator;
+	}
 }
