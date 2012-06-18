@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Matchers;
 import org.mockito.internal.matchers.Equals;
 import org.mockito.internal.matchers.Not;
 
@@ -166,6 +167,6 @@ public final class DocumentrMatchers {
 	
 	@SuppressWarnings("unchecked")
 	public static String notEq(String s) {
-		return argThat(new Not(new Equals(s)));
+		return Matchers.<String>argThat(new Not(new Equals(s)));
 	}
 }
