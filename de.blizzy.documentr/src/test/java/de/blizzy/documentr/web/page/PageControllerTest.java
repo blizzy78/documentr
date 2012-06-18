@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -352,5 +353,17 @@ public class PageControllerTest {
 		assertRedirect(view);
 		
 		verify(pageStore).deletePage(PROJECT, BRANCH, PAGE_PATH, USER);
+	}
+	
+	@Test
+	@Ignore
+	public void relocatePage() {
+		// TODO: implement test
+	}
+	
+	@Test
+	@Ignore
+	public void getPageMarkdown() {
+		// TODO: implement test
 	}
 }

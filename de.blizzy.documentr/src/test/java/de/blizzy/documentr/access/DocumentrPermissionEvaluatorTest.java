@@ -156,7 +156,7 @@ public class DocumentrPermissionEvaluatorTest {
 	@Test
 	@Ignore
 	public void hasPagePermission() {
-		// TODO
+		// TODO: implement test
 	}
 
 	@Test
