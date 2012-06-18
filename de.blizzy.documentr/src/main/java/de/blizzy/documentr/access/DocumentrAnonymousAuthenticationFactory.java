@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 		// must have at least one authority
 		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS")); //$NON-NLS-1$
 		
-		return new DocumentrAnonymousAuthentication(key, principal, authorities);
+		return new AnonymousAuthenticationToken(key, principal, authorities);
 	}
 
 	void setUserStore(UserStore userStore) {
