@@ -753,6 +753,53 @@ class PageStore implements IPageStore {
 		return result;
 	}
 	
+	@Override
+	public void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
+			throws IOException {
+		
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(pagePath);
+		Assert.hasLength(name);
+		Assert.notNull(user);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			
+			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
+			boolean deleted = false;
+			File file = toFile(attachmentsDir, pagePath + "/" + name + PAGE_SUFFIX); //$NON-NLS-1$
+			if (file.isFile()) {
+				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			file = toFile(attachmentsDir, pagePath + "/" + name + META_SUFFIX); //$NON-NLS-1$
+			if (file.isFile()) {
+				FileUtils.forceDelete(file);
+				deleted = true;
+			}
+			
+			if (deleted) {
+				Git git = Git.wrap(repo.r());
+				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+				git.commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("delete " + pagePath + "/" + name) //$NON-NLS-1$ //$NON-NLS-2$
+					.call();
+				git.push().call();
+
+				PageUtil.updateProjectEditTime(projectName);
+			}
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
 	private PageVersion toPageVersion(RevCommit commit) {
 		PersonIdent committer = commit.getCommitterIdent();
 		String lastEditedBy = null;

@@ -26,6 +26,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'VIEW')">
 
+<dt:headerJS>
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+
+function showDeleteDialog(name) {
+	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, "'" + name + "'");
+	$('#delete-dialog-body').text(text);
+	$('#delete-button').attr('href', '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/"/>' + name);
+	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
+}
+
+</sec:authorize>
+
+</dt:headerJS>
+
 <c:set var="pagePathUrl" value="${d:toURLPagePath(pagePath)}"/>
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
@@ -55,6 +70,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<th><spring:message code="title.fileName"/></th>
 					<th><spring:message code="title.size"/></th>
 					<th colspan="2"><spring:message code="title.lastEdit"/></th>
+					<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+						<th><spring:message code="title.administration"/></th>
+					</sec:authorize>
 				</tr>
 			</thead>
 			<tbody>
@@ -65,6 +83,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<td><c:out value="${d:formatSize(metadata.size)}"/></td>
 						<td><c:out value="${metadata.lastEditedBy}"/></td>
 						<td><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></td>
+						<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+							<td><a href="javascript:void(showDeleteDialog('${attachment}'));" class="btn btn-mini"><spring:message code="button.delete"/>...</a>
+						</sec:authorize>
 					</tr>
 				</c:forEach>
 			</tbody>
@@ -79,6 +100,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<p>
 	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
 	</p>
+
+	<div class="modal" id="delete-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#delete-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.deleteAttachment"/></h3>
+		</div>
+		<div id="delete-dialog-body" class="modal-body"></div>
+		<div class="modal-footer">
+			<a id="delete-button" href="#" class="btn btn-danger"><spring:message code="button.delete"/></a>
+			<a href="javascript:void($('#delete-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
 </sec:authorize>
 
 </dt:page>

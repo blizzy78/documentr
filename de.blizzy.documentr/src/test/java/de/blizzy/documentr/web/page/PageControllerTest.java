@@ -366,4 +366,10 @@ public class PageControllerTest {
 	public void getPageMarkdown() {
 		// TODO: implement test
 	}
+
+	@Test
+	@Ignore
+	public void deleteAttachment() {
+		// TODO: implement test
+	}
 }

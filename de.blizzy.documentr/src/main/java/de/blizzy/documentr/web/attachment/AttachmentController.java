@@ -151,6 +151,21 @@ public class AttachmentController {
 			Util.toURLPagePath(pagePath);
 	}
 
+	@RequestMapping(value="/delete/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
+			"{name:.*}",
+			method=RequestMethod.GET)
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
+	public String deleteAttachment(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String pagePath, @PathVariable String name, Authentication authentication) throws IOException {
+
+		User user = userStore.getUser(authentication.getName());
+		pageStore.deleteAttachment(projectName, branchName, pagePath, name, user);
+		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Util.toURLPagePath(pagePath);
+	}
+
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}

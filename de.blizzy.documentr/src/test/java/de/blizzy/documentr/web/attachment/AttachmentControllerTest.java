@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -218,5 +219,11 @@ public class AttachmentControllerTest {
 		
 		Page attachment = Page.fromData(data, DocumentrConstants.DEFAULT_MIME_TYPE);
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment, USER); //$NON-NLS-1$
+	}
+	
+	@Test
+	@Ignore
+	public void deleteAttachment() {
+		// TODO: implement test
 	}
 }

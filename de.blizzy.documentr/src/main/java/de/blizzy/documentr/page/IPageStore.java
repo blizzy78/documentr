@@ -65,4 +65,8 @@ public interface IPageStore {
 			throws IOException;
 
 	List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException;
+
+	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
+	void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
+			throws IOException;
 }
