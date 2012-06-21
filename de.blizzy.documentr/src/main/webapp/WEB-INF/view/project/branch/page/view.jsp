@@ -74,18 +74,20 @@ function copyToBranchSelected() {
 
 function showDeleteDialog() {
 	documentr.openMessageDialog('<spring:message code="title.deletePage"/>',
-		"<spring:message code="deletePageX" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/>",
-		[
-			{
-				text: '<spring:message code="button.delete"/>',
-				type: 'danger',
-				href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
+		<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/></c:set>
+		'<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>', [
+		{
+			text: '<spring:message code="button.delete"/>',
+			type: 'danger',
+			href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
+		},
+		{
+			text: '<spring:message code="button.cancel"/>',
+			cancel: true
+		}
+	], {
+		messageAsHtml: true
+	});
 }
 
 function showRelocateDialog() {

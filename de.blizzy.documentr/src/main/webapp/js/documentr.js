@@ -189,6 +189,7 @@ documentr.openMessageDialog = function(title, message, buttons, options) {
 	var backdrop = true;
 	var keyboard = true;
 	var wide = false;
+	var messageAsHtml = false;
 	if (typeof(options) != 'undefined') {
 		if (typeof(options.backdrop) != 'undefined') {
 			backdrop = options.backdrop;
@@ -198,6 +199,9 @@ documentr.openMessageDialog = function(title, message, buttons, options) {
 		}
 		if (typeof(options.wide) != 'undefined') {
 			wide = options.wide;
+		}
+		if (typeof(options.messageAsHtml) != 'undefined') {
+			messageAsHtml = options.messageAsHtml;
 		}
 	}
 	
@@ -226,7 +230,11 @@ documentr.openMessageDialog = function(title, message, buttons, options) {
 	};
 	
 	dlgEl.find('#' + id + '_title').text(title);
-	dlgEl.find('#' + id + '_body').text(message);
+	if (messageAsHtml) {
+		dlgEl.find('#' + id + '_body').html(message);
+	} else {
+		dlgEl.find('#' + id + '_body').text(message);
+	}
 	dlgEl.find('#' + id + '_close').click(function() {
 		close();
 	});
