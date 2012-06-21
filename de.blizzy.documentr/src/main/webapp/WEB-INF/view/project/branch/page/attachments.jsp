@@ -31,10 +31,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
 
 function showDeleteDialog(name) {
-	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, "'" + name + "'");
-	$('#delete-dialog-body').text(text);
-	$('#delete-button').attr('href', '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/"/>' + name);
-	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
+	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
+	documentr.openMessageDialog('<spring:message code="title.deleteAttachment"/>', text, [
+		{
+			text: '<spring:message code="button.delete"/>',
+			type: 'danger',
+			href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/"/>' + name
+		},
+		{
+			text: '<spring:message code="button.cancel"/>',
+			cancel: true
+		}
+	]);
 }
 
 </sec:authorize>
@@ -100,18 +108,6 @@ function showDeleteDialog(name) {
 	<p>
 	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
 	</p>
-
-	<div class="modal" id="delete-dialog" style="display: none;">
-		<div class="modal-header">
-			<button class="close" onclick="$('#delete-dialog').modal('hide');">×</button>
-			<h3><spring:message code="title.deleteAttachment"/></h3>
-		</div>
-		<div id="delete-dialog-body" class="modal-body"></div>
-		<div class="modal-footer">
-			<a id="delete-button" href="#" class="btn btn-danger"><spring:message code="button.delete"/></a>
-			<a href="javascript:void($('#delete-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
-		</div>
-	</div>
 </sec:authorize>
 
 </dt:page>

@@ -185,6 +185,94 @@ documentr.diffMarkdownAndGetHtml = function(markdown1, markdown2) {
 	return '<pre class="changes"><code>' + html.join('') + '</code></pre>';
 };
 
+documentr.openMessageDialog = function(title, message, buttons, options) {
+	var backdrop = true;
+	var keyboard = true;
+	var wide = false;
+	if (typeof(options) != 'undefined') {
+		if (typeof(options.backdrop) != 'undefined') {
+			backdrop = options.backdrop;
+		}
+		if (typeof(options.keyboard) != 'undefined') {
+			keyboard = options.keyboard;
+		}
+		if (typeof(options.wide) != 'undefined') {
+			wide = options.wide;
+		}
+	}
+	
+	var id = "dialog_" + new Date().getTime();
+	var html =
+		'<div class="modal" id="' + id + '" style="display: none;">' +
+			'<div class="modal-header">' +
+				'<button class="close" id="' + id + '_close">&#x00D7</button>' +
+				'<h3 id="' + id + '_title">title</h3>' +
+			'</div>' +
+			'<div class="modal-body" id="' + id + '_body"></div>' +
+			'<div class="modal-footer" id="' + id + '_footer"></div>' +
+		'</div>';
+	var dlgEl = $(html);
+	if (wide) {
+		dlgEl.addClass('modal-wide');
+	}
+	
+	function close() {
+		dlgEl.modal('hide');
+		dlgEl.remove();
+	}
+	
+	var dlg = {
+		close: close
+	};
+	
+	dlgEl.find('#' + id + '_title').text(title);
+	dlgEl.find('#' + id + '_body').text(message);
+	dlgEl.find('#' + id + '_close').click(function() {
+		close();
+	});
+	var footerEl = dlgEl.find('#' + id + '_footer');
+	for (var i = 0; i < buttons.length; i++) {
+		var button = buttons[i];
+		var b = $('<a href="#" class="btn"></a>');
+		b.data('button_options', button);
+		if ((typeof(button.onclick) != 'undefined') ||
+			((typeof(button.cancel) != 'undefined') && button.cancel)) {
+			
+			b.click(function(event) {
+				var buttonOptions = $(this).data('button_options');
+				var closeDlg = (typeof(buttonOptions.close) != 'undefined') && buttonOptions.close;
+				var cancelDlg = (typeof(buttonOptions.cancel) != 'undefined') && buttonOptions.cancel;
+				if (cancelDlg) {
+					closeDlg = true;
+				}
+				
+				if (closeDlg) {
+					close();
+				}
+				if (!cancelDlg) {
+					buttonOptions.onclick.call(dlg);
+				}
+				event.preventDefault();
+			});
+		} else if (typeof(button.href) != 'undefined') {
+			b.attr('href', button.href);
+		}
+		b.text(button.text);
+		if (typeof(button.type) != 'undefined') {
+			b.addClass('btn-' + button.type);
+		}
+		footerEl.append(b);
+	}
+	$(document.body).append(dlgEl);
+	
+	dlgEl.showModal({
+		backdrop: backdrop,
+		keyboard: keyboard
+	});
+	
+	return dlg;
+};
+
 
 $.fn.extend({
 	showModal: function(options) {

@@ -73,7 +73,19 @@ function copyToBranchSelected() {
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
 
 function showDeleteDialog() {
-	$('#delete-dialog').showModal({backdrop: true, keyboard: true});
+	documentr.openMessageDialog('<spring:message code="title.deletePage"/>',
+		"<spring:message code="deletePageX" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/>",
+		[
+			{
+				text: '<spring:message code="button.delete"/>',
+				type: 'danger',
+				href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		]);
 }
 
 function showRelocateDialog() {
@@ -319,20 +331,6 @@ function showChangesDialog() {
 </sec:authorize>
 
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')">
-	<div class="modal" id="delete-dialog" style="display: none;">
-		<div class="modal-header">
-			<button class="close" onclick="$('#delete-dialog').modal('hide');">×</button>
-			<h3><spring:message code="title.deletePage"/></h3>
-		</div>
-		<div class="modal-body">
-			<spring:message code="deletePageX" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/>
-		</div>
-		<div class="modal-footer">
-			<a href="<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn btn-danger"><spring:message code="button.delete"/></a>
-			<a href="javascript:void($('#delete-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
-		</div>
-	</div>
-
 	<div class="modal" id="relocate-dialog" style="display: none;">
 		<div class="modal-header">
 			<button class="close" onclick="$('#relocate-dialog').modal('hide');">×</button>
