@@ -161,7 +161,7 @@ public class AttachmentController {
 			@PathVariable String pagePath, @PathVariable String name, Authentication authentication) throws IOException {
 
 		User user = userStore.getUser(authentication.getName());
-		pageStore.deleteAttachment(projectName, branchName, pagePath, name, user);
+		pageStore.deleteAttachment(projectName, branchName, Util.toRealPagePath(pagePath), name, user);
 		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(pagePath);
 	}

@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -44,6 +44,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.TestUtil;
@@ -356,20 +359,35 @@ public class PageControllerTest {
 	}
 	
 	@Test
-	@Ignore
-	public void relocatePage() {
-		// TODO: implement test
+	public void relocatePage() throws IOException {
+		String view = pageController.relocatePage(PROJECT, BRANCH, PAGE_PATH_URL, "home,newparent", //$NON-NLS-1$
+				authenticatedAuthentication);
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home,newparent,page", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+		
+		verify(pageStore).relocatePage(PROJECT, BRANCH, PAGE_PATH, "home/newparent", USER); //$NON-NLS-1$
 	}
 	
 	@Test
-	@Ignore
-	public void getPageMarkdown() {
-		// TODO: implement test
+	public void getPageMarkdown() throws IOException {
+		Set<String> versions = Sets.newHashSet("commit1", "commit2", "nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Map<String, String> markdown = Maps.newHashMap();
+		markdown.put("commit1", "md1"); //$NON-NLS-1$ //$NON-NLS-2$
+		markdown.put("commit2", "md2"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageStore.getMarkdown(PROJECT, BRANCH, PAGE_PATH, versions)).thenReturn(markdown);
+		
+		Map<String, String> result = pageController.getPageMarkdown(PROJECT, BRANCH, PAGE_PATH_URL, versions);
+		assertEquals(markdown, result);
 	}
-
+	
 	@Test
-	@Ignore
-	public void deleteAttachment() {
-		// TODO: implement test
+	public void getPageChanges() {
+		Model model = mock(Model.class);
+		String view = pageController.getPageChanges(PROJECT, BRANCH, PAGE_PATH_URL, model);
+		assertEquals("/project/branch/page/changes", view); //$NON-NLS-1$
+		
+		verify(model).addAttribute("projectName", PROJECT); //$NON-NLS-1$
+		verify(model).addAttribute("branchName", BRANCH); //$NON-NLS-1$
+		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
 	}
 }

@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -222,8 +221,11 @@ public class AttachmentControllerTest {
 	}
 	
 	@Test
-	@Ignore
-	public void deleteAttachment() {
-		// TODO: implement test
+	public void deleteAttachment() throws IOException {
+		String view = attachmentController.deleteAttachment(PROJECT, BRANCH, PAGE_PATH_URL, "test.dat", authentication); //$NON-NLS-1$
+		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+		
+		verify(pageStore).deleteAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", USER); //$NON-NLS-1$
 	}
 }
