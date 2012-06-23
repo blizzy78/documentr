@@ -31,9 +31,17 @@ class TableOfContentsMacro extends AbstractMarkdownMacro {
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		List<Header> headers = context.getHeaders();
 		if (!headers.isEmpty()) {
+			int smallestLevel = Integer.MAX_VALUE;
+			for (Header header : headers) {
+				int level = header.getLevel() - 1;
+				if (level < smallestLevel) {
+					smallestLevel = level;
+				}
+			}
+			
 			StringBuilder buf = new StringBuilder();
 			for (Header header : headers) {
-				buf.append(StringUtils.repeat("    ", header.getLevel() - 1)) //$NON-NLS-1$
+				buf.append(StringUtils.repeat("    ", header.getLevel() - 1 - smallestLevel)) //$NON-NLS-1$
 					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return buf.toString() + "\n"; //$NON-NLS-1$
