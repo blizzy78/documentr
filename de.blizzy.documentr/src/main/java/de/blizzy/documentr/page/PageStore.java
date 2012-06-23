@@ -757,6 +757,17 @@ class PageStore implements IPageStore {
 		return result;
 	}
 	
+	private PageVersion toPageVersion(RevCommit commit) {
+		PersonIdent committer = commit.getCommitterIdent();
+		String lastEditedBy = null;
+		if (committer != null) {
+			lastEditedBy = committer.getName();
+		}
+		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+		String commitName = commit.getName();
+		return new PageVersion(commitName, lastEditedBy, lastEdited);
+	}
+
 	@Override
 	public void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException {
@@ -803,18 +814,14 @@ class PageStore implements IPageStore {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
-
-	private PageVersion toPageVersion(RevCommit commit) {
-		PersonIdent committer = commit.getCommitterIdent();
-		String lastEditedBy = null;
-		if (committer != null) {
-			lastEditedBy = committer.getName();
-		}
-		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
-		String commitName = commit.getName();
-		return new PageVersion(commitName, lastEditedBy, lastEdited);
-	}
 	
+	@Override
+	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
+		System.out.println("PageStore.getPageViewRestrictionRole()"); //$NON-NLS-1$
+		
+		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
+	}
+
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		this.repoManager = repoManager;
 	}

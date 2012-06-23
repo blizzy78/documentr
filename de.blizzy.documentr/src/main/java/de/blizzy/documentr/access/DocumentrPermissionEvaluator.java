@@ -33,7 +33,6 @@ import org.springframework.util.Assert;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
-import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageNotFoundException;
 
 @Component
@@ -197,8 +196,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 			return true;
 		} else if (hasBranchPermission(authentication, projectName, branchName, permission)) {
 			try {
-				Page page = pageStore.getPage(projectName, branchName, path, false);
-				String viewRestrictionRole = page.getViewRestrictionRole();
+				String viewRestrictionRole = pageStore.getViewRestrictionRole(projectName, branchName, path);
 				return StringUtils.isBlank(viewRestrictionRole) ||
 						hasRoleOnBranch(authentication, projectName, branchName, viewRestrictionRole);
 			} catch (IOException e) {
@@ -212,24 +210,26 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	
 	private boolean hasRoleOnBranch(Authentication authentication, String projectName, String branchName,
 			String roleName) throws IOException {
-		
-		List<RoleGrantedAuthority> authorities = userStore.getUserAuthorities(authentication.getName());
-		for (RoleGrantedAuthority rga : authorities) {
-			if (rga.getRoleName().equals(roleName)) {
-				GrantedAuthorityTarget target = rga.getTarget();
-				switch (target.getType()) {
-					case APPLICATION:
-						return true;
-					case PROJECT:
-						if (target.getTargetId().equals(projectName)) {
+
+		if (authentication.isAuthenticated()) {
+			List<RoleGrantedAuthority> authorities = userStore.getUserAuthorities(authentication.getName());
+			for (RoleGrantedAuthority rga : authorities) {
+				if (rga.getRoleName().equals(roleName)) {
+					GrantedAuthorityTarget target = rga.getTarget();
+					switch (target.getType()) {
+						case APPLICATION:
 							return true;
-						}
-						break;
-					case BRANCH:
-						if (target.getTargetId().equals(projectName + "/" + branchName)) { //$NON-NLS-1$
-							return true;
-						}
-						break;
+						case PROJECT:
+							if (target.getTargetId().equals(projectName)) {
+								return true;
+							}
+							break;
+						case BRANCH:
+							if (target.getTargetId().equals(projectName + "/" + branchName)) { //$NON-NLS-1$
+								return true;
+							}
+							break;
+					}
 				}
 			}
 		}

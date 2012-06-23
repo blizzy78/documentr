@@ -372,6 +372,17 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertPageVersion(commit1, versions.get(2));
 	}
 	
+	@Test
+	public void getPageViewRestrictionRole() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home/page", page, USER); //$NON-NLS-1$
+		String role = pageStore.getViewRestrictionRole(PROJECT, BRANCH_1, "home/page"); //$NON-NLS-1$
+		assertEquals(page.getViewRestrictionRole(), role);
+	}
+	
 	private void assertPageVersion(RevCommit commit, PageVersion version) {
 		assertEquals(commit.getName(), version.getCommitName());
 		assertEquals(commit.getCommitterIdent().getName(), version.getLastEditedBy());

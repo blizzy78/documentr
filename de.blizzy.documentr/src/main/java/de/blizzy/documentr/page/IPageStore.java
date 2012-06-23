@@ -23,11 +23,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 import de.blizzy.documentr.access.User;
 
 public interface IPageStore {
-	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
+	})
 	void savePage(String projectName, String branchName, String path, Page page,
 			User user) throws IOException;
 
@@ -49,7 +54,10 @@ public interface IPageStore {
 
 	List<String> listChildPagePaths(String projectName, String branchName, String path) throws IOException;
 
-	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
+	})
 	void deletePage(String projectName, String branchName, String path, User user) throws IOException;
 	
 	PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException;
@@ -57,7 +65,10 @@ public interface IPageStore {
 	PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath, String name)
 			throws IOException;
 
-	@CacheEvict(value="pageHTML", allEntries=true)
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", allEntries=true),
+			@CacheEvict(value="pageViewRestrictionRole", allEntries=true)
+	})
 	void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
 			User user) throws IOException;
 
@@ -69,4 +80,7 @@ public interface IPageStore {
 	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
 	void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException;
+
+	@Cacheable(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
+	String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException;
 }

@@ -103,8 +103,9 @@ public class PageController {
 					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
 			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
+			String viewRestrictionRole = page.getViewRestrictionRole();
 			model.addAttribute("viewRestrictionRole", //$NON-NLS-1$
-					(page.getViewRestrictionRole() != null) ? page.getViewRestrictionRole() : StringUtils.EMPTY);
+					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY);
 			return "/project/branch/page/view"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -135,10 +136,11 @@ public class PageController {
 		try {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path, true);
+			String viewRestrictionRole = page.getViewRestrictionRole();
 			PageForm form = new PageForm(projectName, branchName,
 					path, page.getParentPagePath(),
 					page.getTitle(), ((PageTextData) page.getData()).getText(),
-					StringUtils.isNotBlank(page.getViewRestrictionRole()) ? page.getViewRestrictionRole() : StringUtils.EMPTY);
+					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY);
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {

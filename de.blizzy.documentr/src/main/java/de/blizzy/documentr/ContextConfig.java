@@ -100,6 +100,14 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 			.maxEntriesLocalHeap(1000)
 			.maxBytesLocalDisk(100, MemoryUnit.MEGABYTES)
 			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
+		ehCacheManager.addCache(new Cache(new CacheConfiguration()
+			.name("pageViewRestrictionRole") //$NON-NLS-1$
+			.diskStorePath(cacheDir.getAbsolutePath())
+			.overflowToDisk(true)
+			.diskPersistent(true)
+			.maxEntriesLocalHeap(1000)
+			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
+			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
 		
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
 		cacheManager.setCacheManager(ehCacheManager);
