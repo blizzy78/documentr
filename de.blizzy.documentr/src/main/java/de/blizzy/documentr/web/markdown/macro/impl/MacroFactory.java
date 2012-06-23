@@ -39,6 +39,8 @@ public class MacroFactory {
 		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("neighbours", NeighborsMacro.class); //$NON-NLS-1$
 		MACRO_CLASSES.put("toc", TableOfContentsMacro.class); //$NON-NLS-1$
+		MACRO_CLASSES.put("vimeo", VimeoMacro.class); //$NON-NLS-1$
+		MACRO_CLASSES.put("youtube", YoutubeMacro.class); //$NON-NLS-1$
 	}
 	
 	@Autowired
