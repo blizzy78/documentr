@@ -23,6 +23,8 @@ public class UserNotFoundException extends NotFoundException {
 	private String loginName;
 
 	public UserNotFoundException(String loginName) {
+		super("user not found: " + loginName); //$NON-NLS-1$
+		
 		this.loginName = loginName;
 	}
 	
