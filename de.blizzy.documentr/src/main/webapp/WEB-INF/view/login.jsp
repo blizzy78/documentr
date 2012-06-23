@@ -31,12 +31,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well form-horizontal loginForm span4 offset3">
 	<fieldset>
 		<div class="control-group">
-			<label class="control-label"><spring:message code="label.loginName"/>:</label>
+			<label class="control-label" for="j_username"><spring:message code="label.loginName"/>:</label>
 			<input type="text" name="j_username" class="input-large"/>
 		</div>
 		<div class="control-group">
-			<label class="control-label"><spring:message code="label.password"/>:</label>
+			<label class="control-label" for="j_password"><spring:message code="label.password"/>:</label>
 			<input type="password" name="j_password" class="input-large"/>
+		</div>
+		<div class="control-group">
+			<label class="checkbox" for="_spring_security_remember_me">
+				<input type="checkbox" name="_spring_security_remember_me" value="true"/>
+				<spring:message code="label.rememberMe"/>
+			</label>
 		</div>
 		<div class="form-actions">
 			<input type="submit" value="<spring:message code="button.login"/>" class="btn btn-primary"/>
