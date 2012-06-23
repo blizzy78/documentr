@@ -137,6 +137,14 @@ function showPreview() {
 			<form:textarea path="text" cssClass="span11 code" rows="20"/>
 			<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
 		</div>
+		<div class="control-group">
+			<form:label path="viewRestrictionRole" cssClass="control-label"><spring:message code="label.visibleForRole"/>:</form:label>
+			<form:select path="viewRestrictionRole">
+				<form:option value="">(<spring:message code="everyone"/>)</form:option>
+				<c:set var="roles" value="${d:listRoles()}"/>
+				<form:options items="${roles}"/>
+			</form:select>
+		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 			<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>

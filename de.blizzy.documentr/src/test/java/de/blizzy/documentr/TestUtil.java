@@ -30,7 +30,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.page.PageUtil;
+import de.blizzy.documentr.page.TestPageUtil;
 
 public final class TestUtil {
 	private TestUtil() {}
@@ -42,7 +42,7 @@ public final class TestUtil {
 	public static Page createRandomPage(String parentPagePath) {
 		Page page = Page.fromText(String.valueOf(Math.random() * Long.MAX_VALUE),
 				String.valueOf(Math.random() * Long.MAX_VALUE));
-		page.setParentPagePath(parentPagePath);
+		TestPageUtil.setParentPagePath(page, parentPagePath);
 		return page;
 	}
 	
@@ -130,11 +130,13 @@ public final class TestUtil {
 		return context;
 	}
 	
-	public static void clearProjectEditTimes() {
+	public static <T> void invokeMethod(Class<T> targetClass, T target, String methodName,
+			Class<?>[] argTypes, Object[] args) {
+		
 		try {
-			Method method = PageUtil.class.getDeclaredMethod("clearProjectEditTimes"); //$NON-NLS-1$
+			Method method = targetClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
-			method.invoke(null);
+			method.invoke(target, args);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {

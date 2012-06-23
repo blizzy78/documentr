@@ -20,6 +20,8 @@ package de.blizzy.documentr.page;
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 public class PageTest {
@@ -64,6 +66,26 @@ public class PageTest {
 		
 		page = Page.fromMeta(TITLE, IMAGE_PNG); 
 		assertEquals(IMAGE_PNG, page.getContentType()); 
+	}
+	
+	@Test
+	public void setAndGetViewRestrictionRole() {
+		Page page = Page.fromMeta(TITLE, IMAGE_PNG);
+		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
+		assertEquals("viewRole", page.getViewRestrictionRole()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getData() {
+		PageTextData pageData = new PageTextData(TEXT); 
+		Page page = new Page(TITLE, pageData.getContentType(), pageData);
+		assertEquals(pageData, page.getData());
+		
+		page = Page.fromData(new byte[] { 1, 2, 3 }, IMAGE_PNG);
+		assertTrue(Arrays.equals(new byte[] { 1, 2, 3 }, page.getData().getData()));
+		
+		page = Page.fromText(TITLE, TEXT); 
+		assertEquals(TEXT, ((PageTextData) page.getData()).getText());
 	}
 	
 	@Test

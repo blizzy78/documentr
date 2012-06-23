@@ -41,15 +41,17 @@ import de.blizzy.documentr.web.page.PageForm;
 import de.blizzy.documentr.web.project.ProjectForm;
 
 public final class DocumentrMatchers {
-	private static final String ANY = DocumentrMatchers.class.getName() + "_ANY"; //$NON-NLS-1$
+	public static final String ANY = DocumentrMatchers.class.getName() + "_ANY"; //$NON-NLS-1$
 	
 	private DocumentrMatchers() {}
 
 	public static Page argPage(String title, String text) {
-		return argPage(ANY, title, text);
+		return argPage(ANY, title, text, ANY);
 	}
 	
-	public static Page argPage(final String parentPagePath, final String title, final String text) {
+	public static Page argPage(final String parentPagePath, final String title, final String text,
+			final String viewRestrictionRole) {
+		
 		Matcher<Page> matcher = new ArgumentMatcher<Page>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -61,7 +63,9 @@ public final class DocumentrMatchers {
 				return (StringUtils.equals(parentPagePath, ANY) ||
 							StringUtils.equals(page.getParentPagePath(), parentPagePath)) &&
 						StringUtils.equals(page.getTitle(), title) &&
-						StringUtils.equals(pageText, text);
+						StringUtils.equals(pageText, text) &&
+						(StringUtils.equals(viewRestrictionRole, ANY) ||
+							StringUtils.equals(page.getViewRestrictionRole(), viewRestrictionRole));
 			}
 		};
 		return argThat(matcher);

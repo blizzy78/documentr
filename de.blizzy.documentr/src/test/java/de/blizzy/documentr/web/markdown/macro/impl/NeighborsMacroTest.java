@@ -41,6 +41,7 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.TestPageUtil;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
@@ -176,7 +177,7 @@ public class NeighborsMacroTest {
 				StringUtils.substringBeforeLast(pagePath, "/") : //$NON-NLS-1$
 				null;
 		Page page = Page.fromText(pagePath, "text"); //$NON-NLS-1$
-		page.setParentPagePath(parentPagePath);
+		TestPageUtil.setParentPagePath(page, parentPagePath);
 		when(pageStore.getPage(PROJECT, BRANCH, pagePath, false)).thenReturn(page);
 	}
 }

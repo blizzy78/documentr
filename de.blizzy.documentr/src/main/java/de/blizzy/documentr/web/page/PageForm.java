@@ -47,14 +47,19 @@ public class PageForm {
 	@NotBlank(message="{page.title.blank}")
 	private String title;
 	private String text;
+	@RoleExists
+	private String viewRestrictionRole;
 
-	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text) {
+	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
+			String viewRestrictionRole) {
+		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
 		this.parentPagePath = parentPagePath;
 		this.title = title;
 		this.text = text;
+		this.viewRestrictionRole = viewRestrictionRole;
 	}
 	
 	public String getProjectName() {
@@ -79,5 +84,9 @@ public class PageForm {
 	
 	public String getText() {
 		return text;
+	}
+	
+	public String getViewRestrictionRole() {
+		return viewRestrictionRole;
 	}
 }

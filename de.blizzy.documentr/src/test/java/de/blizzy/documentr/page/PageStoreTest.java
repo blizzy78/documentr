@@ -88,6 +88,22 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
 		assertEquals(page.getContentType(), result.getContentType());
 		assertEquals("home", result.getParentPagePath()); //$NON-NLS-1$
+		assertNull(result.getViewRestrictionRole());
+	}
+	
+	@Test
+	public void saveAndGetPageWithViewRestrictionRole() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home/foo", page, USER); //$NON-NLS-1$
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "home/foo", true); //$NON-NLS-1$
+		assertEquals(page.getTitle(), result.getTitle());
+		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
+		assertEquals(page.getContentType(), result.getContentType());
+		assertEquals(page.getViewRestrictionRole(), result.getViewRestrictionRole());
+		assertEquals("home", result.getParentPagePath()); //$NON-NLS-1$
 	}
 	
 	@Test

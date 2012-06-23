@@ -103,6 +103,8 @@ public class PageController {
 					path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path); //$NON-NLS-1$ //$NON-NLS-2$
 			model.addAttribute("parentPagePath", page.getParentPagePath()); //$NON-NLS-1$
 			model.addAttribute("title", page.getTitle()); //$NON-NLS-1$
+			model.addAttribute("viewRestrictionRole", //$NON-NLS-1$
+					(page.getViewRestrictionRole() != null) ? page.getViewRestrictionRole() : StringUtils.EMPTY);
 			return "/project/branch/page/view"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -117,7 +119,7 @@ public class PageController {
 			@PathVariable String parentPagePath, Model model) {
 
 		PageForm form = new PageForm(projectName, branchName, null,
-				Util.toRealPagePath(parentPagePath), null, null);
+				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -135,7 +137,8 @@ public class PageController {
 			Page page = pageStore.getPage(projectName, branchName, path, true);
 			PageForm form = new PageForm(projectName, branchName,
 					path, page.getParentPagePath(),
-					page.getTitle(), ((PageTextData) page.getData()).getText());
+					page.getTitle(), ((PageTextData) page.getData()).getText(),
+					StringUtils.isNotBlank(page.getViewRestrictionRole()) ? page.getViewRestrictionRole() : StringUtils.EMPTY);
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
@@ -145,7 +148,7 @@ public class PageController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
+	@PreAuthorize("hasBranchPermission(#form.projectName, #form.branchName, 'EDIT_PAGE')")
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		
@@ -167,6 +170,8 @@ public class PageController {
 		if (StringUtils.isBlank(path)) {
 			path = parentPagePath + "/" + Util.simplifyForURL(form.getTitle()); //$NON-NLS-1$
 		}
+		page.setViewRestrictionRole(StringUtils.isNotBlank(form.getViewRestrictionRole()) ?
+				form.getViewRestrictionRole() : null);
 		
 		Page oldPage = null;
 		try {
@@ -186,10 +191,13 @@ public class PageController {
 	@ModelAttribute
 	public PageForm createPageForm(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam(required=false) String path, @RequestParam(required=false) String parentPagePath,
-			@RequestParam(required=false) String title, @RequestParam(required=false) String text) {
+			@RequestParam(required=false) String title, @RequestParam(required=false) String text,
+			@RequestParam(required=false) String viewRestrictionRole) {
 		
 		return ((path != null) && (title != null) && (text != null)) ?
-				new PageForm(projectName, branchName, path, parentPagePath, title, text) : null;
+				new PageForm(projectName, branchName, path, parentPagePath, title, text,
+						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY) :
+				null;
 	}
 	
 	@RequestMapping(value="/generateName/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +

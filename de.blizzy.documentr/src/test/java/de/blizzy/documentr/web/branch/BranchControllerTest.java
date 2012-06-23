@@ -93,7 +93,7 @@ public class BranchControllerTest {
 		
 		verify(repoManager).createProjectBranchRepository(PROJECT, BRANCH, null);
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(DocumentrConstants.HOME_PAGE_NAME),
-				argPage(null, "Home", StringUtils.EMPTY), same(USER)); //$NON-NLS-1$
+				argPage(null, "Home", StringUtils.EMPTY, null), same(USER)); //$NON-NLS-1$
 	}
 
 	@Test

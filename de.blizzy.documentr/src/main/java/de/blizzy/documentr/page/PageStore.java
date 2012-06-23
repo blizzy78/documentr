@@ -77,6 +77,7 @@ class PageStore implements IPageStore {
 	private static final String ATTACHMENTS_DIR_NAME = "attachments"; //$NON-NLS-1$
 	private static final String VERSION_LATEST = "latest"; //$NON-NLS-1$
 	private static final String VERSION_PREVIOUS = "previous"; //$NON-NLS-1$
+	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
@@ -128,6 +129,7 @@ class PageStore implements IPageStore {
 			Map<String, Object> metaMap = new HashMap<String, Object>();
 			metaMap.put(TITLE, page.getTitle());
 			metaMap.put(CONTENT_TYPE, page.getContentType());
+			metaMap.put(VIEW_RESTRICTION_ROLE, page.getViewRestrictionRole());
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			String json = gson.toJson(metaMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
@@ -182,9 +184,11 @@ class PageStore implements IPageStore {
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
+			String viewRestrictionRole = (String) pageMap.get(VIEW_RESTRICTION_ROLE);
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
 			Page page = new Page(title, contentType, pageData);
 			page.setParentPagePath(parentPagePath);
+			page.setViewRestrictionRole(viewRestrictionRole);
 			return page;
 		} catch (GitAPIException e) {
 			throw new IOException(e);

@@ -24,6 +24,7 @@ public class Page {
 	private String parentPagePath;
 	private String title;
 	private String contentType;
+	private String viewRestrictionRole;
 	private PageData data;
 
 	Page(String title, String contentType, PageData data) {
@@ -46,7 +47,7 @@ public class Page {
 		return new Page(title, contentType, null);
 	}
 
-	public void setParentPagePath(String parentPagePath) {
+	void setParentPagePath(String parentPagePath) {
 		this.parentPagePath = parentPagePath;
 	}
 	
@@ -60,6 +61,14 @@ public class Page {
 
 	public String getContentType() {
 		return contentType;
+	}
+	
+	public void setViewRestrictionRole(String viewRestrictionRole) {
+		this.viewRestrictionRole = viewRestrictionRole;
+	}
+	
+	public String getViewRestrictionRole() {
+		return viewRestrictionRole;
 	}
 	
 	public PageData getData() {
@@ -77,6 +86,7 @@ public class Page {
 				.append(title, other.title)
 				.append(data, other.data)
 				.append(contentType, other.contentType)
+				.append(viewRestrictionRole, other.viewRestrictionRole)
 				.isEquals();
 		}
 		return false;
@@ -89,6 +99,7 @@ public class Page {
 			.append(title)
 			.append(data)
 			.append(contentType)
+			.append(viewRestrictionRole)
 			.toHashCode();
 	}
 }

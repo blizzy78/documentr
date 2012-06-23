@@ -45,13 +45,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
+import de.blizzy.documentr.page.TestPageUtil;
 
 public class AttachmentControllerTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -170,7 +170,7 @@ public class AttachmentControllerTest {
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
 		
-		TestUtil.clearProjectEditTimes();
+		TestPageUtil.clearProjectEditTimes();
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$

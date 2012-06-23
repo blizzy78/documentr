@@ -29,12 +29,13 @@ public class PageFormTest {
 	private static final String PARENT = "parent"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
+	private static final String VIEW_ROLE = "viewRole"; //$NON-NLS-1$
 	
 	private PageForm form;
 
 	@Before
 	public void setUp() {
-		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT);
+		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE);
 	}
 	
 	@Test
@@ -65,5 +66,10 @@ public class PageFormTest {
 	@Test
 	public void getText() {
 		assertEquals(TEXT, form.getText());
+	}
+	
+	@Test
+	public void getViewRestrictionRole() {
+		assertEquals(VIEW_ROLE, form.getViewRestrictionRole());
 	}
 }

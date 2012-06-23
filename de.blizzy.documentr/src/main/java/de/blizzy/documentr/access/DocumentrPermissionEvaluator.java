@@ -17,10 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -28,9 +32,17 @@ import org.springframework.util.Assert;
 
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageNotFoundException;
 
 @Component
 public class DocumentrPermissionEvaluator implements PermissionEvaluator {
+	@Autowired
+	private IPageStore pageStore;
+	@Autowired
+	private UserStore userStore;
+
 	@Override
 	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
 		Assert.notNull(authentication);
@@ -179,15 +191,61 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	}
 	
 	public boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
-			@SuppressWarnings("unused") String path, Permission permission) {
+			String path, Permission permission) {
 
-		// TODO: check page to see whom it is restricted to
+		if (hasBranchPermission(authentication, projectName, branchName, Permission.ADMIN)) {
+			return true;
+		} else if (hasBranchPermission(authentication, projectName, branchName, permission)) {
+			try {
+				Page page = pageStore.getPage(projectName, branchName, path, false);
+				String viewRestrictionRole = page.getViewRestrictionRole();
+				return StringUtils.isBlank(viewRestrictionRole) ||
+						hasRoleOnBranch(authentication, projectName, branchName, viewRestrictionRole);
+			} catch (IOException e) {
+				throw new AuthenticationServiceException(e.getMessage(), e);
+			} catch (PageNotFoundException e) {
+				throw new AuthenticationServiceException(e.getMessage(), e);
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasRoleOnBranch(Authentication authentication, String projectName, String branchName,
+			String roleName) throws IOException {
 		
-		return hasBranchPermission(authentication, projectName, branchName, permission);
+		List<RoleGrantedAuthority> authorities = userStore.getUserAuthorities(authentication.getName());
+		for (RoleGrantedAuthority rga : authorities) {
+			if (rga.getRoleName().equals(roleName)) {
+				GrantedAuthorityTarget target = rga.getTarget();
+				switch (target.getType()) {
+					case APPLICATION:
+						return true;
+					case PROJECT:
+						if (target.getTargetId().equals(projectName)) {
+							return true;
+						}
+						break;
+					case BRANCH:
+						if (target.getTargetId().equals(projectName + "/" + branchName)) { //$NON-NLS-1$
+							return true;
+						}
+						break;
+				}
+			}
+		}
+		return false;
 	}
 	
 	private boolean hasPermission(PermissionGrantedAuthority authority, Permission permission) {
 		Permission p = authority.getPermission();
 		return (p == Permission.ADMIN) || (p == permission);
+	}
+
+	void setPageStore(IPageStore pageStore) {
+		this.pageStore = pageStore;
+	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
 	}
 }
