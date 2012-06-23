@@ -817,8 +817,6 @@ class PageStore implements IPageStore {
 	
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
-		System.out.println("PageStore.getPageViewRestrictionRole()"); //$NON-NLS-1$
-		
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
 	}
 
