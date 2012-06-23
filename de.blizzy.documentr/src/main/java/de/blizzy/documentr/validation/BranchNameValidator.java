@@ -15,23 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.page;
+package de.blizzy.documentr.validation;
 
-import static org.junit.Assert.*;
+import java.util.regex.Pattern;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
 
-public class PagePathValidatorTest {
-	@Test
-	public void isValid() {
-		PagePathValidator validator = new PagePathValidator();
-		assertTrue(validator.isValid(null, null));
-		assertTrue(validator.isValid(StringUtils.EMPTY, null));
-		assertTrue(validator.isValid("foo", null)); //$NON-NLS-1$
-		assertTrue(validator.isValid("foo/bar", null)); //$NON-NLS-1$
-		assertTrue(validator.isValid("foo,bar", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid(".foo", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid("foo/.bar", null)); //$NON-NLS-1$
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.annotation.ValidBranchName;
+
+public class BranchNameValidator implements ConstraintValidator<ValidBranchName, String> {
+	@Override
+	public void initialize(ValidBranchName annotation) {
+	}
+
+	@Override
+	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (StringUtils.isBlank(value)) {
+			return true;
+		}
+		
+		return Pattern.matches("^" + DocumentrConstants.BRANCH_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

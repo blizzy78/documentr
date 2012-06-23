@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.web.page.PagePathValidator;
+import de.blizzy.documentr.validation.PagePathValidator;
 
 
 public final class Util {

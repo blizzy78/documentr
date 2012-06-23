@@ -15,28 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.branch;
+package de.blizzy.documentr.validation.annotation;
 
-import java.util.regex.Pattern;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import javax.validation.Constraint;
 
-import org.apache.commons.lang3.StringUtils;
+import de.blizzy.documentr.validation.ProjectNameValidator;
 
-import de.blizzy.documentr.DocumentrConstants;
-
-public class BranchNameValidator implements ConstraintValidator<ValidBranchName, String> {
-	@Override
-	public void initialize(ValidBranchName annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		
-		return Pattern.matches("^" + DocumentrConstants.BRANCH_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
-	}
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy=ProjectNameValidator.class)
+public @interface ValidProjectName {
+	String message() default "{project.name.invalid}";
+	Class<?>[] groups() default {};
+	Class<?>[] payload() default {};
 }

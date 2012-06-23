@@ -15,21 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.validation;
 
-import static org.junit.Assert.*;
+import java.util.regex.Pattern;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
 
-public class LoginNameValidatorTest {
-	@Test
-	public void isValid() {
-		LoginNameValidator validator = new LoginNameValidator();
-		assertTrue(validator.isValid(null, null));
-		assertTrue(validator.isValid(StringUtils.EMPTY, null));
-		assertTrue(validator.isValid("admin", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid("x/y", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid("x,y", null)); //$NON-NLS-1$
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.annotation.ValidRoleName;
+
+public class RoleNameValidator implements ConstraintValidator<ValidRoleName, String> {
+	@Override
+	public void initialize(ValidRoleName annotation) {
+	}
+
+	@Override
+	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (StringUtils.isBlank(value)) {
+			return true;
+		}
+		
+		return Pattern.matches("^" + DocumentrConstants.ROLE_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

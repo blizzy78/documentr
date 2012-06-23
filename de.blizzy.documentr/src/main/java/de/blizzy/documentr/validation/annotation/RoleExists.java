@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,11 +24,13 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 
+import de.blizzy.documentr.validation.RoleExistsValidator;
+
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=ProjectDoesNotExistValidator.class)
-public @interface ProjectDoesNotExist {
-	String message() default "{project.name.exists}";
+@Constraint(validatedBy=RoleExistsValidator.class)
+public @interface RoleExists {
+	String message() default "{role.name.nonexistent}";
 	Class<?>[] groups() default {};
 	Class<?>[] payload() default {};
 }

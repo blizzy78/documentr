@@ -15,20 +15,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import static org.junit.Assert.*;
 
-import javax.validation.Constraint;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-@Target({ElementType.METHOD, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=ProjectExistsValidator.class)
-public @interface ProjectExists {
-	String message() default "{project.name.nonexistent}";
-	Class<?>[] groups() default {};
-	Class<?>[] payload() default {};
+import de.blizzy.documentr.validation.ProjectNameValidator;
+
+public class ProjectNameValidatorTest {
+	@Test
+	public void isValid() {
+		ProjectNameValidator validator = new ProjectNameValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("project", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("My-Project_123", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("1,2,3", null)); //$NON-NLS-1$
+	}
 }

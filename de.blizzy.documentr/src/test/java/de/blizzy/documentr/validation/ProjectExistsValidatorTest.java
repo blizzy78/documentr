@@ -15,21 +15,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.validation;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-public class RoleNameValidatorTest {
+import com.google.common.collect.Lists;
+
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.validation.ProjectExistsValidator;
+
+public class ProjectExistsValidatorTest {
 	@Test
 	public void isValid() {
-		RoleNameValidator validator = new RoleNameValidator();
+		GlobalRepositoryManager repoManager = mock(GlobalRepositoryManager.class);
+		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project")); //$NON-NLS-1$
+		
+		ProjectExistsValidator validator = new ProjectExistsValidator();
+		validator.setGlobalRepositoryManager(repoManager);
+		
 		assertTrue(validator.isValid(null, null));
 		assertTrue(validator.isValid(StringUtils.EMPTY, null));
-		assertTrue(validator.isValid("role", null)); //$NON-NLS-1$
-		assertTrue(validator.isValid("Role 123", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid("role.123", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("project", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("project2", null)); //$NON-NLS-1$
 	}
 }

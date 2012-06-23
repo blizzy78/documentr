@@ -15,28 +15,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation;
 
-import java.util.regex.Pattern;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.RoleNameValidator;
 
-public class ProjectNameValidator implements ConstraintValidator<ValidProjectName, String> {
-	@Override
-	public void initialize(ValidProjectName annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-
-		return Pattern.matches("^" + DocumentrConstants.PROJECT_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
+public class RoleNameValidatorTest {
+	@Test
+	public void isValid() {
+		RoleNameValidator validator = new RoleNameValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("role", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("Role 123", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("role.123", null)); //$NON-NLS-1$
 	}
 }

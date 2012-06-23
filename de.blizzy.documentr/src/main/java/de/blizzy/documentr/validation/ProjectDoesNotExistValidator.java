@@ -15,25 +15,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.page;
-
-import java.io.IOException;
+package de.blizzy.documentr.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.validation.annotation.ProjectDoesNotExist;
 
-public class RoleExistsValidator implements ConstraintValidator<RoleExists, String> {
+public class ProjectDoesNotExistValidator implements ConstraintValidator<ProjectDoesNotExist, String> {
 	@Autowired
-	private UserStore userStore;
+	private GlobalRepositoryManager repoManager;
 	
 	@Override
-	public void initialize(RoleExists annotation) {
+	public void initialize(ProjectDoesNotExist annotation) {
 	}
 
 	@Override
@@ -41,15 +39,11 @@ public class RoleExistsValidator implements ConstraintValidator<RoleExists, Stri
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
-		try {
-			return userStore.getRole(value) != null;
-		} catch (IOException e) {
-			throw new ValidationException(e);
-		}
+
+		return !repoManager.listProjects().contains(value);
 	}
-	
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
+
+	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+		this.repoManager = repoManager;
 	}
 }

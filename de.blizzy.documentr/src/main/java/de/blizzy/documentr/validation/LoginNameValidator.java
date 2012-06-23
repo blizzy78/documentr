@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.validation;
 
 import java.util.regex.Pattern;
 
@@ -25,6 +25,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.annotation.ValidLoginName;
 
 public class LoginNameValidator implements ConstraintValidator<ValidLoginName, String> {
 	@Override

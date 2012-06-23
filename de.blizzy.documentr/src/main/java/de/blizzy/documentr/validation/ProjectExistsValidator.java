@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -24,13 +24,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.validation.annotation.ProjectExists;
 
-public class ProjectDoesNotExistValidator implements ConstraintValidator<ProjectDoesNotExist, String> {
+public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	
 	@Override
-	public void initialize(ProjectDoesNotExist annotation) {
+	public void initialize(ProjectExists annotation) {
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class ProjectDoesNotExistValidator implements ConstraintValidator<Project
 			return true;
 		}
 
-		return !repoManager.listProjects().contains(value);
+		return repoManager.listProjects().contains(value);
 	}
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

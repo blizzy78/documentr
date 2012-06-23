@@ -15,28 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.validation.annotation;
 
-import java.util.regex.Pattern;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import javax.validation.Constraint;
 
-import org.apache.commons.lang3.StringUtils;
+import de.blizzy.documentr.validation.RoleNameValidator;
 
-import de.blizzy.documentr.DocumentrConstants;
-
-public class RoleNameValidator implements ConstraintValidator<ValidRoleName, String> {
-	@Override
-	public void initialize(ValidRoleName annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		
-		return Pattern.matches("^" + DocumentrConstants.ROLE_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
-	}
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy=RoleNameValidator.class)
+public @interface ValidRoleName {
+	String message() default "{role.name.invalid}";
+	Class<?>[] groups() default {};
+	Class<?>[] payload() default {};
 }

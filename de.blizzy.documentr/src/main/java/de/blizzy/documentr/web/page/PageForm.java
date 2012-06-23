@@ -21,11 +21,13 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import de.blizzy.documentr.web.branch.BranchNameNotBlacklisted;
-import de.blizzy.documentr.web.branch.ValidBranchName;
-import de.blizzy.documentr.web.project.ProjectExists;
-import de.blizzy.documentr.web.project.ProjectNameNotBlacklisted;
-import de.blizzy.documentr.web.project.ValidProjectName;
+import de.blizzy.documentr.validation.annotation.BranchNameNotBlacklisted;
+import de.blizzy.documentr.validation.annotation.ProjectExists;
+import de.blizzy.documentr.validation.annotation.ProjectNameNotBlacklisted;
+import de.blizzy.documentr.validation.annotation.RoleExists;
+import de.blizzy.documentr.validation.annotation.ValidBranchName;
+import de.blizzy.documentr.validation.annotation.ValidPagePath;
+import de.blizzy.documentr.validation.annotation.ValidProjectName;
 
 public class PageForm {
 	@NotNull(message="{project.name.blank}")

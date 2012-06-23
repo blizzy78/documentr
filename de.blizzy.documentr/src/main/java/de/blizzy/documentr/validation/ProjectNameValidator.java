@@ -15,22 +15,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation;
+
+import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.annotation.ValidProjectName;
 
-public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
-	@Autowired
-	private GlobalRepositoryManager repoManager;
-	
+public class ProjectNameValidator implements ConstraintValidator<ValidProjectName, String> {
 	@Override
-	public void initialize(ProjectExists annotation) {
+	public void initialize(ValidProjectName annotation) {
 	}
 
 	@Override
@@ -39,10 +38,6 @@ public class ProjectExistsValidator implements ConstraintValidator<ProjectExists
 			return true;
 		}
 
-		return repoManager.listProjects().contains(value);
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
+		return Pattern.matches("^" + DocumentrConstants.PROJECT_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

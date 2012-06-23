@@ -15,29 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
+package de.blizzy.documentr.validation;
 
-import javax.validation.constraints.NotNull;
+import java.util.regex.Pattern;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-import de.blizzy.documentr.validation.annotation.ProjectDoesNotExist;
+import org.apache.commons.lang3.StringUtils;
+
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.validation.annotation.ProjectNameNotBlacklisted;
-import de.blizzy.documentr.validation.annotation.ValidProjectName;
 
-public class ProjectForm {
-	@NotNull(message="{project.name.blank}")
-	@NotBlank(message="{project.name.blank}")
-	@ValidProjectName
-	@ProjectNameNotBlacklisted
-	@ProjectDoesNotExist
-	private String name;
-
-	ProjectForm(String name) {
-		this.name = name;
+public class ProjectNameBlacklistValidator implements ConstraintValidator<ProjectNameNotBlacklisted, String> {
+	@Override
+	public void initialize(ProjectNameNotBlacklisted annotation) {
 	}
-	
-	public String getName() {
-		return name;
+
+	@Override
+	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (StringUtils.isBlank(value)) {
+			return true;
+		}
+
+		return !Pattern.matches("^" + DocumentrConstants.PROJECT_NAMES_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

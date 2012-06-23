@@ -23,6 +23,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import de.blizzy.documentr.validation.annotation.ValidRoleName;
+
 public class RoleForm {
 	@NotNull(message="{role.name.blank}")
 	@NotBlank(message="{role.name.blank}")

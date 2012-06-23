@@ -15,32 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.page;
+package de.blizzy.documentr.validation;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import de.blizzy.documentr.access.Role;
-import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.validation.PagePathValidator;
 
-public class RoleExistsValidatorTest {
+public class PagePathValidatorTest {
 	@Test
-	public void isValid() throws IOException {
-		UserStore userStore = mock(UserStore.class);
-		Role role = mock(Role.class);
-		when(userStore.getRole("role")).thenReturn(role); //$NON-NLS-1$
-
-		RoleExistsValidator validator = new RoleExistsValidator();
-		validator.setUserStore(userStore);
-		
+	public void isValid() {
+		PagePathValidator validator = new PagePathValidator();
 		assertTrue(validator.isValid(null, null));
 		assertTrue(validator.isValid(StringUtils.EMPTY, null));
-		assertTrue(validator.isValid("role", null)); //$NON-NLS-1$
-		assertFalse(validator.isValid("role2", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("foo", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("foo/bar", null)); //$NON-NLS-1$
+		assertTrue(validator.isValid("foo,bar", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid(".foo", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("foo/.bar", null)); //$NON-NLS-1$
 	}
 }

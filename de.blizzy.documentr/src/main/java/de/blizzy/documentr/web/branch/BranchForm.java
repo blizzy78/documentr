@@ -21,9 +21,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import de.blizzy.documentr.web.project.ProjectExists;
-import de.blizzy.documentr.web.project.ProjectNameNotBlacklisted;
-import de.blizzy.documentr.web.project.ValidProjectName;
+import de.blizzy.documentr.validation.annotation.BranchNameNotBlacklisted;
+import de.blizzy.documentr.validation.annotation.ProjectExists;
+import de.blizzy.documentr.validation.annotation.ProjectNameNotBlacklisted;
+import de.blizzy.documentr.validation.annotation.ValidBranchName;
+import de.blizzy.documentr.validation.annotation.ValidProjectName;
 
 public class BranchForm {
 	@NotNull(message="{project.name.blank}")

@@ -15,28 +15,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.branch;
+package de.blizzy.documentr.validation;
 
-import java.util.regex.Pattern;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.LoginNameValidator;
 
-public class BranchNameBlacklistValidator implements ConstraintValidator<BranchNameNotBlacklisted, String> {
-	@Override
-	public void initialize(BranchNameNotBlacklisted annotation) {
-	}
-
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		
-		return !Pattern.matches("^" + DocumentrConstants.BRANCH_NAMES_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
+public class LoginNameValidatorTest {
+	@Test
+	public void isValid() {
+		LoginNameValidator validator = new LoginNameValidator();
+		assertTrue(validator.isValid(null, null));
+		assertTrue(validator.isValid(StringUtils.EMPTY, null));
+		assertTrue(validator.isValid("admin", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("x/y", null)); //$NON-NLS-1$
+		assertFalse(validator.isValid("x,y", null)); //$NON-NLS-1$
 	}
 }

@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
+package de.blizzy.documentr.validation.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,11 +24,13 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 
+import de.blizzy.documentr.validation.PagePathValidator;
+
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=LoginNameValidator.class)
-public @interface ValidLoginName {
-	String message() default "{user.loginName.invalid}";
+@Constraint(validatedBy=PagePathValidator.class)
+public @interface ValidPagePath {
+	String message() default "{page.path.invalid}";
 	Class<?>[] groups() default {};
 	Class<?>[] payload() default {};
 }

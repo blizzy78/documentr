@@ -21,6 +21,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import de.blizzy.documentr.validation.annotation.ValidLoginName;
+
 public class UserForm {
 	@NotNull(message="{user.loginName.blank}")
 	@NotBlank(message="{user.loginName.blank}")

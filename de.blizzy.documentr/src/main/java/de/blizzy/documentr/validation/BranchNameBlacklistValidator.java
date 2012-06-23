@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.page;
+package de.blizzy.documentr.validation;
 
 import java.util.regex.Pattern;
 
@@ -25,10 +25,11 @@ import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.validation.annotation.BranchNameNotBlacklisted;
 
-public class PagePathValidator implements ConstraintValidator<ValidPagePath, String> {
+public class BranchNameBlacklistValidator implements ConstraintValidator<BranchNameNotBlacklisted, String> {
 	@Override
-	public void initialize(ValidPagePath annotation) {
+	public void initialize(BranchNameNotBlacklisted annotation) {
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class PagePathValidator implements ConstraintValidator<ValidPagePath, Str
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-
-		return Pattern.matches("^" + DocumentrConstants.PAGE_PATH_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		return !Pattern.matches("^" + DocumentrConstants.BRANCH_NAMES_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
