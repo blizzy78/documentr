@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <%
 pageContext.setAttribute("statusCode", request.getAttribute("javax.servlet.error.status_code")); //$NON-NLS-1$ //$NON-NLS-2$
+pageContext.setAttribute("message", request.getAttribute("javax.servlet.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
 %>
 
 <dt:pageTitle><spring:message code="title.error"/></dt:pageTitle>
@@ -32,13 +33,14 @@ pageContext.setAttribute("statusCode", request.getAttribute("javax.servlet.error
 
 <p>
 <c:choose>
-	<c:when test="${!empty messageKey}"><spring:message code="${messageKey}"/> (error <c:out value="${statusCode}"/>)</c:when>
-	<c:otherwise>Error <c:out value="${statusCode}"/></c:otherwise>
+	<c:when test="${!empty messageKey}"><spring:message code="${messageKey}"/> (<spring:message code="errorX" arguments="${statusCode}"/>)</c:when>
+	<c:when test="${!empty message}"><c:out value="${message}"/> (<spring:message code="errorX" arguments="${statusCode}"/>)</c:when>
+	<c:otherwise><spring:message code="errorX" arguments="${statusCode}"/></c:otherwise>
 </c:choose>
 </p>
 
 <p>
-<a href="javascript:void(history.go(-1))" class="btn">Go Back</a>
+<a href="javascript:void(history.go(-1))" class="btn"><spring:message code="button.goBack"/></a>
 </p>
 
 </dt:page>
