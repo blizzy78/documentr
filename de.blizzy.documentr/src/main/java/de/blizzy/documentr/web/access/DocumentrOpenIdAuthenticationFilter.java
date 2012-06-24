@@ -17,9 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.access;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.openid.OpenIDAuthenticationFilter;
 
 import de.blizzy.documentr.Settings;
@@ -29,18 +35,27 @@ public class DocumentrOpenIdAuthenticationFilter extends OpenIDAuthenticationFil
 	private Settings settings;
 
 	@Override
-	protected String buildReturnToUrl(HttpServletRequest request) {
-		String url = super.buildReturnToUrl(request);
-		String host = null;
-		if (settings.getHost() != null) {
-			host = settings.getHost();
-			if (settings.getPort() != null) {
-				host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
+	public Authentication attemptAuthentication(HttpServletRequest request,
+			HttpServletResponse response) throws AuthenticationException,
+			IOException {
+
+		HttpServletRequest requestWrapper = new HttpServletRequestWrapper(request) {
+			@Override
+			public StringBuffer getRequestURL() {
+				String url = super.getRequestURL().toString();
+				String host = null;
+				if (settings.getHost() != null) {
+					host = settings.getHost();
+					if (settings.getPort() != null) {
+						host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
+					}
+				}
+				if (host != null) {
+					url = url.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+				return new StringBuffer(url);
 			}
-		}
-		if (host != null) {
-			url = url.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		return url;
+		};
+		return super.attemptAuthentication(requestWrapper, response);
 	}
 }
