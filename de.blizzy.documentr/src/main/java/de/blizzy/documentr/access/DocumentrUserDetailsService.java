@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,7 +49,7 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
 		} catch (UserNotFoundException e) {
-			throw new UsernameNotFoundException(StringUtils.EMPTY);
+			throw new UsernameNotFoundException("unknown user name: " + loginName); //$NON-NLS-1$
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
