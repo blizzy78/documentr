@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.openid4java.OpenIDException;
@@ -115,8 +116,26 @@ public class AccountController {
 		session.removeAttribute("openIdConsumer"); //$NON-NLS-1$
 		String openId = (String) session.getAttribute("openId"); //$NON-NLS-1$
 		session.removeAttribute("openId"); //$NON-NLS-1$
+
+		HttpServletRequest requestWrapper = new HttpServletRequestWrapper(request) {
+			@Override
+			public StringBuffer getRequestURL() {
+				String url = super.getRequestURL().toString();
+				String host = null;
+				if (settings.getHost() != null) {
+					host = settings.getHost();
+					if (settings.getPort() != null) {
+						host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
+					}
+				}
+				if (host != null) {
+					url = url.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+				return new StringBuffer(url);
+			}
+		};
 		
-		OpenIDAuthenticationToken token = consumer.endConsumption(request);
+		OpenIDAuthenticationToken token = consumer.endConsumption(requestWrapper);
 		if ((token != null) && (token.getStatus() == OpenIDAuthenticationStatus.SUCCESS)) {
 			boolean exists = false;
 			try {
