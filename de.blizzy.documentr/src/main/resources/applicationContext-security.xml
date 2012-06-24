@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  		<form-login login-page="/access/login" authentication-failure-url="/access/login"/>
 		<logout/>
 		<anonymous enabled="false"/>
-		<remember-me key="documentr" user-service-ref="loginNameUserDetailsService"/>
+		<remember-me services-alias="rememberMeServices" key="documentr" user-service-ref="loginNameUserDetailsService"/>
 		<custom-filter ref="anonymousAuthFilter" position="ANONYMOUS_FILTER"/>
 		<custom-filter ref="openIdAuthFilter" position="OPENID_FILTER"/>
 		<custom-filter ref="authCreationTimeFilter" position="LAST"/>
@@ -63,6 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<beans:constructor-arg value="/access/login"/>
 			</beans:bean>
 		</beans:property>
+		<beans:property name="rememberMeServices" ref="rememberMeServices"/>
 	</beans:bean>
 
 	<beans:bean id="openIdAuthProvider" class="org.springframework.security.openid.OpenIDAuthenticationProvider">
