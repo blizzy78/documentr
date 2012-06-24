@@ -36,11 +36,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/**" access="permitAll"/>
  		<form-login login-page="/access/login" authentication-failure-url="/access/login"/>
-		<openid-login user-service-ref="openIdUserDetailsService" authentication-failure-url="/access/login"/>
 		<logout/>
 		<anonymous enabled="false"/>
 		<remember-me key="documentr" user-service-ref="loginNameUserDetailsService"/>
 		<custom-filter ref="anonymousAuthFilter" position="ANONYMOUS_FILTER"/>
+		<custom-filter ref="openIdAuthFilter" position="OPENID_FILTER"/>
 		<custom-filter ref="authCreationTimeFilter" position="LAST"/>
 	</http>
 
@@ -51,4 +51,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</password-encoder>
 		</authentication-provider>
 	</authentication-manager>
+
+	<authentication-manager id="openIdAuthManager" erase-credentials="true">
+		<authentication-provider ref="openIdAuthProvider"/>
+	</authentication-manager>
+
+	<beans:bean id="openIdAuthFilter" class="de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="openIdAuthManager"/>
+		<beans:property name="authenticationFailureHandler">
+			<beans:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+				<beans:constructor-arg value="/access/login"/>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="openIdAuthProvider" class="org.springframework.security.openid.OpenIDAuthenticationProvider">
+		<beans:property name="userDetailsService" ref="openIdUserDetailsService"/>
+	</beans:bean>
 </beans:beans>

@@ -32,17 +32,29 @@ public class Settings {
 	@Autowired
 	private ServletContext servletContext;
 	private File dataDir;
+	private String host;
+	private Integer port;
 	
 	@PostConstruct
 	public void init() {
-		String dataDirParam = servletContext.getInitParameter("documentr.dataDir"); //$NON-NLS-1$
-		if (StringUtils.isBlank(dataDirParam)) {
-			dataDirParam = System.getProperty("documentr.dataDir"); //$NON-NLS-1$
-		}
-		
+		String dataDirParam = getInitParam("documentr.dataDir"); //$NON-NLS-1$
 		Assert.hasLength(dataDirParam);
-		
 		dataDir = new File(dataDirParam);
+		
+		host = StringUtils.defaultIfBlank(getInitParam("documentr.host"), null); //$NON-NLS-1$
+		
+		String port = getInitParam("documentr.port"); //$NON-NLS-1$
+		if (StringUtils.isNotBlank(port)) {
+			this.port = Integer.valueOf(port);
+		}
+	}
+
+	private String getInitParam(String param) {
+		String value = servletContext.getInitParameter(param);
+		if (StringUtils.isBlank(value)) {
+			value = System.getProperty(param);
+		}
+		return value;
 	}
 	
 	void setServletContext(ServletContext servletContext) {
@@ -55,5 +67,13 @@ public class Settings {
 	
 	public void setDocumentrDataDir(File dataDir) {
 		this.dataDir = dataDir;
+	}
+	
+	public String getHost() {
+		return host;
+	}
+	
+	public Integer getPort() {
+		return port;
 	}
 }

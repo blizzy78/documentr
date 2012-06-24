@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.OpenIdNotFoundException;
 import de.blizzy.documentr.access.User;
@@ -49,6 +50,8 @@ import de.blizzy.documentr.access.UserStore;
 public class AccountController {
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private Settings settings;
 	
 	@RequestMapping(value="/myAccount", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
@@ -77,9 +80,22 @@ public class AccountController {
 					.path("/account/saveOpenIdFinish") //$NON-NLS-1$
 					.build()
 					.encode(DocumentrConstants.ENCODING).toUriString();
+			String host = null;
+			if (settings.getHost() != null) {
+				host = settings.getHost();
+				if (settings.getPort() != null) {
+					host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
+				}
+			}
+			if (host != null) {
+				returnToUrl = returnToUrl.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 			String realm = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/").build() //$NON-NLS-1$
 					.encode(DocumentrConstants.ENCODING).toUriString();
+			if (host != null) {
+				realm = realm.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 			String url = consumer.beginConsumption(request, openId, returnToUrl, realm);
 			session.setAttribute("openIdConsumer", consumer); //$NON-NLS-1$
 			session.setAttribute("openId", openId); //$NON-NLS-1$
