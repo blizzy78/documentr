@@ -28,15 +28,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:page>
 
-<form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well form-horizontal loginForm span4 offset3">
+<center>
+
+<form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well form-horizontal loginForm">
 	<fieldset>
 		<div class="control-group">
 			<label class="control-label" for="j_username"><spring:message code="label.loginName"/>:</label>
-			<input type="text" name="j_username" class="input-large"/>
+			<input type="text" name="j_username" class="input-xlarge"/>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="j_password"><spring:message code="label.password"/>:</label>
-			<input type="password" name="j_password" class="input-large"/>
+			<input type="password" name="j_password" class="input-xlarge"/>
 		</div>
 		<div class="control-group">
 			<label class="checkbox" for="_spring_security_remember_me">
@@ -49,5 +51,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 	</fieldset>
 </form>
+
+<form action="<c:url value="/j_spring_openid_security_check"/>" method="POST" class="well form-horizontal loginForm">
+	<fieldset>
+		<div class="control-group">
+			<label class="control-label" for="openid_identifier"><spring:message code="label.openId"/>:</label>
+			<input type="text" name="openid_identifier" class="input-xlarge"/>
+		</div>
+		<div class="control-group">
+			<label class="checkbox" for="_spring_security_remember_me">
+				<input type="checkbox" name="_spring_security_remember_me" value="true"/>
+				<spring:message code="label.rememberMe"/>
+			</label>
+		</div>
+		<div class="form-actions">
+			<input type="submit" value="<spring:message code="button.login"/>" class="btn btn-primary"/>
+		</div>
+	</fieldset>
+</form>
+
+</center>
 
 </dt:page>

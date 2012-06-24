@@ -33,13 +33,13 @@ import com.google.common.collect.Sets;
 
 public class DocumentrUserDetailsServiceTest {
 	private UserStore userStore;
-	private DocumentrUserDetailsService userDetailsService;
+	private LoginNameUserDetailsService userDetailsService;
 
 	@Before
 	public void setUp() {
 		userStore = mock(UserStore.class);
 		
-		userDetailsService = new DocumentrUserDetailsService();
+		userDetailsService = new LoginNameUserDetailsService();
 		userDetailsService.setUserStore(userStore);
 	}
 	

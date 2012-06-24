@@ -26,19 +26,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
-@Component("userDetailsService")
-public class DocumentrUserDetailsService implements UserDetailsService {
+abstract class AbstractUserDetailsService implements UserDetailsService {
 	@Autowired
 	private UserStore userStore;
 	
 	@Override
 	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
 		try {
-			User user = userStore.getUser(loginName);
+			User user = loadUser(loginName);
+			loginName = user.getLoginName();
+			
 			List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(loginName);
 
 			Set<GrantedAuthority> authorities = Sets.newHashSet();
@@ -48,14 +48,18 @@ public class DocumentrUserDetailsService implements UserDetailsService {
 			
 			return new org.springframework.security.core.userdetails.User(
 					loginName, user.getPassword(), !user.isDisabled(), true, true, true, authorities);
-		} catch (UserNotFoundException e) {
-			throw new UsernameNotFoundException("unknown user name: " + loginName); //$NON-NLS-1$
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
+	abstract User loadUser(String loginName) throws IOException;
+	
 	void setUserStore(UserStore userStore) {
 		this.userStore = userStore;
+	}
+	
+	UserStore getUserStore() {
+		return userStore;
 	}
 }

@@ -35,16 +35,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/**" access="permitAll"/>
-		<form-login login-page="/access/login"/>
+ 		<form-login login-page="/access/login" authentication-failure-url="/access/login"/>
+		<openid-login user-service-ref="openIdUserDetailsService" authentication-failure-url="/access/login"/>
 		<logout/>
 		<anonymous enabled="false"/>
-		<remember-me key="documentr"/>
+		<remember-me key="documentr" user-service-ref="loginNameUserDetailsService"/>
 		<custom-filter ref="anonymousAuthFilter" position="ANONYMOUS_FILTER"/>
 		<custom-filter ref="authCreationTimeFilter" position="LAST"/>
 	</http>
 
 	<authentication-manager erase-credentials="true">
-		<authentication-provider user-service-ref="userDetailsService">
+		<authentication-provider user-service-ref="loginNameUserDetailsService">
 			<password-encoder hash="sha">
 				<salt-source user-property="username"/>
 			</password-encoder>

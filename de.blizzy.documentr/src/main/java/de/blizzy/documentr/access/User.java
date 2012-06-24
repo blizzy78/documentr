@@ -18,8 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import java.security.SecureRandom;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.springframework.security.core.token.Sha512DigestUtils;
+
+import com.google.inject.internal.Sets;
 
 public class User {
 	private static SecureRandom random = new SecureRandom();
@@ -28,6 +32,7 @@ public class User {
 	private String password;
 	private String email;
 	private boolean disabled;
+	private Set<OpenId> openIds = Sets.newHashSet();
 
 	public User(String loginName, String password, String email, boolean disabled) {
 		this.loginName = loginName;
@@ -52,11 +57,28 @@ public class User {
 		return disabled;
 	}
 	
+	public void addOpenId(OpenId openId) {
+		openIds.add(openId);
+	}
+	
+	public Set<OpenId> getOpenIds() {
+		return openIds;
+	}
+	
 	public static String hashPassword(String password, String salt) {
 		return Sha512DigestUtils.shaHex(password + salt);
 	}
 	
 	public static String getRandomSalt() {
 		return String.valueOf(random.nextLong());
+	}
+
+	public void removeOpenId(String openId) {
+		for (Iterator<OpenId> iter = openIds.iterator(); iter.hasNext();) {
+			OpenId id = iter.next();
+			if (id.getDelegateId().equals(openId)) {
+				iter.remove();
+			}
+		}
 	}
 }

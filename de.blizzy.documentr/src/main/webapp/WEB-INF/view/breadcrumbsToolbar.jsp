@@ -28,25 +28,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</sec:authorize>
 	
 	<sec:authorize access="isAuthenticated()">
-		<sec:authorize access="hasAnyProjectPermission('ADMIN') or
-			hasApplicationPermission('ADMIN')">
-			
-			<div class="btn-group">
-				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
-				<ul class="dropdown-menu">
-					<sec:authorize access="hasAnyProjectPermission('ADMIN')">
-						<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
-					</sec:authorize>
-					<sec:authorize access="hasApplicationPermission('ADMIN')">
-						<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
-					</sec:authorize>
-				</ul>
-			</div>
-		</sec:authorize>
+		<div class="btn-group">
+			<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
+
+				<sec:authorize access="hasApplicationPermission('ADMIN')">
+					<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
+				</sec:authorize>
+			</ul>
+		</div>
 
 		<div class="btn-group">
 			<c:set var="loginName"><sec:authentication property="principal.username"/></c:set>
 			<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-mini"><i class="icon-off"></i> <spring:message code="button.logoutUserX" arguments="${loginName}"/></a>
+			<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+			<ul class="dropdown-menu">
+				<li><a href="<c:url value="/account/myAccount"/>"><i class="icon-user"></i> <spring:message code="button.myAccount"/></a></li>
+			</ul>
 		</div>
 	</sec:authorize>
 </li>

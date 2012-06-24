@@ -19,6 +19,7 @@ package de.blizzy.documentr.web;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,8 +32,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.google.inject.internal.Lists;
+
 import de.blizzy.documentr.FileLengthFormat;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
@@ -148,6 +152,18 @@ public final class Functions {
 	
 	public static List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException {
 		return pageStore.listPageVersions(projectName, branchName, Util.toRealPagePath(path));
+	}
+	
+	public static List<OpenId> listMyOpenIds() throws IOException {
+		String loginName = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<OpenId> openIds = Lists.newArrayList(userStore.getUser(loginName).getOpenIds());
+		Collections.sort(openIds, new Comparator<OpenId>() {
+			@Override
+			public int compare(OpenId id1, OpenId id2) {
+				return id1.getDelegateId().compareToIgnoreCase(id2.getDelegateId());
+			}
+		});
+		return openIds;
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
