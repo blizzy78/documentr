@@ -285,11 +285,11 @@ documentr.openMessageDialog = function(title, message, buttons, options) {
 $.fn.extend({
 	showModal: function(options) {
 		this.modal(options);
-		this.position({
-			my: 'center center',
-			at: 'center center',
-			of: window
-		});
+		var win = $(window);
+		this.css('margin-left', '0')
+			.css('margin-top', '0')
+			.css('left', Math.floor((win.width() - this.width()) / 2) + 'px')
+			.css('top', Math.floor((win.height() - this.height()) / 2) + 'px');
 	},
 	
 	hideModal: function() {

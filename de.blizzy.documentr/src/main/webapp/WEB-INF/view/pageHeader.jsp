@@ -39,7 +39,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.20.custom.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-button-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-modal-2.0.4.js"/>"></script>
