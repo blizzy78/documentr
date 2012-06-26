@@ -19,6 +19,8 @@ package de.blizzy.documentr;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Security;
+import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.Filter;
@@ -39,7 +41,6 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.openid.OpenIDAuthenticationProvider;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -54,6 +55,7 @@ import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
+import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 
 @Configuration
@@ -93,7 +95,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new ShaPasswordEncoder();
+		return new Sha512PasswordEncoder();
 	}
 	
 	@Bean

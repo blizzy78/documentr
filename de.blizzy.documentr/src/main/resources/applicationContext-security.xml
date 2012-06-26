@@ -46,9 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<authentication-manager alias="authManager" erase-credentials="true">
 		<authentication-provider user-service-ref="loginNameUserDetailsService">
-			<password-encoder hash="sha">
-				<salt-source user-property="username"/>
-			</password-encoder>
+			<password-encoder ref="passwordEncoder"/>
 		</authentication-provider>
 		<authentication-provider ref="openIdAuthProvider"/>
 	</authentication-manager>
