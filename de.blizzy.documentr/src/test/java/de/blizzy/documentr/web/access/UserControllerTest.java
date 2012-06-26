@@ -24,6 +24,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -33,6 +34,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 
+import com.google.common.collect.Sets;
+
+import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
@@ -91,6 +95,12 @@ public class UserControllerTest {
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 
 		User oldUser = new User("user", "oldPW", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Set<OpenId> openIds = Sets.newHashSet(
+				new OpenId("openId1", "realId1"), //$NON-NLS-1$ //$NON-NLS-2$
+				new OpenId("openId2", "realId2")); //$NON-NLS-1$ //$NON-NLS-2$
+		for (OpenId openId : openIds) {
+			oldUser.addOpenId(openId);
+		}
 		when(userStore.getUser("user")).thenReturn(oldUser); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -99,7 +109,7 @@ public class UserControllerTest {
 		assertFalse(bindingResult.hasErrors());
 		
 		String passwordHash = passwordEncoder.encodePassword("newPW", "user"); //$NON-NLS-1$ //$NON-NLS-2$
-		verify(userStore).saveUser(argUser("user", passwordHash, "email", true), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+		verify(userStore).saveUser(argUser("user", passwordHash, "email", true, openIds), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

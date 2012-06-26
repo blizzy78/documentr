@@ -42,6 +42,7 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.GrantedAuthorityTarget;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
+import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserNotFoundException;
@@ -115,6 +116,11 @@ public class UserController {
 			}
 	
 			User newUser = new User(form.getLoginName(), password, form.getEmail(), form.isDisabled());
+			if (existingUser != null) {
+				for (OpenId openId : existingUser.getOpenIds()) {
+					newUser.addOpenId(openId);
+				}
+			}
 			userStore.saveUser(newUser, user);
 		}
 		

@@ -29,6 +29,7 @@ import org.mockito.Matchers;
 import org.mockito.internal.matchers.Equals;
 import org.mockito.internal.matchers.Not;
 
+import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.Role;
 import de.blizzy.documentr.access.User;
@@ -100,6 +101,23 @@ public final class DocumentrMatchers {
 						StringUtils.equals(user.getPassword(), password) &&
 						StringUtils.equals(user.getEmail(), email) &&
 						(user.isDisabled() == disabled);
+			}
+		};
+		return argThat(matcher);
+	}
+	
+	public static User argUser(final String loginName, final String password, final String email,
+			final boolean disabled, final Set<OpenId> openIds) {
+		
+		Matcher<User> matcher = new ArgumentMatcher<User>() {
+			@Override
+			public boolean matches(Object argument) {
+				User user = (User) argument;
+				return StringUtils.equals(user.getLoginName(), loginName) &&
+						StringUtils.equals(user.getPassword(), password) &&
+						StringUtils.equals(user.getEmail(), email) &&
+						(user.isDisabled() == disabled) &&
+						(user.getOpenIds().equals(openIds));
 			}
 		};
 		return argThat(matcher);
