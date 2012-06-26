@@ -106,11 +106,31 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	@SuppressWarnings("boxing")
 	public void saveAndGetUser() throws IOException {
 		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		user.addOpenId(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$
+		user.addOpenId(new OpenId("openId2", "realOpenId2")); //$NON-NLS-1$ //$NON-NLS-2$
 		userStore.saveUser(user, USER);
 		User result = userStore.getUser("user"); //$NON-NLS-1$
 		assertEquals(user.getLoginName(), result.getLoginName());
 		assertEquals(user.getPassword(), result.getPassword());
 		assertEquals(user.isDisabled(), result.isDisabled());
+		assertEquals(user.getOpenIds(), result.getOpenIds());
+	}
+	
+	@Test
+	public void getUserByOpenId() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		user.addOpenId(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$
+		user.addOpenId(new OpenId("openId2", "realOpenId2")); //$NON-NLS-1$ //$NON-NLS-2$
+		userStore.saveUser(user, USER);
+		User user2 = new User("user2", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		user2.addOpenId(new OpenId("openId3", "realOpenId3")); //$NON-NLS-1$ //$NON-NLS-2$
+		user2.addOpenId(new OpenId("openId4", "realOpenId4")); //$NON-NLS-1$ //$NON-NLS-2$
+		userStore.saveUser(user2, USER);
+
+		User result = userStore.getUserByOpenId("realOpenId1"); //$NON-NLS-1$
+		assertEquals(user.getLoginName(), result.getLoginName());
+		result = userStore.getUserByOpenId("realOpenId4"); //$NON-NLS-1$
+		assertEquals(user2.getLoginName(), result.getLoginName());
 	}
 	
 	@Test
@@ -154,7 +174,7 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		List<RoleGrantedAuthority> result = userStore.getUserAuthorities("user"); //$NON-NLS-1$
 		assertEquals(Sets.newHashSet(rga1, rga2), Sets.newHashSet(result));
 	}
-	
+
 	@Test
 	public void toPermissionGrantedAuthorities() throws IOException {
 		Role role = new Role("role", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)); //$NON-NLS-1$

@@ -57,4 +57,8 @@ public class AccountController {
 		userStore.saveUser(user, user);
 		return "redirect:/account/openId"; //$NON-NLS-1$
 	}
+
+	void setUserStore(UserStore userStore) {
+		this.userStore = userStore;
+	}
 }
