@@ -86,7 +86,7 @@ function showRemoveDialog(openId) {
 		<h3><spring:message code="title.addOpenId"/></h3>
 	</div>
 	<div class="modal-body">
-		<form id="add-openid-form" action="<c:url value="/account/saveOpenId"/>" method="POST" class="form-horizontal">
+		<form id="add-openid-form" action="<c:url value="/accountOpenId/save"/>" method="POST" class="form-horizontal">
 			<fieldset>
 				<div class="control-group">
 					<label class="control-label"><spring:message code="label.openId"/>:</label>
