@@ -19,8 +19,6 @@ package de.blizzy.documentr;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Security;
-import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.Filter;
