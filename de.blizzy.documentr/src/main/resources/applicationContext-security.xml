@@ -44,29 +44,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<custom-filter ref="authCreationTimeFilter" position="LAST"/>
 	</http>
 
-	<authentication-manager erase-credentials="true">
+	<authentication-manager alias="authManager" erase-credentials="true">
 		<authentication-provider user-service-ref="loginNameUserDetailsService">
 			<password-encoder hash="sha">
 				<salt-source user-property="username"/>
 			</password-encoder>
 		</authentication-provider>
-	</authentication-manager>
-
-	<authentication-manager id="openIdAuthManager" erase-credentials="true">
 		<authentication-provider ref="openIdAuthProvider"/>
 	</authentication-manager>
-
-	<beans:bean id="openIdAuthFilter" class="de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter">
-		<beans:property name="authenticationManager" ref="openIdAuthManager"/>
-		<beans:property name="authenticationFailureHandler">
-			<beans:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-				<beans:constructor-arg value="/access/login"/>
-			</beans:bean>
-		</beans:property>
-		<beans:property name="rememberMeServices" ref="rememberMeServices"/>
-	</beans:bean>
-
-	<beans:bean id="openIdAuthProvider" class="org.springframework.security.openid.OpenIDAuthenticationProvider">
-		<beans:property name="userDetailsService" ref="openIdUserDetailsService"/>
-	</beans:bean>
 </beans:beans>

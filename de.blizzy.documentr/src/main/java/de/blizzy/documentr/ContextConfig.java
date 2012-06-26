@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.annotation.PreDestroy;
+import javax.servlet.Filter;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
@@ -35,8 +36,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.openid.OpenIDAuthenticationProvider;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
@@ -45,6 +52,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+
+import de.blizzy.documentr.access.OpenIdUserDetailsService;
+import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 
 @Configuration
 @EnableWebMvc
@@ -115,6 +125,23 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 		return cacheManager;
 	}
 
+	@Bean
+	public Filter openIdAuthFilter(ProviderManager authManager, RememberMeServices rememberMeServices) {
+		DocumentrOpenIdAuthenticationFilter filter = new DocumentrOpenIdAuthenticationFilter();
+		filter.setAuthenticationManager(authManager);
+		AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler("/access/login"); //$NON-NLS-1$
+		filter.setAuthenticationFailureHandler(failureHandler);
+		filter.setRememberMeServices(rememberMeServices);
+		return filter;
+	}
+	
+	@Bean
+	public AuthenticationProvider openIdAuthProvider(OpenIdUserDetailsService userDetailsService) {
+		OpenIDAuthenticationProvider authProvider = new OpenIDAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		return authProvider;
+	}
+	
 	@PreDestroy
 	public void destroy() {
 		if (ehCacheManager != null) {
