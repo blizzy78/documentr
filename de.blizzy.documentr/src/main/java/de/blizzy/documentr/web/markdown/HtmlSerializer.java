@@ -21,9 +21,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.BulletListNode;
+import org.pegdown.ast.DefinitionListNode;
 import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.Node;
+import org.pegdown.ast.OrderedListNode;
+import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.VerbatimNode;
 
@@ -42,8 +46,15 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	}
 
 	@Override
+	public void visit(ParaNode node) {
+		printTagWithTextRange(node, "p"); //$NON-NLS-1$
+	}
+	
+	@Override
 	public void visit(VerbatimNode node) {
-		printer.println().print("<pre class=\"pre-scrollable prettyprint linenums\"><code>"); //$NON-NLS-1$
+		printer.println().print("<pre class=\"pre-scrollable prettyprint linenums\" data-text-range=\"") //$NON-NLS-1$
+			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
+			.print("\"><code>"); //$NON-NLS-1$
 		String text = node.getText();
 		while (text.charAt(0) == '\n') {
 			printer.print("<br/>"); //$NON-NLS-1$
@@ -56,7 +67,9 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	@Override
 	protected void printIndentedTag(SuperNode node, String tag) {
 		if (tag.equals("table")) { //$NON-NLS-1$
-			printer.println().print("<table class=\"table-documentr table-bordered table-striped table-condensed\">").indent(2); //$NON-NLS-1$
+			printer.println().print("<table class=\"table-documentr table-bordered table-striped " + //$NON-NLS-1$
+					"table-condensed\" data-text-range=\"").print(String.valueOf(node.getStartIndex())) //$NON-NLS-1$
+					.print(",").print(String.valueOf(node.getEndIndex())).print("\">").indent(2); //$NON-NLS-1$ //$NON-NLS-2$
 			visitChildren(node);
 			printer.indent(-2).println().print("</table>"); //$NON-NLS-1$
 		} else {
@@ -112,9 +125,32 @@ public class HtmlSerializer extends ToHtmlSerializer {
 				context.addHeader(text, node.getLevel());
 			}
 		}
-		printTag(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
+		printTagWithTextRange(node, "h" + (node.getLevel() + 1)); //$NON-NLS-1$
 	}
 
+	@Override
+	public void visit(BulletListNode node) {
+		printTagWithTextRange(node, "ul"); //$NON-NLS-1$
+	}
+	
+	@Override
+	public void visit(OrderedListNode node) {
+		printTagWithTextRange(node, "ol"); //$NON-NLS-1$
+	}
+	
+	@Override
+	public void visit(DefinitionListNode node) {
+		printTagWithTextRange(node, "dl"); //$NON-NLS-1$
+	}
+	
+	private void printTagWithTextRange(SuperNode node, String tag) {
+		printer.print("<").print(tag).print(" data-text-range=\"") //$NON-NLS-1$ //$NON-NLS-2$
+			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
+			.print("\">"); //$NON-NLS-1$
+		visitChildren(node);
+		printer.print("</").print(tag).print(">"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
 	@Override
 	public void visit(SuperNode node) {
 		if (node instanceof MacroNode) {

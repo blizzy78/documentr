@@ -347,9 +347,9 @@ public class PageControllerTest {
 	
 	@Test
 	public void markdownToHTML() {
-		Map<String, String> result = pageController.markdownToHTML(PROJECT, BRANCH, "**foo**", PAGE_PATH, //$NON-NLS-1$
-				authenticatedAuthentication);
-		assertEquals("<p><strong>foo</strong></p>", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<String, String> result = pageController.markdownToHTML(
+				PROJECT, BRANCH, "**foo**", PAGE_PATH, authenticatedAuthentication); //$NON-NLS-1$
+		assertEquals("<p><strong>foo</strong></p>", removeTextRange(result.get("html"))); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

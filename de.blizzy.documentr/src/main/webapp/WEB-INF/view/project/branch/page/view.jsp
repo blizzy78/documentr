@@ -175,6 +175,128 @@ function showChangesDialog() {
 
 </sec:authorize>
 
+function toggleHideFloatingElements(hide) {
+	$('#pageText').children().each(function() {
+		var el = $(this);
+		var float = el.css('float');
+		if ((float == 'left') || (float == 'right')) {
+			if (hide) {
+				el.hide();
+			} else {
+				el.show();
+			}
+		}
+	});
+}
+
+function saveInlineEditor() {
+	var formEl = $('#inlineEditorForm');
+	var textEl = formEl.data('textEl');
+	formEl.data('textEl', null);
+	formEl.hide();
+	$('#pageText').after(formEl);
+	$(textEl).show();
+	$('#inlineEditorToolbar').hide();
+	$.ajax({
+		url: '<c:url value="/page/saveRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			markdown: formEl.find('textarea').val(),
+			range: $(textEl).attr('data-text-range')
+		},
+		success: function(result) {
+			$('#pageText').html(result.html);
+			toggleHideFloatingElements(false);
+			prettyPrint();
+			$('#inlineEditorToolbar').hide();
+			hookupInlineEditorToolbar();
+		}
+	});
+}
+
+function cancelInlineEditor() {
+	var formEl = $('#inlineEditorForm');
+	var textEl = formEl.data('textEl');
+	if ((typeof(textEl) != 'undefined') && (textEl != null)) {
+		formEl.data('textEl', null);
+		formEl.hide();
+		$(textEl).show();
+		toggleHideFloatingElements(false);
+	}
+}
+
+function startInlineEditor(textEl, range) {
+	cancelInlineEditor();
+
+	$.ajax({
+		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/json',
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			var formEl = $('#inlineEditorForm');
+			formEl.hide();
+			formEl.detach();
+			$(textEl).after(formEl);
+			$(textEl).hide();
+			toggleHideFloatingElements(true);
+			formEl.data('textEl', textEl);
+			formEl.find('textarea').val(result.markdown);
+			formEl.show();
+			formEl.find('textarea').focus();
+		}
+	});
+}
+
+function hookupInlineEditorToolbar() {
+	function showEl(el) {
+		el.stop(true).fadeTo(0, 1);
+	}
+	
+	function hideEl(el) {
+		el.stop(true).fadeTo(3000, 0.25);
+	}
+
+	$('#pageText > *[data-text-range]').hover(
+		function() {
+			var textEl = $(this);
+			var float = textEl.css('float');
+			if ((float != 'left') && (float != 'right')) {
+				var toolbarEl = $('#inlineEditorToolbar');
+				toolbarEl
+					.css('left', textEl.offset().left - toolbarEl.width() - 10)
+					.css('top', textEl.offset().top);
+				showEl(toolbarEl);
+				var buttonEl = $('#inlineEditorToolbar button');
+				buttonEl.off('click');
+				buttonEl.click(
+					{
+						el: this,
+						range: textEl.attr('data-text-range')
+					},
+					function(event) {
+						startInlineEditor(event.data.el, event.data.range);
+					});
+			}
+		},
+		function() {
+			var toolbarEl = $('#inlineEditorToolbar');
+			hideEl(toolbarEl);
+		});
+	
+	$('#inlineEditorToolbar').hover(
+		function() {
+			showEl($(this));
+		},
+		function() {
+			hideEl($(this));
+		});
+}
+
+$(function() {
+	hookupInlineEditorToolbar();
+});
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -211,7 +333,7 @@ function showChangesDialog() {
 	<div class="btn-toolbar pull-right page-toolbar">
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
 			<div class="btn-group">
-				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn" title="<spring:message code="button.editPage"/>"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
+				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
 			</div>
 		</sec:authorize>
 
@@ -290,12 +412,22 @@ function showChangesDialog() {
 
 </div>
 
-<c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/>
+<span id="pageText"><c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/></span>
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
 	<p class="spacer">
 	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 	</p>
+
+	<div id="inlineEditorToolbar" class="btn-toolbar btn-toolbar-icons btn-toolbar-floating" style="display: none; position: absolute;">
+		<button class="btn" title="<spring:message code="button.edit"/>"><i class="icon-edit"></i></button>
+	</div>
+	
+	<form id="inlineEditorForm" class="inline-editor" style="display: none;">
+		<textarea class="code span12" rows="7"></textarea>
+		<a class="btn btn-mini btn-primary" href="javascript:void(saveInlineEditor())"><spring:message code="button.save"/></a>
+		<a class="btn btn-mini" href="javascript:void(cancelInlineEditor())"><spring:message code="button.cancel"/></a>
+	</form>
 </sec:authorize>
 
 <sec:authorize access="hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">

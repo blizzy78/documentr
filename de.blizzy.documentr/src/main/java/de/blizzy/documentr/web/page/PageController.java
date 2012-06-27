@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.inject.internal.Maps;
+
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.AuthenticationUtil;
@@ -53,6 +55,7 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
+import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Controller
@@ -66,6 +69,8 @@ public class PageController {
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private IPageRenderer pageRenderer;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
@@ -306,6 +311,25 @@ public class PageController {
 		return pageStore.getMarkdown(projectName, branchName, Util.toRealPagePath(path), versions);
 	}
 
+	@RequestMapping(value="/markdownInRange/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
+			"{rangeStart:[0-9]+},{rangeEnd:[0-9]+}/json",
+			method=RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	public Map<String, String> getPageMarkdownInRange(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd) throws IOException {
+
+		Page page = pageStore.getPage(projectName, branchName, Util.toRealPagePath(path), true);
+		String markdown = ((PageTextData) page.getData()).getText();
+		Map<String, String> result = Maps.newHashMap();
+		markdown = markdown.substring(rangeStart, Math.min(rangeEnd, markdown.length()));
+		markdown = markdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		result.put("markdown", markdown); //$NON-NLS-1$
+		return result;
+	}
+
 	@RequestMapping(value="/changes/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -319,6 +343,44 @@ public class PageController {
 		path = Util.toRealPagePath(path);
 		model.addAttribute("path", path); //$NON-NLS-1$
 		return "/project/branch/page/changes"; //$NON-NLS-1$
+	}
+
+	@RequestMapping(value="/saveRange/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
+			method=RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
+	public Map<String, String> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam String markdown, @RequestParam String range,
+			Authentication authentication) throws IOException {
+		
+		path = Util.toRealPagePath(path);
+		
+		markdown = markdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		int rangeStart = Integer.parseInt(StringUtils.substringBefore(range, ",")); //$NON-NLS-1$
+		int rangeEnd = Integer.parseInt(StringUtils.substringAfter(range, ",")); //$NON-NLS-1$
+		
+		Page page = pageStore.getPage(projectName, branchName, path, true);
+		String text = ((PageTextData) page.getData()).getText();
+		rangeEnd = Math.min(rangeEnd, text.length());
+
+		String oldMarkdown = text.substring(rangeStart, rangeEnd);
+		String cleanedOldMarkdown = oldMarkdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		rangeEnd -= oldMarkdown.length() - cleanedOldMarkdown.length();
+		
+		String newText = text.substring(0, rangeStart) + markdown + text.substring(Math.min(rangeEnd, text.length()));
+		
+		page.setData(new PageTextData(newText));
+		User user = userStore.getUser(authentication.getName());
+		pageStore.savePage(projectName, branchName, path, page, user);
+		
+		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
+		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+		
+		Map<String, String> result = Maps.newHashMap();
+		result.put("html", html); //$NON-NLS-1$
+		return result;
 	}
 
 	void setPageStore(IPageStore pageStore) {

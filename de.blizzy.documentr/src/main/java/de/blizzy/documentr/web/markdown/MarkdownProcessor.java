@@ -39,14 +39,29 @@ import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
 public class MarkdownProcessor {
 	static final String NON_CACHEABLE_MACRO_MARKER = "__NON_CACHEABLE_MACRO__"; //$NON-NLS-1$
 
+	private static final String TEXT_RANGE_RE = "data-text-range=\"[0-9]+,[0-9]+\""; //$NON-NLS-1$
 	@SuppressWarnings("nls")
 	private static final Pattern[] CLEANUP_RE = {
-		Pattern.compile("<p>(<p.*?</p>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p>(<p(?!re).*?</p>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
 		Pattern.compile("<p>(<div.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
 		Pattern.compile("<p>(<ul.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p>(<ol.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE)
+		Pattern.compile("<p>(<ol.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		
+		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE)
 	};
-	private static final String CLEANUP_REPLACE_WITH = "$1"; //$NON-NLS-1$
+	@SuppressWarnings("nls")
+	private static final String[] CLEANUP_REPLACE_WITH = {
+		"$1",
+		"$1",
+		"$1",
+		"$1",
+		
+		"<div $1$2",
+		"<ul $1$2",
+		"<ol $1$2"
+	};
 	
 	@Autowired
 	private MacroFactory macroFactory;
@@ -112,8 +127,8 @@ public class MarkdownProcessor {
 	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations, boolean cacheable) {
 		for (;;) {
 			String newHtml = html;
-			for (Pattern pattern : CLEANUP_RE) {
-				newHtml = pattern.matcher(newHtml).replaceAll(CLEANUP_REPLACE_WITH);
+			for (int i = 0; i < CLEANUP_RE.length; i++) {
+				newHtml = CLEANUP_RE[i].matcher(newHtml).replaceAll(CLEANUP_REPLACE_WITH[i]);
 			}
 			for (MacroInvocation macroInvocation : macroInvocations) {
 				IMacro macro = macroInvocation.getMacro();

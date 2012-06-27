@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -54,14 +55,16 @@ public class HtmlSerializerTest {
 		String text = "x\ny\nz\n"; //$NON-NLS-1$
 		VerbatimNode node = new VerbatimNode(text);
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<pre class=\"pre-scrollable prettyprint linenums\"><code>" + text + "</code></pre>", html); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("<pre class=\"pre-scrollable prettyprint linenums\"><code>" + text + "</code></pre>", //$NON-NLS-1$ //$NON-NLS-2$
+				removeTextRange(html));
 	}
 	
 	@Test
 	public void printTable() {
 		TableNode node = new TableNode();
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<table class=\"table-documentr table-bordered table-striped table-condensed\">\n</table>", html); //$NON-NLS-1$
+		assertEquals("<table class=\"table-documentr table-bordered table-striped table-condensed\">\n</table>", //$NON-NLS-1$
+				removeTextRange(html));
 	}
 	
 	@Test
@@ -120,7 +123,7 @@ public class HtmlSerializerTest {
 	public void visitHeaderNode() {
 		HeaderNode node = new HeaderNode(2, new TextNode("A Headline")); //$NON-NLS-1$
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<a name=\"a-headline\"></a><h3>A Headline</h3>", html); //$NON-NLS-1$
+		assertEquals("<a name=\"a-headline\"></a><h3>A Headline</h3>", removeTextRange(html)); //$NON-NLS-1$
 		
 		verify(context).addHeader("A Headline", 2); //$NON-NLS-1$
 	}

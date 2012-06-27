@@ -202,13 +202,23 @@ td.radio {
 .btn-toolbar-icons {
 	line-height: 1px;
 
-	a {
+	a,
+	button {
 		line-height: 14px;
 		padding: 4px 5px 4px 5px;
 	}
 }
 
 form {
+	&.inline-editor {
+		margin-bottom: 9px;
+	
+		textarea {
+			margin: 0;
+			margin-bottom: 2px;
+		}
+	}
+
 	.control-group {
 		.btn-toolbar {
 			margin-top: 0px;
@@ -228,4 +238,11 @@ form {
 	padding: 15px 15px 15px 15px;
 	border: 2px dashed gray;
 	overflow: auto;
+}
+
+.btn-toolbar {
+	&.btn-toolbar-floating {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
 }

@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -63,7 +64,7 @@ public class MarkdownProcessorTest {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String html = (String) invocation.getArguments()[0];
-				return StringUtils.replace(html, macroHtml, cleanedMacroHtml);
+				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		
@@ -74,7 +75,7 @@ public class MarkdownProcessorTest {
 				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals(expectedHTML, result);
+		assertEquals(expectedHTML, removeTextRange(result));
 	}
 
 	@Test
@@ -92,7 +93,7 @@ public class MarkdownProcessorTest {
 		String expectedHTML = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
 				MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + PARAMS + //$NON-NLS-1$
 				"/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals(expectedHTML, result);
+		assertEquals(expectedHTML, removeTextRange(result));
 	}
 	
 	@Test

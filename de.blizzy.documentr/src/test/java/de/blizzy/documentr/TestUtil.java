@@ -145,4 +145,8 @@ public final class TestUtil {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public static String removeTextRange(String html) {
+		return html.replaceAll(" data-text-range=\"[0-9]+,[0-9]+\"", StringUtils.EMPTY); //$NON-NLS-1$
+	}
 }

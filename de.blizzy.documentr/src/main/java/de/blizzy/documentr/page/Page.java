@@ -75,6 +75,10 @@ public class Page {
 		return data;
 	}
 	
+	public void setData(PageData data) {
+		this.data = data;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
