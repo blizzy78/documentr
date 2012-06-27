@@ -157,23 +157,7 @@ function showRelocateDialog() {
 
 </sec:authorize>
 
-<sec:authorize access="isAuthenticated()">
-
-function showChangesDialog() {
-	$.ajax({
-		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions=latest,previous"/>',
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			var previous = (typeof(result.previous) != 'undefined') ? result.previous : '';
-			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
-			$('#changes-dialog-body').html(html);
-			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
-		}
-	});
-}
-
-</sec:authorize>
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
 
 function toggleHideFloatingElements(hide) {
 	$('#pageText').children().each(function() {
@@ -293,9 +277,33 @@ function hookupInlineEditorToolbar() {
 		});
 }
 
+</sec:authorize>
+
+<sec:authorize access="isAuthenticated()">
+
+function showChangesDialog() {
+	$.ajax({
+		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions=latest,previous"/>',
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			var previous = (typeof(result.previous) != 'undefined') ? result.previous : '';
+			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
+			$('#changes-dialog-body').html(html);
+			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
+		}
+	});
+}
+
+</sec:authorize>
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+
 $(function() {
 	hookupInlineEditorToolbar();
 });
+
+</sec:authorize>
 
 </dt:headerJS>
 
