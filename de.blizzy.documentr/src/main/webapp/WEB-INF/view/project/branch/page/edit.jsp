@@ -108,7 +108,6 @@ function togglePreview() {
 }
 
 function toggleStyleBold() {
-	window.alert('toggleStyleBold');
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
