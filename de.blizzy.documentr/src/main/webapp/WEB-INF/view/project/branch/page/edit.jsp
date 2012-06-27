@@ -71,25 +71,36 @@ $(function() {
 });
 </c:if>
 
-function showPreview() {
-	var textEl = $('#pageForm').find('#text');
-	$.ajax({
-		url: '<c:url value="/page/markdownToHTML/${pageForm.projectName}/${pageForm.branchName}/json"/>',
-		type: 'POST',
-		dataType: 'json',
-		data: {
-			pagePath: '<c:out value="${hierarchyPagePath}"/>',
-			markdown: textEl.val()
-		},
-		success: function(result) {
-			$('#previewText').html(result.html);
-			$('#preview').showModal({
-				backdrop: true,
-				keyboard: true
-			});
-			prettyPrint();
-		}
-	});
+function togglePreview() {
+	var previewEl = $('#preview');
+	if (previewEl.length == 0) {
+		var textEl = $('#pageForm').find('#text');
+		$.ajax({
+			url: '<c:url value="/page/markdownToHTML/${pageForm.projectName}/${pageForm.branchName}/json"/>',
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				pagePath: '<c:out value="${hierarchyPagePath}"/>',
+				markdown: textEl.val()
+			},
+			success: function(result) {
+				var previewEl = $('<div id="preview" class="preview"></div>');
+				previewEl.html(result.html);
+				$(document.body).append(previewEl);
+				previewEl.show()
+					.css('left', textEl.offset().left)
+					.css('top', textEl.offset().top)
+					.css('width', textEl.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
+					.css('height', textEl.outerHeight() - (previewEl.outerHeight() - previewEl.height()));
+				prettyPrint();
+				$('#textEditorToolbar a').setButtonDisabled(true);
+				$('#togglePreviewButton').setButtonDisabled(false);
+			}
+		});
+	} else {
+		previewEl.remove();
+		$('#textEditorToolbar a').setButtonDisabled(false);
+	}
 }
 
 function toggleStyleBold() {
@@ -179,13 +190,13 @@ function toggleStyleItalic() {
 		<div class="control-group">
 			<form:label path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
 			<div class="texteditor">
-				<div class="btn-toolbar btn-toolbar-icons">
+				<div id="textEditorToolbar" class="btn-toolbar btn-toolbar-icons">
+					<div class="btn-group">
+						<a id="togglePreviewButton" href="javascript:togglePreview();" class="btn" data-toggle="button" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
+					</div>
 					<div class="btn-group">
 						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
 						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
-					</div>
-					<div class="btn-group">
-						<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
 					</div>
 				</div>
 				<form:textarea path="text" cssClass="span11 code" rows="20"/>
@@ -206,17 +217,6 @@ function toggleStyleItalic() {
 	</fieldset>
 </form:form>
 </p>
-
-<div class="modal modal-wide" id="preview" style="display: none;">
-	<div class="modal-header">
-		<button class="close" onclick="$('#preview').hideModal();">×</button>
-		<h3><spring:message code="title.pagePreview"/></h3>
-	</div>
-	<div class="modal-body" id="previewText"></div>
-	<div class="modal-footer">
-		<a href="javascript:void($('#preview').hideModal());" class="btn"><spring:message code="button.close"/></a>
-	</div>
-</div>
 
 </dt:page>
 
