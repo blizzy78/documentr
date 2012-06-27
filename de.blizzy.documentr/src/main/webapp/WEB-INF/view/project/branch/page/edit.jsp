@@ -93,17 +93,22 @@ function togglePreview() {
 					.css('width', textEl.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
 					.css('height', textEl.outerHeight() - (previewEl.outerHeight() - previewEl.height()));
 				prettyPrint();
-				$('#textEditorToolbar a').setButtonDisabled(true);
+				$('#textEditorToolbar a').each(function() {
+					$(this).setButtonDisabled(true);
+				});
 				$('#togglePreviewButton').setButtonDisabled(false);
 			}
 		});
 	} else {
 		previewEl.remove();
-		$('#textEditorToolbar a').setButtonDisabled(false);
+		$('#textEditorToolbar a').each(function() {
+			$(this).setButtonDisabled(false);
+		});
 	}
 }
 
 function toggleStyleBold() {
+	window.alert('toggleStyleBold');
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
