@@ -92,6 +92,50 @@ function showPreview() {
 	});
 }
 
+function toggleStyleBold() {
+	var textEl = $('#text');
+	var start = textEl[0].selectionStart;
+	var end = textEl[0].selectionEnd;
+	var text = textEl.val();
+	var isBold = (start >= 2) && (end <= (text.length - 2)) &&
+		(text.substring(start - 2, start) == '**') &&
+		(text.substring(end, end + 2) == '**');
+	if (!isBold) {
+		text = text.substring(0, start) + '**' + text.substring(start, end) + '**' + text.substring(end);
+		start = start + 2;
+		end = end + 2;
+	} else {
+		text = text.substring(0, start - 2) + text.substring(start, end) + text.substring(end + 2);
+		start = start - 2;
+		end = end - 2;
+	}
+	textEl.val(text);
+	textEl[0].setSelectionRange(start, end);
+	textEl.focus();
+}
+
+function toggleStyleItalic() {
+	var textEl = $('#text');
+	var start = textEl[0].selectionStart;
+	var end = textEl[0].selectionEnd;
+	var text = textEl.val();
+	var isItalic = (start >= 1) && (end <= (text.length - 1)) &&
+		(text.substring(start - 1, start) == '*') &&
+		(text.substring(end, end + 1) == '*');
+	if (!isItalic) {
+		text = text.substring(0, start) + '*' + text.substring(start, end) + '*' + text.substring(end);
+		start++;
+		end++;
+	} else {
+		text = text.substring(0, start - 1) + text.substring(start, end) + text.substring(end + 1);
+		start--;
+		end--;
+	}
+	textEl.val(text);
+	textEl[0].setSelectionRange(start, end);
+	textEl.focus();
+}
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -134,8 +178,18 @@ function showPreview() {
 		</div>
 		<div class="control-group">
 			<form:label path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
-			<form:textarea path="text" cssClass="span11 code" rows="20"/>
-			<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
+			<div class="texteditor">
+				<div class="btn-toolbar btn-toolbar-icons">
+					<div class="btn-group">
+						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
+						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
+					</div>
+					<div class="btn-group">
+						<a href="javascript:showPreview();" class="btn" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
+					</div>
+				</div>
+				<form:textarea path="text" cssClass="span11 code" rows="20"/>
+			</div>
 		</div>
 		<div class="control-group">
 			<form:label path="viewRestrictionRole" cssClass="control-label"><spring:message code="label.visibleForRole"/>:</form:label>
