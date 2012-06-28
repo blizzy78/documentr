@@ -73,7 +73,7 @@ $(function() {
 
 function togglePreview() {
 	var previewEl = $('#preview');
-	if (previewEl.length == 0) {
+	if (previewEl.length === 0) {
 		var textEl = $('#pageForm').find('#text');
 		$.ajax({
 			url: '<c:url value="/page/markdownToHTML/${pageForm.projectName}/${pageForm.branchName}/json"/>',
@@ -113,8 +113,8 @@ function toggleStyleBold() {
 	var end = textEl[0].selectionEnd;
 	var text = textEl.val();
 	var isBold = (start >= 2) && (end <= (text.length - 2)) &&
-		(text.substring(start - 2, start) == '**') &&
-		(text.substring(end, end + 2) == '**');
+		(text.substring(start - 2, start) === '**') &&
+		(text.substring(end, end + 2) === '**');
 	if (!isBold) {
 		text = text.substring(0, start) + '**' + text.substring(start, end) + '**' + text.substring(end);
 		start = start + 2;
@@ -135,8 +135,8 @@ function toggleStyleItalic() {
 	var end = textEl[0].selectionEnd;
 	var text = textEl.val();
 	var isItalic = (start >= 1) && (end <= (text.length - 1)) &&
-		(text.substring(start - 1, start) == '*') &&
-		(text.substring(end, end + 1) == '*');
+		(text.substring(start - 1, start) === '*') &&
+		(text.substring(end, end + 1) === '*');
 	if (!isItalic) {
 		text = text.substring(0, start) + '*' + text.substring(start, end) + '*' + text.substring(end);
 		start++;

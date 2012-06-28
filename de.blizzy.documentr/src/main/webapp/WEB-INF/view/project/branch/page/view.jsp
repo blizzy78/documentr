@@ -96,7 +96,7 @@ function showRelocateDialog() {
 	}
 
 	var treeEl = $('#relocate-target-tree');
-	if (treeEl.children().length == 0) {
+	if (treeEl.children().length === 0) {
 		documentr.createPageTree(treeEl, {
 				start: {
 					type: 'branch',
@@ -112,8 +112,8 @@ function showRelocateDialog() {
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
 				var button = $('#relocate-button');
-				if ((node.data('type') == 'page') && node.data('hasBranchPermissions') &&
-					(node.data('path') != '<c:out value="${parentPagePath}"/>')) {
+				if ((node.data('type') === 'page') && node.data('hasBranchPermissions') &&
+					(node.data('path') !== '<c:out value="${parentPagePath}"/>')) {
 					button.setButtonDisabled(true);
 					
 					$.ajax({
@@ -163,7 +163,7 @@ function toggleHideFloatingElements(hide) {
 	$('#pageText').children().each(function() {
 		var el = $(this);
 		var float = el.css('float');
-		if ((float == 'left') || (float == 'right')) {
+		if ((float === 'left') || (float === 'right')) {
 			if (hide) {
 				el.hide();
 			} else {
@@ -202,7 +202,7 @@ function saveInlineEditor() {
 function cancelInlineEditor() {
 	var formEl = $('#inlineEditorForm');
 	var textEl = formEl.data('textEl');
-	if ((typeof(textEl) != 'undefined') && (textEl != null)) {
+	if (documentr.isSomething(textEl)) {
 		formEl.data('textEl', null);
 		formEl.hide();
 		$(textEl).show();
@@ -245,7 +245,7 @@ function hookupInlineEditorToolbar() {
 		function() {
 			var textEl = $(this);
 			var float = textEl.css('float');
-			if ((float != 'left') && (float != 'right')) {
+			if ((float !== 'left') && (float !== 'right')) {
 				var toolbarEl = $('#inlineEditorToolbar');
 				toolbarEl
 					.css('left', textEl.offset().left - toolbarEl.width() - 10)
@@ -287,7 +287,7 @@ function showChangesDialog() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var previous = (typeof(result.previous) != 'undefined') ? result.previous : '';
+			var previous = documentr.isSomething(result.previous) ? result.previous : '';
 			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
 			$('#changes-dialog-body').html(html);
 			$('#changes-dialog').showModal({backdrop: true, keyboard: true});

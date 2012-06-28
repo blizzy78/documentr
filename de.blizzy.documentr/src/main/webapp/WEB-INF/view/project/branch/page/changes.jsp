@@ -37,7 +37,7 @@ function getCheckedRadioIndex(radiosSel, checkedRadioSel) {
 	var checkedRadioEl = $(checkedRadioSel);
 	var idx;
 	for (var i = 0; i < radioEls.length; i++) {
-		if ($(radioEls[i]).val() == checkedRadioEl.val()) {
+		if ($(radioEls[i]).val() === checkedRadioEl.val()) {
 			idx = i;
 			break;
 		}

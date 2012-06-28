@@ -38,7 +38,7 @@ function updatePasswordStrengthIndicator() {
 	$('#password1Error').remove();
 
 	var indicator = $('#passwordStrengthIndicator');
-	if (indicator.length == 0) {
+	if (indicator.length === 0) {
 		indicator = $('<span class="help-inline" id="passwordStrengthIndicator"><div class="progress password-strength-indicator"><div class="bar"></div></div></span>');
 		$('#password1Fieldset').append(indicator);
 	}
@@ -76,7 +76,7 @@ function updateAuthoritiesInForm() {
 function updateAuthorities() {
 	updateAuthoritiesInForm();
 
-	var newEls = new Array();
+	var newEls = [];
 
 	var authorities = getAuthoritiesByType('APPLICATION');
 	if (authorities.length > 0) {
@@ -93,7 +93,7 @@ function updateAuthorities() {
 		var targetId = null;
 		var ulEl = null;
 		for (var i = 0; i < authorities.length; i++) {
-			if (authorities[i].targetId != targetId) {
+			if (authorities[i].targetId !== targetId) {
 				newEls.push(ulEl);
 			
 				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.project"/>: ' + authorities[i].targetId + '</h4>'));
@@ -111,7 +111,7 @@ function updateAuthorities() {
 		var targetId = null;
 		var ulEl = null;
 		for (var i = 0; i < authorities.length; i++) {
-			if (authorities[i].targetId != targetId) {
+			if (authorities[i].targetId !== targetId) {
 				newEls.push(ulEl);
 			
 				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.branch"/>: ' + authorities[i].targetId + '</h4>'));
@@ -124,7 +124,7 @@ function updateAuthorities() {
 		newEls.push(ulEl);
 	}
 	
-	if (newEls.length == 0) {
+	if (newEls.length === 0) {
 		newEls.push($('<p data-documentr-role="true"><spring:message code="noRolesAssigned"/></p>'));
 	}
 	
@@ -141,9 +141,9 @@ function updateAuthorities() {
 }
 
 function getAuthoritiesByType(type) {
-	var result = new Array();
+	var result = [];
 	for (var i = 0; i < authorities.length; i++) {
-		if (authorities[i].type == type) {
+		if (authorities[i].type === type) {
 			result.push(authorities[i]);
 		}
 	}
@@ -168,11 +168,11 @@ function addRole() {
 	var formEl = $('#addRoleForm');
 	var type = formEl.find('input:radio:checked').val();
 	var targetId;
-	if (type == 'APPLICATION') {
+	if (type === 'APPLICATION') {
 		targetId = 'application';
-	} else if (type == 'PROJECT') {
+	} else if (type === 'PROJECT') {
 		targetId = formEl.find('select[name="projectName"]').val();
-	} else if (type == 'BRANCH') {
+	} else if (type === 'BRANCH') {
 		targetId = formEl.find('select[name="branchName"]').val();
 	}
 	var roleName = formEl.find('select[name="roleName"]').val();
@@ -186,11 +186,11 @@ function addRole() {
 }
 
 function removeRole(type, targetId, roleName) {
-	var newAuthorities = new Array();
+	var newAuthorities = [];
 	for (var i = 0; i < authorities.length; i++) {
-		if ((authorities[i].type != type) ||
-			(authorities[i].targetId != targetId) ||
-			(authorities[i].roleName != roleName)) {
+		if ((authorities[i].type !== type) ||
+			(authorities[i].targetId !== targetId) ||
+			(authorities[i].roleName !== roleName)) {
 		
 			newAuthorities.push(authorities[i]);
 		}
@@ -199,7 +199,7 @@ function removeRole(type, targetId, roleName) {
 	updateAuthorities();
 }
 
-var authorities = new Array();
+var authorities = [];
 
 <c:if test="${!empty userForm.loginName}">
 	<c:set var="authorities" value="${d:getUserAuthorities(userForm.loginName)}"/>

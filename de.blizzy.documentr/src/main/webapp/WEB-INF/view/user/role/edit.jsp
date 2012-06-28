@@ -29,9 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function updatePermissions() {
 	var controlsBox = $('#permissionControls');
-	var admin = controlsBox.find('input:checkbox:checked[value="ADMIN"]').val();
+	var adminCheckbox = controlsBox.find('input:checkbox:checked[value="ADMIN"]');
 	var nonAdminCheckboxes = controlsBox.find('input:checkbox[value!="ADMIN"]');
-	if (admin == undefined) {
+	if (adminCheckbox.length === 0) {
 		nonAdminCheckboxes.removeAttr('disabled');
 	} else {
 		nonAdminCheckboxes.attr('disabled', 'disabled');
