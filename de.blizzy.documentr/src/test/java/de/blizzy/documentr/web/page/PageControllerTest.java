@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -395,6 +396,18 @@ public class PageControllerTest {
 		
 		Map<String, String> result = pageController.getPageMarkdown(PROJECT, BRANCH, PAGE_PATH_URL, versions);
 		assertEquals(markdown, result);
+	}
+	
+	@Test
+	@Ignore
+	public void getPageMarkdownInRange() {
+		// TODO: implement test
+	}
+	
+	@Test
+	@Ignore
+	public void savePageRange() {
+		// TODO: implement test
 	}
 	
 	@Test

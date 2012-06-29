@@ -41,10 +41,14 @@ public class SettingsTest {
 	
 	@Test
 	public void init() {
-		when(servletContext.getInitParameter("documentr.dataDir")).thenReturn("."); //$NON-NLS-1$ //$NON-NLS-2$
+		when(servletContext.getInitParameter("documentr.dataDir")).thenReturn("dataDir"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(servletContext.getInitParameter("documentr.host")).thenReturn("host"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(servletContext.getInitParameter("documentr.port")).thenReturn("8080"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		settings.init();
-		assertEquals(new File("."), settings.getDocumentrDataDir()); //$NON-NLS-1$
+		assertEquals(new File("dataDir"), settings.getDocumentrDataDir()); //$NON-NLS-1$
+		assertEquals("host", settings.getHost()); //$NON-NLS-1$
+		assertEquals(Integer.valueOf(8080), settings.getPort());
 	}
 
 	@Test

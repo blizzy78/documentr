@@ -19,9 +19,13 @@ package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.security.core.token.Sha512DigestUtils;
+
+import com.google.common.collect.Sets;
 
 public class UserTest {
 	@Test
@@ -61,5 +65,51 @@ public class UserTest {
 	public void getRandomSalt() {
 		String salt = User.getRandomSalt();
 		assertTrue(StringUtils.isNotBlank(salt));
+	}
+	
+	@Test
+	public void getOpenIds() {
+		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Set<OpenId> openIds = Sets.newHashSet(
+				new OpenId("openId1", "realId1"), //$NON-NLS-1$ //$NON-NLS-2$
+				new OpenId("openId2", "realId2")); //$NON-NLS-1$ //$NON-NLS-2$
+		for (OpenId openId : openIds) {
+			user.addOpenId(openId);
+		}
+		
+		assertEquals(openIds, user.getOpenIds());
+	}
+	
+	@Test
+	public void addOpenId() {
+		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Set<OpenId> openIds = Sets.newHashSet(
+				new OpenId("openId1", "realId1"), //$NON-NLS-1$ //$NON-NLS-2$
+				new OpenId("openId2", "realId2")); //$NON-NLS-1$ //$NON-NLS-2$
+		for (OpenId openId : openIds) {
+			user.addOpenId(openId);
+		}
+
+		OpenId newOpenId = new OpenId("openId3", "realId3"); //$NON-NLS-1$ //$NON-NLS-2$
+		user.addOpenId(newOpenId);
+		openIds.add(newOpenId);
+		
+		assertEquals(openIds, user.getOpenIds());
+	}
+	
+	@Test
+	public void removeOpenId() {
+		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		OpenId openId2 = new OpenId("openId2", "realId2"); //$NON-NLS-1$ //$NON-NLS-2$
+		Set<OpenId> openIds = Sets.newHashSet(
+				new OpenId("openId1", "realId1"), //$NON-NLS-1$ //$NON-NLS-2$
+				openId2);
+		for (OpenId openId : openIds) {
+			user.addOpenId(openId);
+		}
+		
+		user.removeOpenId(openId2.getDelegateId());
+		openIds.remove(openId2);
+		assertEquals(openIds, user.getOpenIds());
 	}
 }

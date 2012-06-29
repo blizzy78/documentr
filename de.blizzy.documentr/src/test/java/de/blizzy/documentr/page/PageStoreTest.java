@@ -36,6 +36,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -270,6 +271,12 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertFalse(metaFile.exists());
 		assertFalse(subPagesDir.exists());
 		assertFalse(attachmentsDir.exists());
+	}
+	
+	@Test
+	@Ignore
+	public void deleteAttachment() {
+		// TODO: implement test
 	}
 	
 	@Test

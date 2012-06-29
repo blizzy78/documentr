@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -220,5 +221,11 @@ public class FunctionsTest {
 		List<PageVersion> versions = Lists.newArrayList(new PageVersion("commit", "user", new Date())); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE)).thenReturn(versions);
 		assertEquals(versions, Functions.listPageVersions(PROJECT, BRANCH, PAGE));
+	}
+	
+	@Test
+	@Ignore
+	public void listMyOpenIds() {
+		// TODO: implement test
 	}
 }
