@@ -193,25 +193,11 @@ var documentr = {};
 	};
 	
 	documentr.openMessageDialog = function(title, message, buttons, options) {
-		var backdrop = true;
-		var keyboard = true;
-		var wide = false;
-		var messageAsHtml = false;
-		if (documentr.isSomething(options)) {
-			if (documentr.isSomething(options.backdrop)) {
-				backdrop = options.backdrop;
-			}
-			if (documentr.isSomething(options.keyboard)) {
-				keyboard = options.keyboard;
-			}
-			if (documentr.isSomething(options.wide)) {
-				wide = options.wide;
-			}
-			if (documentr.isSomething(options.messageAsHtml)) {
-				messageAsHtml = options.messageAsHtml;
-			}
-		}
-		
+		var backdrop = (documentr.isSomething(options) && documentr.isSomething(options.backdrop)) ? options.backdrop : true;
+		var keyboard = (documentr.isSomething(options) && documentr.isSomething(options.keyboard)) ? options.keyboard : true;
+		var wide = (documentr.isSomething(options) && documentr.isSomething(options.wide)) ? options.wide : false;
+		var messageAsHtml = (documentr.isSomething(options) && documentr.isSomething(options.messageAsHtml)) ? options.messageAsHtml : false;
+
 		var id = "dialog_" + new Date().getTime();
 		var html =
 			'<div class="modal" id="' + id + '" style="display: none;">' +
@@ -291,16 +277,8 @@ var documentr = {};
 	
 	$.fn.extend({
 		showModal: function(options) {
-			if (!documentr.isSomething(options)) {
-				options = {
-					backdrop: true,
-					keyboard: true
-				};
-			}
-
-			var modalBackdrop = documentr.isSomething(options.backdrop) ? options.backdrop : true;
-			var modalKeyboard = documentr.isSomething(options.keyboard) ? options.keyboard : true;
-			
+			var modalBackdrop = (documentr.isSomething(options) && documentr.isSomething(options.backdrop)) ? options.backdrop : true;
+			var modalKeyboard = (documentr.isSomething(options) && documentr.isSomething(options.keyboard)) ? options.keyboard : true;
 			this.modal({
 				backdrop: modalBackdrop,
 				keyboard: modalKeyboard
