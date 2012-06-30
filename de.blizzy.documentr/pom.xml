@@ -470,7 +470,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 									<exclude>de/blizzy/documentr/TestUtil.class</exclude>
 									<exclude>de/blizzy/documentr/repository/LockManager.class</exclude>
 									<exclude>de/blizzy/documentr/web/WebappInitializer.class</exclude>
-									<exclude>de/blizzy/documentr/web/account/AccountOpenIdController.class</exclude>
+									<exclude>de/blizzy/documentr/web/account/AccountOpenIdController*.class</exclude>
 									<exclude>de/blizzy/documentr/web/filter/SwitchablePrintWriter.class</exclude>
 									<exclude>de/blizzy/documentr/web/filter/SwitchableServletOutputStream.class</exclude>
 									<exclude>org/pegdown/DocumentrParser.class</exclude>
