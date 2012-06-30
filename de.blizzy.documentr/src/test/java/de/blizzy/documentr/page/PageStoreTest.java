@@ -44,6 +44,7 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
@@ -66,7 +67,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	public void setUp() {
 		File dataDir = createTempDir();
 		Settings settings = new Settings();
-		settings.setDocumentrDataDir(dataDir);
+		TestSettingsUtil.setDataDir(settings, dataDir);
 
 		globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);

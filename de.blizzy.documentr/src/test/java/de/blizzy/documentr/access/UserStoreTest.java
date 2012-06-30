@@ -37,6 +37,7 @@ import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.LockManager;
@@ -52,7 +53,7 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	public void setUp() throws IOException, GitAPIException {
 		File dataDir = createTempDir();
 		Settings settings = new Settings();
-		settings.setDocumentrDataDir(dataDir);
+		TestSettingsUtil.setDataDir(settings, dataDir);
 
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);
@@ -166,6 +167,9 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveAndGetUserAuthorities() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+
 		RoleGrantedAuthority rga1 = new RoleGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
 		RoleGrantedAuthority rga2 = new RoleGrantedAuthority(

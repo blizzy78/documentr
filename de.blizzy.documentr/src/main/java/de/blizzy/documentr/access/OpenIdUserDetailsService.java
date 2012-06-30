@@ -22,8 +22,10 @@ import java.io.IOException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+/** User details service that resolves users by one of their OpenIDs. */
 @Component("openIdUserDetailsService")
 public class OpenIdUserDetailsService extends AbstractUserDetailsService {
+	/** Returns the {@link User} that has a specified OpenID. */
 	@Override
 	User loadUser(String openId) throws IOException {
 		try {

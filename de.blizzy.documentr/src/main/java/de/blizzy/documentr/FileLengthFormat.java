@@ -25,10 +25,21 @@ import java.util.Locale;
 
 import org.springframework.context.MessageSource;
 
+/**
+ * Formats a file's length into human-readable text format.
+ * 
+ * @see #format(long)
+ */
 public class FileLengthFormat extends Format {
 	private MessageSource messageSource;
 	private Locale locale;
 
+	/**
+	 * Constructs a new file length formatter.
+	 * 
+	 * @param messageSource a source of message texts
+	 * @param locale the locale to use
+	 */
 	public FileLengthFormat(MessageSource messageSource, Locale locale) {
 		this.messageSource = messageSource;
 		this.locale = locale;
@@ -58,6 +69,7 @@ public class FileLengthFormat extends Format {
 		return toAppendTo;
 	}
 
+	/** Formats the specific length into human-readable format. */
 	public String format(long length) {
 		return format(Long.valueOf(length), new StringBuffer(), null).toString();
 	}
@@ -79,7 +91,8 @@ public class FileLengthFormat extends Format {
 	private String formatNumber(long l) {
 		return NumberFormat.getNumberInstance().format(l);
 	}
-	
+
+	/** Returns <code>null</code> since this class does not support parsing. */
 	@Override
 	public Object parseObject(String source, ParsePosition pos) {
 		return null;

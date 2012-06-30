@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 
 public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
@@ -49,7 +50,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 		allReposDir = new File(dataDir, "repositories"); //$NON-NLS-1$
 
 		Settings settings = new Settings();
-		settings.setDocumentrDataDir(dataDir);
+		TestSettingsUtil.setDataDir(settings, dataDir);
 		
 		repoManager = mock(ProjectRepositoryManager.class);
 		
@@ -99,7 +100,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	public void listProjects() throws IOException, GitAPIException {
 		File dataDir = createTempDir();
 		Settings settings = new Settings();
-		settings.setDocumentrDataDir(dataDir);
+		TestSettingsUtil.setDataDir(settings, dataDir);
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);
 		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();

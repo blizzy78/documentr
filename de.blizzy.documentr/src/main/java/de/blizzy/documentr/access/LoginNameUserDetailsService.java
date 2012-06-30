@@ -22,8 +22,10 @@ import java.io.IOException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+/** User details service that resolves users by their login names. */
 @Component("loginNameUserDetailsService")
 public class LoginNameUserDetailsService extends AbstractUserDetailsService {
+	/** Returns the {@link User} that has the specified login name. */
 	@Override
 	User loadUser(String loginName) throws IOException {
 		try {

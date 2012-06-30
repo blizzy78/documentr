@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 
 public class DocumentrAnonymousAuthenticationFilterTest {
@@ -38,8 +37,7 @@ public class DocumentrAnonymousAuthenticationFilterTest {
 		AbstractAuthenticationToken authentication = mock(AbstractAuthenticationToken.class);
 		
 		DocumentrAnonymousAuthenticationFactory authenticationFactory = mock(DocumentrAnonymousAuthenticationFactory.class);
-		when(authenticationFactory.create(eq(DocumentrConstants.ANONYMOUS_AUTH_KEY), anyString()))
-			.thenReturn(authentication);
+		when(authenticationFactory.create(anyString(), anyString())).thenReturn(authentication);
 		
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		

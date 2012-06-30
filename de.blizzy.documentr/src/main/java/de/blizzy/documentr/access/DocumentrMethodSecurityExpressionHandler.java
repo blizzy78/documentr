@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
+/** documentr's security expression handler. */
 @Component("expressionHandler")
 public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 	@Autowired

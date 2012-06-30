@@ -22,12 +22,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 
+/** An authority that grants a role on a target object. */
 public class RoleGrantedAuthority implements GrantedAuthority {
 	private static final long serialVersionUID = 4837778771482591248L;
 	
 	private GrantedAuthorityTarget target;
 	private String roleName;
 
+	/**
+	 * Constructs a new role granted authority.
+	 * 
+	 * @param target the target object
+	 * @param roleName the name of the role being granted
+	 */
 	public RoleGrantedAuthority(GrantedAuthorityTarget target, String roleName) {
 		Assert.notNull(target);
 		Assert.hasLength(roleName);
@@ -35,11 +42,13 @@ public class RoleGrantedAuthority implements GrantedAuthority {
 		this.target = target;
 		this.roleName = roleName;
 	}
-	
+
+	/** Returns the target object. */
 	public GrantedAuthorityTarget getTarget() {
 		return target;
 	}
 
+	/** Returns the name of the role being granted. */
 	public String getRoleName() {
 		return roleName;
 	}

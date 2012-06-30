@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+/** Holds information about settings for the application. */
 @Component
 public class Settings {
 	@Autowired
@@ -61,18 +62,23 @@ public class Settings {
 		this.servletContext = servletContext;
 	}
 
+	/** Returns the directory where all application data is stored. */
 	public File getDocumentrDataDir() {
 		return dataDir;
 	}
 	
-	public void setDocumentrDataDir(File dataDir) {
+	// used for testing
+	@SuppressWarnings("unused")
+	private void setDocumentrDataDir(File dataDir) {
 		this.dataDir = dataDir;
 	}
-	
+
+	/** Returns an alternative host name where the application is available on. */
 	public String getHost() {
 		return host;
 	}
-	
+
+	/** Returns an alternative port number where the application is available on. */
 	public Integer getPort() {
 		return port;
 	}

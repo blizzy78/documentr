@@ -27,6 +27,7 @@ import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
+/** documentr's {@link SecurityExpressionRoot} for use in JSP and security annotations. */
 public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
 	public HttpServletRequest request;
 	

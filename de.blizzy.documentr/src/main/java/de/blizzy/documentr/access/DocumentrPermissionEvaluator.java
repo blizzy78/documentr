@@ -35,6 +35,22 @@ import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.PageNotFoundException;
 
+/**
+ * <p>documentr's {@link PermissionEvaluator}.</p>
+ * 
+ * <p>Permissions are handled recursively. For example, if asked if a user has a permission on a specific page,
+ * and they don't, lookup continues on the page's branch. If the user does not have the permission on the branch,
+ * lookup continues on the branch's project. If they don't have the permission on the project, lookup continues
+ * on the &quot;application object.&quot;</p>
+ * 
+ * <p>Granting the {@link Permission#ADMIN ADMIN} permission on an object implies granting all other permissions
+ * on the same object.</p>
+ * 
+ * <p>It is not possible to grant permissions on a higher-level object, then deny those permissions on any
+ * of their children. For example, having granted the {@link Permission#VIEW VIEW} permission on a project
+ * allows view access to all branches and pages of that project. In that case it is not possible to deny
+ * viewing a particular branch of the project.</p>
+ */
 @Component
 public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	@Autowired

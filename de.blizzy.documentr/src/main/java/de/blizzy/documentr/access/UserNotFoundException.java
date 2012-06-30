@@ -19,6 +19,7 @@ package de.blizzy.documentr.access;
 
 import de.blizzy.documentr.NotFoundException;
 
+/** Thrown when no user is found that has a specific login name. */
 public class UserNotFoundException extends NotFoundException {
 	private String loginName;
 

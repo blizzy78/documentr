@@ -24,10 +24,20 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.util.Assert;
 
+/**
+ * Password encoder that encodes passwords with <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-512</a>
+ * using a random <a href="http://en.wikipedia.org/wiki/Salt_(cryptography)">salt</a> and a configurable
+ * number of <a href="http://en.wikipedia.org/wiki/Key_stretching">iterations</a>.
+ */
 public class Sha512PasswordEncoder implements PasswordEncoder {
 	private int iterations;
 	private SecureRandom RANDOM = new SecureRandom();
 
+	/**
+	 * Constructs a new SHA-512 password encoder.
+	 * 
+	 * @param iterations the number of iterations to perform
+	 */
 	public Sha512PasswordEncoder(int iterations) {
 		Assert.isTrue(iterations >= 1);
 		
@@ -35,7 +45,13 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 		
 		RANDOM.setSeed(System.currentTimeMillis());
 	}
-	
+
+	/**
+	 * Encodes the specified raw password. This method ignores the specified salt and uses its own random salt generation.
+	 * 
+	 * @param rawPass the raw password to encode
+	 * @param salt (ignored)
+	 */
 	@Override
 	public String encodePassword(String rawPass, Object salt) {
 		salt = String.valueOf(getRandomLong());
@@ -44,6 +60,14 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 		return encPass + "{" + salt + "}{" + String.valueOf(iterations) + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	/**
+	 * Verifies a raw password against a previously encoded password.
+	 * 
+	 * @param encPass The previously encoded password to verify against. This password may have been encoded using a
+	 *        different number of iterations than this password encoder is instructed to perform.
+	 * @param rawPass the raw password to verify
+	 * @param salt (ignored)
+	 */
 	@Override
 	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
 		int saltStartPos = StringUtils.indexOf(encPass, "{") + 1; //$NON-NLS-1$

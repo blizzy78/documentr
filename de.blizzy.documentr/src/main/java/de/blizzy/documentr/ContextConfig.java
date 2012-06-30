@@ -56,6 +56,7 @@ import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 
+/** Spring application context configuration. */
 @Configuration
 @EnableWebMvc
 @ComponentScan("de.blizzy.documentr")

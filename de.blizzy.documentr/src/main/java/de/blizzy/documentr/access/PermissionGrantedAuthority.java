@@ -24,12 +24,19 @@ import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
+/** An authority that grants a permission on a target object. */
 class PermissionGrantedAuthority implements GrantedAuthority {
 	private static final long serialVersionUID = 4837778771482591248L;
 	
 	private GrantedAuthorityTarget target;
 	private Permission permission;
 
+	/**
+	 * Constructs a new permission granted authority.
+	 * 
+	 * @param target the target object
+	 * @param permission the permission being granted
+	 */
 	PermissionGrantedAuthority(GrantedAuthorityTarget target, Permission permission) {
 		Assert.notNull(target);
 		Assert.isTrue(target.getType() != Type.PAGE);
@@ -39,10 +46,12 @@ class PermissionGrantedAuthority implements GrantedAuthority {
 		this.permission = permission;
 	}
 	
+	/** Returns the target object. */
 	GrantedAuthorityTarget getTarget() {
 		return target;
 	}
-	
+
+	/** Returns the permission being granted. */
 	Permission getPermission() {
 		return permission;
 	}

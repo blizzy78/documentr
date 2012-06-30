@@ -30,24 +30,32 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.validation.PagePathValidator;
 
-
+/** Generic utility methods. */
 public final class Util {
 	private Util() {}
 
+	/** Converts a page path from URL format to real format. */
 	public static String toRealPagePath(String pagePath) {
 		return (pagePath != null) ? pagePath.replace(',', '/') : null;
 	}
 
+	/** Converts a page path from real format to URL format. */
 	public static String toURLPagePath(String pagePath) {
 		return (pagePath != null) ? pagePath.replace('/', ',') : null;
 	}
 
-	public static String simplifyForURL(String title) {
+	/**
+	 * Converts a text so that it can be used as a URL component. For example, the text
+	 * &quot;<code>My Funny Valentine</code>&quot; will be converted to
+	 * &quot;<code>my-funny-valentine</code>&quot;. This method is useful to convert
+	 * page titles to page path components.
+	 */
+	public static String simplifyForURL(String text) {
 		PagePathValidator validator = new PagePathValidator();
 		StringBuilder buf = new StringBuilder();
-		int len = title.length();
+		int len = text.length();
 		for (int i = 0; i < len; i++) {
-			char c = title.charAt(i);
+			char c = text.charAt(i);
 			switch (c) {
 				case ' ':
 				case '.':
@@ -80,6 +88,18 @@ public final class Util {
 		return name;
 	}
 
+	/**
+	 * <p>Joins a list of objects into a string using a delimiter. This works for different types
+	 * of <code>o</code>:</p>
+	 * 
+	 * <ul>
+	 *   <li>If <code>o</code> is a {@link Collection}, all elements are joined together.</li>
+	 *   <li>If <code>o</code> is an array, all elements are joined together.</li>
+	 *   <li>Otherwise, <code>o</code> is used directly.</li>
+	 * </ul>
+	 * 
+	 * <p>For each element in <code>o</code> its respective {@link Object#toString()} method is invoked.</p>
+	 */
 	public static String join(Object o, String delimiter) {
 		Collection<?> c;
 		if (o instanceof Collection) {
@@ -91,7 +111,8 @@ public final class Util {
 		}
 		return StringUtils.join(c, delimiter);
 	}
-	
+
+	/** Converts a string into a byte array. {@link DocumentrConstants#ENCODING} is used as the encoding. */
 	public static byte[] toBytes(String s) {
 		try {
 			return s.getBytes(DocumentrConstants.ENCODING);
@@ -99,7 +120,8 @@ public final class Util {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	/** Converts a byte array into a string. {@link DocumentrConstants#ENCODING} is used as the encoding. */
 	public static String fromBytes(byte[] b) {
 		try {
 			return StringUtils.toString(b, DocumentrConstants.ENCODING);
@@ -107,7 +129,8 @@ public final class Util {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	/** Deletes a file ignoring exceptions. If <code>f</code> is a directory, it is deleted recursively. */
 	public static void deleteQuietly(File f) {
 		if ((f != null) && f.exists()) {
 			try {

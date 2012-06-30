@@ -19,10 +19,13 @@ package de.blizzy.documentr.access;
 
 import de.blizzy.documentr.NotFoundException;
 
+/** Thrown when no role is found that has a specific name. */
 public class RoleNotFoundException extends NotFoundException {
 	private String roleName;
 
 	RoleNotFoundException(String roleName) {
+		super("role not found: " + roleName); //$NON-NLS-1$
+		
 		this.roleName = roleName;
 	}
 	

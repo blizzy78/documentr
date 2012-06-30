@@ -17,12 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
-/** Thrown when an object is not found. */
-public abstract class NotFoundException extends RuntimeException {
-	protected NotFoundException() {
-	}
+import java.io.File;
+
+public final class TestSettingsUtil {
+	private TestSettingsUtil() {}
 	
-	protected NotFoundException(String msg) {
-		super(msg);
+	public static void setDataDir(Settings settings, File dataDir) {
+		TestUtil.invokeMethod(Settings.class, settings, "setDocumentrDataDir", //$NON-NLS-1$
+				new Class<?>[] { File.class }, new Object[] { dataDir });
 	}
 }

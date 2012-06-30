@@ -19,19 +19,28 @@ package de.blizzy.documentr.access;
 
 import java.util.EnumSet;
 
+/** A user role containing a set of {@link Permission}s. */
 public class Role {
 	private String name;
 	private EnumSet<Permission> permissions;
 
+	/**
+	 * Constructs a new role.
+	 * 
+	 * @param name the role's name
+	 * @param permissions the permissions this role contains
+	 */
 	public Role(String name, EnumSet<Permission> permissions) {
 		this.name = name;
 		this.permissions = permissions;
 	}
-	
+
+	/** Returns the role name. */
 	public String getName() {
 		return name;
 	}
-	
+
+	/** Returns the permissions this role contains. */
 	public EnumSet<Permission> getPermissions() {
 		return permissions;
 	}

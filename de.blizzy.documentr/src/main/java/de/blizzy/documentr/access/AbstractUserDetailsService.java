@@ -29,12 +29,25 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.collect.Sets;
 
+/**
+ * User details service that provides {@link UserDetails} with appropriate authorities.
+ * It relies on subclasses to load up {@link User} instances.
+ */
 abstract class AbstractUserDetailsService implements UserDetailsService {
 	@Autowired
 	private UserStore userStore;
-	
+
+	/**
+	 * Returns {@link UserDetails} according to a specified login name.
+	 * This method invokes {@link #loadUser} and uses the {@link User} instance to
+	 * construct its result.
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
+		if (loginName.equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
+			throw new UsernameNotFoundException("user not found: " + loginName); //$NON-NLS-1$
+		}
+		
 		try {
 			User user = loadUser(loginName);
 			loginName = user.getLoginName();
@@ -52,7 +65,8 @@ abstract class AbstractUserDetailsService implements UserDetailsService {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	/** Returns the {@link User} that has the specified login name. */
 	abstract User loadUser(String loginName) throws IOException;
 	
 	void setUserStore(UserStore userStore) {

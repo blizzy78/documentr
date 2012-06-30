@@ -19,15 +19,20 @@ package de.blizzy.documentr.access;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.security.core.Authentication;
+
+/** {@link Authentication} utility methods. */
 public final class AuthenticationUtil {
 	private static final String AUTHENTICATION_CREATION_TIME = "authenticationCreationTime"; //$NON-NLS-1$
 
 	private AuthenticationUtil() {}
-	
+
+	/** Stores the creation time of the current user's {@link Authentication} into their session. */
 	public static void setAuthenticationCreationTime(HttpSession session, long time) {
 		session.setAttribute(AUTHENTICATION_CREATION_TIME, Long.valueOf(time));
 	}
-	
+
+	/** Retrieves the creation time of the current user's {@link Authentication} from their session. */
 	public static long getAuthenticationCreationTime(HttpSession session) {
 		Long time = (Long) session.getAttribute(AUTHENTICATION_CREATION_TIME);
 		return (time != null) ? time.longValue() / 1000L * 1000L : 0;

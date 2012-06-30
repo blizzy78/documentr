@@ -56,8 +56,10 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 
+/** Manages storage of user account data. */
 @Component
 public class UserStore {
+	/** The login name of the anonymous user. */
 	public static final String ANONYMOUS_USER_LOGIN_NAME = "_anonymous"; //$NON-NLS-1$
 	
 	private static final String REPOSITORY_NAME = "_users"; //$NON-NLS-1$
@@ -110,6 +112,12 @@ public class UserStore {
 		saveUserAuthorities(ANONYMOUS_USER_LOGIN_NAME, authorities, adminUser);
 	}
 
+	/**
+	 * Saves a user.
+	 * 
+	 * @param user the user to save
+	 * @param currentUser the user performing the save operation
+	 */
 	public void saveUser(User user, User currentUser) throws IOException {
 		Assert.notNull(user);
 		Assert.notNull(currentUser);
@@ -147,6 +155,11 @@ public class UserStore {
 		}
 	}
 	
+	/**
+	 * Returns the user that has the specified login name.
+	 * 
+	 * @throws UserNotFoundException when the user could not be found
+	 */
 	public User getUser(String loginName) throws IOException {
 		Assert.notNull(loginName);
 		
@@ -183,6 +196,7 @@ public class UserStore {
 		return user;
 	}
 
+	/** Returns all known user login names. */
 	public List<String> listUsers() throws IOException {
 		ILockedRepository repo = null;
 		try {
@@ -209,6 +223,12 @@ public class UserStore {
 		}
 	}
 
+	/**
+	 * Saves a role.
+	 * 
+	 * @param role the role to save
+	 * @param currentUser the user performing the save operation
+	 */
 	public void saveRole(Role role, User currentUser) throws IOException {
 		Assert.notNull(role);
 		Assert.notNull(currentUser);
@@ -246,6 +266,7 @@ public class UserStore {
 		}
 	}
 
+	/** Returns all known role names. */
 	public List<String> listRoles() throws IOException {
 		ILockedRepository repo = null;
 		try {
@@ -272,6 +293,11 @@ public class UserStore {
 		}
 	}
 
+	/**
+	 * Returns the role that has the specified name.
+	 * 
+	 * @throws RoleNotFoundException when the role could not be found
+	 */
 	public Role getRole(String roleName) throws IOException {
 		Assert.notNull(roleName);
 		
@@ -298,12 +324,25 @@ public class UserStore {
 		}
 	}
 	
+	/**
+	 * Saves a user's authorities
+	 * 
+	 * @param loginName the login name of the user whose authorities are to be saved
+	 * @param authorities the user's authorities to be saved
+	 * @param currentUser the user performing the save operation
+	 * 
+	 * @throws UserNotFoundException when the user does not exist
+	 */
 	public void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities, User currentUser)
 			throws IOException {
 		
 		Assert.notNull(loginName);
 		Assert.notNull(authorities);
 		Assert.notNull(currentUser);
+		if (!loginName.equals(ANONYMOUS_USER_LOGIN_NAME)) {
+			// check that user exists by trying to load it
+			getUser(loginName);
+		}
 		
 		ILockedRepository repo = null;
 		try {
@@ -342,6 +381,13 @@ public class UserStore {
 		}
 	}
 
+	/**
+	 * Returns a user's authorities.
+	 * 
+	 * @param loginName the login name of the user
+	 * 
+	 * @throws UserNotFoundException when the user does not exist
+	 */
 	public List<RoleGrantedAuthority> getUserAuthorities(String loginName) throws IOException {
 		Assert.notNull(loginName);
 		
@@ -395,6 +441,11 @@ public class UserStore {
 		}
 	}
 
+	/**
+	 * Returns the user that has an OpenID whose real ID is equal to the specified OpenID.
+	 * 
+	 * @throws UserNotFoundException when the user could not be found
+	 */
 	public User getUserByOpenId(String openId) throws IOException {
 		ILockedRepository repo = null;
 		try {
@@ -423,6 +474,11 @@ public class UserStore {
 		}
 	}
 
+	/**
+	 * Converts a {@link RoleGrantedAuthority} to a set of {@link PermissionGrantedAuthority}.
+	 * This method will return an empty set if the role specified by the RoleGrantedAuthority does not exist
+	 * (rather than throwing a {@link RoleNotFoundException}.)
+	 */
 	Set<PermissionGrantedAuthority> toPermissionGrantedAuthorities(RoleGrantedAuthority rga) throws IOException {
 		Set<PermissionGrantedAuthority> result = Sets.newHashSet();
 		try {

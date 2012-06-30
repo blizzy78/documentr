@@ -19,29 +19,49 @@ package de.blizzy.documentr;
 
 import org.eclipse.jgit.lib.Constants;
 
+/** Defines various constants used throughout documentr. */
 public final class DocumentrConstants {
+	/** Pattern a project name must match against. */
 	public static final String PROJECT_NAME_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$
+
+	/** Pattern a branch name must match against. */
 	public static final String BRANCH_NAME_PATTERN = "[a-zA-Z0-9_\\.\\-]+"; //$NON-NLS-1$
+
+	/** Pattern a single page path component must match against. */
 	private static final String PAGE_NAME_VALID_CHARS_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$
+
+	/** Pattern a page path must match against (real format). */
 	private static final String PAGE_PATH_REAL_PATTERN =
 			PAGE_NAME_VALID_CHARS_PATTERN + "(?:/" + PAGE_NAME_VALID_CHARS_PATTERN + ")*"; //$NON-NLS-1$ //$NON-NLS-2$
+
+	/** Pattern a page path must match against (URL format). */
 	public static final String PAGE_PATH_URL_PATTERN =
 			PAGE_NAME_VALID_CHARS_PATTERN + "(?:," + PAGE_NAME_VALID_CHARS_PATTERN + ")*"; //$NON-NLS-1$ //$NON-NLS-2$
+
+	/** Pattern a page path must match against (both real and URL format). */
 	public static final String PAGE_PATH_PATTERN =
 			"(?:" + PAGE_PATH_REAL_PATTERN + "|" + PAGE_PATH_URL_PATTERN + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+	/** Pattern a user login name must match against. */
 	public static final String USER_LOGIN_NAME_PATTERN = "[a-zA-Z0-9_\\.\\-]+"; //$NON-NLS-1$
+
+	/** Pattern a role name must match against. */
 	public static final String ROLE_NAME_PATTERN = "[a-zA-Z0-9_\\- ]+"; //$NON-NLS-1$
 
+	/** Blacklist pattern a project name must not match against. */
 	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|_.*)"; //$NON-NLS-1$
+
+	/** Blacklist pattern a branch name must not match against. */
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
 			"(?:create|save|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
 	
+	/** Default content type for binary data. */
 	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
 	
+	/** Encoding to use when writing text as binary data. */
 	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
-	
-	public static final String ANONYMOUS_AUTH_KEY = String.valueOf((long) Math.random() * Long.MAX_VALUE);
-	
+
+	/** Page name and path of a branch's home page. */
 	public static final String HOME_PAGE_NAME = "home"; //$NON-NLS-1$
 
 	private DocumentrConstants() {}

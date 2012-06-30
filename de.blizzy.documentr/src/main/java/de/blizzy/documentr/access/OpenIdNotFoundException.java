@@ -19,6 +19,7 @@ package de.blizzy.documentr.access;
 
 import de.blizzy.documentr.NotFoundException;
 
+/** Thrown when no user is found that has a specific OpenID. */
 public class OpenIdNotFoundException extends NotFoundException {
 	private String openId;
 

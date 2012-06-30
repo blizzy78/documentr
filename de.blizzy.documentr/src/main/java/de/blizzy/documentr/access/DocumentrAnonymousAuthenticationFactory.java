@@ -24,17 +24,20 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
+/** Factory that creates anonymous {@link Authentication} instances. */
 @Component
 public class DocumentrAnonymousAuthenticationFactory {
 	@Autowired
 	private UserStore userStore;
-	
+
+	/** Creates an anonymous {@link Authentication} with authorities granted to the anonymous user. */
 	public AbstractAuthenticationToken create(String key, Object principal) throws IOException {
 		List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		Set<GrantedAuthority> authorities = Sets.newHashSet();

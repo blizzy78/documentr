@@ -17,29 +17,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+/** Permissions that can be granted on objects. */
 public enum Permission {
-	// ===== VALID TARGET TYPES: all =====
-
-	// can do anything (implies all other permissions on same target)
+	/** Administrative permission. Can be granted on all objects. Implies all other permissions on those objects. */
 	ADMIN,
 	
-	// simple viewing
+	/** Viewing permission. Can be granted on all objects. */
 	VIEW,
 	
-
-	// ===== VALID TARGET TYPES: application, project =====
-	
-	// application: create/edit/delete projects
-	// project: edit details
+	/**
+	 * <p>Edit project permission. Can be granted on:</p>
+	 * 
+	 * <ul>
+	 *   <li>Application - Allows to create, edit, and delete projects.</li>
+	 *   <li>Project - Allows to edit project details.</li>
+	 * </ul>
+	 */
 	EDIT_PROJECT,
 
-	
-	// ===== VALID TARGET TYPES: application, project, branch =====
-	
-	// application/project: create/edit/delete branches
-	// branch: edit details
+	/**
+	 * <p>Edit branch permission. Can be granted on:</p>
+	 * 
+	 * <ul>
+	 *   <li>Application, project - Allows to create, edit, and delete branches.</li>
+	 *   <li>Branch - Allows to edit branch details.</li>
+	 * </ul>
+	 */
 	EDIT_BRANCH,
 	
-	// application/project/branch: create/edit/delete pages
+	/**
+	 * <p>Edit page permission. Can be granted on:</p>
+	 * 
+	 * <ul>
+	 *   <li>Application, project, branch - Allows to create, edit, and delete pages and attachments.</li>
+	 * </ul>
+	 */
 	EDIT_PAGE;
 }
