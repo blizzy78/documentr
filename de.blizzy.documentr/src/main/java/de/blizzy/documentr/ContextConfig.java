@@ -93,7 +93,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new Sha512PasswordEncoder();
+		return new Sha512PasswordEncoder(100000);
 	}
 	
 	@Bean

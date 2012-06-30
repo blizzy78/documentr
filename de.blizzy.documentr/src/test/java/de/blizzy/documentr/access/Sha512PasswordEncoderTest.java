@@ -32,8 +32,20 @@ public class Sha512PasswordEncoderTest {
 		SecureRandom ignoredRandom = new SecureRandom();
 		ignoredRandom.setSeed(System.currentTimeMillis());
 		
-		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder();
+		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
 		String encPass = passwordEncoder.encodePassword(PASSWORD, Long.valueOf(ignoredRandom.nextLong()));
+		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, Long.valueOf(ignoredRandom.nextLong())));
+	}
+
+	@Test
+	public void isPasswordValidMustUseIterationsFromEncodedPassword() {
+		SecureRandom ignoredRandom = new SecureRandom();
+		ignoredRandom.setSeed(System.currentTimeMillis());
+		
+		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
+		String encPass = passwordEncoder.encodePassword(PASSWORD, Long.valueOf(ignoredRandom.nextLong()));
+		
+		passwordEncoder = new Sha512PasswordEncoder(2);
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, Long.valueOf(ignoredRandom.nextLong())));
 	}
 }
