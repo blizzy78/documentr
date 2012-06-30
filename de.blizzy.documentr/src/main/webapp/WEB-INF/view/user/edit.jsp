@@ -156,7 +156,7 @@ function showAddRoleDialog() {
 			$('#addRoleForm').each(function() {
 				this.reset();
 			});
-			$('#addRoleDialog').showModal({backdrop: true, keyboard: true});
+			$('#addRoleDialog').showModal();
 		</c:when>
 		<c:otherwise>
 			window.alert('<spring:message code="noRolesConfigured"/>');

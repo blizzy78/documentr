@@ -291,7 +291,20 @@ var documentr = {};
 	
 	$.fn.extend({
 		showModal: function(options) {
-			this.modal(options);
+			if (!documentr.isSomething(options)) {
+				options = {
+					backdrop: true,
+					keyboard: true
+				};
+			}
+
+			var modalBackdrop = documentr.isSomething(options.backdrop) ? options.backdrop : true;
+			var modalKeyboard = documentr.isSomething(options.keyboard) ? options.keyboard : true;
+			
+			this.modal({
+				backdrop: modalBackdrop,
+				keyboard: modalKeyboard
+			});
 			var win = $(window);
 			this.css('margin-left', '0')
 				.css('margin-top', '0')

@@ -77,7 +77,7 @@ function showRemoveDialog(openId) {
 </c:choose>
 
 <p>
-<a href="javascript:void($('#add-openid-dialog').showModal({backdrop: true, keyboard: true}));" class="btn"><i class="icon-plus"></i> <spring:message code="button.addOpenId"/></a>
+<a href="javascript:void($('#add-openid-dialog').showModal());" class="btn"><i class="icon-plus"></i> <spring:message code="button.addOpenId"/></a>
 </p>
 
 <div class="modal" id="add-openid-dialog" style="display: none;">

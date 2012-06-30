@@ -70,7 +70,7 @@ function showChangesDialog() {
 		success: function(result) {
 			var html = documentr.diffMarkdownAndGetHtml(result[version1], result[version2]);
 			$('#changes-dialog-body').html(html);
-			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
+			$('#changes-dialog').showModal();
 		}
 	});
 }

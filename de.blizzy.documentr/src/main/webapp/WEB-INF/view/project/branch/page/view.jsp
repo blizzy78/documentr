@@ -36,7 +36,7 @@ pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
 <sec:authorize access="hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
 
 function showCopyToBranchDialog() {
-	$('#copy-dialog').showModal({backdrop: true, keyboard: true});
+	$('#copy-dialog').showModal();
 	copyToBranchSelected();
 }
 
@@ -92,7 +92,7 @@ function showDeleteDialog() {
 
 function showRelocateDialog() {
 	function showDialog() {
-		$('#relocate-dialog').showModal({backdrop: true, keyboard: true});
+		$('#relocate-dialog').showModal();
 	}
 
 	var treeEl = $('#relocate-target-tree');
@@ -290,7 +290,7 @@ function showChangesDialog() {
 			var previous = documentr.isSomething(result.previous) ? result.previous : '';
 			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
 			$('#changes-dialog-body').html(html);
-			$('#changes-dialog').showModal({backdrop: true, keyboard: true});
+			$('#changes-dialog').showModal();
 		}
 	});
 }
