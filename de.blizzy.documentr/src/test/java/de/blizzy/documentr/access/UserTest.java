@@ -21,9 +21,7 @@ import static org.junit.Assert.*;
 
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.springframework.security.core.token.Sha512DigestUtils;
 
 import com.google.common.collect.Sets;
 
@@ -52,19 +50,6 @@ public class UserTest {
 		assertFalse(user.isDisabled());
 		user = new User("user", "password", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertTrue(user.isDisabled());
-	}
-	
-	@Test
-	public void hashPassword() {
-		String password = "password"; //$NON-NLS-1$
-		String salt = "salt"; //$NON-NLS-1$
-		assertEquals(Sha512DigestUtils.shaHex(password + salt), User.hashPassword(password, salt));
-	}
-	
-	@Test
-	public void getRandomSalt() {
-		String salt = User.getRandomSalt();
-		assertTrue(StringUtils.isNotBlank(salt));
 	}
 	
 	@Test
