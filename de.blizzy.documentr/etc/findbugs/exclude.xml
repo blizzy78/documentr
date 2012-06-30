@@ -24,37 +24,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.Page"/>
+		<Class name="de.blizzy.documentr.page.Page"/>
 		<Bug pattern="EI_EXPOSE_REP"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageData"/>
+		<Class name="de.blizzy.documentr.page.PageData"/>
 		<Bug pattern="EI_EXPOSE_REP"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageData"/>
+		<Class name="de.blizzy.documentr.page.PageData"/>
 		<Bug pattern="EI_EXPOSE_REP2"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageMetadata"/>
+		<Class name="de.blizzy.documentr.page.PageMetadata"/>
 		<Bug pattern="EI_EXPOSE_REP"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageMetadata"/>
+		<Class name="de.blizzy.documentr.page.PageMetadata"/>
 		<Bug pattern="EI_EXPOSE_REP2"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageVersion"/>
+		<Class name="de.blizzy.documentr.page.PageVersion"/>
 		<Bug pattern="EI_EXPOSE_REP"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.PageVersion"/>
+		<Class name="de.blizzy.documentr.page.PageVersion"/>
 		<Bug pattern="EI_EXPOSE_REP2"/>
 	</Match>
 
