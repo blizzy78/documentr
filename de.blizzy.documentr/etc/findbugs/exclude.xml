@@ -24,14 +24,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</Match>
 
 	<Match>
+		<Class name="de.blizzy.documentr.pagestore.Page"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageData"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageData"/>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageMetadata"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageMetadata"/>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageVersion"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+
+	<Match>
+		<Class name="de.blizzy.documentr.pagestore.PageVersion"/>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+
+	<Match>
 		<Class name="de.blizzy.documentr.web.Functions"/>
 		<Method name="init"/>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
 	</Match>
 
 	<Match>
-		<Class name="de.blizzy.documentr.pagestore.Page"/>
-		<Method name="getData"/>
-		<Bug pattern="EI_EXPOSE_REP"/>
+		<Class name="de.blizzy.documentr.web.account.AccountOpenIdController"/>
+		<Method name="saveOpenId"/>
+		<Bug pattern="J2EE_STORE_OF_NON_SERIALIZABLE_OBJECT_INTO_SESSION"/>
 	</Match>
 </FindBugsFilter>
