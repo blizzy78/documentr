@@ -206,6 +206,7 @@ function cancelInlineEditor() {
 		formEl.data('textEl', null);
 		formEl.hide();
 		$(textEl).show();
+		$('#inlineEditorToolbar').hide();
 		toggleHideFloatingElements(false);
 	}
 }
@@ -241,39 +242,34 @@ function hookupInlineEditorToolbar() {
 		el.stop(true).fadeTo(3000, 0.25);
 	}
 
-	$('#pageText > *[data-text-range]').hover(
-		function() {
-			var textEl = $(this);
-			var float = textEl.css('float');
-			if ((float !== 'left') && (float !== 'right')) {
-				var toolbarEl = $('#inlineEditorToolbar');
-				toolbarEl
-					.css('left', textEl.offset().left - toolbarEl.width() - 10)
-					.css('top', textEl.offset().top);
-				showEl(toolbarEl);
-				var buttonEl = $('#inlineEditorToolbar button');
-				buttonEl.off('click');
-				buttonEl.click(
-					{
-						el: this,
-						range: textEl.attr('data-text-range')
-					},
-					function(event) {
-						startInlineEditor(event.data.el, event.data.range);
-					});
-			}
-		},
-		function() {
+	$('#pageText > *[data-text-range]').mouseenter(function() {
+		var textEl = $(this);
+		var float = textEl.css('float');
+		if ((float !== 'left') && (float !== 'right')) {
 			var toolbarEl = $('#inlineEditorToolbar');
-			hideEl(toolbarEl);
-		});
+			toolbarEl
+				.css('left', textEl.offset().left - toolbarEl.width() - 10)
+				.css('top', textEl.offset().top)
+				.fadeTo(0, 0.5);
+			var buttonEl = $('#inlineEditorToolbar button');
+			buttonEl.off('click');
+			buttonEl.click(
+				{
+					el: this,
+					range: textEl.attr('data-text-range')
+				},
+				function(event) {
+					startInlineEditor(event.data.el, event.data.range);
+				});
+		}
+	});
 	
 	$('#inlineEditorToolbar').hover(
 		function() {
-			showEl($(this));
+			$(this).fadeTo(0, 1);
 		},
 		function() {
-			hideEl($(this));
+			$(this).fadeTo(0, 0.5);
 		});
 }
 
