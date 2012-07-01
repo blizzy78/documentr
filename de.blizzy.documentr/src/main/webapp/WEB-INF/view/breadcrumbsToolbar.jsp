@@ -21,24 +21,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <li class="btn-toolbar pull-right">
-	<sec:authorize access="isAnonymous()">
-		<div class="btn-group">
-			<a href="<c:url value="/access/login"/>" class="btn btn-mini"><i class="icon-lock"></i> <spring:message code="button.login"/></a>
-		</div>
-	</sec:authorize>
-	
+	<div class="btn-group">
+		<a href="javascript:void(documentr.toggleSiteSearch())" class="btn btn-mini" data-toggle="button" title="<spring:message code="button.search"/>"><i class="icon-search"></i> <span class="caret"></span></a>
+	</div>
+
+	<div class="btn-group">
+		<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
+		<ul class="dropdown-menu">
+			<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
+
+			<sec:authorize access="hasApplicationPermission('ADMIN')">
+				<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
+			</sec:authorize>
+		</ul>
+	</div>
+
 	<sec:authorize access="isAuthenticated()">
-		<div class="btn-group">
-			<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.administration"/> <span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
-
-				<sec:authorize access="hasApplicationPermission('ADMIN')">
-					<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
-				</sec:authorize>
-			</ul>
-		</div>
-
 		<div class="btn-group">
 			<c:set var="loginName"><sec:authentication property="principal.username"/></c:set>
 			<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-mini"><i class="icon-off"></i> <spring:message code="button.logoutUserX" arguments="${loginName}"/></a>
@@ -46,6 +44,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<ul class="dropdown-menu">
 				<li><a href="<c:url value="/account/myAccount"/>"><i class="icon-user"></i> <spring:message code="button.myAccount"/></a></li>
 			</ul>
+		</div>
+	</sec:authorize>
+
+	<sec:authorize access="isAnonymous()">
+		<div class="btn-group">
+			<a href="<c:url value="/access/login"/>" class="btn btn-mini"><i class="icon-lock"></i> <spring:message code="button.login"/></a>
 		</div>
 	</sec:authorize>
 </li>

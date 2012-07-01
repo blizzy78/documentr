@@ -1,4 +1,4 @@
-<%--
+/*
 documentr - Edit, maintain, and present software documentation on the web.
 Copyright (C) 2012 Maik Schreiber
 
@@ -14,21 +14,41 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
---%>
-<%@ tag pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+*/
+package de.blizzy.documentr.search;
 
-<c:set var="_breadcrumbs" scope="request">
-<nav>
-	<div class="breadcrumb">
-		<div class="container">
-			<ul class="clearfix">
-				<jsp:doBody/>
-				<jsp:include page="/WEB-INF/view/breadcrumbsToolbar.jsp"/>
-			</ul>
+public class SearchHit {
+	private String projectName;
+	private String branchName;
+	private String path;
+	private String title;
+	private String textHtml;
 
-			<jsp:include page="/WEB-INF/view/siteSearch.jsp"/>
-		</div>
-	</div>
-</nav>
-</c:set>
+	SearchHit(String projectName, String branchName, String path, String title, String textHtml) {
+		this.projectName = projectName;
+		this.branchName = branchName;
+		this.path = path;
+		this.title = title;
+		this.textHtml = textHtml;
+	}
+	
+	public String getProjectName() {
+		return projectName;
+	}
+	
+	public String getBranchName() {
+		return branchName;
+	}
+	
+	public String getPath() {
+		return path;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public String getTextHtml() {
+		return textHtml;
+	}
+}

@@ -166,6 +166,10 @@ public final class Functions {
 		return openIds;
 	}
 	
+	public static int floor(double d) {
+		return (int) Math.floor(d);
+	}
+	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

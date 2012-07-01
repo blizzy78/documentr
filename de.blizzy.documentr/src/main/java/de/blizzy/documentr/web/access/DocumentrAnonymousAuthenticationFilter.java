@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
-import de.blizzy.documentr.access.UserStore;
 
 @Component("anonymousAuthFilter")
 public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticationFilter {
@@ -47,8 +46,7 @@ public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticat
 	protected Authentication createAuthentication(HttpServletRequest request) {
 		try {
 			Authentication auth = super.createAuthentication(request);
-			AbstractAuthenticationToken authentication =
-					authenticationFactory.create(authKey, UserStore.ANONYMOUS_USER_LOGIN_NAME);
+			AbstractAuthenticationToken authentication = authenticationFactory.create(authKey);
 			authentication.setDetails(auth.getDetails());
 			return authentication;
 		} catch (IOException e) {

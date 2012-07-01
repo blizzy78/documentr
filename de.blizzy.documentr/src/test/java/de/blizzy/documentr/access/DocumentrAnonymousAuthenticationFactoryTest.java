@@ -63,10 +63,9 @@ public class DocumentrAnonymousAuthenticationFactoryTest {
 			.thenReturn(Collections.singleton(projectAdminAuthority));
 		
 		String key = "key"; //$NON-NLS-1$
-		String principal = "user"; //$NON-NLS-1$
-		AbstractAuthenticationToken authentication = factory.create(key, principal);
+		AbstractAuthenticationToken authentication = factory.create(key);
 		assertEquals(key.hashCode(), ((AnonymousAuthenticationToken) authentication).getKeyHash());
-		assertSame(principal, authentication.getPrincipal());
+		assertSame(UserStore.ANONYMOUS_USER_LOGIN_NAME, authentication.getPrincipal());
 		assertTrue(authentication.getAuthorities().contains(applicationViewAuthority));
 		assertTrue(authentication.getAuthorities().contains(projectAdminAuthority));
 	}

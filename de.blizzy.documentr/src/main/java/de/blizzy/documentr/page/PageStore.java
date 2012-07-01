@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
@@ -64,6 +66,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
+import de.blizzy.documentr.search.PageIndex;
 
 @Component
 class PageStore implements IPageStore {
@@ -81,7 +84,33 @@ class PageStore implements IPageStore {
 	
 	@Autowired
 	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private PageIndex pageIndex;
+
+	@PostConstruct
+	public void init() throws IOException {
+		if (pageIndex.isCreated()) {
+			reindexAllPages();
+		}
+	}
+
+	private void reindexAllPages() throws IOException {
+		for (String projectName : repoManager.listProjects()) {
+			for (String branchName : repoManager.listProjectBranches(projectName)) {
+				addPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
+			}
+		}
+	}
 	
+	private void addPageToIndex(String projectName, String branchName, String path) throws IOException {
+		Page page = getPage(projectName, branchName, path, true);
+		pageIndex.addPage(projectName, branchName, path, page);
+		
+		for (String childPagePath : listChildPagePaths(projectName, branchName, path)) {
+			addPageToIndex(projectName, branchName, childPagePath);
+		}
+	}
+
 	@Override
 	public void savePage(String projectName, String branchName, String path, Page page,
 			User user) throws IOException {
@@ -93,6 +122,7 @@ class PageStore implements IPageStore {
 		
 		try {
 			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME, user);
+			pageIndex.addPage(projectName, branchName, path, page);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -822,5 +852,9 @@ class PageStore implements IPageStore {
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		this.repoManager = repoManager;
+	}
+
+	void setPageIndex(PageIndex pageIndex) {
+		this.pageIndex = pageIndex;
 	}
 }

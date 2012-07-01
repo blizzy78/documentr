@@ -38,7 +38,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 	private UserStore userStore;
 
 	/** Creates an anonymous {@link Authentication} with authorities granted to the anonymous user. */
-	public AbstractAuthenticationToken create(String key, Object principal) throws IOException {
+	public AbstractAuthenticationToken create(String key) throws IOException {
 		List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		Set<GrantedAuthority> authorities = Sets.newHashSet();
 		for (RoleGrantedAuthority rga : userAuthorities) {
@@ -47,7 +47,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 		// must have at least one authority
 		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS")); //$NON-NLS-1$
 		
-		return new AnonymousAuthenticationToken(key, principal, authorities);
+		return new AnonymousAuthenticationToken(key, UserStore.ANONYMOUS_USER_LOGIN_NAME, authorities);
 	}
 
 	void setUserStore(UserStore userStore) {

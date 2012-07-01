@@ -37,7 +37,7 @@ public class DocumentrAnonymousAuthenticationFilterTest {
 		AbstractAuthenticationToken authentication = mock(AbstractAuthenticationToken.class);
 		
 		DocumentrAnonymousAuthenticationFactory authenticationFactory = mock(DocumentrAnonymousAuthenticationFactory.class);
-		when(authenticationFactory.create(anyString(), anyString())).thenReturn(authentication);
+		when(authenticationFactory.create(anyString())).thenReturn(authentication);
 		
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		

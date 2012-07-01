@@ -274,6 +274,14 @@ var documentr = {};
 		return dlg;
 	};
 	
+	documentr.toggleSiteSearch = function() {
+		var divEl = $('#site-search');
+		divEl.toggleClass('invisible');
+		if (!divEl.hasClass('invisible')) {
+			$('#site-search input').focus();
+		}
+	};
+	
 	
 	$.fn.extend({
 		showModal: function(options) {

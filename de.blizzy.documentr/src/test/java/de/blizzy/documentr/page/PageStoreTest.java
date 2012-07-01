@@ -51,6 +51,7 @@ import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 import de.blizzy.documentr.repository.RepositoryUtil;
+import de.blizzy.documentr.search.PageIndex;
 
 public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -61,6 +62,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private GlobalRepositoryManager globalRepoManager;
+	private PageIndex pageIndex;
 	private PageStore pageStore;
 
 	@Before
@@ -76,8 +78,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
 		globalRepoManager.init();
 		
+		pageIndex = mock(PageIndex.class);
+		
 		pageStore = new PageStore();
 		pageStore.setGlobalRepositoryManager(globalRepoManager);
+		pageStore.setPageIndex(pageIndex);
 	}
 	
 	@Test
@@ -91,6 +96,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(page.getContentType(), result.getContentType());
 		assertEquals("home", result.getParentPagePath()); //$NON-NLS-1$
 		assertNull(result.getViewRestrictionRole());
+		
+		verify(pageIndex).addPage(PROJECT, BRANCH_1, "home/foo", page); //$NON-NLS-1$
 	}
 	
 	@Test
