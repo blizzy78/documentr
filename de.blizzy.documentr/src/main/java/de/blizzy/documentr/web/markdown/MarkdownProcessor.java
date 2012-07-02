@@ -69,6 +69,12 @@ public class MarkdownProcessor {
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
 			Authentication authentication) {
 		
+		return markdownToHTML(markdown, projectName, branchName, path, authentication, true);
+	}
+	
+	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
+			Authentication authentication, boolean nonCacheableMacros) {
+		
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
@@ -84,12 +90,14 @@ public class MarkdownProcessor {
 			if (macro.isCacheable()) {
 				String macroHtml = StringUtils.defaultString(macro.getHtml());
 				html = StringUtils.replace(html, marker, macroHtml);
-			} else {
+			} else if (nonCacheableMacros) {
 				String macroName = invocation.getMacroName();
 				String params = invocation.getParameters();
 				html = StringUtils.replace(html, marker,
 						NON_CACHEABLE_MACRO_MARKER + macroName + " " + //$NON-NLS-1$
 						StringUtils.defaultString(params) + "/" + NON_CACHEABLE_MACRO_MARKER); //$NON-NLS-1$
+			} else {
+				html = StringUtils.replace(html, marker, StringUtils.EMPTY);
 			}
 		}
 		html = cleanupHTML(html, macroInvocations, true);

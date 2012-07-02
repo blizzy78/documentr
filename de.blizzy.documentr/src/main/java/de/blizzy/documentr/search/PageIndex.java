@@ -23,11 +23,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -61,6 +64,7 @@ import org.apache.lucene.search.highlight.TokenSources;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.cyberneko.html.HTMLEntities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -70,21 +74,39 @@ import com.google.inject.internal.Lists;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageTextData;
+import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
 public class PageIndex {
 	private static final int HITS_PER_PAGE = 20;
 	private static final int NUM_FRAGMENTS = 5;
 	private static final int FRAGMENT_SIZE = 50;
+	@SuppressWarnings("nls")
+	private static final String[] REMOVE_HTML_TAGS = {
+		"(<br(?: .*?)?(?:/)?>)", "\n$1",
+		"(<p(?: .*?)?>)", "\n$1",
+		"(<pre(?: .*?)?>)", "\n$1",
+		"(<ol(?: .*?)?>)", "\n$1",
+		"(<ul(?: .*?)?>)", "\n$1",
+		"(<dl(?: .*?)?>)", "\n$1",
+		"(<h[0-9]+(?: .*?)?>)", "\n$1",
+		"<script.*?>.*?</script>", StringUtils.EMPTY,
+		"<.*?>", StringUtils.EMPTY
+	};
 	
 	@Autowired
 	private Settings settings;
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Autowired
+	private MarkdownProcessor markdownProcessor;
+	@Autowired
+	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
 	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_36);
 	private File pageIndexDir;
 	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
@@ -147,7 +169,10 @@ public class PageIndex {
 			doc.add(new Field("path", path, Store.YES, Index.NOT_ANALYZED, TermVector.NO)); //$NON-NLS-1$
 			doc.add(new Field("title", page.getTitle(), Store.YES, Index.ANALYZED, TermVector.YES)); //$NON-NLS-1$
 			String text = ((PageTextData) page.getData()).getText();
-			// TODO: index actual text as seen in HTML output
+			Authentication authentication = authenticationFactory.create("dummy"); //$NON-NLS-1$
+			text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
+			text = removeHtmlTags(text);
+			text = replaceHtmlEntities(text);
 			doc.add(new Field("text", text, Store.YES, Index.ANALYZED, TermVector.YES)); //$NON-NLS-1$
 			writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
 		} finally {
@@ -156,6 +181,35 @@ public class PageIndex {
 		}
 	}
 	
+	private String removeHtmlTags(String html) {
+		for (int i = 0; i < REMOVE_HTML_TAGS.length; i += 2) {
+			String re = REMOVE_HTML_TAGS[i];
+			String replaceWith = REMOVE_HTML_TAGS[i + 1];
+			Pattern pattern = Pattern.compile(re, Pattern.DOTALL + Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(html);
+			html = matcher.replaceAll(replaceWith);
+		}
+		return html;
+	}
+	
+	private String replaceHtmlEntities(String html) {
+		for (;;) {
+			int pos = html.indexOf('&');
+			if (pos < 0) {
+				break;
+			}
+			int endPos = html.indexOf(';', pos + 1);
+			if (endPos < 0) {
+				break;
+			}
+			String entityName = html.substring(pos + 1, endPos);
+			int c = HTMLEntities.get(entityName);
+			html = StringUtils.replace(html, "&" + entityName + ";", //$NON-NLS-1$ //$NON-NLS-2$
+					(c >= 0) ? String.valueOf((char) c) : StringUtils.EMPTY);
+		}
+		return html;
+	}
+
 	public SearchResult findPages(String searchText, int page, Authentication authentication) throws ParseException, IOException {
 		QueryParser titleParser = new QueryParser(Version.LUCENE_36, "title", analyzer); //$NON-NLS-1$
 		Query titleQuery = titleParser.parse(searchText);
@@ -198,6 +252,7 @@ public class PageIndex {
 				try {
 					tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
 					String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
+					cleanupFragments(fragments);
 					String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
 					SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
 					hits.add(hit);
@@ -215,6 +270,12 @@ public class PageIndex {
 		return new SearchResult(hits, totalHits, HITS_PER_PAGE);
 	}
 	
+	private void cleanupFragments(String[] fragments) {
+		for (int i = 0; i < fragments.length; i++) {
+			fragments[i] = fragments[i].replaceAll("^[,\\.]+", StringUtils.EMPTY).trim(); //$NON-NLS-1$
+		}
+	}
+
 	public boolean isCreated() {
 		return created;
 	}
