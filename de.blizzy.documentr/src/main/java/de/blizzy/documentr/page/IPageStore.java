@@ -44,8 +44,6 @@ public interface IPageStore {
 
 	Page getAttachment(String projectName, String branchName, String pagePath, String name) throws IOException;
 
-	List<String> listPagePaths(String projectName, String branchName) throws IOException;
-
 	List<String> listPageAttachments(String projectName, String branchName, String pagePath) throws IOException;
 
 	boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) throws IOException;

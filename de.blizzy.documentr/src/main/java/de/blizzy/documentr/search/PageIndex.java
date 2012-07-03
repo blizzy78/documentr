@@ -20,6 +20,7 @@ package de.blizzy.documentr.search;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -146,7 +147,9 @@ public class PageIndex {
 		threadPool.submit(runnable);
 	}
 	
-	private synchronized void addPageInternal(String projectName, String branchName, String path, Page page) throws IOException {
+	private synchronized void addPageInternal(String projectName, String branchName, String path, Page page)
+			throws IOException {
+		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -208,6 +211,45 @@ public class PageIndex {
 					(c >= 0) ? String.valueOf((char) c) : StringUtils.EMPTY);
 		}
 		return html;
+	}
+
+	public void deletePages(final String projectName, final String branchName, final Set<String> paths) {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					deletePagesInternal(projectName, branchName, paths);
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		};
+		threadPool.submit(runnable);
+	}
+
+	private synchronized void deletePagesInternal(String projectName, String branchName, Set<String> paths)
+			throws IOException {
+		
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.notEmpty(paths);
+
+		Directory directory = null;
+		IndexWriter writer = null;
+		try {
+			directory = FSDirectory.open(pageIndexDir);
+			IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+			config.setOpenMode(OpenMode.CREATE_OR_APPEND);
+			writer = new IndexWriter(directory, config);
+
+			for (String path : paths) {
+				String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+				writer.deleteDocuments(new Term("fullPath", fullPath)); //$NON-NLS-1$
+			}
+		} finally {
+			IndexUtil.closeQuietly(writer);
+			IndexUtil.closeQuietly(directory);
+		}
 	}
 
 	public SearchResult findPages(String searchText, int page, Authentication authentication) throws ParseException, IOException {

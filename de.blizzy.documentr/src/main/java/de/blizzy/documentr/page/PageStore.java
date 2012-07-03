@@ -97,17 +97,17 @@ class PageStore implements IPageStore {
 	private void reindexAllPages() throws IOException {
 		for (String projectName : repoManager.listProjects()) {
 			for (String branchName : repoManager.listProjectBranches(projectName)) {
-				addPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
+				reindexAllPagesAddPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
 			}
 		}
 	}
 	
-	private void addPageToIndex(String projectName, String branchName, String path) throws IOException {
+	private void reindexAllPagesAddPageToIndex(String projectName, String branchName, String path) throws IOException {
 		Page page = getPage(projectName, branchName, path, true);
 		pageIndex.addPage(projectName, branchName, path, page);
 		
 		for (String childPagePath : listChildPagePaths(projectName, branchName, path)) {
-			addPageToIndex(projectName, branchName, childPagePath);
+			reindexAllPagesAddPageToIndex(projectName, branchName, childPagePath);
 		}
 	}
 
@@ -307,25 +307,6 @@ class PageStore implements IPageStore {
 	}
 	
 	@Override
-	public List<String> listPagePaths(String projectName, String branchName) throws IOException {
-		Assert.hasLength(projectName);
-		Assert.hasLength(branchName);
-
-		ILockedRepository repo = null;
-		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-			List<String> paths = listPagePaths(pagesDir, true);
-			return paths;
-		} catch (GitAPIException e) {
-			throw new IOException(e);
-		} finally {
-			RepositoryUtil.closeQuietly(repo);
-		}
-	}
-
-	@Override
 	public List<String> listPageAttachments(String projectName, String branchName, String pagePath)
 			throws IOException {
 		
@@ -508,19 +489,31 @@ class PageStore implements IPageStore {
 	}
 
 	@Override
-	public void deletePage(String projectName, String branchName, String path, User user) throws IOException {
+	public void deletePage(String projectName, String branchName, final String path, User user) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		Assert.notNull(user);
 		
 		ILockedRepository repo = null;
+		List<String> oldPagePaths;
+		boolean deleted = false;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
 			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-			boolean deleted = false;
+
+			File oldSubPagesDir = toFile(pagesDir, path);
+			oldPagePaths = listPagePaths(oldSubPagesDir, true);
+			oldPagePaths = Lists.newArrayList(Lists.transform(oldPagePaths, new Function<String, String>() {
+				@Override
+				public String apply(String p) {
+					return path + "/" + p; //$NON-NLS-1$
+				}
+			}));
+			oldPagePaths.add(path);
+
 			File file = toFile(pagesDir, path + PAGE_SUFFIX);
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
@@ -560,6 +553,10 @@ class PageStore implements IPageStore {
 			throw new IOException(e);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
+		}
+
+		if (deleted) {
+			pageIndex.deletePages(projectName, branchName, Sets.newHashSet(oldPagePaths));
 		}
 	}
 	
@@ -631,7 +628,7 @@ class PageStore implements IPageStore {
 	}
 	
 	@Override
-	public void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
+	public void relocatePage(String projectName, String branchName, final String path, String newParentPagePath,
 			User user) throws IOException {
 		
 		Assert.hasLength(projectName);
@@ -644,15 +641,39 @@ class PageStore implements IPageStore {
 		getPage(projectName, branchName, newParentPagePath, false);
 		
 		ILockedRepository repo = null;
+		List<String> oldPagePaths;
+		List<String> deletedPagePaths;
+		List<String> newPagePaths;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
-			String newPagePath = newParentPagePath + "/" + pageName; //$NON-NLS-1$
+			final String newPagePath = newParentPagePath + "/" + pageName; //$NON-NLS-1$
+
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
+			File oldSubPagesDir = toFile(new File(workingDir, PAGES_DIR_NAME), path);
+			oldPagePaths = listPagePaths(oldSubPagesDir, true);
+			oldPagePaths = Lists.newArrayList(Lists.transform(oldPagePaths, new Function<String, String>() {
+				@Override
+				public String apply(String p) {
+					return path + "/" + p; //$NON-NLS-1$
+				}
+			}));
+			oldPagePaths.add(path);
+
+			File deletedPagesSubDir = toFile(new File(workingDir, PAGES_DIR_NAME), newPagePath);
+			deletedPagePaths = listPagePaths(deletedPagesSubDir, true);
+			deletedPagePaths = Lists.newArrayList(Lists.transform(deletedPagePaths, new Function<String, String>() {
+				@Override
+				public String apply(String p) {
+					return newPagePath + "/" + p; //$NON-NLS-1$
+				}
+			}));
+			deletedPagePaths.add(newPagePath);
+
 			Git git = Git.wrap(repo.r());
 			AddCommand addCommand = git.add();
 
-			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			for (String dirName : Sets.newHashSet(PAGES_DIR_NAME, ATTACHMENTS_DIR_NAME)) {
 				File dir = new File(workingDir, dirName);
 				
@@ -699,11 +720,27 @@ class PageStore implements IPageStore {
 				.call();
 			git.push().call();
 
+			newPagePaths = Lists.transform(oldPagePaths, new Function<String, String>() {
+				@Override
+				public String apply(String p) {
+					return newPagePath + StringUtils.removeStart(p, path);
+				}
+			});
+
 			PageUtil.updateProjectEditTime(projectName);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
+		}
+
+		Set<String> allDeletedPagePaths = Sets.newHashSet(oldPagePaths);
+		allDeletedPagePaths.addAll(deletedPagePaths);
+		pageIndex.deletePages(projectName, branchName, Sets.newHashSet(allDeletedPagePaths));
+		
+		for (String newPath : newPagePaths) {
+			Page page = getPage(projectName, branchName, newPath, true);
+			pageIndex.addPage(projectName, branchName, newPath, page);
 		}
 	}
 	

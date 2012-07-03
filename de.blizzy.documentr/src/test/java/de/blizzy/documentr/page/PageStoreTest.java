@@ -125,18 +125,6 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	public void listPagePaths() throws IOException, GitAPIException {
-		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
-		saveRandomPage(BRANCH_1, "test"); //$NON-NLS-1$
-		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
-		List<String> paths = pageStore.listPagePaths(PROJECT, BRANCH_1);
-		assertEquals(2, paths.size());
-		assertTrue(paths.contains("test")); //$NON-NLS-1$
-		assertTrue(paths.contains("foo/bar/baz")); //$NON-NLS-1$
-	}
-	
-	@Test
 	public void isPageSharedWithOtherBranches() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
@@ -260,20 +248,21 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
 		register(repo);
-		saveRandomPage(BRANCH_1, "foo"); //$NON-NLS-1$
-		saveRandomAttachment(BRANCH_1, "foo", "test.txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		saveRandomPage(BRANCH_1, "foo/bar"); //$NON-NLS-1$
-		File pageFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.page"); //$NON-NLS-1$ //$NON-NLS-2$
-		File metaFile = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo.meta"); //$NON-NLS-1$ //$NON-NLS-2$
-		File subPagesDir = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$
-		File attachmentsDir = new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "attachments"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$
+		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
+		saveRandomAttachment(BRANCH_1, "home/foo", "test.txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		saveRandomPage(BRANCH_1, "home/foo/bar"); //$NON-NLS-1$
+		File pageFile = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "home"), "foo.page"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		File metaFile = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "home"), "foo.meta"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		File subPagesDir = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "pages"), "home"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		File attachmentsDir = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "attachments"), "home"), "foo"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertTrue(pageFile.isFile());
 		assertTrue(metaFile.isFile());
 		assertTrue(subPagesDir.isDirectory());
 		assertTrue(attachmentsDir.isDirectory());
 		
-		pageStore.deletePage(PROJECT, BRANCH_1, "foo", USER); //$NON-NLS-1$
-		List<String> result = pageStore.listPagePaths(PROJECT, BRANCH_1);
+		pageStore.deletePage(PROJECT, BRANCH_1, "home/foo", USER); //$NON-NLS-1$
+		List<String> result = pageStore.listChildPagePaths(PROJECT, BRANCH_1, "home"); //$NON-NLS-1$
 		assertTrue(result.isEmpty());
 		assertFalse(pageFile.exists());
 		assertFalse(metaFile.exists());
