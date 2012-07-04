@@ -30,6 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <center>
 
+<c:if test="${!empty errorMessage}">
+	<p class="login-error">
+		<c:out value="${errorMessage}"/>
+	</p>
+</c:if>
+
 <form action="<c:url value="/j_spring_security_check"/>" method="POST" class="well form-horizontal loginForm">
 	<fieldset>
 		<div class="control-group">

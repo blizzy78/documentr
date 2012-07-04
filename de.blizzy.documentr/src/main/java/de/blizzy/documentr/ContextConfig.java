@@ -130,7 +130,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	public Filter openIdAuthFilter(ProviderManager authManager, RememberMeServices rememberMeServices) {
 		DocumentrOpenIdAuthenticationFilter filter = new DocumentrOpenIdAuthenticationFilter();
 		filter.setAuthenticationManager(authManager);
-		AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler("/access/login"); //$NON-NLS-1$
+		AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler("/access/login/error"); //$NON-NLS-1$
 		filter.setAuthenticationFailureHandler(failureHandler);
 		filter.setRememberMeServices(rememberMeServices);
 		return filter;

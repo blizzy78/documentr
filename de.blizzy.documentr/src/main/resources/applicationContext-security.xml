@@ -35,10 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/**" access="permitAll"/>
- 		<form-login login-page="/access/login" authentication-failure-url="/access/login"/>
+ 		<form-login login-page="/access/login" always-use-default-target="false"
+ 			authentication-failure-url="/access/login/error"/>
 		<logout/>
 		<anonymous enabled="false"/>
 		<remember-me services-alias="rememberMeServices" key="documentr" user-service-ref="loginNameUserDetailsService"/>
+		<access-denied-handler error-page="/access/login/forbidden"/>
 		<custom-filter ref="anonymousAuthFilter" position="ANONYMOUS_FILTER"/>
 		<custom-filter ref="openIdAuthFilter" position="OPENID_FILTER"/>
 		<custom-filter ref="authCreationTimeFilter" position="LAST"/>
