@@ -130,13 +130,13 @@ public final class TestUtil {
 		return context;
 	}
 	
-	public static <T> void invokeMethod(Class<T> targetClass, T target, String methodName,
+	public static <T> Object invokeMethod(Class<T> targetClass, T target, String methodName,
 			Class<?>[] argTypes, Object[] args) {
 		
 		try {
 			Method method = targetClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
-			method.invoke(target, args);
+			return method.invoke(target, args);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
