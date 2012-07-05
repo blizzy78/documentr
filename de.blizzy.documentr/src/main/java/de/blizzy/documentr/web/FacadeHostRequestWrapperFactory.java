@@ -15,30 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.access;
-
-import java.io.IOException;
+package de.blizzy.documentr.web;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.openid.OpenIDAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
+import de.blizzy.documentr.Settings;
 
-public class DocumentrOpenIdAuthenticationFilter extends OpenIDAuthenticationFilter {
+@Component
+public class FacadeHostRequestWrapperFactory {
 	@Autowired
-	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
-
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request,
-			HttpServletResponse response) throws AuthenticationException,
-			IOException {
-
-		HttpServletRequest requestWrapper = facadeHostRequestWrapperFactory.create(request);
-		return super.attemptAuthentication(requestWrapper, response);
+	private Settings settings;
+	
+	public HttpServletRequest create(HttpServletRequest request) {
+		return new FacadeHostRequestWrapper(request, settings.getHost(), settings.getPort());
+	}
+	
+	void setSettings(Settings settings) {
+		this.settings = settings;
 	}
 }

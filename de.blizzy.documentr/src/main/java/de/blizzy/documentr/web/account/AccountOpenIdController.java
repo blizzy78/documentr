@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.openid4java.OpenIDException;
@@ -45,6 +44,8 @@ import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.OpenIdNotFoundException;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.web.FacadeHostRequestWrapper;
+import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
 
 @Controller
 @RequestMapping("/accountOpenId")
@@ -53,6 +54,8 @@ public class AccountOpenIdController {
 	private UserStore userStore;
 	@Autowired
 	private Settings settings;
+	@Autowired
+	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
@@ -68,23 +71,14 @@ public class AccountOpenIdController {
 			String returnToUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/accountOpenId/saveFinish") //$NON-NLS-1$
 					.build()
-					.encode(DocumentrConstants.ENCODING).toUriString();
-			String host = null;
-			if (settings.getHost() != null) {
-				host = settings.getHost();
-				if (settings.getPort() != null) {
-					host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
-				}
-			}
-			if (host != null) {
-				returnToUrl = returnToUrl.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
+					.encode(DocumentrConstants.ENCODING)
+					.toUriString();
+			returnToUrl = FacadeHostRequestWrapper.buildFacadeUrl(returnToUrl, settings.getHost(), settings.getPort());
 			String realm = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/").build() //$NON-NLS-1$
-					.encode(DocumentrConstants.ENCODING).toUriString();
-			if (host != null) {
-				realm = realm.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
+					.encode(DocumentrConstants.ENCODING)
+					.toUriString();
+			realm = FacadeHostRequestWrapper.buildFacadeUrl(realm, settings.getHost(), settings.getPort());
 			String url = consumer.beginConsumption(request, openId, returnToUrl, realm);
 			session.setAttribute("openIdConsumer", consumer); //$NON-NLS-1$
 			session.setAttribute("openId", openId); //$NON-NLS-1$
@@ -105,24 +99,7 @@ public class AccountOpenIdController {
 		String openId = (String) session.getAttribute("openId"); //$NON-NLS-1$
 		session.removeAttribute("openId"); //$NON-NLS-1$
 
-		HttpServletRequest requestWrapper = new HttpServletRequestWrapper(request) {
-			@Override
-			public StringBuffer getRequestURL() {
-				String url = super.getRequestURL().toString();
-				String host = null;
-				if (settings.getHost() != null) {
-					host = settings.getHost();
-					if (settings.getPort() != null) {
-						host += ":" + String.valueOf(settings.getPort().intValue()); //$NON-NLS-1$
-					}
-				}
-				if (host != null) {
-					url = url.replaceFirst("^(http(?:s)?://)[^/]+/", "$1" + host + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				}
-				return new StringBuffer(url);
-			}
-		};
-		
+		HttpServletRequest requestWrapper = facadeHostRequestWrapperFactory.create(request);
 		OpenIDAuthenticationToken token = consumer.endConsumption(requestWrapper);
 		if ((token != null) && (token.getStatus() == OpenIDAuthenticationStatus.SUCCESS)) {
 			boolean exists = false;

@@ -27,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
@@ -42,6 +43,11 @@ public abstract class AbstractDocumentrTest {
 	@Before
 	public void setUpTempDirs() {
 		assertTrue(StringUtils.isNotBlank(TEMP_DIR_PATH));
+	}
+	
+	@Before
+	public void initMocks() {
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@After
