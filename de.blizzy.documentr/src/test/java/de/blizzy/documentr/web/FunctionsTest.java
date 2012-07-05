@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -41,7 +41,9 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.GrantedAuthorityTarget;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
+import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
+import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
@@ -85,6 +87,8 @@ public class FunctionsTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		
 		SecurityContextHolder.setContext(securityContext);
+
+		LocaleContextHolder.setLocale(Locale.US);
 	}
 
 	@After
@@ -96,6 +100,7 @@ public class FunctionsTest {
 		Functions.setMarkdownProcessor(null);
 		Functions.setMessageSource(null);
 		SecurityContextHolder.clearContext();
+		LocaleContextHolder.resetLocaleContext();
 	}
 	
 	@Test
@@ -210,9 +215,7 @@ public class FunctionsTest {
 		when(messageSource.getMessage("sizeX.kb", new Object[] { "1.21" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn("1.21 KB"); //$NON-NLS-1$
 		
-		LocaleContextHolder.setLocale(Locale.US);
 		String result = Functions.formatSize(1234);
-		LocaleContextHolder.resetLocaleContext();
 		assertEquals("1.21 KB", result); //$NON-NLS-1$
 	}
 	
@@ -224,8 +227,24 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	@Ignore
-	public void listMyOpenIds() {
-		// TODO: implement test
+	public void listMyOpenIds() throws IOException {
+		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
+		
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Set<OpenId> openIds = Sets.newHashSet();
+		openIds.add(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$
+		openIds.add(new OpenId("openId2", "realOpenId2")); //$NON-NLS-1$ //$NON-NLS-2$
+		for (OpenId openId : openIds) {
+			user.addOpenId(openId);
+		}
+		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
+		
+		List<OpenId> result = Functions.listMyOpenIds();
+		assertEquals(openIds, Sets.newHashSet(result));
+	}
+	
+	@Test
+	public void floor() {
+		assertEquals(3, Functions.floor(3.141592654d));
 	}
 }

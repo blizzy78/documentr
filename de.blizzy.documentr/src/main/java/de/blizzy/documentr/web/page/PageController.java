@@ -398,4 +398,8 @@ public class PageController {
 	void setUserStore(UserStore userStore) {
 		this.userStore = userStore;
 	}
+
+	void setPageRenderer(IPageRenderer pageRenderer) {
+		this.pageRenderer = pageRenderer;
+	}
 }

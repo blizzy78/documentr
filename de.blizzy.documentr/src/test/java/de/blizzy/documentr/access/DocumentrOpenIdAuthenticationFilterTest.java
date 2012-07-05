@@ -17,13 +17,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.mockito.Mockito.*;
 
-public class DocumentrOpenIdAuthenticationFilterTest {
-	@Test
-	@Ignore
-	public void attemptAuthentication() {
-		// TODO: implement tes
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.openid.OpenIDConsumer;
+import org.springframework.security.openid.OpenIDConsumerException;
+
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
+import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
+
+public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTest {
+	@InjectMocks
+	private DocumentrOpenIdAuthenticationFilter filter;
+	@Mock
+	private OpenIDConsumer consumer;
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private HttpServletRequest requestWrapper;
+	@Mock
+	private HttpServletResponse response;
+	@Mock
+	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
+	
+	
+	@Test(expected=AuthenticationServiceException.class)
+	@SuppressWarnings("unchecked")
+	public void attemptAuthentication() throws AuthenticationException, IOException, OpenIDConsumerException {
+		when(facadeHostRequestWrapperFactory.create(request)).thenReturn(requestWrapper);
+
+		when(requestWrapper.getParameter("openid.identity")).thenReturn("identity"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		when(consumer.endConsumption(requestWrapper)).thenThrow(OpenIDConsumerException.class);
+		
+		filter.attemptAuthentication(request, response);
 	}
 }

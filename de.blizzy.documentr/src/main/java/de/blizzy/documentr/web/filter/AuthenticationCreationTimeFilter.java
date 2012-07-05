@@ -41,7 +41,7 @@ public class AuthenticationCreationTimeFilter implements Filter {
 	private static final String AUTHENTICATION_HASH_CODE = "authenticationHashCode"; //$NON-NLS-1$
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) {
 	}
 
 	@Override

@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -59,6 +58,7 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.TestPageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 public class PageControllerTest {
@@ -72,6 +72,8 @@ public class PageControllerTest {
 	
 	private IPageStore pageStore;
 	private GlobalRepositoryManager repoManager;
+	private IPageRenderer pageRenderer;
+	private MarkdownProcessor markdownProcessor;
 	private PageController pageController;
 	private Authentication authenticatedAuthentication;
 	private Authentication anonymousAuthentication;
@@ -85,11 +87,15 @@ public class PageControllerTest {
 		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
+		pageRenderer = mock(IPageRenderer.class);
+		markdownProcessor = mock(MarkdownProcessor.class);
+		
 		pageController = new PageController();
 		pageController.setPageStore(pageStore);
 		pageController.setGlobalRepositoryManager(repoManager);
-		pageController.setMarkdownProcessor(new MarkdownProcessor());
+		pageController.setMarkdownProcessor(markdownProcessor);
 		pageController.setUserStore(userStore);
+		pageController.setPageRenderer(pageRenderer);
 
 		authenticatedAuthentication = mock(Authentication.class);
 		when(authenticatedAuthentication.isAuthenticated()).thenReturn(true);
@@ -348,9 +354,14 @@ public class PageControllerTest {
 	
 	@Test
 	public void markdownToHTML() {
+		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)) //$NON-NLS-1$
+			.thenReturn("html"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)) //$NON-NLS-1$
+			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
+		
 		Map<String, String> result = pageController.markdownToHTML(
-				PROJECT, BRANCH, "**foo**", PAGE_PATH, authenticatedAuthentication); //$NON-NLS-1$
-		assertEquals("<p><strong>foo</strong></p>", removeTextRange(result.get("html"))); //$NON-NLS-1$ //$NON-NLS-2$
+				PROJECT, BRANCH, "markdown", PAGE_PATH, authenticatedAuthentication); //$NON-NLS-1$
+		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
@@ -399,15 +410,30 @@ public class PageControllerTest {
 	}
 	
 	@Test
-	@Ignore
-	public void getPageMarkdownInRange() {
-		// TODO: implement test
+	public void getPageMarkdownInRange() throws IOException {
+		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		
+		Map<String, String> result = pageController.getPageMarkdownInRange(PROJECT, BRANCH, PAGE_PATH_URL, 2, 4);
+		assertEquals("y", result.get("markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
-	@Ignore
-	public void savePageRange() {
-		// TODO: implement test
+	public void savePageRange() throws IOException {
+		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		
+		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)).thenReturn("html"); //$NON-NLS-1$
+		
+		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)) //$NON-NLS-1$
+			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
+		
+		Map<String, String> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
+				"a\nb\nc\n", "2,4", authenticatedAuthentication); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
+				argPage("title", "x\na\nb\nc\nz\n"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

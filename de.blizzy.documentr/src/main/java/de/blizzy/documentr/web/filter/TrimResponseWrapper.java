@@ -52,7 +52,7 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 	}
 
 	@Override
-	public ServletOutputStream getOutputStream() throws IOException {
+	public ServletOutputStream getOutputStream() {
 		if (outputStream == null) {
 			outputStream = new SwitchableServletOutputStream() {
 				@Override
@@ -81,7 +81,7 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 	}
 	
 	@Override
-	public PrintWriter getWriter() throws IOException {
+	public PrintWriter getWriter() {
 		if (writer == null) {
 			writer = new SwitchablePrintWriter() {
 				@Override

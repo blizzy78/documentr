@@ -43,7 +43,8 @@ public class FacadeHostRequestWrapperTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getRequestURL() {
-		FacadeHostRequestWrapper requestWrapper = new FacadeHostRequestWrapper(request, FACADE_HOST, FACADE_PORT);
+		FacadeHostRequestWrapper requestWrapper = new FacadeHostRequestWrapper(
+				request, FACADE_HOST, Integer.valueOf(FACADE_PORT));
 		assertEquals("http://" + FACADE_HOST + ":" + String.valueOf(FACADE_PORT) + URI, //$NON-NLS-1$ //$NON-NLS-2$
 			requestWrapper.getRequestURL().toString());
 	}

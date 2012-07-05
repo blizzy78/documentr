@@ -36,7 +36,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -271,9 +270,15 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@Ignore
-	public void deleteAttachment() {
-		// TODO: implement test
+	public void deleteAttachment() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		saveRandomPage(BRANCH_1, PAGE);
+		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
+		pageStore.saveAttachment(PROJECT, BRANCH_1, PAGE, "test.dat", attachment, USER); //$NON-NLS-1$
+		
+		pageStore.deleteAttachment(PROJECT, BRANCH_1, PAGE, "test.dat", USER); //$NON-NLS-1$
+		assertTrue(pageStore.listPageAttachments(PROJECT, BRANCH_1, PAGE).isEmpty());
 	}
 	
 	@Test
