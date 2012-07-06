@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +37,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 	private UserStore userStore;
 
 	/** Creates an anonymous {@link Authentication} with authorities granted to the anonymous user. */
-	public AbstractAuthenticationToken create(String key) throws IOException {
+	public AnonymousAuthenticationToken create(String key) throws IOException {
 		List<RoleGrantedAuthority> userAuthorities = userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		Set<GrantedAuthority> authorities = Sets.newHashSet();
 		for (RoleGrantedAuthority rga : userAuthorities) {

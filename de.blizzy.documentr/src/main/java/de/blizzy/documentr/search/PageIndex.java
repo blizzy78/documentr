@@ -40,6 +40,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Field.TermVector;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -111,15 +112,11 @@ public class PageIndex {
 	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_36);
 	private File pageIndexDir;
 	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
-	private boolean created;
 	
 	@PostConstruct
 	public void init() throws IOException {
 		File indexDir = new File(settings.getDocumentrDataDir(), "index"); //$NON-NLS-1$
 		pageIndexDir = new File(indexDir, "page"); //$NON-NLS-1$
-		if (!pageIndexDir.isDirectory()) {
-			created = true;
-		}
 		FileUtils.forceMkdir(pageIndexDir);
 	}
 	
@@ -140,7 +137,9 @@ public class PageIndex {
 				try {
 					addPageInternal(projectName, branchName, path, page);
 				} catch (IOException e) {
-					// ignore
+					e.printStackTrace();
+				} catch (RuntimeException e) {
+					e.printStackTrace();
 				}
 			}
 		};
@@ -253,6 +252,8 @@ public class PageIndex {
 	}
 
 	public SearchResult findPages(String searchText, int page, Authentication authentication) throws ParseException, IOException {
+		Assert.isTrue(page >= 1);
+		
 		QueryParser titleParser = new QueryParser(Version.LUCENE_36, "title", analyzer); //$NON-NLS-1$
 		Query titleQuery = titleParser.parse(searchText);
 		QueryParser textParser = new QueryParser(Version.LUCENE_36, "text", analyzer); //$NON-NLS-1$
@@ -318,7 +319,18 @@ public class PageIndex {
 		}
 	}
 
-	public boolean isCreated() {
-		return created;
+	public int getNumDocuments() throws IOException {
+		Directory directory = null;
+		IndexReader reader = null;
+		try {
+			directory = FSDirectory.open(pageIndexDir);
+			reader = IndexReader.open(directory);
+			return reader.numDocs();
+		} catch (IndexNotFoundException e) {
+			return 0;
+		} finally {
+			IndexUtil.closeQuietly(reader);
+			IndexUtil.closeQuietly(directory);
+		}
 	}
 }

@@ -89,7 +89,7 @@ class PageStore implements IPageStore {
 
 	@PostConstruct
 	public void init() throws IOException {
-		if (pageIndex.isCreated()) {
+		if (pageIndex.getNumDocuments() == 0) {
 			reindexAllPages();
 		}
 	}

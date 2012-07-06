@@ -26,7 +26,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
@@ -34,7 +34,7 @@ import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 public class DocumentrAnonymousAuthenticationFilterTest {
 	@Test
 	public void createAuthentication() throws IOException {
-		AbstractAuthenticationToken authentication = mock(AbstractAuthenticationToken.class);
+		AnonymousAuthenticationToken authentication = mock(AnonymousAuthenticationToken.class);
 		
 		DocumentrAnonymousAuthenticationFactory authenticationFactory = mock(DocumentrAnonymousAuthenticationFactory.class);
 		when(authenticationFactory.create(anyString())).thenReturn(authentication);
