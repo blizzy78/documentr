@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.Util;
@@ -28,15 +30,20 @@ import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 /** documentr's {@link SecurityExpressionRoot} for use in JSP and security annotations. */
-public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
+public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 	public HttpServletRequest request;
 	
-	private Object target;
 	private GlobalRepositoryManager repoManager;
+	private Object target;
+	private Object returnObject;
+	private Object filterObject;
 
 	public DocumentrSecurityExpressionRoot(Authentication authentication, GlobalRepositoryManager repoManager) {
 		super(authentication);
+
 		this.repoManager = repoManager;
+		
+		setTrustResolver(new AuthenticationTrustResolverImpl());
 	}
 
 	public boolean hasApplicationPermission(String permission) {
@@ -72,8 +79,29 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot {
 		this.target = target;
 	}
 	
+	@Override
 	public Object getThis() {
 		return target;
+	}
+
+	@Override
+	public void setReturnObject(Object returnObject) {
+		this.returnObject = returnObject;
+	}
+	
+	@Override
+	public Object getReturnObject() {
+		return returnObject;
+	}
+
+	@Override
+	public void setFilterObject(Object filterObject) {
+		this.filterObject = filterObject;
+	}
+	
+	@Override
+	public Object getFilterObject() {
+		return filterObject;
 	}
 	
 	public void setRequest(HttpServletRequest request) {

@@ -22,8 +22,8 @@ import javax.annotation.PostConstruct;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,7 @@ public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecur
 	}
 
 	@Override
-	protected SecurityExpressionRoot createSecurityExpressionRoot(Authentication authentication,
+	protected MethodSecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication,
 			MethodInvocation invocation) {
 		
 		DocumentrSecurityExpressionRoot root =

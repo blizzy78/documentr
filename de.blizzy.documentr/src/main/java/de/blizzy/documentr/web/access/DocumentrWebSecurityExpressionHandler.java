@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.expression.SecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
@@ -43,7 +43,7 @@ public class DocumentrWebSecurityExpressionHandler extends DefaultWebSecurityExp
 	}
 	
 	@Override
-	protected SecurityExpressionRoot createSecurityExpressionRoot(Authentication authentication, FilterInvocation fi) {
+	protected SecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication, FilterInvocation fi) {
 		DocumentrSecurityExpressionRoot root = new DocumentrSecurityExpressionRoot(authentication, repoManager);
 		root.setRequest(fi.getRequest());
         root.setPermissionEvaluator(getPermissionEvaluator());

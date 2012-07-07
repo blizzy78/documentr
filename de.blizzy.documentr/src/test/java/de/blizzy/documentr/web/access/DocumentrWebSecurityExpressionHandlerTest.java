@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.expression.SecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 
@@ -31,7 +31,7 @@ public class DocumentrWebSecurityExpressionHandlerTest {
 	@Test
 	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
 		DocumentrWebSecurityExpressionHandler expressionHandler = new DocumentrWebSecurityExpressionHandler();
-		SecurityExpressionRoot root = expressionHandler.createSecurityExpressionRoot(
+		SecurityExpressionOperations root = expressionHandler.createSecurityExpressionRoot(
 				mock(Authentication.class), mock(FilterInvocation.class));
 		assertTrue(root instanceof DocumentrSecurityExpressionRoot);
 	}
