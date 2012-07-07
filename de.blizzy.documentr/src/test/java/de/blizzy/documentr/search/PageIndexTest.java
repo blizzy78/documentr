@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.junit.After;
@@ -84,15 +85,46 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
 			.thenReturn(true);
 		
+		// wait for page to get indexed
 		while (pageIndex.getNumDocuments() == 0) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// ignore
-			}
+			sleep(10);
 		}
 		
 		SearchResult result = pageIndex.findPages("html", 1, authentication); //$NON-NLS-1$
 		assertEquals(1, result.getTotalHits());
+		assertEquals("<strong>html</strong>", result.getHits().get(0).getTextHtml()); //$NON-NLS-1$
+	}
+
+	@Test
+	@SuppressWarnings("boxing")
+	public void deletePages() throws IOException {
+		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
+			.thenReturn("html"); //$NON-NLS-1$
+		
+		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
+		
+		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
+		.thenReturn(true);
+		
+		// wait for page to get indexed
+		while (pageIndex.getNumDocuments() == 0) {
+			sleep(10);
+		}
+
+		pageIndex.deletePages(PROJECT, BRANCH, Collections.singleton(PAGE_PATH));
+
+		// wait for page to get deleted
+		while (pageIndex.getNumDocuments() > 0) {
+			sleep(10);
+		}
+	}
+
+	private void sleep(long milliseconds) {
+		try {
+			Thread.sleep(milliseconds);
+		} catch (InterruptedException e) {
+			// ignore
+		}
 	}
 }
