@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,8 @@ import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
 public final class Functions {
@@ -57,6 +60,7 @@ public final class Functions {
 	private static IPageRenderer pageRenderer;
 	private static MarkdownProcessor markdownProcessor;
 	private static MessageSource messageSource;
+	private static  MacroFactory macroFactory;
 	
 	@Autowired
 	private GlobalRepositoryManager _repoManager;
@@ -70,6 +74,8 @@ public final class Functions {
 	private MarkdownProcessor _markdownProcessor;
 	@Autowired
 	private MessageSource _messageSource;
+	@Autowired
+	private MacroFactory _macroFactory;
 	
 	@PostConstruct
 	public void init() {
@@ -79,6 +85,7 @@ public final class Functions {
 		pageRenderer = _pageRenderer;
 		markdownProcessor = _markdownProcessor;
 		messageSource = _messageSource;
+		macroFactory = _macroFactory;
 	}
 
 	public static List<String> listProjects() {
@@ -164,6 +171,23 @@ public final class Functions {
 			}
 		});
 		return openIds;
+	}
+	
+	public static List<MacroDescriptor> getMacros() {
+		List<MacroDescriptor> descs = Lists.newArrayList(macroFactory.getDescriptors());
+		final Locale locale = LocaleContextHolder.getLocale();
+		final Collator collator = Collator.getInstance(locale);
+		Collections.sort(descs, new Comparator<MacroDescriptor>() {
+			@Override
+			public int compare(MacroDescriptor d1, MacroDescriptor d2) {
+				String titleKey1 = d1.getTitleKey();
+				String titleKey2 = d2.getTitleKey();
+				String title1 = messageSource.getMessage(titleKey1, null, locale);
+				String title2 = messageSource.getMessage(titleKey2, null, locale);
+				return collator.compare(title1, title2);
+			}
+		});
+		return descs;
 	}
 	
 	public static int floor(double d) {

@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.impl;
+package de.blizzy.documentr.web.markdown.macro;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +28,11 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
 
 public class MacroFactoryTest {
 	private IPageStore pageStore;

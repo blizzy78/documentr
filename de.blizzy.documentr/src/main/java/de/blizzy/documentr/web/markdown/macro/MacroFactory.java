@@ -15,42 +15,51 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.impl;
+package de.blizzy.documentr.web.markdown.macro;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Sets;
+
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.VimeoMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.YoutubeMacro;
 
 @Component
 public class MacroFactory {
-	private static final Map<String, Class<? extends IMacro>> MACRO_CLASSES =
-			new HashMap<String, Class<? extends IMacro>>();
+	private static final Map<String, MacroDescriptor> MACROS = new HashMap<String, MacroDescriptor>();
 	
 	static {
-		MACRO_CLASSES.put("label", LabelMacro.class); //$NON-NLS-1$
-		MACRO_CLASSES.put("neighbors", NeighborsMacro.class); //$NON-NLS-1$
-		MACRO_CLASSES.put("neighbours", NeighborsMacro.class); //$NON-NLS-1$
-		MACRO_CLASSES.put("toc", TableOfContentsMacro.class); //$NON-NLS-1$
-		MACRO_CLASSES.put("vimeo", VimeoMacro.class); //$NON-NLS-1$
-		MACRO_CLASSES.put("youtube", YoutubeMacro.class); //$NON-NLS-1$
+		put(LabelMacro.DESCRIPTOR);
+		put(NeighborsMacro.DESCRIPTOR);
+		put(TableOfContentsMacro.DESCRIPTOR);
+		put(VimeoMacro.DESCRIPTOR);
+		put(YoutubeMacro.DESCRIPTOR);
 	}
 	
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;
+
+	private static final void put(MacroDescriptor desc) {
+		MACROS.put(desc.getName(), desc);
+	}
 	
 	public IMacro get(String macroName, String params, HtmlSerializerContext context) {
 		try {
-			Class<? extends IMacro> clazz = MACRO_CLASSES.get(macroName);
+			Class<? extends IMacro> clazz = MACROS.get(macroName).getMacroClass();
 			IMacro macro;
 			if (clazz != null) {
 				macro = clazz.newInstance();
@@ -69,6 +78,10 @@ public class MacroFactory {
 		}
 	}
 	
+	public Set<MacroDescriptor> getDescriptors() {
+		return Sets.newHashSet(MACROS.values());
+	}
+
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}

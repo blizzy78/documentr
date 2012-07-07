@@ -19,7 +19,7 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 
-class UnknownMacroMacro extends AbstractMacro {
+public class UnknownMacroMacro extends AbstractMacro {
 	private String macroName;
 
 	public UnknownMacroMacro(String macroName) {

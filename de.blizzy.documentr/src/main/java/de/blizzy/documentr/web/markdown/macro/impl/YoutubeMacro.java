@@ -18,8 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro.impl;
 
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class YoutubeMacro extends AbstractMacro {
+	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("youtube", //$NON-NLS-1$
+			"macro.youtube.title", "macro.youtube.description", YoutubeMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
+			"{{youtube [VIDEO]/}}"); //$NON-NLS-1$
+
 	@Override
 	public String getHtml() {
 		String videoId = getParameters();

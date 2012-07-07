@@ -24,8 +24,13 @@ import org.apache.commons.lang3.StringUtils;
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.AbstractMarkdownMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
-class TableOfContentsMacro extends AbstractMarkdownMacro {
+public class TableOfContentsMacro extends AbstractMarkdownMacro {
+	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("toc", //$NON-NLS-1$
+			"macro.toc.title", "macro.toc.description", TableOfContentsMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
+			"{{toc/}}"); //$NON-NLS-1$
+
 	@Override
 	public String getMarkdown() {
 		HtmlSerializerContext context = getHtmlSerializerContext();

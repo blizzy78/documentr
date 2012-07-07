@@ -151,6 +151,22 @@ function toggleStyleItalic() {
 	textEl.focus();
 }
 
+function insertMacro(insertText) {
+	if (insertText.indexOf('[') < 0) {
+		insertText = insertText + '[]';
+	}
+	var selectionStart = insertText.indexOf('[');
+	var selectionEnd = insertText.indexOf(']') - 1;
+	insertText = insertText.replace(/\[/, '').replace(/\]/, '');
+	var textEl = $('#text');
+	var end = textEl[0].selectionEnd;
+	var text = textEl.val();
+	text = text.substring(0, end) + insertText + text.substring(end);
+	textEl.val(text);
+	textEl[0].setSelectionRange(end + selectionStart, end + selectionEnd);
+	textEl.focus();
+}
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -201,6 +217,17 @@ function toggleStyleItalic() {
 					<div class="btn-group">
 						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
 						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
+					</div>
+					<div class="btn-group">
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><spring:message code="button.macros"/> <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<c:set var="macros" value="${d:getMacros()}"/>
+							<c:forEach var="macro" items="${macros}">
+								<dt:dropdownEntry>
+									<li><a href="javascript:insertMacro('<c:out value="${macro.insertText}"/>');"><spring:message code="${macro.titleKey}"/> <div class="macro-description"><spring:message code="${macro.descriptionKey}"/></div></a></li>
+								</dt:dropdownEntry>
+							</c:forEach>
+						</ul>
 					</div>
 				</div>
 				<form:textarea path="text" cssClass="span11 code" rows="20"/>

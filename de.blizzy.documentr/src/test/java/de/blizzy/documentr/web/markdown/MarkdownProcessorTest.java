@@ -32,7 +32,7 @@ import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.impl.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class MarkdownProcessorTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
