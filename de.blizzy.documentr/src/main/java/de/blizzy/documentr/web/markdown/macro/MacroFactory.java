@@ -59,10 +59,10 @@ public class MacroFactory {
 	
 	public IMacro get(String macroName, String params, HtmlSerializerContext context) {
 		try {
-			Class<? extends IMacro> clazz = MACROS.get(macroName).getMacroClass();
+			MacroDescriptor desc = MACROS.get(macroName);
 			IMacro macro;
-			if (clazz != null) {
-				macro = clazz.newInstance();
+			if (desc != null) {
+				macro = desc.getMacroClass().newInstance();
 			} else {
 				macro = new UnknownMacroMacro(macroName);
 			}

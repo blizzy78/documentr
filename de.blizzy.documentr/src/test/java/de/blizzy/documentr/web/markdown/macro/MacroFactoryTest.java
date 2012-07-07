@@ -26,13 +26,12 @@ import org.junit.Test;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.VimeoMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.YoutubeMacro;
 
 public class MacroFactoryTest {
 	private IPageStore pageStore;
@@ -56,8 +55,9 @@ public class MacroFactoryTest {
 	public void getMacro() {
 		assertMacro("label", LabelMacro.class); //$NON-NLS-1$
 		assertMacro("neighbors", NeighborsMacro.class); //$NON-NLS-1$
-		assertMacro("neighbours", NeighborsMacro.class); //$NON-NLS-1$
 		assertMacro("toc", TableOfContentsMacro.class); //$NON-NLS-1$
+		assertMacro("vimeo", VimeoMacro.class); //$NON-NLS-1$
+		assertMacro("youtube", YoutubeMacro.class); //$NON-NLS-1$
 		assertMacro("_unknown_", UnknownMacroMacro.class); //$NON-NLS-1$
 	}
 
