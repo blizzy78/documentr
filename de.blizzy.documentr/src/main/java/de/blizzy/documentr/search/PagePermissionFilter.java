@@ -48,17 +48,25 @@ class PagePermissionFilter extends Filter {
 	
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+		// TODO: This can be made to work at higher speeds. For now it reads through each document
+		// in the index seeing if the user has the permission on the document. But not every user
+		// has access to each project and/or branch. So in this case it would be quicker to just
+		// search for documents that the user really has access to, based on the roles granted to
+		// them on projects and branches.
+		
 		int numDocs = reader.numDocs();
 		FieldSelector selector = new SetBasedFieldSelector(
 				Sets.newHashSet("project", "branch", "path"), Collections.<String>emptySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BitSet bitSet = new BitSet(numDocs);
 		for (int i = 0; i < numDocs; i++) {
-			Document doc = reader.document(i, selector);
-			String projectName = doc.get("project"); //$NON-NLS-1$
-			String branchName = doc.get("branch"); //$NON-NLS-1$
-			String path = doc.get("path"); //$NON-NLS-1$
-			if (permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission)) {
-				bitSet.set(i);
+			if (!reader.isDeleted(i)) {
+				Document doc = reader.document(i, selector);
+				String projectName = doc.get("project"); //$NON-NLS-1$
+				String branchName = doc.get("branch"); //$NON-NLS-1$
+				String path = doc.get("path"); //$NON-NLS-1$
+				if (permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission)) {
+					bitSet.set(i);
+				}
 			}
 		}
 		return new DocIdBitSet(bitSet);
