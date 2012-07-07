@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
@@ -28,6 +30,10 @@ public class VimeoMacro extends AbstractMacro {
 	@Override
 	public String getHtml() {
 		String videoId = getParameters();
+		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);
+		}
+		
 		return "<iframe src=\"http://player.vimeo.com/video/" + videoId + "\" " + //$NON-NLS-1$ //$NON-NLS-2$
 				"width=\"500\" height=\"281\" frameborder=\"0\" " + //$NON-NLS-1$
 				"webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"; //$NON-NLS-1$
