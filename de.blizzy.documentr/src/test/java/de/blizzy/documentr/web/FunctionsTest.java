@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
@@ -38,6 +41,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.TestUtil;
 import de.blizzy.documentr.access.GrantedAuthorityTarget;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
@@ -52,38 +56,45 @@ import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 
-public class FunctionsTest {
+public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
 	
+	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
 	private IPageStore pageStore;
+	@Mock
 	private UserStore userStore;
+	@Mock
 	private IPageRenderer pageRenderer;
+	@Mock
 	private MarkdownProcessor markdownProcessor;
+	@Mock
 	private Authentication authentication;
+	@Mock
 	private MessageSource messageSource;
+	@Mock
+	private SecurityContext securityContext;
+	@Mock
+	private MacroFactory macroFactory;
 
 	@Before
 	public void setUp() {
-		repoManager = mock(GlobalRepositoryManager.class);
 		Functions.setGlobalRepositoryManager(repoManager);
-		pageStore = mock(IPageStore.class);
 		Functions.setPageStore(pageStore);
-		userStore = mock(UserStore.class);
 		Functions.setUserStore(userStore);
-		pageRenderer = mock(IPageRenderer.class);
 		Functions.setPageRenderer(pageRenderer);
-		markdownProcessor = mock(MarkdownProcessor.class);
 		Functions.setMarkdownProcessor(markdownProcessor);
-		messageSource = mock(MessageSource.class);
 		Functions.setMessageSource(messageSource);
+		Functions.setMacroFactory(macroFactory);
 		
-		authentication = mock(Authentication.class);
-		
-		SecurityContext securityContext = mock(SecurityContext.class);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		
 		SecurityContextHolder.setContext(securityContext);
@@ -99,6 +110,7 @@ public class FunctionsTest {
 		Functions.setPageRenderer(null);
 		Functions.setMarkdownProcessor(null);
 		Functions.setMessageSource(null);
+		Functions.setMacroFactory(null);
 		SecurityContextHolder.clearContext();
 		LocaleContextHolder.resetLocaleContext();
 	}
@@ -246,5 +258,15 @@ public class FunctionsTest {
 	@Test
 	public void floor() {
 		assertEquals(3, Functions.floor(3.141592654d));
+	}
+	
+	@Test
+	public void getMacros() {
+		Set<MacroDescriptor> descs = Sets.newHashSet(LabelMacro.DESCRIPTOR, TableOfContentsMacro.DESCRIPTOR);
+		when(macroFactory.getDescriptors()).thenReturn(descs);
+
+		when(messageSource.getMessage(anyString(), (Object[]) isNull(), Matchers.<Locale>any())).thenReturn("title"); //$NON-NLS-1$
+		
+		assertEquals(descs, Sets.newHashSet(Functions.getMacros()));
 	}
 }

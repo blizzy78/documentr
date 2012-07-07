@@ -217,4 +217,8 @@ public final class Functions {
 	static void setMessageSource(MessageSource messageSource) {
 		Functions.messageSource = messageSource;
 	}
+
+	static void setMacroFactory(MacroFactory macroFactory) {
+		Functions.macroFactory = macroFactory;
+	}
 }
