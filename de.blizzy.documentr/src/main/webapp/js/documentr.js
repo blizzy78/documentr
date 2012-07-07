@@ -328,3 +328,11 @@ var documentr = {};
 		}
 	});
 })();
+
+$(function() {
+	$.ajaxSetup({
+		cache: false
+	});
+	
+	prettyPrint();
+});

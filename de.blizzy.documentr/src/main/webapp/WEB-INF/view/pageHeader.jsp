@@ -70,14 +70,6 @@ documentr.pageTreeOptions = {
 
 </sec:authorize>
 
-$(function() {
-	$.ajaxSetup({
-		cache: false
-	});
-	
-	prettyPrint();
-});
-
 <c:out value="${requestScope._headerJS}" escapeXml="false"/>
 
 </script>
