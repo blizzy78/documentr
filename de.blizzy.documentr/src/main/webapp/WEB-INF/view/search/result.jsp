@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<dt:breadcrumbs>
+<dt:breadcrumbs showSiteSearch="${searchText}">
 	<li class="active"><spring:message code="title.searchResults"/></li>
 </dt:breadcrumbs>
 

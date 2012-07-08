@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <li class="btn-toolbar pull-right">
 	<div class="btn-group">
-		<a href="javascript:void(documentr.toggleSiteSearch())" class="btn btn-mini" data-toggle="button" title="<spring:message code="button.search"/>"><i class="icon-search"></i> <span class="caret"></span></a>
+		<c:if test="${!empty requestScope._showSiteSearch}"><c:set var="cssActive" value="active"/></c:if>
+		<a href="javascript:void(documentr.toggleSiteSearch())" class="btn btn-mini ${cssActive}" data-toggle="button" title="<spring:message code="button.search"/>"><i class="icon-search"></i> <span class="caret"></span></a>
 	</div>
 
 	<div class="btn-group">
