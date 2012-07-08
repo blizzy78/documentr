@@ -85,6 +85,8 @@ public class HtmlSerializerContext {
 				return uri;
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
+			} catch (IllegalStateException e) {
+				// ignore: not in web request context
 			}
 		}
 		return "#"; //$NON-NLS-1$
