@@ -278,7 +278,7 @@ var documentr = {};
 		var divEl = $('#site-search');
 		divEl.toggleClass('invisible');
 		if (!divEl.hasClass('invisible')) {
-			$('#site-search input').focus();
+			$('#site-search input').select();
 		}
 	};
 	
