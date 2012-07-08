@@ -167,6 +167,13 @@ function insertMacro(insertText) {
 	textEl.focus();
 }
 
+function toggleFullscreen() {
+	$('#titleFieldset, #pathFieldset, #textLabel, #viewRestrictionRoleFieldset').toggle();
+	var textEl = $('#text');
+	var rows = textEl.attr('rows');
+	textEl.attr('rows', (rows == 29) ? '20' : '29');
+}
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -194,7 +201,7 @@ function insertMacro(insertText) {
 	<fieldset>
 		<form:hidden path="parentPagePath"/>
 		<c:set var="errorText"><form:errors path="title"/></c:set>
-		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+		<div id="titleFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="title" cssClass="control-label"><spring:message code="label.title"/>:</form:label>
 			<form:input path="title" cssClass="input-xlarge"/>
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
@@ -208,11 +215,12 @@ function insertMacro(insertText) {
 			</c:if>
 		</div>
 		<div class="control-group">
-			<form:label path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
+			<form:label id="textLabel" path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
 			<div class="texteditor">
 				<div id="textEditorToolbar" class="btn-toolbar btn-toolbar-icons">
 					<div class="btn-group">
 						<a id="togglePreviewButton" href="javascript:togglePreview();" class="btn" data-toggle="button" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
+						<a href="javascript:toggleFullscreen();" class="btn" data-toggle="button" title="<spring:message code="button.zoomEditor"/>"><i class="icon-fullscreen"></i></a>
 					</div>
 					<div class="btn-group">
 						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
@@ -230,10 +238,10 @@ function insertMacro(insertText) {
 						</ul>
 					</div>
 				</div>
-				<form:textarea path="text" cssClass="span11 code" rows="20"/>
+				<form:textarea id="text" path="text" cssClass="span11 code" rows="20"/>
 			</div>
 		</div>
-		<div class="control-group">
+		<div id="viewRestrictionRoleFieldset" class="control-group">
 			<form:label path="viewRestrictionRole" cssClass="control-label"><spring:message code="label.visibleForRole"/>:</form:label>
 			<form:select path="viewRestrictionRole">
 				<form:option value="">(<spring:message code="everyone"/>)</form:option>
