@@ -21,8 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,7 +113,7 @@ public class PageIndex {
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
 	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_36);
 	private File pageIndexDir;
-	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
+	private ExecutorService threadPool = Executors.newFixedThreadPool(4);
 	private Directory directory;
 	private IndexWriter writer;
 	private IndexSearcher searcher;
@@ -228,7 +230,14 @@ public class PageIndex {
 				}
 			}
 		};
-		threadPool.submit(runnable);
+		Future<?> future = threadPool.submit(runnable);
+		try {
+			future.get();
+		} catch (InterruptedException e) {
+			// ignore
+		} catch (ExecutionException e) {
+			// ignore
+		}
 	}
 
 	private void deletePagesInternal(String projectName, String branchName, Set<String> paths) throws IOException {

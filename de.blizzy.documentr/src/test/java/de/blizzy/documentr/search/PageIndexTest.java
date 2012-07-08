@@ -105,7 +105,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
 		
 		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
-		.thenReturn(true);
+			.thenReturn(true);
 		
 		// wait for page to get indexed
 		while (pageIndex.getNumDocuments() == 0) {
@@ -114,10 +114,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 		pageIndex.deletePages(PROJECT, BRANCH, Collections.singleton(PAGE_PATH));
 
-		// wait for page to get deleted
-		while (pageIndex.getNumDocuments() > 0) {
-			sleep(10);
-		}
+		assertEquals(0, pageIndex.getNumDocuments());
 	}
 
 	private void sleep(long milliseconds) {
