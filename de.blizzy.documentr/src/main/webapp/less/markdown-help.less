@@ -16,9 +16,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "styles.less";
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "markdown-help.less";
+body {
+	&.markdown-help {
+		margin: 5px;
+	}
+}
 
-@import "macros.less";
+.markdown-help {
+	.accordion-heading {
+		font-size: 15px;
+		line-height: 20px;
+		font-weight: bold;
+	
+		a {
+			text-decoration: none;
+		}
+	}
+	
+	.accordion-inner {
+		> table {
+			td {
+				vertical-align: middle;
+			
+				&:last-child {
+					pre,
+					code {
+						border: 0;
+						padding: 0;
+						color: inherit;
+						background-color: inherit;
+					}
+	
+					.alternative {
+						margin-top: 5px;
+						margin-bottom: 5px;
+						display: block;
+					}
+				}
+
+				table,
+				pre,
+				ul,
+				ol,
+				dl {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+}

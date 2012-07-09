@@ -146,4 +146,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.util.List getMacros()</function-signature>
 	</function>
+
+	<function>
+		<name>getLanguage</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String getLanguage()</function-signature>
+	</function>
 </taglib>

@@ -44,34 +44,6 @@ pre {
 	font-size: 12px;
 }
 
-pre.changes {
-	background-color: inherit;
-	border: 0;
-	padding: 0;
-	
-	ins,
-	del {
-		margin-left: 2px;
-		margin-right: 2px;
-		padding-left: 2px;
-		padding-right: 2px;
-		border-radius: 2px 2px 2px 2px;
-	}
-	
-	ins {
-		background-color: #e6ffe6;
-	}
-	
-	del {
-		background-color: #ffe6e6;
-	}
-	
-	del + ins,
-	ins + del {
-		margin-left: 0px;
-	}
-}
-
 code {
 	color: #c00f40;
 }
@@ -96,30 +68,6 @@ table.table-documentr {
 .securityHiddenUI {
 	* {
 		background-color: red !important;
-	}
-}
-
-.breadcrumb {
-	background-color: #f0f0f0;
-	background-image: -moz-linear-gradient(center top, #f5f5f5, #f0f0f0);
-	border-radius: 0;
-	
-	ul {
-		margin: 0;
-	}
-	
-	.btn-toolbar {
-		margin: 0;
-	}
-	
-	.dropdown-menu {
-		li {
-			display: list-item;
-		}
-	}
-	
-	li.btn-toolbar {
-		line-height: 1px;
 	}
 }
 
@@ -289,4 +237,8 @@ form {
 			}
 		}
 	}
+}
+
+blockquote {
+	border-left-color: #08C;
 }

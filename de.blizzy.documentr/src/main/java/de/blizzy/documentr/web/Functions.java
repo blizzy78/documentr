@@ -194,6 +194,11 @@ public final class Functions {
 		return (int) Math.floor(d);
 	}
 	
+	public static String getLanguage() {
+		Locale locale = LocaleContextHolder.getLocale();
+		return locale.getLanguage();
+	}
+	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

@@ -16,9 +16,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "styles.less";
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "markdown-help.less";
-
-@import "macros.less";
+/** Controllers for showing help. */
+package de.blizzy.documentr.web.help;

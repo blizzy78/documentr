@@ -15,10 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+package de.blizzy.documentr.web.help;
 
-@import "styles.less";
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "markdown-help.less";
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-@import "macros.less";
+@Controller
+@RequestMapping("/help")
+public class HelpController {
+	@RequestMapping(value="/markdown", method=RequestMethod.GET)
+	@PreAuthorize("permitAll")
+	public String getMarkdownHelp() {
+		return "/help/markdown"; //$NON-NLS-1$
+	}
+}

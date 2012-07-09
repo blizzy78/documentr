@@ -16,9 +16,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "styles.less";
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "markdown-help.less";
-
-@import "macros.less";
+.breadcrumb {
+	background-color: #f0f0f0;
+	background-image: -moz-linear-gradient(center top, #f5f5f5, #f0f0f0);
+	border-radius: 0;
+	
+	ul {
+		margin: 0;
+	}
+	
+	.btn-toolbar {
+		margin: 0;
+	}
+	
+	.dropdown-menu {
+		li {
+			display: list-item;
+		}
+	}
+	
+	li.btn-toolbar {
+		line-height: 1px;
+	}
+}

@@ -174,6 +174,11 @@ function toggleFullscreen() {
 	textEl.attr('rows', (rows == 29) ? '20' : '29');
 }
 
+function showMarkdownHelp() {
+	window.open('<c:url value="/help/markdown"/>', 'documentrMarkdownHelp',
+		'width=600, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
+}
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -236,6 +241,9 @@ function toggleFullscreen() {
 								</dt:dropdownEntry>
 							</c:forEach>
 						</ul>
+					</div>
+					<div class="btn-group">
+						<a href="javascript:showMarkdownHelp();" class="btn" title="Show Markdown Help"><i class="icon-question-sign"></i></a>
 					</div>
 				</div>
 				<form:textarea id="text" path="text" cssClass="span11 code" rows="20"/>
