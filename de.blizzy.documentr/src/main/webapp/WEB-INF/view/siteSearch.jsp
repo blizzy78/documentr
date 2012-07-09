@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
-<c:if test="${empty requestScope._showSiteSearch}"><c:set var="cssInvisible" value="invisible"/></c:if>
-<div id="site-search" class="site-search ${cssInvisible}">
+<c:if test="${empty requestScope._showSiteSearch}"><c:set var="styleInvisible" value="display: none;"/></c:if>
+<div id="site-search" class="site-search" style="${styleInvisible}">
 	<form class="form-search pull-right" action="<c:url value="/search/page"/>" method="GET">
 		<input type="text" name="q" class="search-query input-xlarge" value="${requestScope._showSiteSearch}"
 			placeholder="<spring:message code="searchTermsPlaceholder"/>"/>

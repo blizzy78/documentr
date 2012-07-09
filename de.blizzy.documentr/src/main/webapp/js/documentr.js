@@ -276,10 +276,11 @@ var documentr = {};
 	
 	documentr.toggleSiteSearch = function() {
 		var divEl = $('#site-search');
-		divEl.toggleClass('invisible');
-		if (!divEl.hasClass('invisible')) {
-			$('#site-search input').select();
-		}
+		divEl.slideToggle('fast', function() {
+			if (divEl.css('display') !== 'none') {
+				$('#site-search input').select();
+			}
+		});
 	};
 	
 	
