@@ -84,23 +84,28 @@ function togglePreview() {
 				markdown: textEl.val()
 			},
 			success: function(result) {
-				var previewEl = $('<div id="preview" class="preview"></div>');
-				previewEl.html(result.html);
-				$(document.body).append(previewEl);
-				previewEl.show()
-					.css('left', textEl.offset().left)
-					.css('top', textEl.offset().top)
-					.css('width', textEl.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
-					.css('height', textEl.outerHeight() - (previewEl.outerHeight() - previewEl.height()));
-				prettyPrint();
 				$('#textEditorToolbar a').each(function() {
 					$(this).setButtonDisabled(true);
 				});
 				$('#togglePreviewButton').setButtonDisabled(false);
+
+				previewEl = $('<div id="preview" class="preview"></div>');
+				previewEl.html(result.html);
+				$(document.body).append(previewEl);
+				prettyPrint();
+				previewEl
+					.css('left', textEl.offset().left)
+					.css('top', textEl.offset().top)
+					.css('width', textEl.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
+					.css('height', textEl.outerHeight() - (previewEl.outerHeight() - previewEl.height()))
+					.slideToggle('fast');
 			}
 		});
 	} else {
-		previewEl.remove();
+		previewEl.slideToggle('fast', function() {
+			previewEl.remove();
+		});
+
 		$('#textEditorToolbar a').each(function() {
 			$(this).setButtonDisabled(false);
 		});
@@ -221,7 +226,7 @@ function showMarkdownHelp() {
 		</div>
 		<div class="control-group">
 			<form:label id="textLabel" path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
-			<div class="texteditor">
+			<div id="textEditor" class="texteditor">
 				<div id="textEditorToolbar" class="btn-toolbar btn-toolbar-icons">
 					<div class="btn-group">
 						<a id="togglePreviewButton" href="javascript:togglePreview();" class="btn" data-toggle="button" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
