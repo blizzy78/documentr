@@ -17,9 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web;
 
+import java.util.EnumSet;
+
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.servlet.SessionTrackingMode;
 
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.WebApplicationContext;
@@ -40,6 +43,8 @@ public class WebappInitializer implements WebApplicationInitializer {
 		
 		context.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, appContext);
 
+		context.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
+		
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(appContext);
 		ServletRegistration.Dynamic dispatcher = context.addServlet("dispatcher", dispatcherServlet); //$NON-NLS-1$
 		dispatcher.setLoadOnStartup(1);
