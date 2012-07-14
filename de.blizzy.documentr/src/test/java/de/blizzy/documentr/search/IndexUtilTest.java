@@ -23,11 +23,8 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.FilterIndexReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
@@ -36,31 +33,15 @@ import org.junit.Test;
 import org.junit.Test.None;
 
 public class IndexUtilTest {
-	private static final class BrokenIndexReader extends FilterIndexReader {
-		public BrokenIndexReader(IndexReader reader) {
-			super(reader);
-		}
-		
-		@Override
-		protected void doClose() throws IOException {
-			throw new IOException();
-		}
-	}
-	
 	private Directory directory;
-	private IndexReader indexReader;
-	private IndexReader brokenIndexReader;
 
 	@Before
 	public void setUp() throws IOException {
 		directory = new RAMDirectory();
-		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
-		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		IndexWriter indexWriter = new IndexWriter(directory, writerConfig);
 		indexWriter.close();
-		
-		indexReader = IndexReader.open(directory);
-		brokenIndexReader = new BrokenIndexReader(indexReader);
 	}
 	
 	@Test(expected=None.class)
@@ -82,48 +63,6 @@ public class IndexUtilTest {
 		IndexUtil.closeQuietly(indexWriter);
 	}
 
-	@Test(expected=None.class)
-	public void closeIndexReaderQuietly() {
-		IndexReader.ReaderClosedListener listener = mock(IndexReader.ReaderClosedListener.class);
-		indexReader.addReaderClosedListener(listener);
-		
-		IndexUtil.closeQuietly(indexReader);
-		verify(listener).onClose(indexReader);
-	}
-
-	@Test(expected=None.class)
-	public void closeIndexReaderQuietlyMustAcceptNull() {
-		IndexUtil.closeQuietly((IndexReader) null);
-	}
-
-	@Test(expected=None.class)
-	public void closeIndexReaderQuietlyMustCatchException() throws IOException {
-		for (String file : directory.listAll()) {
-			directory.deleteFile(file);
-		}
-		
-		IndexUtil.closeQuietly(brokenIndexReader);
-	}
-	
-	@Test(expected=None.class)
-	public void closeIndexSearcherQuietly() throws IOException {
-		IndexSearcher indexSearcher = mock(IndexSearcher.class);
-		IndexUtil.closeQuietly(indexSearcher);
-		verify(indexSearcher).close();
-	}
-	
-	@Test(expected=None.class)
-	public void closeIndexSearcherQuietlyMustAcceptNull() {
-		IndexUtil.closeQuietly((IndexSearcher) null);
-	}
-	
-	@Test(expected=None.class)
-	public void closeIndexSearcherQuietlyMustCatchException() throws IOException {
-		IndexSearcher indexSearcher = mock(IndexSearcher.class);
-		doThrow(IOException.class).when(indexSearcher).close();
-		IndexUtil.closeQuietly(indexSearcher);
-	}
-	
 	@Test(expected=None.class)
 	public void closeTokenStreamQuietly() throws IOException {
 		TokenStream tokenStream = mock(TokenStream.class);

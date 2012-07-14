@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

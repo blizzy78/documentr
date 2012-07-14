@@ -20,9 +20,7 @@ package de.blizzy.documentr.search;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 
 final class IndexUtil {
@@ -32,30 +30,6 @@ final class IndexUtil {
 		if (writer != null) {
 			try {
 				writer.close();
-			} catch (IOException e) {
-				// ignore
-			} catch (RuntimeException e) {
-				// ignore
-			}
-		}
-	}
-
-	static void closeQuietly(IndexReader reader) {
-		if (reader != null) {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				// ignore
-			} catch (RuntimeException e) {
-				// ignore
-			}
-		}
-	}
-
-	static void closeQuietly(IndexSearcher searcher) {
-		if (searcher != null) {
-			try {
-				searcher.close();
 			} catch (IOException e) {
 				// ignore
 			} catch (RuntimeException e) {

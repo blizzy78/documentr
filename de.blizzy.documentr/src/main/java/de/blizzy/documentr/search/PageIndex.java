@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,23 +40,24 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.Field.TermVector;
-import org.apache.lucene.index.IndexNotFoundException;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -90,6 +93,7 @@ public class PageIndex {
 	private static final int HITS_PER_PAGE = 20;
 	private static final int NUM_FRAGMENTS = 5;
 	private static final int FRAGMENT_SIZE = 50;
+	private static final int REFRESH_INTERVAL = 30; // seconds
 	@SuppressWarnings("nls")
 	private static final String[] REMOVE_HTML_TAGS = {
 		"(<br(?: .*?)?(?:/)?>)", "\n$1",
@@ -111,12 +115,15 @@ public class PageIndex {
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
-	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_36);
+	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_40);
 	private File pageIndexDir;
 	private ExecutorService threadPool = Executors.newFixedThreadPool(4);
 	private Directory directory;
 	private IndexWriter writer;
-	private IndexSearcher searcher;
+	private ReaderManager readerManager;
+	private SearcherManager searcherManager;
+	private Timer timer = new Timer();
+	private int refreshInterval = REFRESH_INTERVAL;
 	
 	@PostConstruct
 	public void init() throws IOException {
@@ -126,9 +133,31 @@ public class PageIndex {
 		
 		directory = FSDirectory.open(pageIndexDir);
 		
-		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		config.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		writer = new IndexWriter(directory, config);
+		writer.commit();
+		
+		readerManager = new ReaderManager(directory);
+		searcherManager = new SearcherManager(directory, null);
+		
+		TimerTask refreshTask = new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					readerManager.maybeRefresh();
+				} catch (IOException e) {
+					// ignore
+				}
+				
+				try {
+					searcherManager.maybeRefresh();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		};
+		timer.schedule(refreshTask, 0, refreshInterval * 1000);
 	}
 	
 	@PreDestroy
@@ -139,7 +168,17 @@ public class PageIndex {
 		} catch (InterruptedException e) {
 			// ignore
 		}
-		IndexUtil.closeQuietly(searcher);
+		timer.cancel();
+		try {
+			searcherManager.close();
+		} catch (IOException e) {
+			// ignore
+		}
+		try {
+			readerManager.close();
+		} catch (IOException e) {
+			// ignore
+		}
 		IndexUtil.closeQuietly(writer);
 		IndexUtil.closeQuietly(directory);
 	}
@@ -175,12 +214,12 @@ public class PageIndex {
 		text = replaceHtmlEntities(text);
 
 		Document doc = new Document();
-		doc.add(new Field("fullPath", fullPath, Store.NO, Index.NOT_ANALYZED, TermVector.NO)); //$NON-NLS-1$
-		doc.add(new Field("project", projectName, Store.YES, Index.NOT_ANALYZED, TermVector.NO)); //$NON-NLS-1$
-		doc.add(new Field("branch", branchName, Store.YES, Index.NOT_ANALYZED, TermVector.NO)); //$NON-NLS-1$
-		doc.add(new Field("path", path, Store.YES, Index.NOT_ANALYZED, TermVector.NO)); //$NON-NLS-1$
-		doc.add(new Field("title", page.getTitle(), Store.YES, Index.ANALYZED, TermVector.YES)); //$NON-NLS-1$
-		doc.add(new Field("text", text, Store.YES, Index.ANALYZED, TermVector.YES)); //$NON-NLS-1$
+		doc.add(new StringField("fullPath", fullPath, Store.NO)); //$NON-NLS-1$
+		doc.add(new StringField("project", projectName, Store.YES)); //$NON-NLS-1$
+		doc.add(new StringField("branch", branchName, Store.YES)); //$NON-NLS-1$
+		doc.add(new StringField("path", path, Store.YES)); //$NON-NLS-1$
+		doc.add(new TextField("title", page.getTitle(), Store.YES)); //$NON-NLS-1$
+		doc.add(new TextField("text", text, Store.YES)); //$NON-NLS-1$
 		writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
 
 		writer.commit();
@@ -260,70 +299,59 @@ public class PageIndex {
 		Assert.isTrue(page >= 1);
 		Assert.notNull(authentication);
 		
-		QueryParser titleParser = new QueryParser(Version.LUCENE_36, "title", analyzer); //$NON-NLS-1$
+		QueryParser titleParser = new QueryParser(Version.LUCENE_40, "title", analyzer); //$NON-NLS-1$
 		Query titleQuery = titleParser.parse(searchText);
-		QueryParser textParser = new QueryParser(Version.LUCENE_36, "text", analyzer); //$NON-NLS-1$
+		QueryParser textParser = new QueryParser(Version.LUCENE_40, "text", analyzer); //$NON-NLS-1$
 		Query textQuery = textParser.parse(searchText);
 		
 		BooleanQuery query = new BooleanQuery();
 		query.add(titleQuery, Occur.SHOULD);
 		query.add(textQuery, Occur.SHOULD);
 		
-		List<SearchHit> hits = Lists.newArrayList();
-		IndexSearcher searcher = getSearcher();
-		IndexReader reader = searcher.getIndexReader();
-		Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
-		TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
-		Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
-		Scorer scorer = new QueryScorer(query);
-		Highlighter highlighter = new Highlighter(formatter, scorer);
-		highlighter.setTextFragmenter(new SimpleFragmenter(FRAGMENT_SIZE));
-		highlighter.setEncoder(new SimpleHTMLEncoder());
-		int start = HITS_PER_PAGE * (page - 1);
-		int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
-		for (int i = start; i < end; i++) {
-			int docId = docs.scoreDocs[i].doc;
-			Document doc = reader.document(docId);
-			String projectName = doc.get("project"); //$NON-NLS-1$
-			String branchName = doc.get("branch"); //$NON-NLS-1$
-			String path = doc.get("path"); //$NON-NLS-1$
-			String title = doc.get("title"); //$NON-NLS-1$
-			String text = doc.get("text"); //$NON-NLS-1$
-			TokenStream tokenStream = null;
-			try {
-				tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
-				String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
-				cleanupFragments(fragments);
-				String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
-				SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
-				hits.add(hit);
-			} catch (InvalidTokenOffsetsException e) {
-				// ignore
-			} finally {
-				IndexUtil.closeQuietly(tokenStream);
+		IndexSearcher searcher = null;
+		try {
+			searcher = searcherManager.acquire();
+			List<SearchHit> hits = Lists.newArrayList();
+			IndexReader reader = searcher.getIndexReader();
+			Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
+			TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
+			Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
+			Scorer scorer = new QueryScorer(query);
+			Highlighter highlighter = new Highlighter(formatter, scorer);
+			highlighter.setTextFragmenter(new SimpleFragmenter(FRAGMENT_SIZE));
+			highlighter.setEncoder(new SimpleHTMLEncoder());
+			int start = HITS_PER_PAGE * (page - 1);
+			int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
+			for (int i = start; i < end; i++) {
+				int docId = docs.scoreDocs[i].doc;
+				Document doc = reader.document(docId);
+				String projectName = doc.get("project"); //$NON-NLS-1$
+				String branchName = doc.get("branch"); //$NON-NLS-1$
+				String path = doc.get("path"); //$NON-NLS-1$
+				String title = doc.get("title"); //$NON-NLS-1$
+				String text = doc.get("text"); //$NON-NLS-1$
+				TokenStream tokenStream = null;
+				try {
+					tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
+					String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
+					cleanupFragments(fragments);
+					String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
+					SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
+					hits.add(hit);
+				} catch (InvalidTokenOffsetsException e) {
+					// ignore
+				} finally {
+					IndexUtil.closeQuietly(tokenStream);
+				}
+			}
+			return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
+		} finally {
+			if (searcher != null) {
+				searcherManager.release(searcher);
 			}
 		}
-		return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
 	}
 
-	private synchronized IndexSearcher getSearcher() throws IOException {
-		if (searcher != null) {
-			IndexReader reader = searcher.getIndexReader();
-			if (!reader.isCurrent()) {
-				IndexUtil.closeQuietly(searcher);
-				IndexUtil.closeQuietly(reader);
-				searcher = null;
-			}
-		}
-		
-		if (searcher == null) {
-			IndexReader reader = IndexReader.open(directory);
-			searcher = new IndexSearcher(reader);
-		}
-		
-		return searcher;
-	}
-	
 	private void cleanupFragments(String[] fragments) {
 		for (int i = 0; i < fragments.length; i++) {
 			fragments[i] = fragments[i].replaceAll("^[,\\.]+", StringUtils.EMPTY).trim(); //$NON-NLS-1$
@@ -331,17 +359,16 @@ public class PageIndex {
 	}
 	
 	public int getNumDocuments() throws IOException {
-		Directory directory = null;
-		IndexReader reader = null;
+		DirectoryReader reader = null;
 		try {
-			directory = FSDirectory.open(pageIndexDir);
-			reader = IndexReader.open(directory);
+			reader = readerManager.acquire();
 			return reader.numDocs();
-		} catch (IndexNotFoundException e) {
-			return 0;
 		} finally {
-			IndexUtil.closeQuietly(reader);
-			IndexUtil.closeQuietly(directory);
+			readerManager.release(reader);
 		}
+	}
+	
+	void setRefreshInterval(int refreshInterval) {
+		this.refreshInterval = refreshInterval;
 	}
 }

@@ -19,14 +19,14 @@ package de.blizzy.documentr.search;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Collections;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.SetBasedFieldSelector;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.DocIdBitSet;
 import org.springframework.security.core.Authentication;
 
@@ -36,6 +36,8 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 
 class PagePermissionFilter extends Filter {
+	private static final Set<String> FIELDS = Sets.newHashSet("project", "branch", "path"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	
 	private Authentication authentication;
 	private Permission permission;
 	private DocumentrPermissionEvaluator permissionEvaluator;
@@ -47,28 +49,27 @@ class PagePermissionFilter extends Filter {
 	}
 	
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		// TODO: This can be made to work at higher speeds. For now it reads through each document
 		// in the index seeing if the user has the permission on the document. But not every user
 		// has access to each project and/or branch. So in this case it would be quicker to just
 		// search for documents that the user really has access to, based on the roles granted to
 		// them on projects and branches.
-		
+
+		AtomicReader reader = context.reader();
 		int numDocs = reader.numDocs();
-		FieldSelector selector = new SetBasedFieldSelector(
-				Sets.newHashSet("project", "branch", "path"), Collections.<String>emptySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		BitSet bitSet = new BitSet(numDocs);
+		BitSet docs = new BitSet(numDocs);
 		for (int i = 0; i < numDocs; i++) {
-			if (!reader.isDeleted(i)) {
-				Document doc = reader.document(i, selector);
+			if ((acceptDocs == null) || acceptDocs.get(i)) {
+				Document doc = reader.document(i, FIELDS);
 				String projectName = doc.get("project"); //$NON-NLS-1$
 				String branchName = doc.get("branch"); //$NON-NLS-1$
 				String path = doc.get("path"); //$NON-NLS-1$
 				if (permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission)) {
-					bitSet.set(i);
+					docs.set(i);
 				}
 			}
 		}
-		return new DocIdBitSet(bitSet);
+		return new DocIdBitSet(docs);
 	}
 }

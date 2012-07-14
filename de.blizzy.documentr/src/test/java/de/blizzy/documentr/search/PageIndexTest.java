@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,6 +65,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		
 		when(anonymousAuthenticationFactory.create("dummy")).thenReturn(authentication); //$NON-NLS-1$
 		
+		pageIndex.setRefreshInterval(1);
 		pageIndex.init();
 	}
 	
@@ -114,7 +115,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 		pageIndex.deletePages(PROJECT, BRANCH, Collections.singleton(PAGE_PATH));
 
-		assertEquals(0, pageIndex.getNumDocuments());
+		// wait for page to get deleted
+		while (pageIndex.getNumDocuments() == 0) {
+			sleep(10);
+		}
 	}
 
 	private void sleep(long milliseconds) {
