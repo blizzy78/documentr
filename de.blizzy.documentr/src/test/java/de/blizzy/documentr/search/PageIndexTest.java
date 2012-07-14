@@ -65,7 +65,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		
 		when(anonymousAuthenticationFactory.create("dummy")).thenReturn(authentication); //$NON-NLS-1$
 		
-		pageIndex.setRefreshInterval(1);
+		pageIndex.setAlwaysRefresh(true);
 		pageIndex.init();
 	}
 	
@@ -116,7 +116,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		pageIndex.deletePages(PROJECT, BRANCH, Collections.singleton(PAGE_PATH));
 
 		// wait for page to get deleted
-		while (pageIndex.getNumDocuments() == 0) {
+		while (pageIndex.getNumDocuments() > 0) {
 			sleep(10);
 		}
 	}

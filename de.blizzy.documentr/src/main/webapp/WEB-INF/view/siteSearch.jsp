@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:if test="${empty requestScope._showSiteSearch}"><c:set var="styleInvisible" value="display: none;"/></c:if>
 <div id="site-search" class="site-search" style="${styleInvisible}">
 	<form class="form-search pull-right" action="<c:url value="/search/page"/>" method="GET">
-		<input type="text" name="q" class="search-query input-xlarge" value="${requestScope._showSiteSearch}"
+		<input type="text" name="q" class="search-query input-xlarge" value="<c:out value="${requestScope._showSiteSearch}"/>"
 			placeholder="<spring:message code="searchTermsPlaceholder"/>"/>
 	</form>
 </div>

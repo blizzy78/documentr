@@ -17,37 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
-import java.util.List;
-
-public class SearchResult {
-	private List<SearchHit> hits;
+public class SearchTextSuggestion {
+	private String searchText;
+	private String searchTextHtml;
 	private int totalHits;
-	private int hitsPerPage;
-	private SearchTextSuggestion suggestion;
 
-	SearchResult(List<SearchHit> hits, int totalHits, int hitsPerPage) {
-		this.hits = hits;
+	SearchTextSuggestion(String searchText, String searchTextHtml, int totalHits) {
+		this.searchText = searchText;
+		this.searchTextHtml = searchTextHtml;
 		this.totalHits = totalHits;
-		this.hitsPerPage = hitsPerPage;
 	}
 	
-	public List<SearchHit> getHits() {
-		return hits;
+	public String getSearchText() {
+		return searchText;
+	}
+	
+	public String getSearchTextHtml() {
+		return searchTextHtml;
 	}
 	
 	public int getTotalHits() {
 		return totalHits;
-	}
-	
-	public int getHitsPerPage() {
-		return hitsPerPage;
-	}
-
-	void setSuggestion(SearchTextSuggestion suggestion) {
-		this.suggestion = suggestion;
-	}
-	
-	public SearchTextSuggestion getSuggestion() {
-		return suggestion;
 	}
 }

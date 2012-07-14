@@ -19,7 +19,10 @@ package de.blizzy.documentr.search;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,10 +38,15 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
@@ -68,6 +76,9 @@ import org.apache.lucene.search.highlight.SimpleFragmenter;
 import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TokenSources;
+import org.apache.lucene.search.spell.DirectSpellChecker;
+import org.apache.lucene.search.spell.SuggestMode;
+import org.apache.lucene.search.spell.SuggestWord;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -78,6 +89,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.google.inject.internal.Lists;
+import com.google.inject.internal.Maps;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;
@@ -90,6 +102,18 @@ import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
 public class PageIndex {
+	private static final class WordPosition {
+		String word;
+		int start;
+		int end;
+
+		WordPosition(String word, int start, int end) {
+			this.word = word;
+			this.start = start;
+			this.end = end;
+		}
+	}
+	
 	private static final int HITS_PER_PAGE = 20;
 	private static final int NUM_FRAGMENTS = 5;
 	private static final int FRAGMENT_SIZE = 50;
@@ -115,7 +139,8 @@ public class PageIndex {
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
-	private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_40);
+	private Analyzer defaultAnalyzer;
+	private Analyzer analyzer;
 	private File pageIndexDir;
 	private ExecutorService threadPool = Executors.newFixedThreadPool(4);
 	private Directory directory;
@@ -123,7 +148,7 @@ public class PageIndex {
 	private ReaderManager readerManager;
 	private SearcherManager searcherManager;
 	private Timer timer = new Timer();
-	private int refreshInterval = REFRESH_INTERVAL;
+	private boolean alwaysRefresh;
 	
 	@PostConstruct
 	public void init() throws IOException {
@@ -132,7 +157,12 @@ public class PageIndex {
 		FileUtils.forceMkdir(pageIndexDir);
 		
 		directory = FSDirectory.open(pageIndexDir);
-		
+
+		defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
+		Map<String, Analyzer> fieldAnalyzers = Maps.newHashMap();
+		fieldAnalyzers.put("allText", new StandardAnalyzer(Version.LUCENE_40)); //$NON-NLS-1$
+		analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, fieldAnalyzers);
+
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		config.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		writer = new IndexWriter(directory, config);
@@ -144,20 +174,10 @@ public class PageIndex {
 		TimerTask refreshTask = new TimerTask() {
 			@Override
 			public void run() {
-				try {
-					readerManager.maybeRefresh();
-				} catch (IOException e) {
-					// ignore
-				}
-				
-				try {
-					searcherManager.maybeRefresh();
-				} catch (IOException e) {
-					// ignore
-				}
+				refresh();
 			}
 		};
-		timer.schedule(refreshTask, 0, refreshInterval * 1000);
+		timer.schedule(refreshTask, 0, REFRESH_INTERVAL * 1000);
 	}
 	
 	@PreDestroy
@@ -220,6 +240,8 @@ public class PageIndex {
 		doc.add(new StringField("path", path, Store.YES)); //$NON-NLS-1$
 		doc.add(new TextField("title", page.getTitle(), Store.YES)); //$NON-NLS-1$
 		doc.add(new TextField("text", text, Store.YES)); //$NON-NLS-1$
+		doc.add(new TextField("allText", page.getTitle(), Store.NO)); //$NON-NLS-1$
+		doc.add(new TextField("allText", text, Store.NO)); //$NON-NLS-1$
 		writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
 
 		writer.commit();
@@ -298,6 +320,26 @@ public class PageIndex {
 		Assert.hasLength(searchText);
 		Assert.isTrue(page >= 1);
 		Assert.notNull(authentication);
+
+		IndexSearcher searcher = null;
+		try {
+			if (alwaysRefresh) {
+				refreshBlocking();
+			}
+			searcher = searcherManager.acquire();
+			SearchResult result = findPages(searchText, page, authentication, searcher);
+			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, searcher);
+			result.setSuggestion(suggestion);
+			return result;
+		} finally {
+			if (searcher != null) {
+				searcherManager.release(searcher);
+			}
+		}
+	}
+	
+	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
+			throws ParseException, IOException {
 		
 		QueryParser titleParser = new QueryParser(Version.LUCENE_40, "title", analyzer); //$NON-NLS-1$
 		Query titleQuery = titleParser.parse(searchText);
@@ -307,49 +349,105 @@ public class PageIndex {
 		BooleanQuery query = new BooleanQuery();
 		query.add(titleQuery, Occur.SHOULD);
 		query.add(textQuery, Occur.SHOULD);
-		
-		IndexSearcher searcher = null;
-		try {
-			searcher = searcherManager.acquire();
-			List<SearchHit> hits = Lists.newArrayList();
-			IndexReader reader = searcher.getIndexReader();
-			Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
-			TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
-			Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
-			Scorer scorer = new QueryScorer(query);
-			Highlighter highlighter = new Highlighter(formatter, scorer);
-			highlighter.setTextFragmenter(new SimpleFragmenter(FRAGMENT_SIZE));
-			highlighter.setEncoder(new SimpleHTMLEncoder());
-			int start = HITS_PER_PAGE * (page - 1);
-			int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
-			for (int i = start; i < end; i++) {
-				int docId = docs.scoreDocs[i].doc;
-				Document doc = reader.document(docId);
-				String projectName = doc.get("project"); //$NON-NLS-1$
-				String branchName = doc.get("branch"); //$NON-NLS-1$
-				String path = doc.get("path"); //$NON-NLS-1$
-				String title = doc.get("title"); //$NON-NLS-1$
-				String text = doc.get("text"); //$NON-NLS-1$
-				TokenStream tokenStream = null;
-				try {
-					tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
-					String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
-					cleanupFragments(fragments);
-					String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
-					SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
-					hits.add(hit);
-				} catch (InvalidTokenOffsetsException e) {
-					// ignore
-				} finally {
-					IndexUtil.closeQuietly(tokenStream);
-				}
-			}
-			return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
-		} finally {
-			if (searcher != null) {
-				searcherManager.release(searcher);
+		List<SearchHit> hits = Lists.newArrayList();
+		IndexReader reader = searcher.getIndexReader();
+		Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
+		TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
+		Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
+		Scorer scorer = new QueryScorer(query);
+		Highlighter highlighter = new Highlighter(formatter, scorer);
+		highlighter.setTextFragmenter(new SimpleFragmenter(FRAGMENT_SIZE));
+		highlighter.setEncoder(new SimpleHTMLEncoder());
+		int start = HITS_PER_PAGE * (page - 1);
+		int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
+		for (int i = start; i < end; i++) {
+			int docId = docs.scoreDocs[i].doc;
+			Document doc = reader.document(docId);
+			String projectName = doc.get("project"); //$NON-NLS-1$
+			String branchName = doc.get("branch"); //$NON-NLS-1$
+			String path = doc.get("path"); //$NON-NLS-1$
+			String title = doc.get("title"); //$NON-NLS-1$
+			String text = doc.get("text"); //$NON-NLS-1$
+			TokenStream tokenStream = null;
+			try {
+				tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
+				String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
+				cleanupFragments(fragments);
+				String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
+				SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
+				hits.add(hit);
+			} catch (InvalidTokenOffsetsException e) {
+				// ignore
+			} finally {
+				IndexUtil.closeQuietly(tokenStream);
 			}
 		}
+		
+		return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
+	}
+
+	private SearchTextSuggestion getSearchTextSuggestion(String searchText, Authentication authentication,
+			IndexSearcher searcher) throws IOException, ParseException {
+		
+		List<WordPosition> words = Lists.newArrayList();
+		
+		TokenStream tokenStream = null;
+		try {
+			tokenStream = analyzer.tokenStream("allText", new StringReader(searchText)); //$NON-NLS-1$
+			tokenStream.addAttribute(CharTermAttribute.class);
+			tokenStream.addAttribute(OffsetAttribute.class);
+			tokenStream.reset();
+			while (tokenStream.incrementToken()) {
+				CharTermAttribute charTerm = tokenStream.getAttribute(CharTermAttribute.class);
+				String text = charTerm.toString();
+				if (StringUtils.isNotBlank(text)) {
+					OffsetAttribute offset = tokenStream.getAttribute(OffsetAttribute.class);
+					WordPosition word = new WordPosition(text, offset.startOffset(), offset.endOffset());
+					words.add(word);
+				}
+			}
+			tokenStream.end();
+		} finally {
+			if (tokenStream != null) {
+				tokenStream.close();
+			}
+		}
+		
+		Collections.reverse(words);
+
+		StringBuilder suggestedSearchText = new StringBuilder(searchText);
+		StringBuilder suggestedSearchTextHtml = new StringBuilder(searchText);
+		boolean foundSuggestions = false;
+		String now = String.valueOf(System.currentTimeMillis());
+		String startMarker = "__SUGGESTION-" + now + "__"; //$NON-NLS-1$ //$NON-NLS-2$
+		String endMarker = "__/SUGGESTION-" + now + "__"; //$NON-NLS-1$ //$NON-NLS-2$
+		DirectSpellChecker spellChecker = new DirectSpellChecker();
+		IndexReader reader = searcher.getIndexReader();
+		for (WordPosition word : words) {
+			Term term = new Term("allText", word.word); //$NON-NLS-1$
+			SuggestWord[] suggestions = spellChecker.suggestSimilar(term, 1, reader, SuggestMode.SUGGEST_MORE_POPULAR);
+			if (suggestions.length > 0) {
+				String suggestedWord = suggestions[0].string;
+				suggestedSearchText.replace(word.start, word.end, suggestedWord);
+				suggestedSearchTextHtml.replace(word.start, word.end,
+						startMarker + StringEscapeUtils.escapeHtml4(suggestedWord) + endMarker);
+				
+				foundSuggestions = true;
+			}
+		}
+		
+		if (foundSuggestions) {
+			String suggestion = suggestedSearchText.toString();
+			SearchResult suggestionResult = findPages(suggestion, 1, authentication, searcher);
+			int suggestionTotalHits = suggestionResult.getTotalHits();
+			if (suggestionTotalHits > 0) {
+				String html = StringEscapeUtils.escapeHtml4(suggestedSearchTextHtml.toString())
+						.replaceAll(startMarker + "(.*?)" + endMarker, "<strong><em>$1</em></strong>"); //$NON-NLS-1$ //$NON-NLS-2$
+				return new SearchTextSuggestion(suggestedSearchText.toString(), html, suggestionTotalHits);
+			}
+		}
+
+		return null;
 	}
 
 	private void cleanupFragments(String[] fragments) {
@@ -358,9 +456,44 @@ public class PageIndex {
 		}
 	}
 	
+	private void refresh() {
+		try {
+			readerManager.maybeRefresh();
+		} catch (IOException e) {
+			// ignore
+		}
+		
+		try {
+			searcherManager.maybeRefresh();
+		} catch (IOException e) {
+			// ignore
+		}
+	}
+	
+	private void refreshBlocking() {
+		try {
+			readerManager.maybeRefreshBlocking();
+		} catch (IOException e) {
+			// ignore
+		} catch (InterruptedException e) {
+			// ignore
+		}
+		
+		try {
+			searcherManager.maybeRefreshBlocking();
+		} catch (IOException e) {
+			// ignore
+		} catch (InterruptedException e) {
+			// ignore
+		}
+	}
+	
 	public int getNumDocuments() throws IOException {
 		DirectoryReader reader = null;
 		try {
+			if (alwaysRefresh) {
+				refreshBlocking();
+			}
 			reader = readerManager.acquire();
 			return reader.numDocs();
 		} finally {
@@ -368,7 +501,7 @@ public class PageIndex {
 		}
 	}
 	
-	void setRefreshInterval(int refreshInterval) {
-		this.refreshInterval = refreshInterval;
+	void setAlwaysRefresh(boolean alwaysRefresh) {
+		this.alwaysRefresh = alwaysRefresh;
 	}
 }

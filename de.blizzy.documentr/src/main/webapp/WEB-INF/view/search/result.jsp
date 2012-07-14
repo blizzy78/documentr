@@ -32,6 +32,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <div class="page-header"><h1><spring:message code="title.searchResults"/></h1></div>
 
+<c:if test="${!empty searchResult.suggestion}">
+	<p class="search-didyoumean">
+		<span class="leader"><spring:message code="label.didYouMean"/>:</span>
+		<a href="<c:url value="/search/page"><c:param name="q" value="${searchResult.suggestion.searchText}"/></c:url>"><c:out value="${searchResult.suggestion.searchTextHtml}" escapeXml="false"/></a>
+		<span class="hits"><spring:message code="xHits" arguments="${searchResult.suggestion.totalHits}"/></span>
+	</p>
+</c:if>
+
 <c:choose>
 	<c:when test="${searchResult.totalHits gt 0}">
 		<c:forEach var="hit" items="${searchResult.hits}">
@@ -109,7 +117,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</c:when>
 	<c:otherwise>
 		<p>
-		<spring:message code="noDocumentsFound"/>
+		<spring:message code="noDocumentsFoundForSearchTermsX" arguments="${searchText}" argumentSeparator="__DUMMY__"/>
 		</p>
 	</c:otherwise>
 </c:choose>

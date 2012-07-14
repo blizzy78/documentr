@@ -215,6 +215,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<artifactId>lucene-queryparser</artifactId>
 			<version>4.0.0-ALPHA</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-suggest</artifactId>
+			<version>4.0.0-ALPHA</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
