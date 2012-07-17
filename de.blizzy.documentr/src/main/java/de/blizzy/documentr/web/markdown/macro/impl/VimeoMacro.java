@@ -29,7 +29,7 @@ public class VimeoMacro extends AbstractMacro {
 
 	@Override
 	public String getHtml() {
-		String videoId = getParameters();
+		String videoId = getParameters().trim();
 		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);
 		}
