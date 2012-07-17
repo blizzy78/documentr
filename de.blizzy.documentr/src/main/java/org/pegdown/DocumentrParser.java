@@ -122,7 +122,7 @@ public class DocumentrParser extends Parser {
 	public Rule MacroParameters(StringVar params, boolean allowSlash) {
 		return Sequence(
 				OneOrMore(
-						TestNot(allowSlash ? Ch('}') : AnyOf("/}")), //$NON-NLS-1$
+						TestNot(allowSlash ? Ch('}') : "/}"), //$NON-NLS-1$
 						ANY),
 				params.isSet() && match().equals(params.get()) ||
 					params.isNotSet() && params.set(match()));
