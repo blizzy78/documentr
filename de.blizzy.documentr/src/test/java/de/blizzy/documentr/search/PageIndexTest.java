@@ -98,6 +98,31 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 	@Test
 	@SuppressWarnings("boxing")
+	public void findPagesAndSuggestion() throws ParseException, IOException {
+		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
+			.thenReturn("html"); //$NON-NLS-1$
+		
+		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
+		
+		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
+			.thenReturn(true);
+		
+		// wait for page to get indexed
+		while (pageIndex.getNumDocuments() == 0) {
+			sleep(10);
+		}
+		
+		SearchResult result = pageIndex.findPages("htlm", 1, authentication); //$NON-NLS-1$
+		SearchTextSuggestion suggestion = result.getSuggestion();
+		assertNotNull(suggestion);
+		assertEquals(1, suggestion.getTotalHits());
+		assertEquals("html", suggestion.getSearchText()); //$NON-NLS-1$
+		assertEquals("<strong><em>html</em></strong>", suggestion.getSearchTextHtml()); //$NON-NLS-1$
+	}
+	
+	@Test
+	@SuppressWarnings("boxing")
 	public void deletePages() throws IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
