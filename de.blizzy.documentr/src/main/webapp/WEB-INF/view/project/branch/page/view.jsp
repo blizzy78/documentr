@@ -273,6 +273,21 @@ function hookupInlineEditorToolbar() {
 		});
 }
 
+function restoreOldVersion() {
+	var previousCommit = $('#changes-dialog').data('previousCommit');
+	$.ajax({
+		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			version: previousCommit
+		},
+		success: function(result) {
+			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>?_=' + new Date().getTime();
+		}
+	});
+}
+
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">
@@ -283,9 +298,16 @@ function showChangesDialog() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var previous = documentr.isSomething(result.previous) ? result.previous : '';
-			var html = documentr.diffMarkdownAndGetHtml(previous, result.latest);
+			var previous = documentr.isSomething(result.previous) ? result[result.previous] : '';
+			var html = documentr.diffMarkdownAndGetHtml(previous, result[result.latest]);
 			$('#changes-dialog-body').html(html);
+			if (documentr.isSomething(result.previous)) {
+				$('#changes-dialog').data('previousCommit', result.previous);
+				$('#restore-old-commit-button').show();
+			} else {
+				$('#changes-dialog').data('previousCommit', null);
+				$('#restore-old-commit-button').hide();
+			}
 			$('#changes-dialog').showModal();
 		}
 	});
@@ -503,7 +525,10 @@ $(function() {
 		</div>
 		<div class="modal-body" id="changes-dialog-body"></div>
 		<div class="modal-footer">
-			<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn"><spring:message code="button.close"/></a>
+			<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+				<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
+			</sec:authorize>
+			<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn btn-primary"><spring:message code="button.close"/></a>
 		</div>
 	</div>
 </sec:authorize>

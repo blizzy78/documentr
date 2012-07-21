@@ -70,10 +70,30 @@ function showChangesDialog() {
 		success: function(result) {
 			var html = documentr.diffMarkdownAndGetHtml(result[version1], result[version2]);
 			$('#changes-dialog-body').html(html);
-			$('#changes-dialog').showModal();
+			$('#changes-dialog').data('previousCommit', version1)
+				.showModal();
 		}
 	});
 }
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+
+function restoreOldVersion() {
+	var previousCommit = $('#changes-dialog').data('previousCommit');
+	$.ajax({
+		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			version: previousCommit
+		},
+		success: function(result) {
+			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>';
+		}
+	});
+}
+
+</sec:authorize>
 
 $(function() {
 	updateButtons();
@@ -151,7 +171,10 @@ $(function() {
 	</div>
 	<div class="modal-body" id="changes-dialog-body"></div>
 	<div class="modal-footer">
-		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn"><spring:message code="button.close"/></a>
+		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+			<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
+		</sec:authorize>
+		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn btn-primary"><spring:message code="button.close"/></a>
 	</div>
 </div>
 

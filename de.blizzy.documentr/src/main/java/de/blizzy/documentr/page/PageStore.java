@@ -753,32 +753,39 @@ class PageStore implements IPageStore {
 		Assert.hasLength(path);
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, path, false);
-		Assert.notNull(versions);
-		Assert.isTrue(!versions.isEmpty());
+		Assert.notEmpty(versions);
 
 		Map<String, String> result = Maps.newHashMap();
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			String filePath = PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX; //$NON-NLS-1$
+			
+			Set<String> realVersions = Sets.newHashSet();
 			for (String version : versions) {
-				String markdown = null;
 				if (version.equals(VERSION_LATEST)) {
-					File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-					File file = toFile(workingDir, filePath);
-					markdown = FileUtils.readFileToString(file, DocumentrConstants.ENCODING);
+					RevCommit latestCommit = CommitUtils.getLastCommit(repo.r(), filePath);
+					String commitId = latestCommit.getName();
+					result.put(VERSION_LATEST, commitId);
+					realVersions.add(commitId);
 				} else if (version.equals(VERSION_PREVIOUS)) {
 					RevCommit latestCommit = CommitUtils.getLastCommit(repo.r(), filePath);
 					if (latestCommit.getParentCount() > 0) {
 						RevCommit parentCommit = latestCommit.getParent(0);
 						RevCommit previousCommit = CommitUtils.getLastCommit(repo.r(), parentCommit.getName(), filePath);
 						if (previousCommit != null) {
-							markdown = BlobUtils.getContent(repo.r(), previousCommit, filePath);
+							String commitId = previousCommit.getName();
+							result.put(VERSION_PREVIOUS, commitId);
+							realVersions.add(commitId);
 						}
 					}
 				} else {
-					markdown = BlobUtils.getContent(repo.r(), version, filePath);
+					realVersions.add(version);
 				}
+			}
+			
+			for (String version : realVersions) {
+				String markdown = BlobUtils.getContent(repo.r(), version, filePath);
 				if (markdown != null) {
 					result.put(version, markdown);
 				}
@@ -805,9 +812,7 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
 			CommitFinder finder = new CommitFinder(repo.r());
-			TreeFilter pathFilter = PathFilterUtils.or(
-					PAGES_DIR_NAME + "/" + path + META_SUFFIX, //$NON-NLS-1$
-					PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			TreeFilter pathFilter = PathFilterUtils.or(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
 			finder.setFilter(pathFilter);
 			CommitListFilter commits = new CommitListFilter();
 			finder.setMatcher(new AndCommitFilter(new CommitLimitFilter(50), commits));
@@ -880,6 +885,45 @@ class PageStore implements IPageStore {
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+	
+	@Override
+	public void restorePageVersion(String projectName, String branchName, String path, String version, User user)
+			throws IOException {
+		
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+		Assert.hasLength(version);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			String text = BlobUtils.getContent(repo.r(), version, PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			File file = toFile(pagesDir, path + PAGE_SUFFIX);
+			FileUtils.writeStringToFile(file, text, DocumentrConstants.ENCODING);
+			
+			Git git = Git.wrap(repo.r());
+			git.add()
+				.addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
+				.call();
+			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(PAGES_DIR_NAME + "/" + path) //$NON-NLS-1$
+				.call();
+			git.push().call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+
+		Page page = getPage(projectName, branchName, path, true);
+		pageIndex.addPage(projectName, branchName, path, page);
 	}
 	
 	@Override

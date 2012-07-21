@@ -349,11 +349,12 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		RevCommit commit2 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
 		Page page3 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home", page3, USER); //$NON-NLS-1$
+		RevCommit commit3 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
 		
 		Map<String, String> result = pageStore.getMarkdown(PROJECT, BRANCH_1, "home", //$NON-NLS-1$
 				Sets.newHashSet("latest", "previous", commit2.getName(), commit1.getName())); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals(((PageTextData) page3.getData()).getText(), result.get("latest")); //$NON-NLS-1$
-		assertEquals(((PageTextData) page2.getData()).getText(), result.get("previous")); //$NON-NLS-1$
+		assertEquals(commit3.getName(), result.get("latest")); //$NON-NLS-1$
+		assertEquals(commit2.getName(), result.get("previous")); //$NON-NLS-1$
 		assertEquals(((PageTextData) page2.getData()).getText(), result.get(commit2.getName()));
 		assertEquals(((PageTextData) page1.getData()).getText(), result.get(commit1.getName()));
 	}
@@ -388,8 +389,26 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home/page", page, USER); //$NON-NLS-1$
+		
 		String role = pageStore.getViewRestrictionRole(PROJECT, BRANCH_1, "home/page"); //$NON-NLS-1$
 		assertEquals(page.getViewRestrictionRole(), role);
+	}
+	
+	@Test
+	public void restorePageVersion() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("old", "old"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, USER);
+		page = Page.fromText("new", "new"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, USER);
+		List<PageVersion> versions = pageStore.listPageVersions(PROJECT, BRANCH_1, PAGE);
+		
+		pageStore.restorePageVersion(PROJECT, BRANCH_1, PAGE, versions.get(1).getCommitName(), USER);
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, PAGE, true);
+		assertEquals("old", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
+		versions = pageStore.listPageVersions(PROJECT, BRANCH_1, PAGE);
+		assertEquals(3, versions.size());
 	}
 	
 	private void assertPageVersion(RevCommit commit, PageVersion version) {

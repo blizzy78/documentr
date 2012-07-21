@@ -81,4 +81,8 @@ public interface IPageStore {
 
 	@Cacheable(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
 	String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException;
+	
+	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	void restorePageVersion(String projectName, String branchName, String path, String version, User user)
+			throws IOException;
 }

@@ -446,4 +446,11 @@ public class PageControllerTest {
 		verify(model).addAttribute("branchName", BRANCH); //$NON-NLS-1$
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
 	}
+	
+	@Test
+	public void restoreVersion() throws IOException {
+		pageController.restoreVersion(PROJECT, BRANCH, PAGE_PATH_URL, "version", authenticatedAuthentication); //$NON-NLS-1$
+		
+		verify(pageStore).restorePageVersion(PROJECT, BRANCH, PAGE_PATH, "version", USER); //$NON-NLS-1$
+	}
 }
