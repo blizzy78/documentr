@@ -106,7 +106,7 @@ public class AttachmentControllerTest {
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		when(request.getSession()).thenReturn(session);
 		
-		getAttachment(request);
+		getAttachment(false, request);
 	}
 
 	@Test
@@ -120,10 +120,23 @@ public class AttachmentControllerTest {
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
 		
-		getAttachment(request);
+		getAttachment(false, request);
 	}
 	
-	private void getAttachment(HttpServletRequest request) throws IOException {
+	@Test
+	@SuppressWarnings("boxing")
+	public void getAttachmentAsDownload() throws IOException {
+		HttpSession session = mock(HttpSession.class);
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
+
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getDateHeader(anyString())).thenReturn(-1L);
+		when(request.getSession()).thenReturn(session);
+		
+		getAttachment(true, request);
+	}
+
+	private void getAttachment(boolean download, HttpServletRequest request) throws IOException {
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new Date(), 123)); //$NON-NLS-1$
 
@@ -134,11 +147,15 @@ public class AttachmentControllerTest {
 		
 		SecurityContextHolder.setContext(createSecurityContext(authentication));
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
-				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", download, request); //$NON-NLS-1$
 		SecurityContextHolder.clearContext();
 		assertTrue(Arrays.equals(data, result.getBody()));
 		assertEquals(MediaType.parseMediaType(contentType), result.getHeaders().getContentType());
 		assertEquals(HttpStatus.OK, result.getStatusCode());
+		if (download) {
+			assertEquals("attachment; filename=\"test.png\"", //$NON-NLS-1$
+					result.getHeaders().getFirst("Content-Disposition")); //$NON-NLS-1$
+		}
 	}
 
 	@Test
@@ -151,7 +168,7 @@ public class AttachmentControllerTest {
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, PAGE_PATH + "/test.png")); //$NON-NLS-1$
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
-				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", false, request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
 	}
 
@@ -173,7 +190,7 @@ public class AttachmentControllerTest {
 		TestPageUtil.clearProjectEditTimes();
 		
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
-				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", request); //$NON-NLS-1$
+				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", false, request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_MODIFIED, result.getStatusCode());
 	}
 	

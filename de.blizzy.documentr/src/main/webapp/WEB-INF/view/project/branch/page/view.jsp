@@ -371,7 +371,7 @@ $(function() {
 						<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
 					</dt:dropdownEntry>
 				</sec:authorize>
-				<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+				<sec:authorize access="isAuthenticated()">
 					<dt:dropdownEntry>
 						<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
 						<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>

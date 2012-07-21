@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'VIEW')">
+<sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')">
 
 <dt:headerJS>
 
@@ -78,22 +78,23 @@ function showDeleteDialog(name) {
 					<th><spring:message code="title.fileName"/></th>
 					<th><spring:message code="title.size"/></th>
 					<th colspan="2"><spring:message code="title.lastEdit"/></th>
-					<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
-						<th><spring:message code="title.administration"/></th>
-					</sec:authorize>
+					<th><spring:message code="title.actions"/></th>
 				</tr>
 			</thead>
 			<tbody>
 				<c:forEach var="attachment" items="${attachments}">
 					<c:set var="metadata" value="${d:getAttachmentMetadata(projectName, branchName, pagePath, attachment)}"/>
 					<tr>
-						<td><c:out value="${attachment}"/></td>
+						<td><a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/${attachment}"/>"><c:out value="${attachment}"/></a></td>
 						<td><c:out value="${d:formatSize(metadata.size)}"/></td>
 						<td><c:out value="${metadata.lastEditedBy}"/></td>
 						<td><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></td>
-						<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
-							<td><a href="javascript:void(showDeleteDialog('${attachment}'));" class="btn btn-mini"><spring:message code="button.delete"/>...</a>
-						</sec:authorize>
+						<td>
+							<a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/${attachment}"><c:param name="download" value="true"/></c:url>" class="btn btn-mini" rel="nofollow"><spring:message code="button.download"/></a>
+							<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+								<a href="javascript:void(showDeleteDialog('${attachment}'));" class="btn btn-mini"><spring:message code="button.delete"/>...</a>
+							</sec:authorize>
+						</td>
 					</tr>
 				</c:forEach>
 			</tbody>

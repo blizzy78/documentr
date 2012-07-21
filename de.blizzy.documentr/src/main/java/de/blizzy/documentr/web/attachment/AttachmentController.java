@@ -64,7 +64,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
+	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
 	public String getAttachments(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 
@@ -81,7 +81,8 @@ public class AttachmentController {
 			"{name:.*}", method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String pagePath, @PathVariable String name, HttpServletRequest request) throws IOException {
+			@PathVariable String pagePath, @PathVariable String name, @RequestParam(required=false) boolean download,
+			HttpServletRequest request) throws IOException {
 		
 		try {
 			pagePath = Util.toRealPagePath(pagePath);
@@ -90,20 +91,26 @@ public class AttachmentController {
 			
 			long lastEdited = metadata.getLastEdited().getTime();
 			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
-			long projectEditTime = PageUtil.getProjectEditTime(projectName);
 			long lastModified = Math.max(lastEdited, authenticationCreated);
-			if (projectEditTime >= 0) {
-				lastModified = Math.max(lastModified, projectEditTime);
-			}
-
-			long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
-			if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
-				return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
+			if (!download) {
+				long projectEditTime = PageUtil.getProjectEditTime(projectName);
+				if (projectEditTime >= 0) {
+					lastModified = Math.max(lastModified, projectEditTime);
+				}
+	
+				long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
+				if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
+					return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
+				}
 			}
 
 			headers.setLastModified(lastModified);
 			headers.setExpires(0);
 			headers.setCacheControl("must-revalidate, private"); //$NON-NLS-1$
+			if (download) {
+				headers.set("Content-Disposition", //$NON-NLS-1$
+						"attachment; filename=\"" + name.replace('"', '_') + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 			Page attachment = pageStore.getAttachment(projectName, branchName, pagePath, name);
 			headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
