@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.impl.AlertMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.GoogleDocsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
@@ -42,6 +43,7 @@ public class MacroFactory {
 	private static final Map<String, MacroDescriptor> MACROS = new HashMap<String, MacroDescriptor>();
 	
 	static {
+		put(AlertMacro.DESCRIPTOR);
 		put(GoogleDocsMacro.DESCRIPTOR);
 		put(LabelMacro.DESCRIPTOR);
 		put(NeighborsMacro.DESCRIPTOR);
