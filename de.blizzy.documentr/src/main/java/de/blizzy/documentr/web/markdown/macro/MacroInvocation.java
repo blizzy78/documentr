@@ -21,7 +21,8 @@ public class MacroInvocation {
 	private IMacro macro;
 	private String macroName;
 	private String params;
-	private String marker;
+	private String startMarker;
+	private String endMarker;
 
 	public MacroInvocation(IMacro macro, String macroName, String params) {
 		this.macro = macro;
@@ -29,7 +30,9 @@ public class MacroInvocation {
 		this.params = params;
 		
 		long random = (long) (Math.random() * Long.MAX_VALUE);
-		marker = "__" + macro.getClass().getName() + "_" + String.valueOf(random) + "__"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String markerLabel = macroName + "_" + String.valueOf(random); //$NON-NLS-1$
+		startMarker = "__" + markerLabel + "__"; //$NON-NLS-1$ //$NON-NLS-2$
+		endMarker = "__/" + markerLabel + "__"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public IMacro getMacro() {
@@ -44,7 +47,11 @@ public class MacroInvocation {
 		return params;
 	}
 	
-	public String getMarker() {
-		return marker;
+	public String getStartMarker() {
+		return startMarker;
+	}
+
+	public String getEndMarker() {
+		return endMarker;
 	}
 }

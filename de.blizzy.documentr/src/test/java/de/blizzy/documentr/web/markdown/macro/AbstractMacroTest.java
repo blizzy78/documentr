@@ -29,7 +29,7 @@ import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 public class AbstractMacroTest {
 	private static final class TestMacro extends AbstractMacro {
 		@Override
-		public String getHtml() {
+		public String getHtml(String body) {
 			return null;
 		}
 	}

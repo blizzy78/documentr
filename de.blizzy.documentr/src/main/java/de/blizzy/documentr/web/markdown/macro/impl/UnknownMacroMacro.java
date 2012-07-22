@@ -27,7 +27,7 @@ public class UnknownMacroMacro extends AbstractMacro {
 	}
 
 	@Override
-	public String getHtml() {
+	public String getHtml(String body) {
 		return "<span class=\"unknown-macro\">!" + macroName + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

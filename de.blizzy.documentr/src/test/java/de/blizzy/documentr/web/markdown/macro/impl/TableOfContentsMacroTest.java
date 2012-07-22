@@ -49,7 +49,7 @@ public class TableOfContentsMacroTest {
 				"    - [[#bar]]\n" + //$NON-NLS-1$
 				"        - [[#baz]]\n" + //$NON-NLS-1$
 				"- [[#qux]]\n\n", //$NON-NLS-1$
-				macro.getMarkdown());
+				macro.getMarkdown(null));
 	}
 	
 	@Test
@@ -61,6 +61,6 @@ public class TableOfContentsMacroTest {
 		TableOfContentsMacro macro = new TableOfContentsMacro();
 		macro.setHtmlSerializerContext(context);
 		
-		assertNull(macro.getMarkdown());
+		assertNull(macro.getMarkdown(null));
 	}
 }

@@ -28,7 +28,7 @@ public class VimeoMacro extends AbstractMacro {
 			"{{vimeo [VIDEO]/}}"); //$NON-NLS-1$
 
 	@Override
-	public String getHtml() {
+	public String getHtml(String body) {
 		String videoId = getParameters().trim();
 		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);

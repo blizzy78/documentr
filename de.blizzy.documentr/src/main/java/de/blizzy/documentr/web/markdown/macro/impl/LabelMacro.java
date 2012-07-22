@@ -28,7 +28,7 @@ public class LabelMacro extends AbstractMacro {
 			"{{label [TYPE] TEXT/}}"); //$NON-NLS-1$
 	
 	@Override
-	public String getHtml() {
+	public String getHtml(String body) {
 		String type = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
 		String text = StringUtils.substringAfter(getParameters(), " ").trim(); //$NON-NLS-1$
 		return "<span class=\"label label-" + type + "\">" + text + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -163,7 +163,7 @@ public class NeighborsMacroTest {
 						"</li>" +
 					"</ul>" +
 				"</div>";
-		assertEquals(html, macro.getHtml());
+		assertEquals(html, macro.getHtml(null));
 	}
 
 	private void setupPages(String... pagePaths) throws IOException {

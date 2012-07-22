@@ -47,7 +47,7 @@ public class NeighborsMacro extends AbstractMacro {
 	private static final String CLEANUP_REPLACE_WITH = "$1$2"; //$NON-NLS-1$
 
 	@Override
-	public String getHtml() {
+	public String getHtml(String body) {
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		if (context.getPagePath() != null) {
 			try {

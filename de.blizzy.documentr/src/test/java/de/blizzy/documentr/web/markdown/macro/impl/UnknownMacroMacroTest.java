@@ -21,13 +21,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
-
 public class UnknownMacroMacroTest {
 	@Test
 	public void getHtml() {
 		UnknownMacroMacro macro = new UnknownMacroMacro("nonexistent"); //$NON-NLS-1$
-		String html = macro.getHtml();
+		String html = macro.getHtml(null);
 		assertEquals("<span class=\"unknown-macro\">!nonexistent!</span>", html); //$NON-NLS-1$
 	}
 }

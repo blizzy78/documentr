@@ -46,9 +46,16 @@ public class MacroInvocationTest {
 	}
 	
 	@Test
-	public void getMarker() {
+	public void getStartMarker() {
 		IMacro macro = mock(IMacro.class);
 		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertTrue(StringUtils.isNotBlank(invocation.getMarker()));
+		assertTrue(StringUtils.isNotBlank(invocation.getStartMarker()));
+	}
+	
+	@Test
+	public void getEndMarker() {
+		IMacro macro = mock(IMacro.class);
+		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(StringUtils.isNotBlank(invocation.getEndMarker()));
 	}
 }

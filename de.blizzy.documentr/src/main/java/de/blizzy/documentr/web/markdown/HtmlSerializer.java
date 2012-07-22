@@ -158,7 +158,9 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			String macroName = macroNode.getMacroName();
 			String params = macroNode.getParams();
 			MacroInvocation invocation = context.addMacroInvocation(macroName, params);
-			printer.print(invocation.getMarker());
+			printer.print(invocation.getStartMarker());
+			visitChildren(macroNode);
+			printer.print(invocation.getEndMarker());
 		} else {
 			super.visit(node);
 		}

@@ -32,7 +32,7 @@ public class TableOfContentsMacro extends AbstractMarkdownMacro {
 			"{{toc/}}"); //$NON-NLS-1$
 
 	@Override
-	public String getMarkdown() {
+	public String getMarkdown(String body) {
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		List<Header> headers = context.getHeaders();
 		if (!headers.isEmpty()) {

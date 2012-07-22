@@ -23,8 +23,8 @@ import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 public abstract class AbstractMarkdownMacro extends AbstractMacro {
 	@Override
-	public final String getHtml() {
-		String markdown = getMarkdown();
+	public final String getHtml(String body) {
+		String markdown = getMarkdown(body);
 		if (StringUtils.isNotBlank(markdown)) {
 			HtmlSerializerContext context = getHtmlSerializerContext();
 			return context.markdownToHTML(markdown);
@@ -32,5 +32,5 @@ public abstract class AbstractMarkdownMacro extends AbstractMacro {
 		return null;
 	}
 	
-	protected abstract String getMarkdown();
+	protected abstract String getMarkdown(String body);
 }

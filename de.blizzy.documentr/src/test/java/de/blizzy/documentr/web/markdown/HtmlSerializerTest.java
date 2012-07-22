@@ -136,7 +136,7 @@ public class HtmlSerializerTest {
 		
 		MacroNode node = new MacroNode("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals(invocation.getMarker(), html);
+		assertEquals(invocation.getStartMarker() + invocation.getEndMarker(), html);
 	}
 	
 	private RootNode root(Node child) {

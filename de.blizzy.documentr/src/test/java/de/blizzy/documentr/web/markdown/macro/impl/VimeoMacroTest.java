@@ -28,11 +28,11 @@ public class VimeoMacroTest {
 		macro.setParameters("video123"); //$NON-NLS-1$
 		assertEquals("<iframe src=\"http://player.vimeo.com/video/video123\" width=\"500\" " + //$NON-NLS-1$
 				"height=\"281\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen " + //$NON-NLS-1$
-				"allowFullScreen></iframe>", macro.getHtml()); //$NON-NLS-1$
+				"allowFullScreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
 
 		macro.setParameters("http://vimeo.com/video123?foo=bar"); //$NON-NLS-1$
 		assertEquals("<iframe src=\"http://player.vimeo.com/video/video123\" width=\"500\" " + //$NON-NLS-1$
 				"height=\"281\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen " + //$NON-NLS-1$
-				"allowFullScreen></iframe>", macro.getHtml()); //$NON-NLS-1$
+				"allowFullScreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
 	}
 }

@@ -23,7 +23,7 @@ public interface IMacro {
 	void setParameters(String params);
 	void setHtmlSerializerContext(HtmlSerializerContext htmlSerializerContext);
 	void setMacroContext(IMacroContext macroContext);
-	String getHtml();
+	String getHtml(String body);
 	String cleanupHTML(String html);
 	boolean isCacheable();
 }

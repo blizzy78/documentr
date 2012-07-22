@@ -29,7 +29,7 @@ import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 public class AbstractMarkdownMacroTest {
 	private static final class TestMacro extends AbstractMarkdownMacro {
 		@Override
-		protected String getMarkdown() {
+		protected String getMarkdown(String body) {
 			return getParameters();
 		}
 	}
@@ -43,12 +43,12 @@ public class AbstractMarkdownMacroTest {
 		macro.setHtmlSerializerContext(context);
 		
 		macro.setParameters(null);
-		assertNull(macro.getHtml());
+		assertNull(macro.getHtml(null));
 
 		macro.setParameters(StringUtils.EMPTY);
-		assertNull(macro.getHtml());
+		assertNull(macro.getHtml(null));
 
 		macro.setParameters("foo"); //$NON-NLS-1$
-		assertEquals("markdown", macro.getHtml()); //$NON-NLS-1$
+		assertEquals("markdown", macro.getHtml(null)); //$NON-NLS-1$
 	}
 }

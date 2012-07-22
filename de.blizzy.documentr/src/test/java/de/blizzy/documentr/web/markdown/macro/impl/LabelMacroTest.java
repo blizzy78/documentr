@@ -26,6 +26,6 @@ public class LabelMacroTest {
 	public void getHtml() {
 		LabelMacro macro = new LabelMacro();
 		macro.setParameters("info label text"); //$NON-NLS-1$
-		assertEquals("<span class=\"label label-info\">label text</span>", macro.getHtml()); //$NON-NLS-1$
+		assertEquals("<span class=\"label label-info\">label text</span>", macro.getHtml(null)); //$NON-NLS-1$
 	}
 }

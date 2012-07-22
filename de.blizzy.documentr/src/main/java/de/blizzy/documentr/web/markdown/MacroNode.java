@@ -17,6 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.pegdown.ast.Node;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.Visitor;
 
@@ -25,7 +29,11 @@ public class MacroNode extends SuperNode {
 	private String params;
 
 	public MacroNode(String macroName, String params) {
-		super();
+		this(macroName, params, Collections.<Node>emptyList());
+	}
+	
+	public MacroNode(String macroName, String params, List<Node> children) {
+		super(children);
 		
 		this.macroName = macroName;
 		this.params = params;

@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Rule;
 import org.parboiled.annotations.Cached;
 import org.parboiled.common.ArrayBuilder;
-import org.parboiled.matchers.AnyOfMatcher;
 import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.StringVar;
 
@@ -39,7 +38,7 @@ public class DocumentrParser extends Parser {
 	public Rule NonLinkInline() {
 		return FirstOf(new ArrayBuilder<Rule>()
 				.add(
-						StandaloneMacro(),
+						BodyMacro(), StandaloneMacro(),
 						Str(), Endline(), UlOrStarLine(), Space(), StrongOrEmph(), Image(), Code(), InlineHtml(),
 						Entity(), EscapedChar())
 				.addNonNulls(ext(QUOTES) ? new Rule[] { SingleQuoted(), DoubleQuoted(), DoubleAngleQuoted() } : null)
@@ -47,64 +46,53 @@ public class DocumentrParser extends Parser {
 				.add(Symbol()).get());
 	}
 
+	@SuppressWarnings("boxing")
 	public Rule StandaloneMacro() {
 		StringVar macroName = new StringVar();
 		StringVar params = new StringVar();
-		return Sequence(
-				Test(StandaloneMacroOpen(macroName, params)),
-				NamedStandaloneMacro(macroName, params));
-	}
-	
-	@SuppressWarnings("boxing")
-	public Rule NamedStandaloneMacro(StringVar macroName, StringVar params) {
-		return Sequence(
-				StandaloneMacroOpen(macroName, params),
+		return NodeSequence(
+				"{{", //$NON-NLS-1$
+				MacroNameAndParameters(macroName, params, true),
 				push(new MacroNode(macroName.get(), params.get())),
 				"/}}"); //$NON-NLS-1$
 	}
 	
-	public Rule StandaloneMacroOpen(StringVar macroName, StringVar params) {
-		return Sequence(
+	@SuppressWarnings("boxing")
+	public Rule BodyMacro() {
+		StringVar macroName = new StringVar();
+		StringVar params = new StringVar();
+		StringBuilderVar inner = new StringBuilderVar();
+		return NodeSequence(
 				"{{", //$NON-NLS-1$
-				MacroNameAndParameters(macroName, params, false));
+				MacroNameAndParameters(macroName, params, false),
+				"}}", //$NON-NLS-1$
+				push(getContext().getCurrentIndex()),
+				BodyMacroBody(inner, macroName),
+				"{{/", //$NON-NLS-1$
+				MacroName(macroName),
+				"}}", //$NON-NLS-1$
+				push(new MacroNode(macroName.get(), params.get(),
+						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
-
-//	public Rule BodyMacro() {
-//		StringVar macroName = new StringVar();
-//		StringVar params = new StringVar();
-//		return Sequence(
-//				Test(BodyMacroOpen(macroName, params)),
-//				NamedBodyMacro(macroName, params));
-//	}
-//
-//	@SuppressWarnings("boxing")
-//	public Rule NamedBodyMacro(StringVar macroName, StringVar params) {
-//		return Sequence(
-//				BodyMacroOpen(macroName, params),
-//				push(new MacroNode(macroName.get(), params.get())),
-//				// FIXME: does not work
-//				ZeroOrMore(TestNot(BodyMacroClose()), Block(), addAsChild()),
-//				BodyMacroClose());
-//	}
-//
-//	public Rule BodyMacroOpen(StringVar macroName, StringVar params) {
-//		return Sequence(
-//				"{{", //$NON-NLS-1$
-//				MacroNameAndParameters(macroName, params, true),
-//				"}}"); //$NON-NLS-1$
-//	}
-//	
-//	public Rule BodyMacroClose() {
-//		return String("{{/}}"); //$NON-NLS-1$
-//	}
 	
-	public Rule MacroNameAndParameters(StringVar macroName, StringVar params, boolean allowSlashInParams) {
+	@SuppressWarnings("boxing")
+	public Rule BodyMacroBody(StringBuilderVar inner, StringVar macroName) {
+		return Sequence(
+				ZeroOrMore(BlankLine()),
+				ZeroOrMore(
+						TestNot(Sequence("{{/", MacroName(macroName), "}}")), //$NON-NLS-1$ //$NON-NLS-2$
+						ANY,
+						inner.append(match())),
+				ZeroOrMore(BlankLine()));
+	}
+	
+	public Rule MacroNameAndParameters(StringVar macroName, StringVar params, boolean standalone) {
 		return Sequence(
 				MacroName(macroName),
 				Optional(
 						Sequence(
 								Spacechar(),
-								MacroParameters(params, allowSlashInParams)
+								MacroParameters(params, standalone)
 						)
 				)
 		);
@@ -119,21 +107,13 @@ public class DocumentrParser extends Parser {
 	}
 	
 	@SuppressWarnings("boxing")
-	public Rule MacroParameters(StringVar params, boolean allowSlash) {
+	public Rule MacroParameters(StringVar params, boolean standalone) {
 		return Sequence(
 				OneOrMore(
-						TestNot(allowSlash ? Ch('}') : "/}"), //$NON-NLS-1$
+						TestNot(standalone ? "/}}" : "}}"), //$NON-NLS-1$ //$NON-NLS-2$
 						ANY),
 				params.isSet() && match().equals(params.get()) ||
 					params.isNotSet() && params.set(match()));
-	}
-
-	@Override
-	public Rule SpecialChar() {
-		AnyOfMatcher anyOf = (AnyOfMatcher) super.SpecialChar();
-		String chars = String.valueOf(anyOf.characters.getChars());
-		chars += "{}/"; //$NON-NLS-1$
-		return AnyOf(chars);
 	}
 
 	@Override

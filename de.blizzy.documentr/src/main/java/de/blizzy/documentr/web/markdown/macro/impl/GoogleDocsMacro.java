@@ -34,7 +34,7 @@ public class GoogleDocsMacro extends AbstractMacro {
 			"{{googledoc [DOCUMENT]/}}"); //$NON-NLS-1$
 
 	@Override
-	public String getHtml() {
+	public String getHtml(String body) {
 		String macroParams = getParameters();
 		String googleUrl = StringUtils.substringBefore(macroParams, " ").trim(); //$NON-NLS-1$
 		String width = StringUtils.substringAfter(macroParams, " ").trim(); //$NON-NLS-1$

@@ -58,7 +58,7 @@ public class MarkdownProcessorTest {
 		IMacro macro = mock(IMacro.class);
 		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
 		when(macro.isCacheable()).thenReturn(true);
-		when(macro.getHtml()).thenReturn(macroHtml);
+		when(macro.getHtml(anyString())).thenReturn(macroHtml);
 		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
 		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
 			@Override
@@ -91,8 +91,9 @@ public class MarkdownProcessorTest {
 				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String expectedHTML = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
-				MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + PARAMS + //$NON-NLS-1$
-				"/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				"__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + PARAMS + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"__" + MarkdownProcessor.NON_CACHEABLE_MACRO_BODY_MARKER + "__" + //$NON-NLS-1$ //$NON-NLS-2$
+				"__/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + "</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals(expectedHTML, removeTextRange(result));
 	}
 	
@@ -102,7 +103,7 @@ public class MarkdownProcessorTest {
 		IMacro macro = mock(IMacro.class);
 		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
 		when(macro.isCacheable()).thenReturn(false);
-		when(macro.getHtml()).thenReturn(macroHtml);
+		when(macro.getHtml(anyString())).thenReturn(macroHtml);
 		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
 		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
 			@Override
@@ -114,8 +115,8 @@ public class MarkdownProcessorTest {
 		
 		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 
-		String html = "<p>" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$
-				PARAMS + "/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+		String html = "<p>__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				PARAMS + "__/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.processNonCacheableMacros(
 				html, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String expectedHTML = cleanedMacroHtml;

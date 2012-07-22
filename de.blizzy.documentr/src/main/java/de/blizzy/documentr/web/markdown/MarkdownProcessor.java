@@ -37,7 +37,8 @@ import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 @Component
 public class MarkdownProcessor {
-	static final String NON_CACHEABLE_MACRO_MARKER = "__NON_CACHEABLE_MACRO__"; //$NON-NLS-1$
+	static final String NON_CACHEABLE_MACRO_MARKER = MarkdownProcessor.class.getName() + "_NON_CACHEABLE_MACRO"; //$NON-NLS-1$
+	static final String NON_CACHEABLE_MACRO_BODY_MARKER = MarkdownProcessor.class.getName() + "_NON_CACHEABLE_MACRO_BODY"; //$NON-NLS-1$
 
 	private static final String TEXT_RANGE_RE = "data-text-range=\"[0-9]+,[0-9]+\""; //$NON-NLS-1$
 	@SuppressWarnings("nls")
@@ -84,20 +85,27 @@ public class MarkdownProcessor {
 		String html = serializer.toHtml(rootNode);
 		
 		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
+		int nonCacheableMacroIdx = 1;
 		for (MacroInvocation invocation : macroInvocations) {
 			IMacro macro = invocation.getMacro();
-			String marker = invocation.getMarker();
+			String startMarker = invocation.getStartMarker();
+			String endMarker = invocation.getEndMarker();
+			String body = StringUtils.substringBetween(html, startMarker, endMarker);
 			if (macro.isCacheable()) {
-				String macroHtml = StringUtils.defaultString(macro.getHtml());
-				html = StringUtils.replace(html, marker, macroHtml);
+				String macroHtml = StringUtils.defaultString(macro.getHtml(body));
+				html = StringUtils.replace(html, startMarker + body + endMarker, macroHtml);
 			} else if (nonCacheableMacros) {
 				String macroName = invocation.getMacroName();
 				String params = invocation.getParameters();
-				html = StringUtils.replace(html, marker,
-						NON_CACHEABLE_MACRO_MARKER + macroName + " " + //$NON-NLS-1$
-						StringUtils.defaultString(params) + "/" + NON_CACHEABLE_MACRO_MARKER); //$NON-NLS-1$
+				String idx = String.valueOf(nonCacheableMacroIdx++);
+				html = StringUtils.replace(html, startMarker + body + endMarker,
+						"__" + NON_CACHEABLE_MACRO_MARKER + "_" + idx + "__" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						macroName + " " + StringUtils.defaultString(params) + //$NON-NLS-1$
+						"__" + NON_CACHEABLE_MACRO_BODY_MARKER + "__" + //$NON-NLS-1$ //$NON-NLS-2$
+						body +
+						"__/" + NON_CACHEABLE_MACRO_MARKER + "_" + idx + "__"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else {
-				html = StringUtils.replace(html, marker, StringUtils.EMPTY);
+				html = StringUtils.replace(html, startMarker + body + endMarker, StringUtils.EMPTY);
 			}
 		}
 		html = cleanupHTML(html, macroInvocations, true);
@@ -108,23 +116,43 @@ public class MarkdownProcessor {
 			Authentication authentication) {
 		
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
+		String startMarkerPrefix = "__" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
+		String endMarkerPrefix = "__/" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
+		String bodyMarker = "__" + NON_CACHEABLE_MACRO_BODY_MARKER + "__"; //$NON-NLS-1$ //$NON-NLS-2$
 		for (;;) {
-			int start = html.indexOf(NON_CACHEABLE_MACRO_MARKER) + NON_CACHEABLE_MACRO_MARKER.length();
+			int start = html.indexOf(startMarkerPrefix);
 			if (start < 0) {
 				break;
 			}
-			int end = html.indexOf("/" + NON_CACHEABLE_MACRO_MARKER, start); //$NON-NLS-1$
+			start += startMarkerPrefix.length();
+			
+			int end = html.indexOf("_", start); //$NON-NLS-1$
+			if (end < 0) {
+				break;
+			}
+			String idx = html.substring(start, end);
+
+			start = html.indexOf("__", start); //$NON-NLS-1$
+			if (start < 0) {
+				break;
+			}
+			start += 2;
+			
+			end = html.indexOf(endMarkerPrefix + idx + "__", start); //$NON-NLS-1$
 			if (end < 0) {
 				break;
 			}
 
-			String macroCall = html.substring(start, end);
+			String macroCallWithBody = html.substring(start, end);
+			String macroCall = StringUtils.substringBefore(macroCallWithBody, bodyMarker);
+			String body = StringUtils.substringAfter(macroCallWithBody, bodyMarker);
 			String macroName = StringUtils.substringBefore(macroCall, " "); //$NON-NLS-1$
 			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
 			IMacro macro = macroFactory.get(macroName, params, context);
 
-			html = StringUtils.replace(html, NON_CACHEABLE_MACRO_MARKER + macroCall + "/" + //$NON-NLS-1$
-					NON_CACHEABLE_MACRO_MARKER, macro.getHtml());
+			html = StringUtils.replace(html,
+					startMarkerPrefix + idx + "__" + macroCallWithBody + endMarkerPrefix + idx + "__", //$NON-NLS-1$ //$NON-NLS-2$
+					macro.getHtml(body));
 
 			MacroInvocation invocation = new MacroInvocation(macro, macroName, params);
 			html = cleanupHTML(html, Collections.singletonList(invocation), false);
