@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
@@ -28,6 +30,7 @@ public class ColorMacro extends AbstractMacro {
 	@Override
 	public String getHtml(String body) {
 		String color = getParameters();
-		return "<span style=\"color: " + color + ";\">" + body + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "<span style=\"color: " + StringEscapeUtils.escapeHtml4(color) + ";\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				body + "</span>"; //$NON-NLS-1$
 	}
 }

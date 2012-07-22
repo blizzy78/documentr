@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
@@ -31,7 +32,7 @@ public class PanelMacro extends AbstractMacro {
 	public String getHtml(String body) {
 		String width = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
 		boolean border = StringUtils.indexOf(getParameters(), " border") >= 0; //$NON-NLS-1$
-		return "<div class=\"span" + width + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
+		return "<div class=\"span" + StringEscapeUtils.escapeHtml4(width) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
 				(border ? "<div class=\"span12 panel-border\">" : StringUtils.EMPTY) + //$NON-NLS-1$
 				body +
 				(border ? "</div>" : StringUtils.EMPTY) + //$NON-NLS-1$

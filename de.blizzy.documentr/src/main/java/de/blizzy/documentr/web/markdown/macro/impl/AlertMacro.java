@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
@@ -37,7 +38,7 @@ public class AlertMacro extends AbstractMacro {
 		}
 		String typeClass = StringUtils.EMPTY;
 		if (StringUtils.isNotBlank(type)) {
-			typeClass = " alert-" + type; //$NON-NLS-1$
+			typeClass = " alert-" + StringEscapeUtils.escapeHtml4(type); //$NON-NLS-1$
 		}
 		return "<div class=\"alert" + typeClass + "\">" + body + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

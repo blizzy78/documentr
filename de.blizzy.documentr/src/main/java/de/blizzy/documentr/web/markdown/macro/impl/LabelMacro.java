@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
@@ -31,6 +32,7 @@ public class LabelMacro extends AbstractMacro {
 	public String getHtml(String body) {
 		String type = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
 		String text = StringUtils.substringAfter(getParameters(), " ").trim(); //$NON-NLS-1$
-		return "<span class=\"label label-" + type + "\">" + text + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "<span class=\"label label-" + StringEscapeUtils.escapeHtml4(type) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				StringEscapeUtils.escapeHtml4(text) + "</span>"; //$NON-NLS-1$
 	}
 }
