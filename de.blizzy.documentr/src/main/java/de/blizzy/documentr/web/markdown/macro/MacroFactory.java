@@ -30,9 +30,12 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.impl.AlertMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.ColorMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.GoogleDocsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.PanelMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.PanelRowMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.VimeoMacro;
@@ -44,9 +47,12 @@ public class MacroFactory {
 	
 	static {
 		put(AlertMacro.DESCRIPTOR);
+		put(ColorMacro.DESCRIPTOR);
 		put(GoogleDocsMacro.DESCRIPTOR);
 		put(LabelMacro.DESCRIPTOR);
 		put(NeighborsMacro.DESCRIPTOR);
+		put(PanelMacro.DESCRIPTOR);
+		put(PanelRowMacro.DESCRIPTOR);
 		put(TableOfContentsMacro.DESCRIPTOR);
 		put(VimeoMacro.DESCRIPTOR);
 		put(YoutubeMacro.DESCRIPTOR);

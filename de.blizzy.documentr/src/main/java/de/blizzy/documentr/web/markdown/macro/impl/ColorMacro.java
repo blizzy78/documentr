@@ -15,8 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+package de.blizzy.documentr.web.markdown.macro.impl;
 
-@import "macro-alert.less";
-@import "macro-googledocs.less";
-@import "macro-neighbors.less";
-@import "macro-panel.less";
+import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+
+public class ColorMacro extends AbstractMacro {
+	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("color", //$NON-NLS-1$
+			"macro.color.title", "macro.color.description", ColorMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
+			"{{color [COLOR]}}[CONTENTS]{{/color}}"); //$NON-NLS-1$
+
+	@Override
+	public String getHtml(String body) {
+		String color = getParameters();
+		return "<span style=\"color: " + color + ";\">" + body + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+}

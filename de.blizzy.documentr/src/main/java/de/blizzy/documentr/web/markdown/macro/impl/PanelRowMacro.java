@@ -15,8 +15,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+package de.blizzy.documentr.web.markdown.macro.impl;
 
-@import "macro-alert.less";
-@import "macro-googledocs.less";
-@import "macro-neighbors.less";
-@import "macro-panel.less";
+import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+
+public class PanelRowMacro extends AbstractMacro {
+	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("panelrow", //$NON-NLS-1$
+			"macro.panelrow.title", "macro.panelrow.description", PanelRowMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
+			"{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+
+	@Override
+	public String getHtml(String body) {
+		return "<div class=\"row-fluid\">" + body + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+}

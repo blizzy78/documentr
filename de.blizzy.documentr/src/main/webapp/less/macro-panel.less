@@ -16,7 +16,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "macro-alert.less";
-@import "macro-googledocs.less";
-@import "macro-neighbors.less";
-@import "macro-panel.less";
+.panel-border {
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 4px 4px 4px 4px;
+	padding: 8px 14px 8px 14px;
+	margin-bottom: 9px;
+	
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}

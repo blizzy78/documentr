@@ -26,7 +26,10 @@ import org.parboiled.Parboiled;
 import org.pegdown.DocumentrParser;
 import org.pegdown.Parser;
 import org.pegdown.PegDownProcessor;
+import org.pegdown.ast.Node;
+import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.RootNode;
+import org.pegdown.ast.SuperNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -79,6 +82,8 @@ public class MarkdownProcessor {
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
+		
+		fixParaNodes(rootNode);
 
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		HtmlSerializer serializer = new HtmlSerializer(context);
@@ -112,6 +117,23 @@ public class MarkdownProcessor {
 		return html;
 	}
 	
+	private void fixParaNodes(Node node) {
+		if (node instanceof MacroNode) {
+			List<Node> children = ((MacroNode) node).getChildren();
+			if ((children.size() == 1) && (children.get(0) instanceof ParaNode)) {
+				List<Node> newChildren = ((ParaNode) children.get(0)).getChildren();
+				children.clear();
+				children.addAll(newChildren);
+			}
+		}
+		
+		if (node instanceof SuperNode) {
+			for (Node child : ((SuperNode) node).getChildren()) {
+				fixParaNodes(child);
+			}
+		}
+	}
+
 	public String processNonCacheableMacros(String html, String projectName, String branchName, String path,
 			Authentication authentication) {
 		
