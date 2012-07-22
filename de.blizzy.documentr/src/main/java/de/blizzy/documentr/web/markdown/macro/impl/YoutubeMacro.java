@@ -24,8 +24,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class YoutubeMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("youtube", //$NON-NLS-1$
-			"macro.youtube.title", "macro.youtube.description", YoutubeMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{youtube [VIDEO]/}}"); //$NON-NLS-1$
+			YoutubeMacro.class, "{{youtube [VIDEO]/}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

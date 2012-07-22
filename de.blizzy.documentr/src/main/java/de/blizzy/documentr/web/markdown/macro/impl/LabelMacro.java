@@ -25,8 +25,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class LabelMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("label", //$NON-NLS-1$
-			"macro.label.title", "macro.label.description", LabelMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{label [TYPE] TEXT/}}"); //$NON-NLS-1$
+			LabelMacro.class, "{{label [TYPE] TEXT/}}"); //$NON-NLS-1$
 	
 	@Override
 	public String getHtml(String body) {

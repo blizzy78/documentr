@@ -24,8 +24,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class ColorMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("color", //$NON-NLS-1$
-			"macro.color.title", "macro.color.description", ColorMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{color [COLOR]}}[CONTENTS]{{/color}}"); //$NON-NLS-1$
+			ColorMacro.class, "{{color [COLOR]}}[CONTENTS]{{/color}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

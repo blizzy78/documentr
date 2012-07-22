@@ -24,6 +24,11 @@ public class MacroDescriptor {
 	private Class<? extends IMacro> macroClass;
 	private String insertText;
 
+	public MacroDescriptor(String name, Class<? extends IMacro> macroClass, String insertText) {
+		this(name, "macro." + name + ".title", "macro." + name + ".description", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				macroClass, insertText);
+	}
+	
 	public MacroDescriptor(String name, String titleKey, String descriptionKey, Class<? extends IMacro> macroClass,
 			String insertText) {
 		

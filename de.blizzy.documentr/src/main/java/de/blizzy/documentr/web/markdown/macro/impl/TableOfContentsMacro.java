@@ -28,8 +28,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class TableOfContentsMacro extends AbstractMarkdownMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("toc", //$NON-NLS-1$
-			"macro.toc.title", "macro.toc.description", TableOfContentsMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{toc/}}"); //$NON-NLS-1$
+			TableOfContentsMacro.class, "{{toc/}}"); //$NON-NLS-1$
 
 	@Override
 	public String getMarkdown(String body) {

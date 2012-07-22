@@ -30,8 +30,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class GoogleDocsMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("googledocs", //$NON-NLS-1$
-			"macro.googledocs.title", "macro.googledocs.description", GoogleDocsMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{googledoc [DOCUMENT]/}}"); //$NON-NLS-1$
+			GoogleDocsMacro.class, "{{googledoc [DOCUMENT]/}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

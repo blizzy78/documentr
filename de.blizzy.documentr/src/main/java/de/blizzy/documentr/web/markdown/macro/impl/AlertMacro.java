@@ -25,8 +25,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class AlertMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("alert", //$NON-NLS-1$
-			"macro.alert.title", "macro.alert.description", AlertMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{alert TYPE}}[TEXT]{{/alert}}"); //$NON-NLS-1$
+			AlertMacro.class, "{{alert TYPE}}[TEXT]{{/alert}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

@@ -22,8 +22,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class PanelRowMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("panelrow", //$NON-NLS-1$
-			"macro.panelrow.title", "macro.panelrow.description", PanelRowMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+			PanelRowMacro.class, "{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

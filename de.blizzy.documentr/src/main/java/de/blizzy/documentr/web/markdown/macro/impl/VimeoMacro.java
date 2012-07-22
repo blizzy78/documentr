@@ -24,8 +24,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class VimeoMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("vimeo", //$NON-NLS-1$
-			"macro.vimeo.title", "macro.vimeo.description", VimeoMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{vimeo [VIDEO]/}}"); //$NON-NLS-1$
+			VimeoMacro.class, "{{vimeo [VIDEO]/}}"); //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {

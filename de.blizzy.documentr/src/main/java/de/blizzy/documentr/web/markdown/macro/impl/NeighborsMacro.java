@@ -34,8 +34,7 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
 public class NeighborsMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("neighbors", //$NON-NLS-1$
-			"macro.neighbors.title", "macro.neighbors.description", NeighborsMacro.class, //$NON-NLS-1$ //$NON-NLS-2$
-			"{{neighbors/}}"); //$NON-NLS-1$
+			NeighborsMacro.class, "{{neighbors/}}"); //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
 	private static final Pattern CLEANUP_RE = Pattern.compile(
