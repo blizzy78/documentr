@@ -185,6 +185,13 @@ function showMarkdownHelp() {
 }
 
 function openInsertLinkDialog() {
+	var textEl = $('#text');
+	var start = textEl[0].selectionStart;
+	var end = textEl[0].selectionEnd;
+	var text = textEl.val();
+	var linkText = text.substring(start, end);
+	$('#insert-link-linktext').val(linkText);
+
 	function showDialog() {
 		$('#insert-link-dialog').showModal();
 	}
@@ -222,15 +229,15 @@ function openInsertLinkDialog() {
 function insertLink() {
 	$('#insert-link-dialog').hideModal();
 	var path = $('#insert-link-dialog').data('linkedPagePath');
+	var linkText = $('#insert-link-linktext').val();
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	var linkText = text.substring(start, end);
 	var link = '<c:url value="/page/"/>' + path;
+	var text = textEl.val();
 	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
 	start = start + link.length + 3;
-	end = end + link.length + 3;
+	end = start + linkText.length;
 	textEl.val(text);
 	textEl[0].setSelectionRange(start, end);
 	textEl.focus();
@@ -337,6 +344,12 @@ function insertLink() {
 					<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
 					<div class="controls">
 						<div id="linked-page-tree"></div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label"><spring:message code="label.linkText"/>:</label>
+					<div class="controls">
+						<input type="text" id="insert-link-linktext"/>
 					</div>
 				</div>
 			</fieldset>
