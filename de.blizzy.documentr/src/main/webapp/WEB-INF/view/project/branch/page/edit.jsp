@@ -184,6 +184,58 @@ function showMarkdownHelp() {
 		'width=600, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
 }
 
+function openInsertLinkDialog() {
+	function showDialog() {
+		$('#insert-link-dialog').showModal();
+	}
+
+	var treeEl = $('#linked-page-tree');
+	if (treeEl.children().length === 0) {
+		documentr.createPageTree(treeEl, {
+				start: {
+					type: 'application'
+				},
+				checkBranchPermissions: 'VIEW'
+			})
+			.bind('loaded.jstree', function() {
+				showDialog();
+			})
+			.bind('select_node.jstree', function(event, data) {
+				var node = data.rslt.obj;
+				var button = $('#insert-link-button');
+				$('#insert-link-dialog').data('linkedPagePath',
+					node.data('projectName') + '/' + node.data('branchName') + '/' +
+					node.data('path').replace(/\//g, ','));
+				button.setButtonDisabled(node.data('type') !== 'page');
+			})
+			.bind('deselect_node.jstree', function() {
+				var button = $('#insert-link-button');
+				button.setButtonDisabled(true);
+			});
+
+		$('#insert-link-button').setButtonDisabled(true);
+	} else {
+		showDialog();
+	}
+}
+
+function insertLink() {
+	$('#insert-link-dialog').hideModal();
+	var path = $('#insert-link-dialog').data('linkedPagePath');
+	var textEl = $('#text');
+	var start = textEl[0].selectionStart;
+	var end = textEl[0].selectionEnd;
+	var text = textEl.val();
+	var linkText = text.substring(start, end);
+	var link = '<c:url value="/page/"/>' + path;
+	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
+	start = start + link.length + 3;
+	end = end + link.length + 3;
+	textEl.val(text);
+	textEl[0].setSelectionRange(start, end);
+	textEl.focus();
+}
+
 </dt:headerJS>
 
 <dt:breadcrumbs>
@@ -237,6 +289,9 @@ function showMarkdownHelp() {
 						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
 					</div>
 					<div class="btn-group">
+						<a href="javascript:openInsertLinkDialog();" class="btn" title="<spring:message code="button.insertLink"/>"><i class="icon-share-alt"></i></a>
+					</div>
+					<div class="btn-group">
 						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><spring:message code="button.macros"/> <span class="caret"></span></a>
 						<ul class="dropdown-menu">
 							<c:set var="macros" value="${d:getMacros()}"/>
@@ -269,6 +324,29 @@ function showMarkdownHelp() {
 	</fieldset>
 </form:form>
 </p>
+
+<div class="modal" id="insert-link-dialog" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="$('#insert-link-dialog').modal('hide');">×</button>
+		<h3><spring:message code="title.insertLink"/></h3>
+	</div>
+	<div class="modal-body">
+		<form id="insertLinkForm" action="" method="POST" class="form-horizontal">
+			<fieldset>
+				<div class="control-group">
+					<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
+					<div class="controls">
+						<div id="linked-page-tree"></div>
+					</div>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a id="insert-link-button" href="javascript:void(insertLink());" class="btn btn-primary"><spring:message code="button.insertLink"/></a>
+		<a href="javascript:void($('#insert-link-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</div>
 
 </dt:page>
 
