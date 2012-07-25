@@ -159,14 +159,16 @@ public class PageTreeControllerTest {
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
 
-		List<PageTreeNode> result = pageTreeController.getPageChildren(
-				"project", "branch", "home/foo", Sets.newHashSet(Permission.EDIT_PAGE.name()), authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		Function<PageTreeNode, String> function = new Function<PageTreeNode, String>() {
+		List<AbstractTreeNode> result = pageTreeController.getPageChildren(
+				"project", "branch", "home/foo", Sets.newHashSet(Permission.EDIT_PAGE.name()), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				false, authentication);
+		Function<AbstractTreeNode, String> function = new Function<AbstractTreeNode, String>() {
 			@Override
-			public String apply(PageTreeNode node) {
-				return node.getProjectName() + "/" + node.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
-						Util.toURLPagePath(node.getPath()) + "/" + node.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
-						node.isHasBranchPermissions();
+			public String apply(AbstractTreeNode node) {
+				PageTreeNode n = (PageTreeNode) node;
+				return n.getProjectName() + "/" + n.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
+						Util.toURLPagePath(n.getPath()) + "/" + n.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
+						n.isHasBranchPermissions();
 			}
 		};
 		Set<String> pages = Sets.newHashSet(Lists.transform(result, function));
