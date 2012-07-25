@@ -184,6 +184,15 @@ function showMarkdownHelp() {
 		'width=700, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
 }
 
+function updateInsertLinkButton() {
+	var linkedPagePath = $('#insert-link-dialog').data('linkedPagePath');
+	var url = $('#insert-link-dialog input[name="url"]').val();
+	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
+	var valid = (internal && documentr.isSomething(linkedPagePath)) ||
+		(!internal && (url.length > 0));
+	$('#insert-link-button').setButtonDisabled(!valid);
+}
+
 function openInsertLinkDialog() {
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
@@ -191,8 +200,12 @@ function openInsertLinkDialog() {
 	var text = textEl.val();
 	var linkText = text.substring(start, end);
 	$('#insert-link-linktext').val(linkText);
+	$('#insert-link-dialog input[name="url"]').val('');
+	$('#insert-link-dialog input[name="externalLinkText"]').val(linkText);
+	$('#insert-link-dialog .nav-tabs a:first').tab('show');
 
 	function showDialog() {
+		updateInsertLinkButton();
 		$('#insert-link-dialog').showModal();
 	}
 
@@ -214,17 +227,16 @@ function openInsertLinkDialog() {
 					$('#insert-link-dialog').data('linkedPagePath',
 						node.data('projectName') + '/' + node.data('branchName') + '/' +
 						node.data('path').replace(/\//g, ','));
-					button.setButtonDisabled(false);
+					updateInsertLinkButton();
 				} else {
-					button.setButtonDisabled(true);
+					$('#insert-link-dialog').data('linkedPagePath', null);
+					updateInsertLinkButton();
 				}
 			})
 			.bind('deselect_node.jstree', function() {
-				var button = $('#insert-link-button');
-				button.setButtonDisabled(true);
+				$('#insert-link-dialog').data('linkedPagePath', null);
+				updateInsertLinkButton();
 			});
-
-		$('#insert-link-button').setButtonDisabled(true);
 	} else {
 		showDialog();
 	}
@@ -232,12 +244,14 @@ function openInsertLinkDialog() {
 
 function insertLink() {
 	$('#insert-link-dialog').hideModal();
+
+	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
 	var path = $('#insert-link-dialog').data('linkedPagePath');
-	var linkText = $('#insert-link-linktext').val();
+	var linkText = internal ? $('#insert-link-linktext').val() : $('#insert-link-dialog input[name="externalLinkText"]').val();
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
-	var link = '<c:url value="/page/"/>' + path;
+	var link = internal ? '<c:url value="/page/"/>' + path : $('#insert-link-dialog input[name="url"]').val();
 	var text = textEl.val();
 	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
 	start = start + link.length + 3;
@@ -246,6 +260,14 @@ function insertLink() {
 	textEl[0].setSelectionRange(start, end);
 	textEl.focus();
 }
+
+$(function() {
+	$('#insert-link-dialog .nav-tabs a').click(function(e) {
+		e.preventDefault();
+		$(this).tab('show');
+		updateInsertLinkButton();
+	});
+});
 
 </dt:headerJS>
 
@@ -343,20 +365,41 @@ function insertLink() {
 	</div>
 	<div class="modal-body">
 		<form id="insertLinkForm" action="" method="POST" class="form-horizontal">
-			<fieldset>
-				<div class="control-group">
-					<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
-					<div class="controls">
-						<div id="linked-page-tree"></div>
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#insert-link-internal"><spring:message code="title.pageOrAttachment"/></a></li>
+				<li><a href="#insert-link-external"><spring:message code="title.externalWebPage"/></a></li>
+			</ul>
+
+			<div class="tab-content">
+				<fieldset id="insert-link-internal" class="tab-pane active">
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
+						<div class="controls">
+							<div id="linked-page-tree"></div>
+						</div>
 					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label"><spring:message code="label.linkText"/>:</label>
-					<div class="controls">
-						<input type="text" id="insert-link-linktext"/>
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkText"/>:</label>
+						<div class="controls">
+							<input type="text" id="insert-link-linktext" class="input-xlarge"/>
+						</div>
 					</div>
-				</div>
-			</fieldset>
+				</fieldset>
+				<fieldset id="insert-link-external" class="tab-pane">
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.url"/>:</label>
+						<div class="controls">
+							<input type="text" name="url" class="input-xlarge" onkeyup="updateInsertLinkButton()"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkText"/>:</label>
+						<div class="controls">
+							<input type="text" name="externalLinkText" class="input-xlarge"/>
+						</div>
+					</div>
+				</fieldset>
+			</div>
 		</form>
 	</div>
 	<div class="modal-footer">
