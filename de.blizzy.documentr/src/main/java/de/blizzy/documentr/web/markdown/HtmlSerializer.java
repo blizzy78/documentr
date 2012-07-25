@@ -86,23 +86,29 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		}
 		
 		boolean thumbnail = params.contains(IMAGE_PARAM_THUMB);
+		String altText = printChildrenToString(imageNode);
+		String title = null;
+		if (imageNode instanceof ExpImageNode) {
+			title = StringUtils.defaultIfBlank(((ExpImageNode) imageNode).title, altText);
+		}
 		
 		if (thumbnail) {
 			printer.print("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" ") //$NON-NLS-1$
 				.print("rel=\"lightbox[images]\" href=\"") //$NON-NLS-1$
-				.print(context.getAttachmentURI(url)).print("\">"); //$NON-NLS-1$
+				.print(context.getAttachmentURI(url)).print("\""); //$NON-NLS-1$
+			
+			if (StringUtils.isNotBlank(title)) {
+				printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			printer.print(">"); //$NON-NLS-1$
 		}
 		
-		String altText = printChildrenToString(imageNode);
 		printer.print("<img src=\"").print(context.getAttachmentURI(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		if (StringUtils.isNotBlank(altText)) {
 			printer.print(" alt=\"").printEncoded(altText).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (imageNode instanceof ExpImageNode) {
-			String title = ((ExpImageNode) imageNode).title;
-			if (StringUtils.isNotBlank(title)) {
-				printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+		if (StringUtils.isNotBlank(title)) {
+			printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (thumbnail) {
 			printer.print(" width=\"260\""); //$NON-NLS-1$
