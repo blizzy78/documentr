@@ -103,6 +103,10 @@ function showRelocateDialog() {
 					projectName: '<c:out value="${projectName}"/>',
 					branchName: '<c:out value="${branchName}"/>'
 				},
+				selectable: {
+					projects: false,
+					branches: false
+				},
 				checkBranchPermissions: 'EDIT_PAGE',
 				filterPage: '<c:out value="${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
 			})

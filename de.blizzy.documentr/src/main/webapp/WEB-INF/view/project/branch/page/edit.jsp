@@ -215,6 +215,10 @@ function openInsertLinkDialog() {
 				start: {
 					type: 'application'
 				},
+				selectable: {
+					projects: false,
+					branches: false
+				},
 				checkBranchPermissions: 'VIEW'
 			})
 			.bind('loaded.jstree', function() {

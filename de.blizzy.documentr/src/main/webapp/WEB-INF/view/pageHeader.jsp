@@ -65,7 +65,12 @@ documentr.pageTreeOptions = {
 	branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
 	pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
 	projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
-	branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>"
+	branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>",
+	iconUrls: {
+		project: '<c:url value="/img/project.png"/>',
+		branch: '<c:url value="/img/branch.png"/>',
+		page: '<c:url value="/img/page.png"/>'
+	}
 };
 
 </sec:authorize>

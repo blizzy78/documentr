@@ -62,9 +62,14 @@ var documentr = {};
 				startUrl = getApplicationUrl();
 			}
 		}
+
+		var selectable = documentr.isSomething(options.selectable) ? options.selectable : {};
+		var projectsSelectable = documentr.isSomething(selectable.projects) ? selectable.projects : true;
+		var branchesSelectable = documentr.isSomething(selectable.branches) ? selectable.branches : true;
+		var pagesSelectable = documentr.isSomething(selectable.pages) ? selectable.pages : true;
 		
 		var tree = treeEl.jstree({
-			plugins: ['themes', 'json_data', 'ui'],
+			plugins: ['themes', 'json_data', 'ui', 'types'],
 			core: {
 				animation: 0
 			},
@@ -73,6 +78,32 @@ var documentr = {};
 			},
 			ui: {
 				select_limit: 1
+			},
+			types: {
+				max_children: -2,
+				max_depth: -2,
+				types: {
+					project: {
+						select_node: projectsSelectable,
+						icon: {
+							image: documentr.pageTreeOptions.iconUrls.project
+						}
+					},
+					
+					branch: {
+						select_node: branchesSelectable,
+						icon: {
+							image: documentr.pageTreeOptions.iconUrls.branch
+						}
+					},
+					
+					page: {
+						select_node: pagesSelectable,
+						icon: {
+							image: documentr.pageTreeOptions.iconUrls.page
+						}
+					}
+				}
 			},
 			json_data: {
 				ajax: {
@@ -111,6 +142,9 @@ var documentr = {};
 									var node = nodes[i];
 									treeNodes.push({
 										data: documentr.pageTreeOptions.projectTitle.replace(/_PROJECTNAME_/g, node.name),
+										attr: {
+											rel: 'project'
+										},
 										metadata: {
 											type: 'project',
 											name: node.name
@@ -123,6 +157,9 @@ var documentr = {};
 									var node = nodes[i];
 									treeNodes.push({
 										data: documentr.pageTreeOptions.branchTitle.replace(/_BRANCHNAME_/g, node.name),
+										attr: {
+											rel: 'branch'
+										},
 										metadata: {
 											type: 'branch',
 											projectName: node.projectName,
@@ -140,6 +177,9 @@ var documentr = {};
 										
 										treeNodes.push({
 											data: node.title,
+											attr: {
+												rel: 'page'
+											},
 											metadata: {
 												type: 'page',
 												projectName: node.projectName,
