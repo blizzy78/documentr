@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
-<title><spring:message code="title.markdownHelp"/> &ndash; documentr</title>
+<title><spring:message code="title.formattingHelp"/> &ndash; documentr</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -45,6 +45,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <body id="#top" class="markdown-help">
 
 <c:set var="lang" value="${d:getLanguage()}"/>
+
+<c:choose>
+	<c:when test="${lang eq 'de'}">
+		<h2>Formatierungshilfe</h2>
+		
+		<p>Klicken Sie auf einen der Bereiche, um Hilfe zur Formatierung zu erhalten.</p>
+	</c:when>
+	<c:otherwise>
+		<h2>Formatting Help</h2>
+		
+		<p>Click on any of the sections to get help on formatting.</p>
+	</c:otherwise>
+</c:choose>
 
 <div class="accordion" id="accordion">
 	<div class="accordion-group">
@@ -155,6 +168,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 									<td><code>[[http://www.example.com Gehe zu www.example.com]]</code></td>
 								</tr>
 								<tr>
+									<td><a href="http://www.example.com" rel="nofollow">Link mit &quot;nofollow&quot;</a></td>
+									<td><code>[[http://www.example.com Link mit &quot;nofollow&quot; | nofollow]]</code></td>
+								</tr>
+								<tr>
 									<td><a href="mailto:info@example.com">info@example.com</a></td>
 									<td><code>&lt;info@example.com&gt;</code></td>
 								</tr>
@@ -183,6 +200,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 								<tr>
 									<td><a href="http://www.example.com">Go to www.example.com</a></td>
 									<td><code>[[http://www.example.com Go to www.example.com]]</code></td>
+								</tr>
+								<tr>
+									<td><a href="http://www.example.com" rel="nofollow">Link using &quot;nofollow&quot;</a></td>
+									<td><code>[[http://www.example.com Link using &quot;nofollow&quot; | nofollow]]</code></td>
 								</tr>
 								<tr>
 									<td><a href="mailto:info@example.com">info@example.com</a></td>
@@ -234,6 +255,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						</p>
 
 						<pre><code>![Bild 1](image1.jpg | thumb)<br/>![Bild 2](image2.jpg | thumb)<br/>![Bild 3](image3.jpg | thumb)</code></pre>
+						
+						<p>
+						Mehrere solcher Vorschaubilder hintereinander werden automatisch zusammen in einer Art
+						Galerie angezeigt.
+						</p>
 					</c:when>
 					<c:otherwise>
 						<p>
@@ -253,6 +279,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						</p>
 
 						<pre><code>![Image 1](image1.jpg | thumb)<br/>![Image 2](image2.jpg | thumb)<br/>![Image 3](image3.jpg | thumb)</code></pre>
+						
+						<p>
+						Multiple preview images directly following one another are displayed automatically in
+						some sort of gallery.
+						</p>
 					</c:otherwise>
 				</c:choose>
 			</div>

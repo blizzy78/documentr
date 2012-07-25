@@ -181,7 +181,7 @@ function toggleFullscreen() {
 
 function showMarkdownHelp() {
 	window.open('<c:url value="/help/markdown"/>', 'documentrMarkdownHelp',
-		'width=600, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
+		'width=700, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
 }
 
 function openInsertLinkDialog() {
@@ -310,7 +310,7 @@ function insertLink() {
 						</ul>
 					</div>
 					<div class="btn-group">
-						<a href="javascript:showMarkdownHelp();" class="btn" title="Show Markdown Help"><i class="icon-question-sign"></i></a>
+						<a href="javascript:showMarkdownHelp();" class="btn" title="<spring:message code="button.showFormattingHelp"/>"><i class="icon-question-sign"></i></a>
 					</div>
 				</div>
 				<form:textarea id="text" path="text" cssClass="span11 code" rows="20"/>
