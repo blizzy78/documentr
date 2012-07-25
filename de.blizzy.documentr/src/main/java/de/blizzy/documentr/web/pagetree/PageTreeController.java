@@ -107,16 +107,20 @@ public class PageTreeController {
 	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'VIEW')")
 	public List<AbstractTreeNode> getPageChildren(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam(required=false) Set<String> checkBranchPermissions,
-			@RequestParam(required=false) boolean attachments, Authentication authentication) throws IOException {
+			@RequestParam(required=false) boolean pages, @RequestParam(required=false) boolean attachments,
+			Authentication authentication) throws IOException {
 
-		List<String> childPagePaths = pageStore.listChildPagePaths(projectName, branchName, Util.toRealPagePath(path));
 		List<AbstractTreeNode> result = Lists.newArrayList();
-		for (String childPagePath : childPagePaths) {
-			Page page = pageStore.getPage(projectName, branchName, childPagePath, false);
-			PageTreeNode node = new PageTreeNode(projectName, branchName, childPagePath, page.getTitle());
-			node.setHasBranchPermissions(hasBranchPermissions(authentication, projectName, branchName,
-					checkBranchPermissions));
-			result.add(node);
+		
+		if (pages) {
+			List<String> childPagePaths = pageStore.listChildPagePaths(projectName, branchName, Util.toRealPagePath(path));
+			for (String childPagePath : childPagePaths) {
+				Page page = pageStore.getPage(projectName, branchName, childPagePath, false);
+				PageTreeNode node = new PageTreeNode(projectName, branchName, childPagePath, page.getTitle());
+				node.setHasBranchPermissions(hasBranchPermissions(authentication, projectName, branchName,
+						checkBranchPermissions));
+				result.add(node);
+			}
 		}
 		
 		if (attachments) {

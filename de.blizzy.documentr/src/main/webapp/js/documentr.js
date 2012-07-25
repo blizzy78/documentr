@@ -68,6 +68,7 @@ var documentr = {};
 		var branchesSelectable = documentr.isSomething(selectable.branches) ? selectable.branches : true;
 		var pagesSelectable = documentr.isSomething(selectable.pages) ? selectable.pages : true;
 		
+		var showPages = documentr.isSomething(options.showPages) ? options.showPages : true;
 		var showAttachments = documentr.isSomething(options.showAttachments) ? options.showAttachments : false;
 		
 		var tree = treeEl.jstree({
@@ -137,6 +138,7 @@ var documentr = {};
 						if (documentr.isSomething(options.checkBranchPermissions)) {
 							d.checkBranchPermissions = options.checkBranchPermissions;
 						}
+						d.pages = showPages;
 						d.attachments = showAttachments;
 						return d;
 					},

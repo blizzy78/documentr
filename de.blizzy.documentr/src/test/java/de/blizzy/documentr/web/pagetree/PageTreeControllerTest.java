@@ -161,7 +161,7 @@ public class PageTreeControllerTest {
 
 		List<AbstractTreeNode> result = pageTreeController.getPageChildren(
 				"project", "branch", "home/foo", Sets.newHashSet(Permission.EDIT_PAGE.name()), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				false, authentication);
+				true, false, authentication);
 		Function<AbstractTreeNode, String> function = new Function<AbstractTreeNode, String>() {
 			@Override
 			public String apply(AbstractTreeNode node) {

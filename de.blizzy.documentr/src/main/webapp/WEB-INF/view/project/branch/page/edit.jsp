@@ -227,7 +227,6 @@ function openInsertLinkDialog() {
 			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
-				var button = $('#insert-link-button');
 				if (node.data('type') === 'page') {
 					var linkedPage = {
 						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
@@ -235,7 +234,6 @@ function openInsertLinkDialog() {
 						pageType: 'page'
 					};
 					$('#insert-link-dialog').data('linkedPage', linkedPage);
-					updateInsertLinkButton();
 				} else if (node.data('type') === 'attachment') {
 					var linkedPage = {
 						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
@@ -243,11 +241,10 @@ function openInsertLinkDialog() {
 						pageType: 'attachment'
 					};
 					$('#insert-link-dialog').data('linkedPage', linkedPage);
-					updateInsertLinkButton();
 				} else {
 					$('#insert-link-dialog').data('linkedPagePath', null);
-					updateInsertLinkButton();
 				}
+				updateInsertLinkButton();
 			})
 			.bind('deselect_node.jstree', function() {
 				$('#insert-link-dialog').data('linkedPagePath', null);
@@ -281,6 +278,70 @@ function insertLink() {
 	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
 	start = start + link.length + 3;
 	end = start + linkText.length;
+	textEl.val(text);
+	textEl[0].setSelectionRange(start, end);
+	textEl.focus();
+}
+
+function updateInsertImageButton() {
+	var linkedImage = $('#insert-image-dialog').data('linkedImage');
+	var altText = $('#insert-image-alttext').val();
+	$('#insert-image-button').setButtonDisabled(!documentr.isSomething(linkedImage) || (altText.length === 0));
+}
+
+function openInsertImageDialog() {
+	function showDialog() {
+		$('#insert-image-alttext').val('');
+		updateInsertImageButton();
+		$('#insert-image-dialog').showModal();
+	}
+
+	var treeEl = $('#linked-image-tree');
+	if (treeEl.children().length === 0) {
+		documentr.createPageTree(treeEl, {
+				start: {
+					type: 'page',
+					projectName: '<c:out value="${projectName}"/>',
+					branchName: '<c:out value="${branchName}"/>',
+					pagePath: '<c:out value="${path}"/>'
+				},
+				checkBranchPermissions: 'VIEW',
+				showPages: false,
+				showAttachments: true
+			})
+			.bind('loaded.jstree', function() {
+				showDialog();
+			})
+			.bind('select_node.jstree', function(event, data) {
+				var node = data.rslt.obj;
+				var linkedImage = node.data('name');
+				$('#insert-image-dialog').data('linkedImage', linkedImage);
+				updateInsertImageButton();
+			})
+			.bind('deselect_node.jstree', function() {
+				$('#insert-image-dialog').data('linkedImage', null);
+				updateInsertImageButton();
+			});
+	} else {
+		showDialog();
+	}
+}
+
+function insertImage() {
+	$('#insert-image-dialog').hideModal();
+	
+	var linkedImage = $('#insert-image-dialog').data('linkedImage');
+	var altText = $('#insert-image-alttext').val();
+	var thumbnail = $('#insert-image-thumbnail:checked').length === 1;
+	if (thumbnail) {
+		linkedImage = linkedImage + ' | thumb';
+	}
+	var textEl = $('#text');
+	var start = textEl[0].selectionStart;
+	var text = textEl.val();
+	text = text.substring(0, start) + '![' + altText + '](' + linkedImage + ')' + text.substring(start);
+	start = start + 2;
+	var end = start + altText.length;
 	textEl.val(text);
 	textEl[0].setSelectionRange(start, end);
 	textEl.focus();
@@ -345,6 +406,9 @@ $(function() {
 					<div class="btn-group">
 						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
 						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
+					</div>
+					<div class="btn-group">
+						<a href="javascript:openInsertImageDialog();" class="btn" title="<spring:message code="button.insertImage"/>"><i class="icon-picture"></i></a>
 					</div>
 					<div class="btn-group">
 						<a href="javascript:openInsertLinkDialog();" class="btn" title="<spring:message code="button.insertLink"/>"><i class="icon-share-alt"></i></a>
@@ -430,6 +494,41 @@ $(function() {
 	<div class="modal-footer">
 		<a id="insert-link-button" href="javascript:void(insertLink());" class="btn btn-primary"><spring:message code="button.insertLink"/></a>
 		<a href="javascript:void($('#insert-link-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</div>
+
+<div class="modal" id="insert-image-dialog" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="$('#insert-image-dialog').modal('hide');">×</button>
+		<h3><spring:message code="title.insertImage"/></h3>
+	</div>
+	<div class="modal-body">
+		<form action="" method="POST" class="form-horizontal">
+			<fieldset>
+				<div class="control-group">
+					<label class="control-label"><spring:message code="label.image"/>:</label>
+					<div class="controls">
+						<div id="linked-image-tree"></div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label"><spring:message code="label.altText"/>:</label>
+					<div class="controls">
+						<input type="text" id="insert-image-alttext" class="input-xlarge" onkeyup="updateInsertImageButton()"/>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="checkbox">
+						<input type="checkbox" id="insert-image-thumbnail">
+						<spring:message code="label.insertAsThumbnail"/>
+					</label>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a id="insert-image-button" href="javascript:void(insertImage());" class="btn btn-primary"><spring:message code="button.insertImage"/></a>
+		<a href="javascript:void($('#insert-image-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 
