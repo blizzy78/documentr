@@ -210,10 +210,14 @@ function openInsertLinkDialog() {
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
 				var button = $('#insert-link-button');
-				$('#insert-link-dialog').data('linkedPagePath',
-					node.data('projectName') + '/' + node.data('branchName') + '/' +
-					node.data('path').replace(/\//g, ','));
-				button.setButtonDisabled(node.data('type') !== 'page');
+				if (node.data('type') === 'page') {
+					$('#insert-link-dialog').data('linkedPagePath',
+						node.data('projectName') + '/' + node.data('branchName') + '/' +
+						node.data('path').replace(/\//g, ','));
+					button.setButtonDisabled(false);
+				} else {
+					button.setButtonDisabled(true);
+				}
 			})
 			.bind('deselect_node.jstree', function() {
 				var button = $('#insert-link-button');
