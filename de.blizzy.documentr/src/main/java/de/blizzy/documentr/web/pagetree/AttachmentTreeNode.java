@@ -17,18 +17,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
-public abstract class AbstractTreeNode {
-	public static enum Type {
-		PROJECT, BRANCH, PAGE, ATTACHMENT;
-	}
-	
-	private Type type;
+public class AttachmentTreeNode extends AbstractTreeNode {
+	private String projectName;
+	private String branchName;
+	private String pagePath;
+	private String name;
 
-	AbstractTreeNode(Type type) {
-		this.type = type;
+	AttachmentTreeNode(String projectName, String branchName, String pagePath, String name) {
+		super(Type.ATTACHMENT);
+		
+		this.projectName = projectName;
+		this.branchName = branchName;
+		this.pagePath = pagePath;
+		this.name = name;
+	}
+
+	public String getProjectName() {
+		return projectName;
 	}
 	
-	public Type getType() {
-		return type;
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public String getPagePath() {
+		return pagePath;
+	}
+	
+	public String getName() {
+		return name;
 	}
 }

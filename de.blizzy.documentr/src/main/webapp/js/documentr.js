@@ -68,6 +68,8 @@ var documentr = {};
 		var branchesSelectable = documentr.isSomething(selectable.branches) ? selectable.branches : true;
 		var pagesSelectable = documentr.isSomething(selectable.pages) ? selectable.pages : true;
 		
+		var showAttachments = documentr.isSomething(options.showAttachments) ? options.showAttachments : false;
+		
 		var tree = treeEl.jstree({
 			plugins: ['themes', 'json_data', 'ui', 'types'],
 			core: {
@@ -102,6 +104,12 @@ var documentr = {};
 						icon: {
 							image: documentr.pageTreeOptions.iconUrls.page
 						}
+					},
+					
+					attachment: {
+						icon: {
+							image: documentr.pageTreeOptions.iconUrls.attachment
+						}
 					}
 				}
 			},
@@ -129,68 +137,74 @@ var documentr = {};
 						if (documentr.isSomething(options.checkBranchPermissions)) {
 							d.checkBranchPermissions = options.checkBranchPermissions;
 						}
+						d.attachments = showAttachments;
 						return d;
 					},
 					type: 'POST',
 					dataType: 'json',
 					success: function(nodes) {
 						var treeNodes = [];
-						if (nodes.length > 0) {
-							var type = nodes[0].type;
-							if (type === 'PROJECT') {
-								for (var i = 0; i < nodes.length; i++) {
-									var node = nodes[i];
+						for (var i = 0; i < nodes.length; i++) {
+							var node = nodes[i];
+							if (node.type === 'PROJECT') {
+								treeNodes.push({
+									data: documentr.pageTreeOptions.projectTitle.replace(/_PROJECTNAME_/g, node.name),
+									attr: {
+										rel: 'project'
+									},
+									metadata: {
+										type: 'project',
+										name: node.name
+									},
+									state: 'closed'
+								});
+							} else if (node.type === 'BRANCH') {
+								treeNodes.push({
+									data: documentr.pageTreeOptions.branchTitle.replace(/_BRANCHNAME_/g, node.name),
+									attr: {
+										rel: 'branch'
+									},
+									metadata: {
+										type: 'branch',
+										projectName: node.projectName,
+										name: node.name
+									},
+									state: 'closed'
+								});
+							} else if (node.type === 'PAGE') {
+								if (!documentr.isSomething(options.filterPage) ||
+									((node.projectName + '/' + node.branchName + '/' + node.path.replace(/\//g, ',')) !==
+										options.filterPage)) {
+									
 									treeNodes.push({
-										data: documentr.pageTreeOptions.projectTitle.replace(/_PROJECTNAME_/g, node.name),
+										data: node.title,
 										attr: {
-											rel: 'project'
+											rel: 'page'
 										},
 										metadata: {
-											type: 'project',
-											name: node.name
-										},
-										state: 'closed'
-									});
-								}
-							} else if (type === 'BRANCH') {
-								for (var i = 0; i < nodes.length; i++) {
-									var node = nodes[i];
-									treeNodes.push({
-										data: documentr.pageTreeOptions.branchTitle.replace(/_BRANCHNAME_/g, node.name),
-										attr: {
-											rel: 'branch'
-										},
-										metadata: {
-											type: 'branch',
+											type: 'page',
 											projectName: node.projectName,
-											name: node.name
+											branchName: node.branchName,
+											path: node.path,
+											hasBranchPermissions: node.hasBranchPermissions
 										},
 										state: 'closed'
 									});
 								}
-							} else if (type === 'PAGE') {
-								for (var i = 0; i < nodes.length; i++) {
-									var node = nodes[i];
-									if (!documentr.isSomething(options.filterPage) ||
-										((node.projectName + '/' + node.branchName + '/' + node.path.replace(/\//g, ',')) !==
-											options.filterPage)) {
-										
-										treeNodes.push({
-											data: node.title,
-											attr: {
-												rel: 'page'
-											},
-											metadata: {
-												type: 'page',
-												projectName: node.projectName,
-												branchName: node.branchName,
-												path: node.path,
-												hasBranchPermissions: node.hasBranchPermissions
-											},
-											state: 'closed'
-										});
+							} else if (node.type === 'ATTACHMENT') {
+								treeNodes.push({
+									data: node.name,
+									attr: {
+										rel: 'attachment'
+									},
+									metadata: {
+										type: 'attachment',
+										projectName: node.projectName,
+										branchName: node.branchName,
+										pagePath: node.pagePath,
+										name: node.name
 									}
-								}
+								});
 							}
 						}
 						return treeNodes;

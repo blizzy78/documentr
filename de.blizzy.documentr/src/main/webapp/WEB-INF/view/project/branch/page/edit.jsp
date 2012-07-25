@@ -185,10 +185,10 @@ function showMarkdownHelp() {
 }
 
 function updateInsertLinkButton() {
-	var linkedPagePath = $('#insert-link-dialog').data('linkedPagePath');
+	var linkedPage = $('#insert-link-dialog').data('linkedPage');
 	var url = $('#insert-link-dialog input[name="url"]').val();
 	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
-	var valid = (internal && documentr.isSomething(linkedPagePath)) ||
+	var valid = (internal && documentr.isSomething(linkedPage)) ||
 		(!internal && (url.length > 0));
 	$('#insert-link-button').setButtonDisabled(!valid);
 }
@@ -219,7 +219,8 @@ function openInsertLinkDialog() {
 					projects: false,
 					branches: false
 				},
-				checkBranchPermissions: 'VIEW'
+				checkBranchPermissions: 'VIEW',
+				showAttachments: true
 			})
 			.bind('loaded.jstree', function() {
 				showDialog();
@@ -228,9 +229,20 @@ function openInsertLinkDialog() {
 				var node = data.rslt.obj;
 				var button = $('#insert-link-button');
 				if (node.data('type') === 'page') {
-					$('#insert-link-dialog').data('linkedPagePath',
-						node.data('projectName') + '/' + node.data('branchName') + '/' +
-						node.data('path').replace(/\//g, ','));
+					var linkedPage = {
+						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
+							node.data('path').replace(/\//g, ','),
+						pageType: 'page'
+					};
+					$('#insert-link-dialog').data('linkedPage', linkedPage);
+					updateInsertLinkButton();
+				} else if (node.data('type') === 'attachment') {
+					var linkedPage = {
+						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
+							node.data('pagePath').replace(/\//g, ',') + '/' + node.data('name'),
+						pageType: 'attachment'
+					};
+					$('#insert-link-dialog').data('linkedPage', linkedPage);
 					updateInsertLinkButton();
 				} else {
 					$('#insert-link-dialog').data('linkedPagePath', null);
@@ -250,12 +262,21 @@ function insertLink() {
 	$('#insert-link-dialog').hideModal();
 
 	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
-	var path = $('#insert-link-dialog').data('linkedPagePath');
+	var linkedPage = $('#insert-link-dialog').data('linkedPage');
 	var linkText = internal ? $('#insert-link-linktext').val() : $('#insert-link-dialog input[name="externalLinkText"]').val();
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
-	var link = internal ? '<c:url value="/page/"/>' + path : $('#insert-link-dialog input[name="url"]').val();
+	var link;
+	if (internal) {
+		if (linkedPage.pageType === 'page') {
+			link = '<c:url value="/page/"/>' + linkedPage.path;
+		} else {
+			link = '<c:url value="/attachment/"/>' + linkedPage.path;
+		}
+	} else {
+		link = $('#insert-link-dialog input[name="url"]').val();
+	}
 	var text = textEl.val();
 	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
 	start = start + link.length + 3;

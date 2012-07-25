@@ -69,7 +69,8 @@ documentr.pageTreeOptions = {
 	iconUrls: {
 		project: '<c:url value="/img/project.png"/>',
 		branch: '<c:url value="/img/branch.png"/>',
-		page: '<c:url value="/img/page.png"/>'
+		page: '<c:url value="/img/page.png"/>',
+		attachment: '<c:url value="/img/attachment.png"/>'
 	}
 };
 

@@ -105,12 +105,12 @@ public class PageTreeController {
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'VIEW')")
-	public List<PageTreeNode> getPageChildren(@PathVariable String projectName, @PathVariable String branchName,
+	public List<AbstractTreeNode> getPageChildren(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam(required=false) Set<String> checkBranchPermissions,
-			Authentication authentication) throws IOException {
+			@RequestParam(required=false) boolean attachments, Authentication authentication) throws IOException {
 
 		List<String> childPagePaths = pageStore.listChildPagePaths(projectName, branchName, Util.toRealPagePath(path));
-		List<PageTreeNode> result = Lists.newArrayList();
+		List<AbstractTreeNode> result = Lists.newArrayList();
 		for (String childPagePath : childPagePaths) {
 			Page page = pageStore.getPage(projectName, branchName, childPagePath, false);
 			PageTreeNode node = new PageTreeNode(projectName, branchName, childPagePath, page.getTitle());
@@ -118,6 +118,14 @@ public class PageTreeController {
 					checkBranchPermissions));
 			result.add(node);
 		}
+		
+		if (attachments) {
+			List<String> pageAttachments = pageStore.listPageAttachments(projectName, branchName, Util.toRealPagePath(path));
+			for (String attachment : pageAttachments) {
+				result.add(new AttachmentTreeNode(projectName, branchName, path, attachment));
+			}
+		}
+		
 		return result;
 	}
 	
