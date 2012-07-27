@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -78,12 +79,30 @@ public class MarkdownProcessor {
 	
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros) {
+
+		return markdownToHTML(markdown, projectName, branchName, path, authentication, nonCacheableMacros, false);
+	}
+	
+	public String headerMarkdownToHTML(String markdown, String projectName, String branchName, String path,
+			Authentication authentication) {
+
+		return markdownToHTML(markdown, projectName, branchName, path, authentication, true, true);
+	}
+
+	private String markdownToHTML(String markdown, String projectName, String branchName, String path,
+			Authentication authentication, boolean nonCacheableMacros, boolean header) {
 		
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
 		
 		fixParaNodes(rootNode);
+		
+		if (header) {
+			extractHeader(rootNode);
+		} else {
+			removeHeader(rootNode);
+		}
 
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		HtmlSerializer serializer = new HtmlSerializer(context);
@@ -118,8 +137,8 @@ public class MarkdownProcessor {
 	}
 	
 	private void fixParaNodes(Node node) {
-		if (node instanceof MacroNode) {
-			List<Node> children = ((MacroNode) node).getChildren();
+		if ((node instanceof MacroNode) || (node instanceof PageHeaderNode)) {
+			List<Node> children = ((SuperNode) node).getChildren();
 			if ((children.size() == 1) && (children.get(0) instanceof ParaNode)) {
 				List<Node> newChildren = ((ParaNode) children.get(0)).getChildren();
 				children.clear();
@@ -130,6 +149,48 @@ public class MarkdownProcessor {
 		if (node instanceof SuperNode) {
 			for (Node child : ((SuperNode) node).getChildren()) {
 				fixParaNodes(child);
+			}
+		}
+	}
+	
+	private void extractHeader(RootNode rootNode) {
+		List<Node> children = rootNode.getChildren();
+		PageHeaderNode headerNode = findHeaderNode(rootNode);
+		children.clear();
+		if (headerNode != null) {
+			children.addAll(headerNode.getChildren());
+		}
+	}
+	
+	private PageHeaderNode findHeaderNode(Node node) {
+		if (node instanceof PageHeaderNode) {
+			return (PageHeaderNode) node;
+		}
+		
+		if (node instanceof SuperNode) {
+			for (Node child : ((SuperNode) node).getChildren()) {
+				PageHeaderNode headerNode = findHeaderNode(child);
+				if (headerNode != null) {
+					return headerNode;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	private void removeHeader(Node node) {
+		if (node instanceof SuperNode) {
+			List<Node> children = ((SuperNode) node).getChildren();
+			for (Iterator<Node> iter = children.iterator(); iter.hasNext();) {
+				Node child = iter.next();
+				if (child instanceof PageHeaderNode) {
+					iter.remove();
+				}
+			}
+			
+			for (Node child : children) {
+				removeHeader(child);
 			}
 		}
 	}

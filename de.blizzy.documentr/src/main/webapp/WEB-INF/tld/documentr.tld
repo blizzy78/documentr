@@ -76,6 +76,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</function>
 
 	<function>
+		<name>getPageHeaderHTML</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String getPageHeaderHTML(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
 		<name>listUsers</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.util.List listUsers()</function-signature>

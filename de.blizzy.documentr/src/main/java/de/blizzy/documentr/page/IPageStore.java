@@ -31,12 +31,16 @@ import de.blizzy.documentr.access.User;
 public interface IPageStore {
 	@Caching(evict={
 			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path"),
 			@CacheEvict(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
 	})
 	void savePage(String projectName, String branchName, String path, Page page,
 			User user) throws IOException;
 
-	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath"),
+			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
+	})
 	void saveAttachment(String projectName, String branchName, String pagePath, String name,
 			Page attachment, User user) throws IOException;
 
@@ -54,6 +58,7 @@ public interface IPageStore {
 
 	@Caching(evict={
 			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path"),
 			@CacheEvict(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
 	})
 	void deletePage(String projectName, String branchName, String path, User user) throws IOException;
@@ -65,6 +70,7 @@ public interface IPageStore {
 
 	@Caching(evict={
 			@CacheEvict(value="pageHTML", allEntries=true),
+			@CacheEvict(value="pageHeaderHTML", allEntries=true),
 			@CacheEvict(value="pageViewRestrictionRole", allEntries=true)
 	})
 	void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
@@ -75,14 +81,20 @@ public interface IPageStore {
 
 	List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException;
 
-	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #pagePath"),
+			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #pagePath")
+	})
 	void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException;
 
 	@Cacheable(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
 	String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException;
-	
-	@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
+
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	})
 	void restorePageVersion(String projectName, String branchName, String path, String version, User user)
 			throws IOException;
 }

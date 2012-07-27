@@ -123,6 +123,12 @@ public final class Functions {
 		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
 	}
 
+	public static String getPageHeaderHTML(String projectName, String branchName, String path) throws IOException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String html = pageRenderer.getHeaderHtml(projectName, branchName, path, authentication);
+		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+	}
+	
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)
 			throws IOException {
 		

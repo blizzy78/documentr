@@ -42,6 +42,15 @@ public class PageRenderer implements IPageRenderer {
 		String markdown = ((PageTextData) page.getData()).getText();
 		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path, authentication);
 	}
+
+	@Override
+	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication)
+			throws IOException {
+
+		Page page = pageStore.getPage(projectName, branchName, path, true);
+		String markdown = ((PageTextData) page.getData()).getText();
+		return markdownProcessor.headerMarkdownToHTML(markdown, projectName, branchName, path, authentication);
+	}
 	
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;

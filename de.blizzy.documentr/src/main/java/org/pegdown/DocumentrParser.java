@@ -25,6 +25,7 @@ import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.StringVar;
 
 import de.blizzy.documentr.web.markdown.MacroNode;
+import de.blizzy.documentr.web.markdown.PageHeaderNode;
 
 public class DocumentrParser extends Parser {
 	private static final int PEGDOWN_OPTIONS = Extensions.ALL -
@@ -38,7 +39,7 @@ public class DocumentrParser extends Parser {
 	public Rule NonLinkInline() {
 		return FirstOf(new ArrayBuilder<Rule>()
 				.add(
-						BodyMacro(), StandaloneMacro(),
+						BodyMacro(), StandaloneMacro(), PageHeader(),
 						Str(), Endline(), UlOrStarLine(), Space(), StrongOrEmph(), Image(), Code(), InlineHtml(),
 						Entity(), EscapedChar())
 				.addNonNulls(ext(QUOTES) ? new Rule[] { SingleQuoted(), DoubleQuoted(), DoubleAngleQuoted() } : null)
@@ -158,5 +159,28 @@ public class DocumentrParser extends Parser {
 								url.append(matchedChar()))
 				)
 		);
+	}
+
+	@SuppressWarnings("boxing")
+	public Rule PageHeader() {
+		StringBuilderVar inner = new StringBuilderVar();
+		return NodeSequence(
+				"{{:header:}}", //$NON-NLS-1$
+				push(getContext().getCurrentIndex()),
+				PageHeaderBody(inner),
+				"{{:/header:}}", //$NON-NLS-1$
+				push(new PageHeaderNode(
+						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
+	}
+	
+	@SuppressWarnings("boxing")
+	public Rule PageHeaderBody(StringBuilderVar inner) {
+		return Sequence(
+				ZeroOrMore(BlankLine()),
+				ZeroOrMore(
+						TestNot("{{:/header:}}"), //$NON-NLS-1$
+						ANY,
+						inner.append(match())),
+				ZeroOrMore(BlankLine()));
 	}
 }

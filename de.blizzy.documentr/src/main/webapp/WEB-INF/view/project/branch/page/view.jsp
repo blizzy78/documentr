@@ -354,13 +354,16 @@ $(function() {
 <dt:page>
 
 <c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
+<c:set var="pageHeader"><c:out value="${d:getPageHeaderHTML(projectName, branchName, path)}" escapeXml="false"/></c:set>
 
 <sec:authorize access="isAuthenticated() or
 	hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE') or
 	hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE') or
 	hasAnyBranchPermission(#projectName, 'EDIT_PAGE')">
 
-	<div class="btn-toolbar pull-right page-toolbar">
+	<c:if test="${!empty pageHeader}"><c:set var="cssNoMargin" value="btn-toolbar-no-margin"/></c:if>
+
+	<div class="btn-toolbar ${cssNoMargin} pull-right page-toolbar">
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
 			<div class="btn-group">
 				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
@@ -417,10 +420,6 @@ $(function() {
 	</div>
 </sec:authorize>
 
-<div class="page-header">
-<h1>
-<c:out value="${title}"/>
-</h1>
 <c:set var="metadata" value="${d:getPageMetadata(projectName, branchName, path)}"/>
 <c:set var="lastEdited"><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></c:set>
 <c:choose>
@@ -433,13 +432,16 @@ $(function() {
 		<c:set var="branchNames" value="${d:join(branchesSharedWith, ', ')}"/>
 	</c:if>
 </sec:authorize>
-<div class="page-metadata"><spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
---%><sec:authorize access="isAuthenticated()"><%--
---%> (<a href="javascript:void(showChangesDialog());"><spring:message code="button.showChanges"/></a>)<%--
---%></sec:authorize><%--
---%><c:if test="${!empty branchNames}"> &ndash; <spring:message code="sharedWithX" arguments="${branchNames}" argumentSeparator="|"/></c:if><%--
---%></div>
 
+<c:if test="${empty pageHeader}"><c:set var="pageHeader"><h1><c:out value="${title}"/></h1></c:set></c:if>
+<div class="page-header">
+	<c:out value="${pageHeader}" escapeXml="false"/>
+	<div class="page-metadata"><spring:message code="lastEditX" arguments="${lastEdit}" argumentSeparator="|"/><%--
+		--%><sec:authorize access="isAuthenticated()"><%--
+		--%> (<a href="javascript:void(showChangesDialog());"><spring:message code="button.showChanges"/></a>)<%--
+		--%></sec:authorize><%--
+		--%><c:if test="${!empty branchNames}"> &ndash; <spring:message code="sharedWithX" arguments="${branchNames}" argumentSeparator="|"/></c:if><%--
+		--%></div>
 </div>
 
 <span id="pageText"><c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/></span>

@@ -20,19 +20,17 @@ body {
 	background-color: white;
 }
 
-.page-header {
-	.page-metadata {
+.page-metadata {
+	color: #999999;
+	font-size: 11px;
+	line-height: 15px;
+	
+	a {
 		color: #999999;
-		font-size: 11px;
-		line-height: 15px;
+		text-decoration: underline;
 		
-		a {
-			color: #999999;
-			text-decoration: underline;
-			
-			&:hover {
-				color: #666666;
-			}
+		&:hover {
+			color: #666666;
 		}
 	}
 }
@@ -191,7 +189,7 @@ form {
 }
 
 .btn-toolbar {
-	&.btn-toolbar-floating {
+	&.btn-toolbar-floating, &.btn-toolbar-no-margin {
 		margin-top: 0;
 		margin-bottom: 0;
 	}

@@ -17,15 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown;
 
-import java.io.IOException;
+import java.util.List;
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.Authentication;
+import org.pegdown.ast.Node;
+import org.pegdown.ast.SuperNode;
 
-public interface IPageRenderer {
-	@Cacheable(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHtml(String projectName, String branchName, String path, Authentication authentication) throws IOException;
-
-	@Cacheable(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication) throws IOException;
+public class PageHeaderNode extends SuperNode {
+	public PageHeaderNode(List<Node> children) {
+		super(children);
+	}
 }
