@@ -32,9 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="<c:url value="/css/bootstrap-2.0.4.min.css"/>" media="all"/>
-<link rel="stylesheet" href="<c:url value="/css/bootstrap-responsive-2.0.4.min.css"/>" media="all"/>
-<link rel="stylesheet" href="<c:url value="/css/prettify-20110601.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/lightbox-2.51.css.jsp"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
