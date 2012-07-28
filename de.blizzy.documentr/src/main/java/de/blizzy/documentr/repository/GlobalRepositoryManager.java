@@ -118,6 +118,11 @@ public class GlobalRepositoryManager {
 		return result;
 	}
 	
+	public void importSampleContents(String projectName) throws IOException, GitAPIException {
+		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		repoManager.importSampleContents();
+	}
+
 	public void setSettings(Settings settings) {
 		this.settings = settings;
 	}

@@ -24,6 +24,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasProjectPermission(#name, 'VIEW')">
 
+<c:set var="branches" value="${d:listProjectBranches(name)}"/>
+
+<dt:headerJS>
+
+<c:if test="${empty branches}">
+<sec:authorize access="hasProjectPermission(#name, 'ADMIN')">
+
+function importSampleContents() {
+	var dlg = documentr.openMessageDialog('<spring:message code="title.importSampleContents"/>',
+		"<spring:message code="importSampleContents" arguments="${name}"/>", [
+			{
+				text: '<spring:message code="button.import"/>',
+				type: 'primary',
+				onclick: function() {
+					dlg.setText('<spring:message code="importingContents"/>');
+					dlg.setAllButtonsDisabled();
+
+					$.ajax({
+						url: '<c:url value="/project/importSample/${name}/json"/>',
+						type: 'GET',
+						dataType: 'json',
+						success: function(result) {
+							window.location.reload(true);
+						}
+					});
+				}
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		]);
+}
+
+</sec:authorize>
+</c:if>
+
+</dt:headerJS>
+
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li class="active"><c:out value="${name}"/></li>
@@ -37,7 +76,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <h2><spring:message code="title.branches"/></h2>
 
-<c:set var="branches" value="${d:listProjectBranches(name)}"/>
 <c:choose>
 	<c:when test="${!empty branches}">
 		<ul>
@@ -52,6 +90,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="hasProjectPermission(#name, 'EDIT_BRANCH')">
 	<p>
 	<a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
+	<c:if test="${empty branches}">
+		<sec:authorize access="hasProjectPermission(#name, 'ADMIN')">
+			<a href="javascript:void(importSampleContents());" class="btn"><i class="icon-download-alt"></i> <spring:message code="button.importSampleContents"/></a>
+		</sec:authorize>
+	</c:if>
 	</p>
 </sec:authorize>
 

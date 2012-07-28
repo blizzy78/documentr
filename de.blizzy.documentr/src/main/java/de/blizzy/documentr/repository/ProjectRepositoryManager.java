@@ -30,6 +30,7 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.gitective.core.RepositoryUtils;
 import org.springframework.util.Assert;
@@ -37,6 +38,7 @@ import org.springframework.util.Assert;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 
 class ProjectRepositoryManager {
@@ -228,6 +230,59 @@ class ProjectRepositoryManager {
 			return result;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+
+	public void importSampleContents() throws IOException, GitAPIException {
+		// TODO: synchronization is not quite correct here, but should be okay in this edge case
+		if (listBranches().isEmpty()) {
+			ILock lock = lockManager.lockAll();
+			try {
+				File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
+				FileUtils.forceDelete(gitDir);
+				
+				Git.cloneRepository()
+					.setURI(DocumentrConstants.SAMPLE_REPO_URL)
+					.setDirectory(gitDir)
+					.setBare(true)
+					.call();
+
+				Repository centralRepo = null;
+				File centralRepoGitDir;
+				try {
+					centralRepo = getCentralRepositoryInternal(true);
+					centralRepoGitDir = centralRepo.getDirectory();
+					StoredConfig config = centralRepo.getConfig();
+					config.unsetSection("remote", "origin"); //$NON-NLS-1$ //$NON-NLS-2$
+					config.unsetSection("branch", "master"); //$NON-NLS-1$ //$NON-NLS-2$
+					config.save();
+				} finally {
+					RepositoryUtil.closeQuietly(centralRepo);
+				}
+				
+				List<String> branches = listBranches();
+				for (String branchName : branches) {
+					File repoDir = new File(reposDir, branchName);
+					Repository repo = null;
+					try {
+						repo = Git.cloneRepository()
+								.setURI(centralRepoGitDir.toURI().toString())
+								.setDirectory(repoDir)
+								.call()
+								.getRepository();
+						
+						Git git = Git.wrap(repo);
+						RefSpec refSpec = new RefSpec("refs/heads/" + branchName + ":refs/remotes/origin/" + branchName); //$NON-NLS-1$ //$NON-NLS-2$
+						git.fetch().setRemote("origin").setRefSpecs(refSpec).call();  //$NON-NLS-1$
+						git.branchCreate().setName(branchName).setStartPoint("origin/" + branchName).call(); //$NON-NLS-1$
+						git.checkout().setName(branchName).call();
+					} finally {
+						RepositoryUtil.closeQuietly(repo);
+					}
+				}
+			} finally {
+				lockManager.unlock(lock);
+			}
 		}
 	}
 }

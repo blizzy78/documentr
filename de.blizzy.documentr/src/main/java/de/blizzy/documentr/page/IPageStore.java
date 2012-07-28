@@ -97,4 +97,6 @@ public interface IPageStore {
 	})
 	void restorePageVersion(String projectName, String branchName, String path, String version, User user)
 			throws IOException;
+	
+	void reindexAllPages(String projectName) throws IOException;
 }

@@ -49,7 +49,7 @@ public final class DocumentrConstants {
 	public static final String ROLE_NAME_PATTERN = "[a-zA-Z0-9_\\- ]+"; //$NON-NLS-1$
 
 	/** Blacklist pattern a project name must not match against. */
-	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|_.*)"; //$NON-NLS-1$
+	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|importSample|_.*)"; //$NON-NLS-1$
 
 	/** Blacklist pattern a branch name must not match against. */
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
@@ -63,6 +63,9 @@ public final class DocumentrConstants {
 
 	/** Page name and path of a branch's home page. */
 	public static final String HOME_PAGE_NAME = "home"; //$NON-NLS-1$
+
+	/** URL of the sample contents repository. */
+	public static final String SAMPLE_REPO_URL = "http://sample.documentr.org/sample.git"; //$NON-NLS-1$
 
 	private DocumentrConstants() {}
 }

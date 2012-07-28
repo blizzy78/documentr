@@ -269,25 +269,34 @@ var documentr = {};
 			dlgEl.addClass('modal-wide');
 		}
 		
+		var footerEl = dlgEl.find('#' + id + '_footer');
+
 		function close() {
 			dlgEl.modal('hide');
 			dlgEl.remove();
 		}
 		
+		function setText(message) {
+			if (messageAsHtml) {
+				dlgEl.find('#' + id + '_body').html(message);
+			} else {
+				dlgEl.find('#' + id + '_body').text(message);
+			}
+		}
+		
+		function setAllButtonsDisabled() {
+			footerEl.find('a').off('click').setButtonDisabled(true);
+		}
+		
 		var dlg = {
-			close: close
+			close: close,
+			setText: setText,
+			setAllButtonsDisabled: setAllButtonsDisabled
 		};
 		
 		dlgEl.find('#' + id + '_title').text(title);
-		if (messageAsHtml) {
-			dlgEl.find('#' + id + '_body').html(message);
-		} else {
-			dlgEl.find('#' + id + '_body').text(message);
-		}
-		dlgEl.find('#' + id + '_close').click(function() {
-			close();
-		});
-		var footerEl = dlgEl.find('#' + id + '_footer');
+		setText(message);
+		dlgEl.find('#' + id + '_close').click(close);
 		var clickHandler = function(event) {
 			var buttonOptions = event.data;
 			var closeDlg = documentr.isSomething(buttonOptions.close) && buttonOptions.close;

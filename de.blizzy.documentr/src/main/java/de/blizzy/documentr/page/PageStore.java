@@ -96,9 +96,14 @@ class PageStore implements IPageStore {
 
 	private void reindexAllPages() throws IOException {
 		for (String projectName : repoManager.listProjects()) {
-			for (String branchName : repoManager.listProjectBranches(projectName)) {
-				reindexAllPagesAddPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
-			}
+			reindexAllPages(projectName);
+		}
+	}
+
+	@Override
+	public void reindexAllPages(String projectName) throws IOException {
+		for (String branchName : repoManager.listProjectBranches(projectName)) {
+			reindexAllPagesAddPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
 		}
 	}
 	

@@ -33,10 +33,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -48,6 +50,8 @@ public class ProjectController {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private IPageStore pageStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasProjectPermission(#name, 'VIEW')")
@@ -83,6 +87,14 @@ public class ProjectController {
 			RepositoryUtil.closeQuietly(repo);
 		}
 		return "redirect:/project/" + form.getName(); //$NON-NLS-1$
+	}
+
+	@RequestMapping(value="/importSample/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json", method=RequestMethod.GET)
+	@PreAuthorize("hasProjectPermission(#name, 'ADMIN')")
+	@ResponseBody
+	public void importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
+		repoManager.importSampleContents(name);
+		pageStore.reindexAllPages(name);
 	}
 
 	@ModelAttribute
