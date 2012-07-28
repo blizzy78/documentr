@@ -27,25 +27,11 @@ import org.pegdown.ast.Node;
 
 import com.google.inject.internal.Lists;
 
-public class MacroNodeTest {
-	@Test
-	public void getMacroName() {
-		List<Node> children = Lists.<Node>newArrayList(new HeaderNode(1));
-		MacroNode node = new MacroNode("macro", "params", children); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("macro", node.getMacroName()); //$NON-NLS-1$
-	}
-
-	@Test
-	public void getParams() {
-		List<Node> children = Lists.<Node>newArrayList(new HeaderNode(1));
-		MacroNode node = new MacroNode("macro", "params", children); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("params", node.getParams()); //$NON-NLS-1$
-	}
-	
+public class PageHeaderNodeTest {
 	@Test
 	public void getChildren() {
 		List<Node> children = Lists.<Node>newArrayList(new HeaderNode(1));
-		MacroNode node = new MacroNode("macro", "params", children); //$NON-NLS-1$ //$NON-NLS-2$
+		PageHeaderNode node = new PageHeaderNode(children);
 		assertEquals(children, node.getChildren());
 	}
 }

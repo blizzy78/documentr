@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.pegdown.ast.Node;
 import org.pegdown.ast.SuperNode;
-import org.pegdown.ast.Visitor;
 
 public class MacroNode extends SuperNode {
 	private String macroName;
@@ -37,11 +36,6 @@ public class MacroNode extends SuperNode {
 		
 		this.macroName = macroName;
 		this.params = params;
-	}
-	
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.visit(this);
 	}
 	
 	public String getMacroName() {

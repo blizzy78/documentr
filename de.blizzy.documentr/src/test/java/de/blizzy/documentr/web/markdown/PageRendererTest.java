@@ -35,7 +35,7 @@ public class PageRendererTest {
 	private static final String HTML = "html"; //$NON-NLS-1$
 
 	@Test
-	public void getHTML() throws IOException {
+	public void getHtml() throws IOException {
 		Page page = Page.fromText("title", MARKDOWN); //$NON-NLS-1$
 		
 		IPageStore pageStore = mock(IPageStore.class);
@@ -49,6 +49,24 @@ public class PageRendererTest {
 		pageRenderer.setMarkdownProcessor(markdownProcessor);
 		
 		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE, null);
+		assertEquals(HTML, result);
+	}
+
+	@Test
+	public void getHeaderHtml() throws IOException {
+		Page page = Page.fromText("title", MARKDOWN); //$NON-NLS-1$
+		
+		IPageStore pageStore = mock(IPageStore.class);
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE, true)).thenReturn(page); 
+
+		MarkdownProcessor markdownProcessor = mock(MarkdownProcessor.class);
+		when(markdownProcessor.headerMarkdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE, null)).thenReturn(HTML); 
+		
+		PageRenderer pageRenderer = new PageRenderer();
+		pageRenderer.setPageStore(pageStore);
+		pageRenderer.setMarkdownProcessor(markdownProcessor);
+		
+		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, null);
 		assertEquals(HTML, result);
 	}
 }

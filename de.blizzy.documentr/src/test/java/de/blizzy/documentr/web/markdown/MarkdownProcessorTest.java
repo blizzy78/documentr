@@ -70,7 +70,7 @@ public class MarkdownProcessorTest {
 		
 		when(macroFactory.get(eq(MACRO), (String) isNull(), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
 		
-		String markdown = "**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
+		String markdown = "{{:header:}}*header*{{:/header:}}**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHTML(
 				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
@@ -121,5 +121,15 @@ public class MarkdownProcessorTest {
 				html, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String expectedHTML = cleanedMacroHtml;
 		assertEquals(expectedHTML, result);
+	}
+
+	@Test
+	public void headerMarkdownToHTML() {
+		String markdown = "{{:header:}}*header*{{:/header:}}**foo**"; //$NON-NLS-1$
+		String result = markdownProcessor.headerMarkdownToHTML(
+				markdown, "project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		
+		String expectedHTML = "<em>header</em>"; //$NON-NLS-1$
+		assertEquals(expectedHTML, removeTextRange(result));
 	}
 }
