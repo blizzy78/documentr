@@ -80,30 +80,30 @@ public class MarkdownProcessor {
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros) {
 
-		return markdownToHTML(markdown, projectName, branchName, path, authentication, nonCacheableMacros, false);
+		RootNode rootNode = parse(markdown);
+		removeHeader(rootNode);
+		return markdownToHTML(rootNode, projectName, branchName, path, authentication, nonCacheableMacros);
 	}
 	
 	public String headerMarkdownToHTML(String markdown, String projectName, String branchName, String path,
 			Authentication authentication) {
 
-		return markdownToHTML(markdown, projectName, branchName, path, authentication, true, true);
+		RootNode rootNode = parse(markdown);
+		extractHeader(rootNode);
+		return markdownToHTML(rootNode, projectName, branchName, path, authentication, true);
 	}
 
-	private String markdownToHTML(String markdown, String projectName, String branchName, String path,
-			Authentication authentication, boolean nonCacheableMacros, boolean header) {
-		
+	private RootNode parse(String markdown) {
 		Parser parser = Parboiled.createParser(DocumentrParser.class);
 		PegDownProcessor proc = new PegDownProcessor(parser);
 		RootNode rootNode = proc.parseMarkdown(markdown.toCharArray());
-		
 		fixParaNodes(rootNode);
+		return rootNode;
+	}
+	
+	private String markdownToHTML(RootNode rootNode, String projectName, String branchName, String path,
+			Authentication authentication, boolean nonCacheableMacros) {
 		
-		if (header) {
-			extractHeader(rootNode);
-		} else {
-			removeHeader(rootNode);
-		}
-
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
