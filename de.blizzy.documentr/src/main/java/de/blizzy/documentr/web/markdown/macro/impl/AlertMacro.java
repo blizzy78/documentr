@@ -32,9 +32,6 @@ public class AlertMacro extends AbstractMacro {
 		body = StringUtils.defaultString(body);
 		
 		String type = getParameters();
-		if (StringUtils.equals(type, "TYPE")) { //$NON-NLS-1$
-			type = null;
-		}
 		String typeClass = StringUtils.EMPTY;
 		if (StringUtils.isNotBlank(type)) {
 			typeClass = " alert-" + StringEscapeUtils.escapeHtml4(type); //$NON-NLS-1$

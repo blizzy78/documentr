@@ -17,19 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import static org.junit.Assert.*;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import org.junit.Test;
 
-public class ColorMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("color", //$NON-NLS-1$
-			ColorMacro.class, "{{color [COLOR]}}[TEXT]{{/color}}"); //$NON-NLS-1$
+public class PanelMacroTest {
+	@Test
+	public void getHtml() {
+		PanelMacro macro = new PanelMacro();
+		macro.setParameters("3"); //$NON-NLS-1$
+		assertEquals("<div class=\"span3\">body</div>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
 
-	@Override
-	public String getHtml(String body) {
-		String color = getParameters();
-		return "<span style=\"color: " + StringEscapeUtils.escapeHtml4(color) + ";\">" + //$NON-NLS-1$ //$NON-NLS-2$
-				body + "</span>"; //$NON-NLS-1$
+		macro = new PanelMacro();
+		macro.setParameters("3 border"); //$NON-NLS-1$
+		assertEquals("<div class=\"span3\"><div class=\"span12 panel-border\">body</div></div>", //$NON-NLS-1$
+				macro.getHtml("body")); //$NON-NLS-1$
 	}
 }
