@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="hasApplicationPermission('ADMIN')">
+<sec:authorize access="hasApplicationPermission(ADMIN)">
 
 <dt:breadcrumbs>
 	<li class="active"><spring:message code="title.users"/></li>

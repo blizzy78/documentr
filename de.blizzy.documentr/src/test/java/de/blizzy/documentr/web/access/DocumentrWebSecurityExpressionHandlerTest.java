@@ -25,12 +25,17 @@ import org.springframework.security.access.expression.SecurityExpressionOperatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.DocumentrSecurityExpressionRoot;
 
 public class DocumentrWebSecurityExpressionHandlerTest {
 	@Test
 	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
+		DocumentrPermissionEvaluator permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
+
 		DocumentrWebSecurityExpressionHandler expressionHandler = new DocumentrWebSecurityExpressionHandler();
+		expressionHandler.setPermissionEvaluator(permissionEvaluator);
+		
 		SecurityExpressionOperations root = expressionHandler.createSecurityExpressionRoot(
 				mock(Authentication.class), mock(FilterInvocation.class));
 		assertTrue(root instanceof DocumentrSecurityExpressionRoot);

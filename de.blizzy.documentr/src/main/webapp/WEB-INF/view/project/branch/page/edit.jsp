@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
 <sec:authorize access="(#pageForm.path == null) ?
-	hasBranchPermission(#pageForm.projectName, #pageForm.branchName, 'EDIT_PAGE') :
-	hasPagePermission(#pageForm.projectName, #pageForm.branchName, #pageForm.path, 'EDIT_PAGE')">
+	hasBranchPermission(#pageForm.projectName, #pageForm.branchName, EDIT_PAGE) :
+	hasPagePermission(#pageForm.projectName, #pageForm.branchName, #pageForm.path, EDIT_PAGE)">
 
 <c:choose>
 	<c:when test="${!empty pageForm.path}"><c:set var="hierarchyPagePath" value="${pageForm.path}"/></c:when>

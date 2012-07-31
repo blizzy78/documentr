@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/users")
 public class UsersController {
 	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String getUsers() {
 		return "/user/index"; //$NON-NLS-1$
 	}

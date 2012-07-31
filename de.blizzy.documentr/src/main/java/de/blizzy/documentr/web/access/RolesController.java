@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/roles")
 public class RolesController {
 	@RequestMapping(method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String getRoles() {
 		return "/user/role/index"; //$NON-NLS-1$
 	}

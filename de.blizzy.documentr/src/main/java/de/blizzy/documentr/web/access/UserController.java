@@ -57,7 +57,7 @@ public class UserController {
 	private PasswordEncoder passwordEncoder;
 
 	@RequestMapping(value="/add", method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String addUser(Model model) {
 		UserForm form = new UserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
 				StringUtils.EMPTY, false, null);
@@ -66,7 +66,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value="/save", method=RequestMethod.POST)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String saveUser(@ModelAttribute @Valid UserForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		
@@ -142,7 +142,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value="/edit/{loginName:" + DocumentrConstants.USER_LOGIN_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String editUser(@PathVariable String loginName, Model model) throws IOException {
 		User user;
 		if (loginName.equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {

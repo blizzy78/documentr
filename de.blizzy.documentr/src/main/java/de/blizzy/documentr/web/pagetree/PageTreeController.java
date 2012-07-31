@@ -54,7 +54,7 @@ public class PageTreeController {
 
 	@RequestMapping(value="/application/json", method=RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("hasAnyProjectPermission('VIEW')")
+	@PreAuthorize("hasAnyProjectPermission(VIEW)")
 	public List<ProjectTreeNode> getApplicationChildren(Authentication authentication) {
 		List<ProjectTreeNode> result = Lists.newArrayList();
 		List<String> projects = repoManager.listProjects();
@@ -69,7 +69,7 @@ public class PageTreeController {
 	@RequestMapping(value="/project/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@PreAuthorize("hasAnyBranchPermission(#name, 'VIEW')")
+	@PreAuthorize("hasAnyBranchPermission(#name, VIEW)")
 	public List<BranchTreeNode> getProjectChildren(@PathVariable String name, Authentication authentication)
 			throws IOException {
 		
@@ -87,7 +87,7 @@ public class PageTreeController {
 			"{name:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@PreAuthorize("hasBranchPermission(#projectName, #name, 'VIEW')")
+	@PreAuthorize("hasBranchPermission(#projectName, #name, VIEW)")
 	public List<PageTreeNode> getBranchChildren(@PathVariable String projectName, @PathVariable String name,
 			@RequestParam(required=false) Set<String> checkBranchPermissions, Authentication authentication)
 			throws IOException {
@@ -104,7 +104,7 @@ public class PageTreeController {
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'VIEW')")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, VIEW)")
 	public List<AbstractTreeNode> getPageChildren(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam(required=false) Set<String> checkBranchPermissions,
 			@RequestParam(required=false) boolean pages, @RequestParam(required=false) boolean attachments,

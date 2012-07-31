@@ -24,11 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')">
+<sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, VIEW)">
 
 <dt:headerJS>
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 
 function showDeleteDialog(name) {
 	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
@@ -91,7 +91,7 @@ function showDeleteDialog(name) {
 						<td><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></td>
 						<td>
 							<a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/${attachment}"><c:param name="download" value="true"/></c:url>" class="btn btn-mini" rel="nofollow"><spring:message code="button.download"/></a>
-							<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+							<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 								<a href="javascript:void(showDeleteDialog('${attachment}'));" class="btn btn-mini"><spring:message code="button.delete"/>...</a>
 							</sec:authorize>
 						</td>
@@ -105,7 +105,7 @@ function showDeleteDialog(name) {
 	</c:otherwise>
 </c:choose>
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 	<p>
 	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
 	</p>

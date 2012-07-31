@@ -26,11 +26,15 @@ import org.springframework.security.core.Authentication;
 
 public class DocumentrMethodSecurityExpressionHandlerTest {
 	@Test
-	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
+	public void createSecurityExpressionRoot() {
 		MethodInvocation methodInvocation = mock(MethodInvocation.class);
 		Object target = "this"; //$NON-NLS-1$
 		when(methodInvocation.getThis()).thenReturn(target);
+		
+		DocumentrPermissionEvaluator permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
+		
 		DocumentrMethodSecurityExpressionHandler expressionHandler = new DocumentrMethodSecurityExpressionHandler();
+		expressionHandler.setPermissionEvaluator(permissionEvaluator);
 
 		DocumentrSecurityExpressionRoot root =
 				(DocumentrSecurityExpressionRoot) expressionHandler.createSecurityExpressionRoot(

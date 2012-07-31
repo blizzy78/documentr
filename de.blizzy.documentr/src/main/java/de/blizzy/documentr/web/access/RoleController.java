@@ -51,7 +51,7 @@ public class RoleController {
 	private UserStore userStore;
 
 	@RequestMapping(value="/add", method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String addRole(Model model) {
 		RoleForm form = new RoleForm(null, Collections.<String>emptySet());
 		model.addAttribute("roleForm", form); //$NON-NLS-1$
@@ -59,7 +59,7 @@ public class RoleController {
 	}
 
 	@RequestMapping(value="/edit/{roleName:" + DocumentrConstants.ROLE_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String editRole(@PathVariable String roleName, Model model) throws IOException {
 		Role role = userStore.getRole(roleName);
 		Set<String> permissions = Sets.newHashSet();
@@ -72,7 +72,7 @@ public class RoleController {
 	}
 
 	@RequestMapping(value="/save", method=RequestMethod.POST)
-	@PreAuthorize("hasApplicationPermission('ADMIN')")
+	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String saveRole(@ModelAttribute @Valid RoleForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		

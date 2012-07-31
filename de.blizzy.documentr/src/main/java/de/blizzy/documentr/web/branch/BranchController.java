@@ -56,7 +56,7 @@ public class BranchController {
 	private UserStore userStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("hasProjectPermission(#projectName, 'EDIT_BRANCH')")
+	@PreAuthorize("hasProjectPermission(#projectName, EDIT_BRANCH)")
 	public String createBranch(@PathVariable String projectName, Model model) {
 		BranchForm form = new BranchForm(projectName, null, null);
 		model.addAttribute("branchForm", form); //$NON-NLS-1$
@@ -64,7 +64,7 @@ public class BranchController {
 	}
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.POST)
-	@PreAuthorize("hasBranchPermission(#form.projectName, #form.name, 'EDIT_BRANCH')")
+	@PreAuthorize("hasBranchPermission(#form.projectName, #form.name, EDIT_BRANCH)")
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 		
@@ -93,6 +93,8 @@ public class BranchController {
 			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 					"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 		}
+		
+		pageStore.reindexAllPages(form.getProjectName(), form.getName());
 		
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$

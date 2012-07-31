@@ -54,14 +54,14 @@ public class ProjectController {
 	private IPageStore pageStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("hasProjectPermission(#name, 'VIEW')")
+	@PreAuthorize("hasProjectPermission(#name, VIEW)")
 	public String getProject(@PathVariable String name, Model model) {
 		model.addAttribute("name", name); //$NON-NLS-1$
 		return "/project/view"; //$NON-NLS-1$
 	}
 
 	@RequestMapping(value="/create", method=RequestMethod.GET)
-	@PreAuthorize("hasApplicationPermission('EDIT_PROJECT')")
+	@PreAuthorize("hasApplicationPermission(EDIT_PROJECT)")
 	public String createProject(Model model) {
 		ProjectForm form = new ProjectForm(null);
 		model.addAttribute("projectForm", form); //$NON-NLS-1$
@@ -70,8 +70,8 @@ public class ProjectController {
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("projectExists(#form.name) ? " +
-			"hasProjectPermission(#form.name, 'EDIT_PROJECT') : " +
-			"hasApplicationPermission('EDIT_PROJECT')")
+			"hasProjectPermission(#form.name, EDIT_PROJECT) : " +
+			"hasApplicationPermission(EDIT_PROJECT)")
 	public String saveProject(@ModelAttribute @Valid ProjectForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 		
@@ -90,7 +90,7 @@ public class ProjectController {
 	}
 
 	@RequestMapping(value="/importSample/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json", method=RequestMethod.GET)
-	@PreAuthorize("hasProjectPermission(#name, 'ADMIN')")
+	@PreAuthorize("hasProjectPermission(#name, ADMIN)")
 	@ResponseBody
 	public void importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
 		repoManager.importSampleContents(name);

@@ -99,4 +99,6 @@ public interface IPageStore {
 			throws IOException;
 	
 	void reindexAllPages(String projectName) throws IOException;
+
+	void reindexAllPages(String projectName, String branchName) throws IOException;
 }

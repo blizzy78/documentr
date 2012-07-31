@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #path, 'VIEW')">
+<sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #path, VIEW)">
 
 <c:set var="versions" value="${d:listPageVersions(projectName, branchName, path)}"/>
 
@@ -76,7 +76,7 @@ function showChangesDialog() {
 	});
 }
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 
 function restoreOldVersion() {
 	var previousCommit = $('#changes-dialog').data('previousCommit');
@@ -171,7 +171,7 @@ $(function() {
 	</div>
 	<div class="modal-body" id="changes-dialog-body"></div>
 	<div class="modal-footer">
-		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')">
+		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
 		</sec:authorize>
 		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn btn-primary"><spring:message code="button.close"/></a>

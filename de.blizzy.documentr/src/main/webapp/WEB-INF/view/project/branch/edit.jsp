@@ -24,8 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
 <sec:authorize access="(#branchForm.name == null) ?
-	hasProjectPermission(#branchForm.projectName, 'EDIT_BRANCH') :
-	hasBranchPermission(#branchForm.projectName, #branchForm.name, 'EDIT_BRANCH')">
+	hasProjectPermission(#branchForm.projectName, EDIT_BRANCH) :
+	hasBranchPermission(#branchForm.projectName, #branchForm.name, EDIT_BRANCH)">
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

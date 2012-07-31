@@ -30,7 +30,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.PageNotFoundException;
@@ -77,44 +76,10 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		Assert.hasLength(targetType);
 		Assert.notNull(permission);
 		
-		return hasPermission(authentication, targetId.toString(), Type.valueOf(targetType),
-				Permission.valueOf(permission.toString()));
+		// not used
+		return false;
 	}
 	
-	private boolean hasPermission(Authentication authentication, String targetId, Type targetType, Permission permission) {
-		Assert.hasLength(targetId);
-		
-		switch (targetType) {
-			case APPLICATION:
-				return hasApplicationPermission(authentication, permission);
-			case PROJECT:
-				if (targetId.equals(GrantedAuthorityTarget.ANY)) {
-					return hasAnyProjectPermission(authentication, permission);
-				}
-				return hasProjectPermission(authentication, targetId, permission);
-			case BRANCH:
-				{
-					String projectName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
-					String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
-					if (branchName.equals(GrantedAuthorityTarget.ANY)) {
-						return hasAnyBranchPermission(authentication, projectName, permission);
-					}
-					return hasBranchPermission(authentication, projectName, branchName, permission);
-				}
-			case PAGE:
-				{
-					String[] parts = targetId.split("/"); //$NON-NLS-1$
-					Assert.isTrue(parts.length == 3);
-					String projectName = parts[0];
-					String branchName = parts[1];
-					String path = Util.toRealPagePath(parts[2]);
-					return hasPagePermission(authentication, projectName, branchName, path, permission);
-				}
-			default:
-				return false;
-		}
-	}
-
 	public boolean hasApplicationPermission(Authentication authentication, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {

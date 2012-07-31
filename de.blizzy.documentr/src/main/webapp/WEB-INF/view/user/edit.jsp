@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="hasApplicationPermission('ADMIN')">
+<sec:authorize access="hasApplicationPermission(ADMIN)">
 
 <c:set var="projects" value="${d:listProjects()}"/>
 <c:set var="roles" value="${d:listRoles()}"/>

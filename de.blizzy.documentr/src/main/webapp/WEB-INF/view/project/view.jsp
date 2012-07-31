@@ -22,14 +22,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="hasProjectPermission(#name, 'VIEW')">
+<sec:authorize access="hasProjectPermission(#name, VIEW)">
 
 <c:set var="branches" value="${d:listProjectBranches(name)}"/>
 
 <dt:headerJS>
 
 <c:if test="${empty branches}">
-<sec:authorize access="hasProjectPermission(#name, 'ADMIN')">
+<sec:authorize access="hasProjectPermission(#name, ADMIN)">
 
 function importSampleContents() {
 	var dlg = documentr.openMessageDialog('<spring:message code="title.importSampleContents"/>',
@@ -87,11 +87,11 @@ function importSampleContents() {
 	<c:otherwise><p>No branches found.</p></c:otherwise>
 </c:choose>
 
-<sec:authorize access="hasProjectPermission(#name, 'EDIT_BRANCH')">
+<sec:authorize access="hasProjectPermission(#name, EDIT_BRANCH)">
 	<p>
 	<a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
 	<c:if test="${empty branches}">
-		<sec:authorize access="hasProjectPermission(#name, 'ADMIN')">
+		<sec:authorize access="hasProjectPermission(#name, ADMIN)">
 			<a href="javascript:void(importSampleContents());" class="btn"><i class="icon-download-alt"></i> <spring:message code="button.importSampleContents"/></a>
 		</sec:authorize>
 	</c:if>

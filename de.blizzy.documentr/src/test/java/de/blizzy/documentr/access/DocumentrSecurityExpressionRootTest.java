@@ -24,26 +24,24 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 public class DocumentrSecurityExpressionRootTest {
 	private Authentication authentication;
 	private GlobalRepositoryManager repoManager;
 	private DocumentrSecurityExpressionRoot root;
-	private PermissionEvaluator permissionEvaluator;
+	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@Before
 	public void setUp() {
 		authentication = mock(Authentication.class);
 		repoManager = mock(GlobalRepositoryManager.class);
-		permissionEvaluator = mock(PermissionEvaluator.class);
+		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
 		
 		root = new DocumentrSecurityExpressionRoot(authentication, repoManager);
 		root.setPermissionEvaluator(permissionEvaluator);
@@ -52,51 +50,47 @@ public class DocumentrSecurityExpressionRootTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasApplicationPermission() {
-		when(permissionEvaluator.hasPermission(authentication, GrantedAuthorityTarget.APPLICATION_TARGET_ID,
-				Type.APPLICATION.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasApplicationPermission(Permission.EDIT_PAGE.name()));
+		when(permissionEvaluator.hasApplicationPermission(authentication, Permission.EDIT_PAGE)).thenReturn(true);
+		assertTrue(root.hasApplicationPermission(Permission.EDIT_PAGE));
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasProjectPermission() {
-		when(permissionEvaluator.hasPermission(authentication, "project", //$NON-NLS-1$
-				Type.PROJECT.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasProjectPermission("project", Permission.EDIT_PAGE.name())); //$NON-NLS-1$
+		when(permissionEvaluator.hasProjectPermission(authentication, "project", Permission.EDIT_PAGE)).thenReturn(true); //$NON-NLS-1$
+		assertTrue(root.hasProjectPermission("project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasAnyProjectPermission() {
-		when(permissionEvaluator.hasPermission(authentication, GrantedAuthorityTarget.ANY,
-				Type.PROJECT.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasAnyProjectPermission(Permission.EDIT_PAGE.name()));
+		when(permissionEvaluator.hasAnyProjectPermission(authentication, Permission.EDIT_PAGE)).thenReturn(true);
+		assertTrue(root.hasAnyProjectPermission(Permission.EDIT_PAGE));
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasBranchPermission() {
-		when(permissionEvaluator.hasPermission(authentication, "project/branch", //$NON-NLS-1$
-				Type.BRANCH.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasBranchPermission("project", "branch", Permission.EDIT_PAGE.name())); //$NON-NLS-1$ //$NON-NLS-2$
+		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(true);
+		assertTrue(root.hasBranchPermission("project", "branch", Permission.EDIT_PAGE)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasAnyBranchPermission() {
-		when(permissionEvaluator.hasPermission(authentication, "project/" + GrantedAuthorityTarget.ANY, //$NON-NLS-1$
-				Type.BRANCH.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
-		assertTrue(root.hasAnyBranchPermission("project", Permission.EDIT_PAGE.name())); //$NON-NLS-1$
+		when(permissionEvaluator.hasAnyBranchPermission(authentication, "project", Permission.EDIT_PAGE)) //$NON-NLS-1$
+			.thenReturn(true);
+		assertTrue(root.hasAnyBranchPermission("project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasPagePermission() {
-		when(permissionEvaluator.hasPermission(authentication,
-				"project/branch/" + DocumentrConstants.HOME_PAGE_NAME + ",foo", //$NON-NLS-1$ //$NON-NLS-2$
-				Type.PAGE.name(), Permission.EDIT_PAGE.name())).thenReturn(true);
+		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
+				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE)).thenReturn(true); //$NON-NLS-1$
 		assertTrue(root.hasPagePermission("project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE.name())); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
 
 	@Test

@@ -103,16 +103,21 @@ class PageStore implements IPageStore {
 	@Override
 	public void reindexAllPages(String projectName) throws IOException {
 		for (String branchName : repoManager.listProjectBranches(projectName)) {
-			reindexAllPagesAddPageToIndex(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
+			reindexAllPages(projectName, branchName);
 		}
 	}
+
+	@Override
+	public void reindexAllPages(String projectName, String branchName) throws IOException {
+		reindexPageAndChildPages(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
+	}
 	
-	private void reindexAllPagesAddPageToIndex(String projectName, String branchName, String path) throws IOException {
+	private void reindexPageAndChildPages(String projectName, String branchName, String path) throws IOException {
 		Page page = getPage(projectName, branchName, path, true);
 		pageIndex.addPage(projectName, branchName, path, page);
 		
 		for (String childPagePath : listChildPagePaths(projectName, branchName, path)) {
-			reindexAllPagesAddPageToIndex(projectName, branchName, childPagePath);
+			reindexPageAndChildPages(projectName, branchName, childPagePath);
 		}
 	}
 

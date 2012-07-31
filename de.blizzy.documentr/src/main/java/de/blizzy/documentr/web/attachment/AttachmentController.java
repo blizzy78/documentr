@@ -64,7 +64,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
+	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, VIEW)")
 	public String getAttachments(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 
@@ -79,7 +79,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
 			"{name:.*}", method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'VIEW')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, VIEW)")
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name, @RequestParam(required=false) boolean download,
 			HttpServletRequest request) throws IOException {
@@ -124,7 +124,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)")
 	public String createAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
 		
@@ -139,7 +139,7 @@ public class AttachmentController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)")
 	public String saveAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @RequestParam MultipartFile file, Authentication authentication)
 			throws IOException {
@@ -163,7 +163,7 @@ public class AttachmentController {
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
 			"{name:.*}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)")
 	public String deleteAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name, Authentication authentication) throws IOException {
 

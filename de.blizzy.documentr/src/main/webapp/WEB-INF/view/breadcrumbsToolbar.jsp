@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<ul class="dropdown-menu">
 			<li><a href="<c:url value="/projects"/>"><i class="icon-folder-open"></i> <spring:message code="button.projects"/></a></li>
 
-			<sec:authorize access="hasApplicationPermission('ADMIN')">
+			<sec:authorize access="hasApplicationPermission(ADMIN)">
 				<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
 			</sec:authorize>
 		</ul>

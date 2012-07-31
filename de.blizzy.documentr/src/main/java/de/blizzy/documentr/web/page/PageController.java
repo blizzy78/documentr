@@ -76,7 +76,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -120,7 +120,7 @@ public class PageController {
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}", method=RequestMethod.GET)
-	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
 	public String createPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String parentPagePath, Model model) {
 
@@ -134,7 +134,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) throws IOException {
 		
@@ -155,7 +155,7 @@ public class PageController {
 	
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
-	@PreAuthorize("hasBranchPermission(#form.projectName, #form.branchName, 'EDIT_PAGE')")
+	@PreAuthorize("hasBranchPermission(#form.projectName, #form.branchName, EDIT_PAGE)")
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 		
@@ -212,7 +212,7 @@ public class PageController {
 			"{parentPagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'VIEW')")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, VIEW)")
 	public Map<String, Object> generateName(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String parentPagePath, @RequestParam String title) throws IOException {
 
@@ -251,8 +251,8 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW') and " +
-			"hasBranchPermission(#projectName, #targetBranchName, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW) and " +
+			"hasBranchPermission(#projectName, #targetBranchName, EDIT_PAGE)")
 	public String copyToBranch(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String targetBranchName, Authentication authentication)
 			throws IOException {
@@ -269,7 +269,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
 	public String deletePage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Authentication authentication) throws IOException {
 		
@@ -284,7 +284,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.POST)
-	@PreAuthorize("hasBranchPermission(#projectName, #branchName, 'EDIT_PAGE')")
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
 	public String relocatePage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String newParentPagePath, Authentication authentication)
 			throws IOException {
@@ -304,7 +304,7 @@ public class PageController {
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public Map<String, String> getPageMarkdown(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam Set<String> versions) throws IOException {
 
@@ -317,7 +317,7 @@ public class PageController {
 			"{rangeStart:[0-9]+},{rangeEnd:[0-9]+}/json",
 			method=RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public Map<String, String> getPageMarkdownInRange(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd) throws IOException {
 
@@ -334,7 +334,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
 			method=RequestMethod.GET)
-	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #path, 'VIEW')")
+	@PreAuthorize("isAuthenticated() and hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public String getPageChanges(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model) {
 
@@ -350,7 +350,7 @@ public class PageController {
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public Map<String, String> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String markdown, @RequestParam String range,
 			Authentication authentication) throws IOException {
@@ -388,7 +388,7 @@ public class PageController {
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
 			method=RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, 'EDIT_PAGE')")
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public void restoreVersion(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String version, Authentication authentication) throws IOException {
 		

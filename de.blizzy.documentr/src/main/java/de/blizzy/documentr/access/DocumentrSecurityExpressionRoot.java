@@ -20,23 +20,29 @@ package de.blizzy.documentr.access;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.Util;
-import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 /** documentr's {@link SecurityExpressionRoot} for use in JSP and security annotations. */
 public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+	public static final Permission ADMIN = Permission.ADMIN;
+	public static final Permission VIEW = Permission.VIEW;
+	public static final Permission EDIT_PROJECT = Permission.EDIT_PROJECT;
+	public static final Permission EDIT_BRANCH = Permission.EDIT_BRANCH;
+	public static final Permission EDIT_PAGE = Permission.EDIT_PAGE;
+
 	public HttpServletRequest request;
 	
 	private GlobalRepositoryManager repoManager;
 	private Object target;
 	private Object returnObject;
 	private Object filterObject;
+	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	public DocumentrSecurityExpressionRoot(Authentication authentication, GlobalRepositoryManager repoManager) {
 		super(authentication);
@@ -46,29 +52,28 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 		setTrustResolver(new AuthenticationTrustResolverImpl());
 	}
 
-	public boolean hasApplicationPermission(String permission) {
-		return hasPermission(GrantedAuthorityTarget.APPLICATION_TARGET_ID, Type.APPLICATION.name(), permission);
+	public boolean hasApplicationPermission(Permission permission) {
+		return permissionEvaluator.hasApplicationPermission(authentication, permission);
 	}
 
-	public boolean hasProjectPermission(String projectName, String permission) {
-		return hasPermission(projectName, Type.PROJECT.name(), permission);
+	public boolean hasProjectPermission(String projectName, Permission permission) {
+		return permissionEvaluator.hasProjectPermission(authentication, projectName, permission);
 	}
 	
-	public boolean hasAnyProjectPermission(String permission) {
-		return hasPermission(GrantedAuthorityTarget.ANY, Type.PROJECT.name(), permission);
+	public boolean hasAnyProjectPermission(Permission permission) {
+		return permissionEvaluator.hasAnyProjectPermission(authentication, permission);
 	}
 	
-	public boolean hasBranchPermission(String projectName, String branchName, String permission) {
-		return hasPermission(projectName + "/" + branchName, Type.BRANCH.name(), permission); //$NON-NLS-1$
+	public boolean hasBranchPermission(String projectName, String branchName, Permission permission) {
+		return permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, permission);
 	}
 	
-	public boolean hasAnyBranchPermission(String projectName, String permission) {
-		return hasPermission(projectName + "/" + GrantedAuthorityTarget.ANY, Type.BRANCH.name(), permission); //$NON-NLS-1$
+	public boolean hasAnyBranchPermission(String projectName, Permission permission) {
+		return permissionEvaluator.hasAnyBranchPermission(authentication, projectName, permission);
 	}
 	
-	public boolean hasPagePermission(String projectName, String branchName, String path, String permission) {
-		return hasPermission(projectName + "/" + branchName + "/" + Util.toURLPagePath(path), //$NON-NLS-1$ //$NON-NLS-2$
-				Type.PAGE.name(), permission);
+	public boolean hasPagePermission(String projectName, String branchName, String path, Permission permission) {
+		return permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission);
 	}
 	
 	public boolean projectExists(String projectName) {
@@ -110,5 +115,11 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	
 	public HttpServletRequest getRequest() {
 		return request;
+	}
+	
+	@Override
+	public void setPermissionEvaluator(PermissionEvaluator permissionEvaluator) {
+		super.setPermissionEvaluator(permissionEvaluator);
+		this.permissionEvaluator = (DocumentrPermissionEvaluator) permissionEvaluator;
 	}
 }
