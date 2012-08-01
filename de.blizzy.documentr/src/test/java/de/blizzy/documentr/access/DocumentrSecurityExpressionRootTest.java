@@ -90,7 +90,7 @@ public class DocumentrSecurityExpressionRootTest {
 		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
 				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE)).thenReturn(true); //$NON-NLS-1$
 		assertTrue(root.hasPagePermission("project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.EDIT_PAGE)); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + ",foo", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
 
 	@Test
