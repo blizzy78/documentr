@@ -111,6 +111,7 @@ public class PageController {
 			String viewRestrictionRole = page.getViewRestrictionRole();
 			model.addAttribute("viewRestrictionRole", //$NON-NLS-1$
 					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY);
+			model.addAttribute("commit", metadata.getCommit()); //$NON-NLS-1$
 			return "/project/branch/page/view"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -357,7 +358,7 @@ public class PageController {
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public Map<String, String> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String markdown, @RequestParam String range,
-			Authentication authentication) throws IOException {
+			@RequestParam String commit, Authentication authentication) throws IOException {
 		
 		path = Util.toRealPagePath(path);
 		
@@ -377,8 +378,7 @@ public class PageController {
 		
 		page.setData(new PageTextData(newText));
 		User user = userStore.getUser(authentication.getName());
-		// FIXME: base commit?
-		pageStore.savePage(projectName, branchName, path, page, null, user);
+		pageStore.savePage(projectName, branchName, path, page, commit, user);
 		
 		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
 		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);

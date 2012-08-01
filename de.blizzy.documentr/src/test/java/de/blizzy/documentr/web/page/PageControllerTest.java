@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -423,7 +422,6 @@ public class PageControllerTest {
 	}
 	
 	@Test
-	@Ignore
 	public void savePageRange() throws IOException {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
@@ -434,12 +432,11 @@ public class PageControllerTest {
 			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		
 		Map<String, String> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
-				"a\nb\nc\n", "2,4", authenticatedAuthentication); //$NON-NLS-1$ //$NON-NLS-2$
+				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		// FIXME: base commit?
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
-				argPage("title", "x\na\nb\nc\nz\n"), isNull(String.class), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
+				argPage("title", "x\na\nb\nc\nz\n"), eq("commit"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
 	@Test

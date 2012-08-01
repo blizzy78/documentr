@@ -191,7 +191,8 @@ function saveInlineEditor() {
 		dataType: 'json',
 		data: {
 			markdown: formEl.find('textarea').val(),
-			range: $(textEl).attr('data-text-range')
+			range: $(textEl).attr('data-text-range'),
+			commit: '<c:out value="${commit}"/>'
 		},
 		success: function(result) {
 			$('#pageText').html(result.html);
