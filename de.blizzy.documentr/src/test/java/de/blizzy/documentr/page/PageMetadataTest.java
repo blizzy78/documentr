@@ -27,21 +27,28 @@ public class PageMetadataTest {
 	@Test
 	public void getLastEditedBy() {
 		Date lastEdited = new Date();
-		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("user", metadata.getLastEditedBy()); //$NON-NLS-1$
 	}
 
 	@Test
 	public void getLastEdited() {
 		Date lastEdited = new Date();
-		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(lastEdited, metadata.getLastEdited());
 	}
 	
 	@Test
 	public void getSize() {
 		Date lastEdited = new Date();
-		PageMetadata metadata = new PageMetadata("user", lastEdited, 123); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(123, metadata.getSize());
+	}
+	
+	@Test
+	public void getCommit() {
+		Date lastEdited = new Date();
+		PageMetadata metadata = new PageMetadata("user", lastEdited, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("commit", metadata.getCommit()); //$NON-NLS-1$
 	}
 }

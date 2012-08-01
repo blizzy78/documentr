@@ -381,6 +381,7 @@ $(function() {
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal">
 	<fieldset>
 		<form:hidden path="parentPagePath"/>
+		<form:hidden path="commit"/>
 		<c:set var="errorText"><form:errors path="title"/></c:set>
 		<div id="titleFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="title" cssClass="control-label"><spring:message code="label.title"/>:</form:label>

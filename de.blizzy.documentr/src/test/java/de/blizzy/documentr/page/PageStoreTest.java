@@ -100,12 +100,12 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void saveAndGetPageWithViewRestrictionRole() throws IOException, GitAPIException {
+	public void savePageWithViewRestrictionRole() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
-		pageStore.savePage(PROJECT, BRANCH_1, "home/foo", page, USER); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home/foo", page, null, USER); //$NON-NLS-1$
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, "home/foo", true); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
 		assertEquals(((PageTextData) page.getData()).getText(), ((PageTextData) result.getData()).getText());
@@ -114,6 +114,23 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals("home", result.getParentPagePath()); //$NON-NLS-1$
 	}
 	
+	@Test
+	public void savePageWithSameBaseCommitAndNonconflictingChanges() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String baseCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		page = Page.fromText("title", "a\nbbb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
+		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\niii\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
+
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, PAGE, true);
+		assertEquals("a\nbbb\nc\nd\ne\nf\ng\nh\niii\nj\n", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
+	}
+
 	@Test
 	public void getPageWithoutData() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
@@ -342,13 +359,13 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(repo);
 		
 		Page page1 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
-		pageStore.savePage(PROJECT, BRANCH_1, "home", page1, USER); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page1, null, USER); //$NON-NLS-1$
 		RevCommit commit1 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
 		Page page2 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
-		pageStore.savePage(PROJECT, BRANCH_1, "home", page2, USER); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page2, null, USER); //$NON-NLS-1$
 		RevCommit commit2 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
 		Page page3 = Page.fromText("title", UUID.randomUUID().toString()); //$NON-NLS-1$
-		pageStore.savePage(PROJECT, BRANCH_1, "home", page3, USER); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home", page3, null, USER); //$NON-NLS-1$
 		RevCommit commit3 = CommitUtils.getLastCommit(repo.r(), "pages/home.page"); //$NON-NLS-1$
 		
 		Map<String, String> result = pageStore.getMarkdown(PROJECT, BRANCH_1, "home", //$NON-NLS-1$
@@ -388,7 +405,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
-		pageStore.savePage(PROJECT, BRANCH_1, "home/page", page, USER); //$NON-NLS-1$
+		pageStore.savePage(PROJECT, BRANCH_1, "home/page", page, null, USER); //$NON-NLS-1$
 		
 		String role = pageStore.getViewRestrictionRole(PROJECT, BRANCH_1, "home/page"); //$NON-NLS-1$
 		assertEquals(page.getViewRestrictionRole(), role);
@@ -399,9 +416,9 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("old", "old"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, USER);
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		page = Page.fromText("new", "new"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, USER);
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		List<PageVersion> versions = pageStore.listPageVersions(PROJECT, BRANCH_1, PAGE);
 		
 		pageStore.restorePageVersion(PROJECT, BRANCH_1, PAGE, versions.get(1).getCommitName(), USER);
@@ -427,7 +444,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	
 	private Page saveRandomPage(String branchName, String path) throws IOException {
 		Page page = createRandomPage();
-		pageStore.savePage(PROJECT, branchName, path, page, USER);
+		pageStore.savePage(PROJECT, branchName, path, page, null, USER);
 		return page;
 	}
 	

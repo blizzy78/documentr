@@ -125,7 +125,7 @@ public class PageController {
 			@PathVariable String parentPagePath, Model model) {
 
 		PageForm form = new PageForm(projectName, branchName, null,
-				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY);
+				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY, null);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -142,10 +142,12 @@ public class PageController {
 			path = Util.toRealPagePath(path);
 			Page page = pageStore.getPage(projectName, branchName, path, true);
 			String viewRestrictionRole = page.getViewRestrictionRole();
+			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
 			PageForm form = new PageForm(projectName, branchName,
 					path, page.getParentPagePath(),
 					page.getTitle(), ((PageTextData) page.getData()).getText(),
-					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY);
+					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY,
+					metadata.getCommit());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
@@ -188,7 +190,7 @@ public class PageController {
 		}
 		if ((oldPage == null) || !page.equals(oldPage)) {
 			User user = userStore.getUser(authentication.getName());
-			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page, user);
+			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page, form.getCommit(), user);
 		}
 
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -199,11 +201,13 @@ public class PageController {
 	public PageForm createPageForm(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam(required=false) String path, @RequestParam(required=false) String parentPagePath,
 			@RequestParam(required=false) String title, @RequestParam(required=false) String text,
-			@RequestParam(required=false) String viewRestrictionRole) {
+			@RequestParam(required=false) String viewRestrictionRole,
+			@RequestParam(required=false) String commit) {
 		
 		return ((path != null) && (title != null) && (text != null)) ?
 				new PageForm(projectName, branchName, path, parentPagePath, title, text,
-						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY) :
+						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY,
+						StringUtils.defaultIfBlank(commit, null)) :
 				null;
 	}
 	
@@ -260,7 +264,7 @@ public class PageController {
 		path = Util.toRealPagePath(path);
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		User user = userStore.getUser(authentication.getName());
-		pageStore.savePage(projectName, targetBranchName, path, page, user);
+		pageStore.savePage(projectName, targetBranchName, path, page, null, user);
 		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Util.toURLPagePath(path);
 	}
@@ -373,7 +377,8 @@ public class PageController {
 		
 		page.setData(new PageTextData(newText));
 		User user = userStore.getUser(authentication.getName());
-		pageStore.savePage(projectName, branchName, path, page, user);
+		// FIXME: base commit?
+		pageStore.savePage(projectName, branchName, path, page, null, user);
 		
 		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
 		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);

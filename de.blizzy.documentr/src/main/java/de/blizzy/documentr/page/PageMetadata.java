@@ -23,11 +23,13 @@ public class PageMetadata {
 	private String lastEditedBy;
 	private Date lastEdited;
 	private long size;
+	private String commit;
 
-	public PageMetadata(String lastEditedBy, Date lastEdited, long size) {
+	public PageMetadata(String lastEditedBy, Date lastEdited, long size, String commit) {
 		this.lastEditedBy = lastEditedBy;
 		this.lastEdited = lastEdited;
 		this.size = size;
+		this.commit = commit;
 	}
 	
 	public String getLastEditedBy() {
@@ -40,5 +42,9 @@ public class PageMetadata {
 	
 	public long getSize() {
 		return size;
+	}
+	
+	public String getCommit() {
+		return commit;
 	}
 }

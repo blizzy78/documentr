@@ -73,7 +73,7 @@ public final class DocumentrMatchers {
 	}
 
 	public static PageForm argPageForm(final String projectName, final String branchName, final String path,
-			final String parentPagePath, final String title, final String text) {
+			final String parentPagePath, final String title, final String text, final String commit) {
 		
 		Matcher<PageForm> matcher = new ArgumentMatcher<PageForm>() {
 			@Override
@@ -84,7 +84,8 @@ public final class DocumentrMatchers {
 						StringUtils.equals(form.getPath(), path) &&
 						StringUtils.equals(form.getParentPagePath(), parentPagePath) &&
 						StringUtils.equals(form.getTitle(), title) &&
-						StringUtils.equals(form.getText(), text);
+						StringUtils.equals(form.getText(), text) &&
+						StringUtils.equals(form.getCommit(), commit);
 			}
 		};
 		return argThat(matcher);

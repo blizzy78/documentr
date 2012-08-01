@@ -51,9 +51,10 @@ public class PageForm {
 	private String text;
 	@RoleExists
 	private String viewRestrictionRole;
+	private String commit;
 
 	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
-			String viewRestrictionRole) {
+			String viewRestrictionRole, String commit) {
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
@@ -62,6 +63,7 @@ public class PageForm {
 		this.title = title;
 		this.text = text;
 		this.viewRestrictionRole = viewRestrictionRole;
+		this.commit = commit;
 	}
 	
 	public String getProjectName() {
@@ -90,5 +92,9 @@ public class PageForm {
 	
 	public String getViewRestrictionRole() {
 		return viewRestrictionRole;
+	}
+	
+	public String getCommit() {
+		return commit;
 	}
 }

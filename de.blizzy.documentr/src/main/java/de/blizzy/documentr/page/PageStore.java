@@ -122,7 +122,7 @@ class PageStore implements IPageStore {
 	}
 
 	@Override
-	public void savePage(String projectName, String branchName, String path, Page page,
+	public void savePage(String projectName, String branchName, String path, Page page, String baseCommit,
 			User user) throws IOException {
 		
 		Assert.hasLength(projectName);
@@ -131,7 +131,7 @@ class PageStore implements IPageStore {
 		Assert.notNull(user);
 		
 		try {
-			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, PAGES_DIR_NAME, user);
+			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, baseCommit, PAGES_DIR_NAME, user);
 			pageIndex.addPage(projectName, branchName, path, page);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -153,19 +153,39 @@ class PageStore implements IPageStore {
 		
 		try {
 			savePageInternal(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, attachment, //$NON-NLS-1$
-					ATTACHMENTS_DIR_NAME, user);
+					null, ATTACHMENTS_DIR_NAME, user);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
 	}
 
 	private void savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
-			String rootDir, User user) throws IOException, GitAPIException {
+			String baseCommit, String rootDir, User user) throws IOException, GitAPIException {
 
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			Git git = Git.wrap(repo.r());
 
+			if (baseCommit != null) {
+				RevCommit headCommit = CommitUtils.getHead(repo.r());
+				if (headCommit.getName().equals(baseCommit)) {
+					baseCommit = null;
+				}
+			}
+			
+			String editBranchName = "_edit_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
+			if (baseCommit != null) {
+				git.branchCreate()
+					.setName(editBranchName)
+					.setStartPoint(baseCommit)
+					.call();
+
+				git.checkout()
+					.setName(editBranchName)
+					.call();
+			}
+			
 			Map<String, Object> metaMap = new HashMap<String, Object>();
 			metaMap.put(TITLE, page.getTitle());
 			metaMap.put(CONTENT_TYPE, page.getContentType());
@@ -183,18 +203,38 @@ class PageStore implements IPageStore {
 				FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
 			}
 			
-			Git git = Git.wrap(repo.r());
 			AddCommand addCommand = git.add()
 				.addFilepattern(rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
 			if (pageData != null) {
 				addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
 			}
 			addCommand.call();
+
 			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
 				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
+
+			if (baseCommit != null) {
+				git.rebase()
+					.setUpstream(branchName)
+					.call();
+				
+				git.checkout()
+					.setName(branchName)
+					.call();
+				
+				git.merge()
+					.include(repo.r().resolve(editBranchName))
+					.call();
+				
+				git.branchDelete()
+					.setBranchNames(editBranchName)
+					.setForce(true)
+					.call();
+			}
+			
 			git.push().call();
 			
 			page.setParentPagePath(getParentPagePath(path, repo.r()));
@@ -615,7 +655,7 @@ class PageStore implements IPageStore {
 			File rootDirFile = new File(workingDir, rootDir);
 			File file = toFile(rootDirFile, path + PAGE_SUFFIX);
 			
-			return new PageMetadata(lastEditedBy, lastEdited, file.length());
+			return new PageMetadata(lastEditedBy, lastEdited, file.length(), commit.getName());
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {

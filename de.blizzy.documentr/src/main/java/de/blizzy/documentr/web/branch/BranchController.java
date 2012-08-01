@@ -89,7 +89,7 @@ public class BranchController {
 			Page page = Page.fromText("Home", StringUtils.EMPTY); //$NON-NLS-1$
 			User user = userStore.getUser(authentication.getName());
 			pageStore.savePage(form.getProjectName(), form.getName(),
-					DocumentrConstants.HOME_PAGE_NAME, page, user);
+					DocumentrConstants.HOME_PAGE_NAME, page, null, user);
 			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 					"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 		}

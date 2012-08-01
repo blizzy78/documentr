@@ -181,25 +181,27 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	@Test
 	public void getPageMetadata() throws IOException {
 		Date date = new Date();
-		PageMetadata metadata = new PageMetadata("user", date, 123); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", date, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(metadata);
 		
 		PageMetadata result = Functions.getPageMetadata(PROJECT, BRANCH, PAGE);
 		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
 		assertEquals(metadata.getLastEdited(), result.getLastEdited());
 		assertEquals(metadata.getSize(), result.getSize());
+		assertEquals(metadata.getCommit(), result.getCommit());
 	}
 	
 	@Test
 	public void getAttachmentMetadata() throws IOException {
 		Date date = new Date();
-		PageMetadata metadata = new PageMetadata("user", date, 123); //$NON-NLS-1$
+		PageMetadata metadata = new PageMetadata("user", date, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png")).thenReturn(metadata); //$NON-NLS-1$
 		
 		PageMetadata result = Functions.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png"); //$NON-NLS-1$
 		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
 		assertEquals(metadata.getLastEdited(), result.getLastEdited());
 		assertEquals(metadata.getSize(), result.getSize());
+		assertEquals(metadata.getCommit(), result.getCommit());
 	}
 	
 	@Test

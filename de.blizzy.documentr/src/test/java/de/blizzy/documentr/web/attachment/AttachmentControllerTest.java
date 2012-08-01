@@ -138,7 +138,7 @@ public class AttachmentControllerTest {
 
 	private void getAttachment(boolean download, HttpServletRequest request) throws IOException {
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
-			.thenReturn(new PageMetadata("user", new Date(), 123)); //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new Date(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		byte[] data = { 1, 2, 3 };
 		String contentType = "image/png"; //$NON-NLS-1$
@@ -185,7 +185,7 @@ public class AttachmentControllerTest {
 		when(request.getSession()).thenReturn(session);
 		
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
-			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123)); //$NON-NLS-1$
+			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		TestPageUtil.clearProjectEditTimes();
 		

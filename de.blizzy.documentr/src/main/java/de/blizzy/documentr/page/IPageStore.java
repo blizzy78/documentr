@@ -34,7 +34,7 @@ public interface IPageStore {
 			@CacheEvict(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path"),
 			@CacheEvict(value="pageViewRestrictionRole", key="#projectName + '/' + #branchName + '/' + #path")
 	})
-	void savePage(String projectName, String branchName, String path, Page page,
+	void savePage(String projectName, String branchName, String path, Page page, String baseCommit,
 			User user) throws IOException;
 
 	@Caching(evict={

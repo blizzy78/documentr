@@ -30,12 +30,13 @@ public class PageFormTest {
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
 	private static final String VIEW_ROLE = "viewRole"; //$NON-NLS-1$
+	private static final String COMMIT = "commit"; //$NON-NLS-1$
 	
 	private PageForm form;
 
 	@Before
 	public void setUp() {
-		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE);
+		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE, COMMIT);
 	}
 	
 	@Test
@@ -71,5 +72,10 @@ public class PageFormTest {
 	@Test
 	public void getViewRestrictionRole() {
 		assertEquals(VIEW_ROLE, form.getViewRestrictionRole());
+	}
+	
+	@Test
+	public void getCommit() {
+		assertEquals(COMMIT, form.getCommit());
 	}
 }
