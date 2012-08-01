@@ -125,9 +125,10 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		page = Page.fromText("title", "a\nbbb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
 		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\niii\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
+		MergeConflict conflict = pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
 
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, PAGE, true);
+		assertNull(conflict);
 		assertEquals("a\nbbb\nc\nd\ne\nf\ng\nh\niii\nj\n", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
 	}
 

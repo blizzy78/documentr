@@ -34,10 +34,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.RebaseCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
@@ -122,7 +124,7 @@ class PageStore implements IPageStore {
 	}
 
 	@Override
-	public void savePage(String projectName, String branchName, String path, Page page, String baseCommit,
+	public MergeConflict savePage(String projectName, String branchName, String path, Page page, String baseCommit,
 			User user) throws IOException {
 		
 		Assert.hasLength(projectName);
@@ -131,8 +133,10 @@ class PageStore implements IPageStore {
 		Assert.notNull(user);
 		
 		try {
-			savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page, baseCommit, PAGES_DIR_NAME, user);
+			MergeConflict conflict = savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page,
+					baseCommit, PAGES_DIR_NAME, user);
 			pageIndex.addPage(projectName, branchName, path, page);
+			return conflict;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -159,7 +163,7 @@ class PageStore implements IPageStore {
 		}
 	}
 
-	private void savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
+	private MergeConflict savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
 			String baseCommit, String rootDir, User user) throws IOException, GitAPIException {
 
 		ILockedRepository repo = null;
@@ -216,18 +220,31 @@ class PageStore implements IPageStore {
 				.setCommitter(ident)
 				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 
+			MergeConflict conflict = null;
+			
 			if (baseCommit != null) {
 				git.rebase()
 					.setUpstream(branchName)
 					.call();
+
+				if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
+					String text = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+					conflict = new MergeConflict(text);
+					
+					git.rebase()
+						.setOperation(RebaseCommand.Operation.ABORT)
+						.call();
+				}
 				
 				git.checkout()
 					.setName(branchName)
 					.call();
-				
-				git.merge()
-					.include(repo.r().resolve(editBranchName))
-					.call();
+
+				if (conflict == null) {
+					git.merge()
+						.include(repo.r().resolve(editBranchName))
+						.call();
+				}
 				
 				git.branchDelete()
 					.setBranchNames(editBranchName)
@@ -235,11 +252,17 @@ class PageStore implements IPageStore {
 					.call();
 			}
 			
-			git.push().call();
+			if (conflict == null) {
+				git.push().call();
+			}
 			
 			page.setParentPagePath(getParentPagePath(path, repo.r()));
+
+			if (conflict == null) {
+				PageUtil.updateProjectEditTime(projectName);
+			}
 			
-			PageUtil.updateProjectEditTime(projectName);
+			return conflict;
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
