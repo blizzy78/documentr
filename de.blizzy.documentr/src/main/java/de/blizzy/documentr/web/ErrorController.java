@@ -46,4 +46,8 @@ public class ErrorController {
 	public static String notModified() {
 		return "forward:/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/dummy"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	public static String forbidden() {
+		return "forward:/error/" + HttpServletResponse.SC_FORBIDDEN + "/dummy"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

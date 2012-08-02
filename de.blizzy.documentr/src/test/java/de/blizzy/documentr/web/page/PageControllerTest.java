@@ -223,7 +223,8 @@ public class PageControllerTest {
 			.thenReturn(new PageMetadata("user", new Date(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Model model = mock(Model.class);
-		String view = pageController.editPage(PROJECT, BRANCH, PAGE_PATH_URL, model);
+		HttpSession session = mock(HttpSession.class);
+		String view = pageController.editPage(PROJECT, BRANCH, PAGE_PATH_URL, model, session);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		
 		verify(model).addAttribute(eq("pageForm"), //$NON-NLS-1$
@@ -236,7 +237,8 @@ public class PageControllerTest {
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
 		Model model = mock(Model.class);
-		String view = pageController.editPage(PROJECT, BRANCH, "nonexistent", model); //$NON-NLS-1$
+		HttpSession session = mock(HttpSession.class);
+		String view = pageController.editPage(PROJECT, BRANCH, "nonexistent", model, session); //$NON-NLS-1$
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
@@ -247,7 +249,8 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -262,7 +265,8 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", "viewRole", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -276,14 +280,15 @@ public class PageControllerTest {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
-		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -299,7 +304,8 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text", null, null); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
 		String pathUrl = Util.toURLPagePath(path);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + pathUrl, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -318,7 +324,8 @@ public class PageControllerTest {
 		
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 
 		verify(pageStore, never()).savePage(
 				anyString(), anyString(), anyString(), Matchers.<Page>any(), anyString(), Matchers.<User>any());
@@ -330,7 +337,8 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		String view = pageController.savePage(pageForm, bindingResult, authenticatedAuthentication);
+		Model model = mock(Model.class);
+		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("branchName")); //$NON-NLS-1$
@@ -431,8 +439,9 @@ public class PageControllerTest {
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)) //$NON-NLS-1$
 			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		
-		Map<String, String> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
-				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HttpSession session = mock(HttpSession.class);
+		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
+				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, session); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),

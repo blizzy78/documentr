@@ -17,14 +17,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
-public class MergeConflict {
-	private String text;
+import java.io.Serializable;
 
-	MergeConflict(String text) {
+public class MergeConflict implements Serializable {
+	private static final long serialVersionUID = -694341729219549082L;
+	
+	private String text;
+	private String newBaseCommit;
+
+	MergeConflict(String text, String newBaseCommit) {
 		this.text = text;
+		this.newBaseCommit = newBaseCommit;
 	}
 	
 	public String getText() {
 		return text;
+	}
+	
+	public String getNewBaseCommit() {
+		return newBaseCommit;
 	}
 }

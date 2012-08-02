@@ -90,11 +90,19 @@ public class PageForm {
 		return text;
 	}
 	
+	public void setText(String text) {
+		this.text = text;
+	}
+
 	public String getViewRestrictionRole() {
 		return viewRestrictionRole;
 	}
 	
 	public String getCommit() {
 		return commit;
+	}
+
+	public void setCommit(String commit) {
+		this.commit = commit;
 	}
 }

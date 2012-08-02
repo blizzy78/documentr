@@ -133,6 +133,25 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 
 	@Test
+	public void savePageWithSameBaseCommitAndConflictingChanges() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String baseCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		page = Page.fromText("title", "a\nbbb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
+		page = Page.fromText("title", "a\nxxx\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		MergeConflict conflict = pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, baseCommit, USER);
+		
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, PAGE, true);
+		assertNotNull(conflict);
+		assertEquals("a\nbbb\nc\nd\ne\nf\ng\nh\ni\nj\n", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
+		assertEquals("a\n<<<<<<< OURS\nbbb\n=======\nxxx\n>>>>>>> THEIRS\nc\nd\ne\nf\ng\nh\ni\nj\n", conflict.getText()); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void getPageWithoutData() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));

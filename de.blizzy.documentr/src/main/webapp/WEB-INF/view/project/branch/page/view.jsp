@@ -195,11 +195,15 @@ function saveInlineEditor() {
 			commit: '<c:out value="${commit}"/>'
 		},
 		success: function(result) {
-			$('#pageText').html(result.html);
-			toggleHideFloatingElements(false);
-			prettyPrint();
-			$('#inlineEditorToolbar').hide();
-			hookupInlineEditorToolbar();
+			if (documentr.isSomething(result.conflict) && result.conflict) {
+				window.location.href = '<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>';
+			} else {
+				$('#pageText').html(result.html);
+				toggleHideFloatingElements(false);
+				prettyPrint();
+				$('#inlineEditorToolbar').hide();
+				hookupInlineEditorToolbar();
+			}
 		}
 	});
 }

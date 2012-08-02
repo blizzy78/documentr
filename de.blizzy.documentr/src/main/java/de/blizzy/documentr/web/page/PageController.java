@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,7 @@ import de.blizzy.documentr.access.AuthenticationUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.page.MergeConflict;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
@@ -137,19 +139,37 @@ public class PageController {
 			method=RequestMethod.GET)
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public String editPage(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, Model model) throws IOException {
+			@PathVariable String path, Model model, HttpSession session) throws IOException {
 		
 		try {
 			path = Util.toRealPagePath(path);
+
 			Page page = pageStore.getPage(projectName, branchName, path, true);
+			String text = ((PageTextData) page.getData()).getText();
 			String viewRestrictionRole = page.getViewRestrictionRole();
 			PageMetadata metadata = pageStore.getPageMetadata(projectName, branchName, path);
-			PageForm form = new PageForm(projectName, branchName,
-					path, page.getParentPagePath(),
-					page.getTitle(), ((PageTextData) page.getData()).getText(),
-					(viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY,
-					metadata.getCommit());
+			String commit = metadata.getCommit();
+			
+			MergeConflict conflict = (MergeConflict) session.getAttribute("conflict"); //$NON-NLS-1$
+			session.removeAttribute("conflict"); //$NON-NLS-1$
+			if (conflict != null) {
+				projectName = (String) session.getAttribute("conflict.projectName"); //$NON-NLS-1$
+				session.removeAttribute("conflict.projectName"); //$NON-NLS-1$
+				branchName = (String) session.getAttribute("conflict.branchName"); //$NON-NLS-1$
+				session.removeAttribute("conflict.branchName"); //$NON-NLS-1$
+				path = (String) session.getAttribute("conflict.pagePath"); //$NON-NLS-1$
+				session.removeAttribute("conflict.pagePath"); //$NON-NLS-1$
+				text = conflict.getText();
+				commit = conflict.getNewBaseCommit();
+			}
+
+			PageForm form = new PageForm(projectName, branchName, path, page.getParentPagePath(),
+					page.getTitle(), text, (viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY,
+					commit);
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
+			if (conflict != null) {
+				model.addAttribute("mergeConflict", Boolean.TRUE); //$NON-NLS-1$
+			}
 			return "/project/branch/page/edit"; //$NON-NLS-1$
 		} catch (PageNotFoundException e) {
 			return ErrorController.notFound("page.notFound"); //$NON-NLS-1$
@@ -160,7 +180,7 @@ public class PageController {
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}", method=RequestMethod.POST)
 	@PreAuthorize("hasBranchPermission(#form.projectName, #form.branchName, EDIT_PAGE)")
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
-			Authentication authentication) throws IOException {
+			Model model, Authentication authentication) throws IOException {
 		
 		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,7 +211,14 @@ public class PageController {
 		}
 		if ((oldPage == null) || !page.equals(oldPage)) {
 			User user = userStore.getUser(authentication.getName());
-			pageStore.savePage(form.getProjectName(), form.getBranchName(), path, page, form.getCommit(), user);
+			MergeConflict conflict = pageStore.savePage(form.getProjectName(), form.getBranchName(), path,
+					page, form.getCommit(), user);
+			if (conflict != null) {
+				form.setText(conflict.getText());
+				form.setCommit(conflict.getNewBaseCommit());
+				model.addAttribute("mergeConflict", Boolean.TRUE); //$NON-NLS-1$
+				return "/project/branch/page/edit"; //$NON-NLS-1$
+			}
 		}
 
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -356,9 +383,9 @@ public class PageController {
 			method=RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
-	public Map<String, String> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
+	public Map<String, Object> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String markdown, @RequestParam String range,
-			@RequestParam String commit, Authentication authentication) throws IOException {
+			@RequestParam String commit, Authentication authentication, HttpSession session) throws IOException {
 		
 		path = Util.toRealPagePath(path);
 		
@@ -378,13 +405,20 @@ public class PageController {
 		
 		page.setData(new PageTextData(newText));
 		User user = userStore.getUser(authentication.getName());
-		pageStore.savePage(projectName, branchName, path, page, commit, user);
-		
-		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
-		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
-		
-		Map<String, String> result = Maps.newHashMap();
-		result.put("html", html); //$NON-NLS-1$
+		MergeConflict conflict = pageStore.savePage(projectName, branchName, path, page, commit, user);
+
+		Map<String, Object> result = Maps.newHashMap();
+		if (conflict != null) {
+			result.put("conflict", Boolean.TRUE); //$NON-NLS-1$
+			session.setAttribute("conflict", conflict); //$NON-NLS-1$
+			session.setAttribute("conflict.projectName", projectName); //$NON-NLS-1$
+			session.setAttribute("conflict.branchName", branchName); //$NON-NLS-1$
+			session.setAttribute("conflict.path", path); //$NON-NLS-1$
+		} else {
+			String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
+			html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+			result.put("html", html); //$NON-NLS-1$
+		}
 		return result;
 	}
 

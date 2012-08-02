@@ -171,9 +171,9 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			Git git = Git.wrap(repo.r());
 
+			String headCommit = CommitUtils.getHead(repo.r()).getName();
 			if (baseCommit != null) {
-				RevCommit headCommit = CommitUtils.getHead(repo.r());
-				if (headCommit.getName().equals(baseCommit)) {
+				if (headCommit.equals(baseCommit)) {
 					baseCommit = null;
 				}
 			}
@@ -229,7 +229,7 @@ class PageStore implements IPageStore {
 
 				if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
 					String text = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
-					conflict = new MergeConflict(text);
+					conflict = new MergeConflict(text, headCommit);
 					
 					git.rebase()
 						.setOperation(RebaseCommand.Operation.ABORT)
