@@ -45,6 +45,8 @@ public interface IPageStore {
 			Page attachment, User user) throws IOException;
 
 	Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException;
+	
+	Page getPage(String projectName, String branchName, String path, String commit, boolean loadData) throws IOException;
 
 	Page getAttachment(String projectName, String branchName, String pagePath, String name) throws IOException;
 

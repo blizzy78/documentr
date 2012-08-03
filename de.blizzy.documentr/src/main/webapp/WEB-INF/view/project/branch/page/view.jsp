@@ -224,7 +224,7 @@ function startInlineEditor(textEl, range) {
 	cancelInlineEditor();
 
 	$.ajax({
-		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/json',
+		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/<c:out value="${commit}"/>/json',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

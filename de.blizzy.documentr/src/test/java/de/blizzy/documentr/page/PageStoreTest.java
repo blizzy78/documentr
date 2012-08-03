@@ -161,6 +161,23 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	}
 
 	@Test
+	public void getPageForCommit() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page oldPage = saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		String oldCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, "home").getCommit(); //$NON-NLS-1$
+		Page newPage = saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
+		String newCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, "home").getCommit(); //$NON-NLS-1$
+		assertFalse(oldPage.getData().equals(newPage.getData()));
+		assertFalse(newCommit.equals(oldCommit));
+
+		Page result = pageStore.getPage(PROJECT, BRANCH_1, "home", oldCommit, true); //$NON-NLS-1$
+		assertEquals(oldPage.getData(), result.getData());
+		result = pageStore.getPage(PROJECT, BRANCH_1, "home", newCommit, true); //$NON-NLS-1$
+		assertEquals(newPage.getData(), result.getData());
+	}
+
+	@Test
 	public void isPageSharedWithOtherBranches() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));

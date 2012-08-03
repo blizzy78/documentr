@@ -278,12 +278,20 @@ class PageStore implements IPageStore {
 	
 	@Override
 	public Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException {
+		return getPage(projectName, branchName, path, null, loadData);
+	}
+	
+	@Override
+	public Page getPage(String projectName, String branchName, String path, String commit, boolean loadData) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
+		if (commit != null) {
+			Assert.hasLength(commit);
+		}
 
 		try {
-			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGES_DIR_NAME, loadData);
+			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGES_DIR_NAME, commit, loadData);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
@@ -299,7 +307,7 @@ class PageStore implements IPageStore {
 	}
 
 	private Map<String, Object> getPageData(String projectName, String branchName, String path, String rootDir,
-		boolean loadData) throws IOException, GitAPIException {
+			String commit, boolean loadData) throws IOException, GitAPIException {
 		
 		ILockedRepository repo = null;
 		try {
@@ -312,13 +320,23 @@ class PageStore implements IPageStore {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
 			
-			String json = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+			String json;
+			if (commit != null) {
+				json = BlobUtils.getContent(repo.r(), commit, PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
+			} else {
+				json = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+			}
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			
 			if (loadData) {
 				workingFile = toFile(pagesDir, path + PAGE_SUFFIX);
-				byte[] data = FileUtils.readFileToByteArray(workingFile);
+				byte[] data;
+				if (commit != null) {
+					data = BlobUtils.getRawContent(repo.r(), commit, PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+				} else {
+					data = FileUtils.readFileToByteArray(workingFile);
+				}
 				String contentType = (String) pageMap.get(CONTENT_TYPE);
 				PageData pageData;
 				if (contentType.equals(PageTextData.CONTENT_TYPE)) {
@@ -367,7 +385,7 @@ class PageStore implements IPageStore {
 
 		try {
 			Map<String, Object> pageMap = getPageData(projectName, branchName, pagePath + "/" + name, //$NON-NLS-1$
-					ATTACHMENTS_DIR_NAME, true);
+					ATTACHMENTS_DIR_NAME, null, true);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);

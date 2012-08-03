@@ -423,16 +423,17 @@ public class PageControllerTest {
 	@Test
 	public void getPageMarkdownInRange() throws IOException {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, "commit", true)).thenReturn(page); //$NON-NLS-1$
 		
-		Map<String, String> result = pageController.getPageMarkdownInRange(PROJECT, BRANCH, PAGE_PATH_URL, 2, 4);
+		Map<String, String> result = pageController.getPageMarkdownInRange(
+				PROJECT, BRANCH, PAGE_PATH_URL, 2, 4, "commit"); //$NON-NLS-1$
 		assertEquals("y", result.get("markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test
 	public void savePageRange() throws IOException {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, "commit", true)).thenReturn(page); //$NON-NLS-1$
 		
 		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)).thenReturn("html"); //$NON-NLS-1$
 		

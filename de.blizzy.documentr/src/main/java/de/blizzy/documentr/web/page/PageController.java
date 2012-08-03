@@ -346,14 +346,15 @@ public class PageController {
 	@RequestMapping(value="/markdownInRange/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
-			"{rangeStart:[0-9]+},{rangeEnd:[0-9]+}/json",
+			"{rangeStart:[0-9]+},{rangeEnd:[0-9]+}/{commit:[0-9a-fA-F]+}/json",
 			method=RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public Map<String, String> getPageMarkdownInRange(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd) throws IOException {
+			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd,
+			@PathVariable String commit) throws IOException {
 
-		Page page = pageStore.getPage(projectName, branchName, Util.toRealPagePath(path), true);
+		Page page = pageStore.getPage(projectName, branchName, Util.toRealPagePath(path), commit, true);
 		String markdown = ((PageTextData) page.getData()).getText();
 		Map<String, String> result = Maps.newHashMap();
 		markdown = markdown.substring(rangeStart, Math.min(rangeEnd, markdown.length()));
@@ -393,7 +394,7 @@ public class PageController {
 		int rangeStart = Integer.parseInt(StringUtils.substringBefore(range, ",")); //$NON-NLS-1$
 		int rangeEnd = Integer.parseInt(StringUtils.substringAfter(range, ",")); //$NON-NLS-1$
 		
-		Page page = pageStore.getPage(projectName, branchName, path, true);
+		Page page = pageStore.getPage(projectName, branchName, path, commit, true);
 		String text = ((PageTextData) page.getData()).getText();
 		rangeEnd = Math.min(rangeEnd, text.length());
 
