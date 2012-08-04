@@ -59,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -203,7 +204,7 @@ class PageStore implements IPageStore {
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
 			File workingFile = toFile(pagesDir, path + META_SUFFIX);
-			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+			FileUtils.write(workingFile, json, Charsets.UTF_8);
 
 			PageData pageData = page.getData();
 			if (pageData != null) {
@@ -232,7 +233,7 @@ class PageStore implements IPageStore {
 					.call();
 
 				if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
-					String text = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+					String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 					conflict = new MergeConflict(text, headCommit);
 					
 					git.rebase()
@@ -328,7 +329,7 @@ class PageStore implements IPageStore {
 			if (commit != null) {
 				json = BlobUtils.getContent(repo.r(), commit, PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
 			} else {
-				json = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+				json = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 			}
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
@@ -1002,7 +1003,7 @@ class PageStore implements IPageStore {
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
 			File file = toFile(pagesDir, path + PAGE_SUFFIX);
-			FileUtils.writeStringToFile(file, text, DocumentrConstants.ENCODING);
+			FileUtils.writeStringToFile(file, text, Charsets.UTF_8.name());
 			
 			Git git = Git.wrap(repo.r());
 			git.add()
@@ -1110,7 +1111,7 @@ class PageStore implements IPageStore {
 
 								String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, commit);
 								if (resolveText != null) {
-									FileUtils.writeStringToFile(workingFile, resolveText, DocumentrConstants.ENCODING);
+									FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
 									git.add()
 										.addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
 										.call();
@@ -1122,7 +1123,7 @@ class PageStore implements IPageStore {
 										.call();
 									cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK));
 								} else {
-									String text = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+									String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 									cherryPickResults.add(new CommitCherryPickResult(pageVersion, text));
 									hadConflicts = true;
 								}

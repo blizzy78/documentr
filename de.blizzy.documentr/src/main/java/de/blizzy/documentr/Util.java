@@ -19,7 +19,6 @@ package de.blizzy.documentr;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -110,24 +109,6 @@ public final class Util {
 			c = Collections.singleton(o);
 		}
 		return StringUtils.join(c, delimiter);
-	}
-
-	/** Converts a string into a byte array. {@link DocumentrConstants#ENCODING} is used as the encoding. */
-	public static byte[] toBytes(String s) {
-		try {
-			return s.getBytes(DocumentrConstants.ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/** Converts a byte array into a string. {@link DocumentrConstants#ENCODING} is used as the encoding. */
-	public static String fromBytes(byte[] b) {
-		try {
-			return StringUtils.toString(b, DocumentrConstants.ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/** Deletes a file ignoring exceptions. If <code>f</code> is a directory, it is deleted recursively. */

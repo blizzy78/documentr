@@ -26,9 +26,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
@@ -80,7 +80,7 @@ public class HtmlSerializerContext {
 				String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
 						.path(pattern).build()
 						.expand(projectName, branchName, Util.toURLPagePath(pagePath), name)
-						.encode(DocumentrConstants.ENCODING).toUriString()
+						.encode(Charsets.UTF_8.name()).toUriString()
 						.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 				return uri;
 			} catch (UnsupportedEncodingException e) {
@@ -98,7 +98,7 @@ public class HtmlSerializerContext {
 			String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path(pattern).build()
 					.expand(projectName, branchName, Util.toURLPagePath(path))
-					.encode(DocumentrConstants.ENCODING).toUriString()
+					.encode(Charsets.UTF_8.name()).toUriString()
 					.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 			return uri;
 		} catch (UnsupportedEncodingException e) {

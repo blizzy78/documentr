@@ -17,20 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
-import de.blizzy.documentr.Util;
+import com.google.common.base.Charsets;
 
 public class PageTextData extends PageData {
 	static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
 	
 	public PageTextData(String text) {
-		super(Util.toBytes(text), CONTENT_TYPE);
+		super(text.getBytes(Charsets.UTF_8), CONTENT_TYPE);
 	}
 	
 	static PageTextData fromBytes(byte[] data) {
-		return new PageTextData(Util.fromBytes(data));
+		return new PageTextData(new String(data, Charsets.UTF_8));
 	}
 	
 	public String getText() {
-		return Util.fromBytes(getData());
+		return new String(getData(), Charsets.UTF_8);
 	}
 }

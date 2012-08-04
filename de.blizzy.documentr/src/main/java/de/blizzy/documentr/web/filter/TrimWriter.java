@@ -21,12 +21,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 class TrimWriter {
-	void write(String text, OutputStream out, String encoding) throws IOException {
+	void write(String text, OutputStream out, Charset charset) throws IOException {
 		BufferedReader in = null;
 		try {
 			in = new BufferedReader(new StringReader(text));
@@ -51,11 +52,11 @@ class TrimWriter {
 				}
 
 				if (textarea || pre || notrim) {
-					writeln(line, out, encoding);
+					writeln(line, out, charset);
 				} else {
 					line = line.trim();
 					if (StringUtils.isNotBlank(line)) {
-						writeln(line, out, encoding);
+						writeln(line, out, charset);
 					}
 				}
 
@@ -74,8 +75,8 @@ class TrimWriter {
 		}
 	}
 
-	private void writeln(String line, OutputStream out, String encoding) throws IOException {
-		byte[] lineData = line.getBytes(encoding);
+	private void writeln(String line, OutputStream out, Charset charset) throws IOException {
+		byte[] lineData = line.getBytes(charset);
 		out.write(lineData);
 		out.write('\n');
 	}

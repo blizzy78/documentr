@@ -31,8 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
+import com.google.common.base.Charsets;
 
 public class TrimResponseWrapperTest {
 	@Test
@@ -50,7 +49,7 @@ public class TrimResponseWrapperTest {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 
-		byte[] data = Util.toBytes("hello \u20AC"); //$NON-NLS-1$
+		byte[] data = "hello \u20AC".getBytes(Charsets.UTF_8); //$NON-NLS-1$
 		
 		ServletOutputStream out = null;
 		try {
@@ -68,7 +67,7 @@ public class TrimResponseWrapperTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 
-		byte[] data = Util.toBytes("hello \u20AC"); //$NON-NLS-1$
+		byte[] data = "hello \u20AC".getBytes(Charsets.UTF_8); //$NON-NLS-1$
 		
 		ServletOutputStream out = null;
 		try {
@@ -85,7 +84,7 @@ public class TrimResponseWrapperTest {
 	@Test
 	public void getWriterAndGetData() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		when(response.getCharacterEncoding()).thenReturn(DocumentrConstants.ENCODING);
+		when(response.getCharacterEncoding()).thenReturn(Charsets.UTF_8.name());
 		
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
@@ -100,6 +99,6 @@ public class TrimResponseWrapperTest {
 			IOUtils.closeQuietly(out);
 		}
 		
-		assertTrue(Arrays.equals(Util.toBytes(s), wrapper.getData()));
+		assertTrue(Arrays.equals(s.getBytes(Charsets.UTF_8), wrapper.getData()));
 	}
 }

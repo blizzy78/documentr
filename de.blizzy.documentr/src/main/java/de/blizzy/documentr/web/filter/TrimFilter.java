@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -63,11 +64,11 @@ public class TrimFilter implements Filter {
 		BufferedReader in = null;
 		ByteArrayOutputStream out = null;
 		try {
-			String encoding = trimResponse.getCharacterEncoding();
-			String text = new String(trimResponse.getData(), encoding);
+			Charset charset = Charset.forName(trimResponse.getCharacterEncoding());
+			String text = new String(trimResponse.getData(), charset);
 			in = new BufferedReader(new StringReader(text));
 			out = new ByteArrayOutputStream();
-			writer.write(text, out, encoding);
+			writer.write(text, out, charset);
 		} finally {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);

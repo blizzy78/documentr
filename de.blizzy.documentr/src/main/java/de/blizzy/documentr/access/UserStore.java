@@ -42,6 +42,7 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -50,7 +51,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.internal.StringMap;
 import com.google.gson.reflect.TypeToken;
 
-import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
@@ -138,7 +138,7 @@ public class UserStore {
 			String json = gson.toJson(userMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File workingFile = new File(workingDir, user.getLoginName() + USER_SUFFIX);
-			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+			FileUtils.write(workingFile, json, Charsets.UTF_8);
 
 			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(user.getLoginName() + USER_SUFFIX).call();
@@ -249,7 +249,7 @@ public class UserStore {
 			String json = gson.toJson(roleMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File workingFile = new File(workingDir, role.getName() + ROLE_SUFFIX);
-			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+			FileUtils.write(workingFile, json, Charsets.UTF_8);
 
 			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(role.getName() + ROLE_SUFFIX).call();
@@ -364,7 +364,7 @@ public class UserStore {
 			String json = gson.toJson(authoritiesMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File workingFile = new File(workingDir, loginName + AUTHORITIES_SUFFIX);
-			FileUtils.write(workingFile, json, DocumentrConstants.ENCODING);
+			FileUtils.write(workingFile, json, Charsets.UTF_8);
 
 			Git git = Git.wrap(repo.r());
 			git.add().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
@@ -459,7 +459,7 @@ public class UserStore {
 			};
 			for (File file : workingDir.listFiles(filter)) {
 				String loginName = StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
-				String json = FileUtils.readFileToString(file, DocumentrConstants.ENCODING);
+				String json = FileUtils.readFileToString(file, Charsets.UTF_8);
 				User user = getUser(loginName, json);
 				for (OpenId id : user.getOpenIds()) {
 					if (id.getRealId().equals(openId)) {

@@ -22,14 +22,13 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.Util;
-import de.blizzy.documentr.page.PageTextData;
+import com.google.common.base.Charsets;
 
 public class PageTextDataTest {
 	@Test
 	public void getText() {
 		assertEquals("foo", new PageTextData("foo").getText()); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("foo", PageTextData.fromBytes(Util.toBytes("foo")).getText()); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("foo", PageTextData.fromBytes("foo".getBytes(Charsets.UTF_8)).getText()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

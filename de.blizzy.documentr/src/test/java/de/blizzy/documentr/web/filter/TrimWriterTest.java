@@ -25,8 +25,7 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
+import com.google.common.base.Charsets;
 
 public class TrimWriterTest {
 	@Test
@@ -48,12 +47,12 @@ public class TrimWriterTest {
 					"  d e  \r\n" +
 					"  f g  </textarea>\r\n" +
 					"  zzz \t  \r\n";
-			writer.write(text, out, DocumentrConstants.ENCODING);
+			writer.write(text, out, Charsets.UTF_8);
 		} finally {
 			IOUtils.closeQuietly(out);
 		}
 		
-		String result = Util.fromBytes(out.toByteArray());
+		String result = new String(out.toByteArray(), Charsets.UTF_8);
 		@SuppressWarnings("nls")
 		String expected =
 				"xyz\n" +

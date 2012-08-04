@@ -58,9 +58,6 @@ public final class DocumentrConstants {
 	/** Default content type for binary data. */
 	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
 	
-	/** Encoding to use when writing text as binary data. */
-	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
-
 	/** Page name and path of a branch's home page. */
 	public static final String HOME_PAGE_NAME = "home"; //$NON-NLS-1$
 

@@ -38,7 +38,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import de.blizzy.documentr.DocumentrConstants;
+import com.google.common.base.Charsets;
+
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.OpenIdNotFoundException;
@@ -71,12 +72,12 @@ public class AccountOpenIdController {
 			String returnToUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/accountOpenId/saveFinish") //$NON-NLS-1$
 					.build()
-					.encode(DocumentrConstants.ENCODING)
+					.encode(Charsets.UTF_8.name())
 					.toUriString();
 			returnToUrl = FacadeHostRequestWrapper.buildFacadeUrl(returnToUrl, settings.getHost(), settings.getPort());
 			String realm = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/").build() //$NON-NLS-1$
-					.encode(DocumentrConstants.ENCODING)
+					.encode(Charsets.UTF_8.name())
 					.toUriString();
 			realm = FacadeHostRequestWrapper.buildFacadeUrl(realm, settings.getHost(), settings.getPort());
 			String url = consumer.beginConsumption(request, openId, returnToUrl, realm);

@@ -24,7 +24,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.blizzy.documentr.DocumentrConstants;
+import com.google.common.base.Charsets;
+
 import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 
@@ -93,7 +94,7 @@ public class GoogleDocsMacro extends AbstractMacro {
 
 	private String toURL(UriComponents components) {
 		try {
-			return components.encode(DocumentrConstants.ENCODING).toUriString();
+			return components.encode(Charsets.UTF_8.name()).toUriString();
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}

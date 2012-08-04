@@ -22,8 +22,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -59,19 +57,6 @@ public class UtilTest extends AbstractDocumentrTest {
 		assertEquals("1, 2, 3", Util.join(Lists.newArrayList( //$NON-NLS-1$
 				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }), ", ")); //$NON-NLS-1$
 		assertEquals("123", Util.join(Integer.valueOf(123), ", ")); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-	
-	@Test
-	public void toBytes() throws UnsupportedEncodingException {
-		String text = "hello \u20AC"; //$NON-NLS-1$
-		assertTrue(Arrays.equals(text.getBytes(DocumentrConstants.ENCODING), Util.toBytes(text)));
-	}
-	
-	@Test
-	public void fromBytes() throws UnsupportedEncodingException {
-		String text = "hello \u20AC"; //$NON-NLS-1$
-		byte[] bytes = text.getBytes(DocumentrConstants.ENCODING);
-		assertEquals(text, Util.fromBytes(bytes));
 	}
 	
 	@Test(expected=None.class)

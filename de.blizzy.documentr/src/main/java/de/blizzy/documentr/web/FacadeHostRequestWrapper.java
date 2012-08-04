@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.blizzy.documentr.DocumentrConstants;
+import com.google.common.base.Charsets;
 
 public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
 	private static final Integer DEFAULT_HTTP_PORT = Integer.valueOf(80);
@@ -63,7 +63,7 @@ public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
 					.host(facadeHost)
 					.port(facadePort.intValue())
 					.build()
-					.encode(DocumentrConstants.ENCODING)
+					.encode(Charsets.UTF_8.name())
 					.toUriString();
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
