@@ -20,7 +20,7 @@ package de.blizzy.documentr.access;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.google.inject.internal.Sets;
+import com.google.common.collect.Sets;
 
 /** Represents a user. */
 public class User {

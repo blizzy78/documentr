@@ -48,7 +48,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.internal.Sets;
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;

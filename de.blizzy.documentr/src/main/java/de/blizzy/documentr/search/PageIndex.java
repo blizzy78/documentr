@@ -88,8 +88,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.google.inject.internal.Lists;
-import com.google.inject.internal.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;

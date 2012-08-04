@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.Node;
 
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 public class MacroNodeTest {
 	@Test

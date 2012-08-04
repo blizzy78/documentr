@@ -24,7 +24,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 public class SearchResultTest {
 	@SuppressWarnings("nls")
