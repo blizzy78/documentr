@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Strings;
+
 /** Holds information about settings for the application. */
 @Component
 public class Settings {
@@ -42,7 +44,7 @@ public class Settings {
 		Assert.hasLength(dataDirParam);
 		dataDir = new File(dataDirParam);
 		
-		host = StringUtils.defaultIfBlank(getInitParam("documentr.host"), null); //$NON-NLS-1$
+		host = Strings.emptyToNull(getInitParam("documentr.host")); //$NON-NLS-1$
 		
 		String port = getInitParam("documentr.port"); //$NON-NLS-1$
 		if (StringUtils.isNotBlank(port)) {

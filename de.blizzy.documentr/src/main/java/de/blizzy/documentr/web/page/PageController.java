@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -226,7 +227,7 @@ public class PageController {
 		if ((oldPage == null) || !page.equals(oldPage)) {
 			User user = userStore.getUser(authentication.getName());
 			MergeConflict conflict = pageStore.savePage(form.getProjectName(), form.getBranchName(), path,
-					page, StringUtils.defaultIfBlank(form.getCommit(), null), user);
+					page, Strings.emptyToNull(form.getCommit()), user);
 			if (conflict != null) {
 				form.setText(conflict.getText());
 				form.setCommit(conflict.getNewBaseCommit());
@@ -249,7 +250,7 @@ public class PageController {
 		return ((path != null) && (title != null) && (text != null)) ?
 				new PageForm(projectName, branchName, path, parentPagePath, title, text,
 						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY,
-						StringUtils.defaultIfBlank(commit, null)) :
+						Strings.emptyToNull(commit)) :
 				null;
 	}
 	
