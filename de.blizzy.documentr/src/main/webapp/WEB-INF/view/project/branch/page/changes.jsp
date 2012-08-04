@@ -60,8 +60,8 @@ function updateButtons() {
 }
 
 function showChangesDialog() {
-	var version1 = $('input:radio:checked[name="version1"]').val();
-	var version2 = $('input:radio:checked[name="version2"]').val();
+	var version1 = $('#versions input:radio:checked[name="version1"]').val();
+	var version2 = $('#versions input:radio:checked[name="version2"]').val();
 
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
@@ -95,8 +95,28 @@ function restoreOldVersion() {
 
 </sec:authorize>
 
+<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
+
+function startCherryPick() {
+	var version1 = $('#versions input:radio:checked[name="version1"]').val();
+	var version2 = $('#versions input:radio:checked[name="version2"]').val();
+	$('#cherryPickForm input[name="version1"]').val(version1);
+	$('#cherryPickForm input[name="version2"]').val(version2);
+	$('#cherryPickForm')[0].submit();
+}
+
+function updateCherryPickButton() {
+	var button = $('#cherryPickButton');
+	button.setButtonDisabled($('#cherryPickForm input:checkbox:checked').length == 0);
+}
+
+</sec:authorize>
+
 $(function() {
 	updateButtons();
+	<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
+		updateCherryPickButton();
+	</sec:authorize>
 });
 
 </dt:headerJS>
@@ -123,7 +143,7 @@ $(function() {
 
 <div class="page-header"><h1><spring:message code="title.changes"/></h1></div>
 
-<table class="table table-documentr table-bordered table-striped">
+<table id="versions" class="table table-documentr table-bordered table-striped">
 	<thead>
 		<tr>
 			<c:if test="${fn:length(versions) >= 2}">
@@ -158,9 +178,12 @@ $(function() {
 	</tbody>
 </table>
 
-<c:if test="${fn:length(versions) >= 2}">
+<c:if test="${fn:length(versions) ge 2}">
 	<p>
-	<a href="javascript:void(showChangesDialog());" class="btn"><spring:message code="button.showChangesBetweenSelectedVersions"/></a>
+		<a href="javascript:void(showChangesDialog());" class="btn"><spring:message code="button.showChanges"/></a>
+		<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
+			<a href="javascript:void($('#cherrypick-dialog').showModal());" class="btn"><spring:message code="button.copyChangesToOtherBranches"/></a>
+		</sec:authorize>
 	</p>
 </c:if>
 
@@ -174,9 +197,51 @@ $(function() {
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
 		</sec:authorize>
-		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn btn-primary"><spring:message code="button.close"/></a>
+		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn"><spring:message code="button.close"/></a>
 	</div>
 </div>
+
+<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
+	<div class="modal" id="cherrypick-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="$('#cherrypick-dialog').modal('hide');">×</button>
+			<h3><spring:message code="title.copyChangesToOtherBranches"/></h3>
+		</div>
+		<div class="modal-body" id="cherrypick-dialog-body">
+			<p>
+			<spring:message code="selectBranchesToCopyChangesInto"/>
+			</p>
+		
+			<form id="cherryPickForm" action="<c:url value="/page/cherryPick/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+				<fieldset>
+					<input type="hidden" name="version1" value=""/>
+					<input type="hidden" name="version2" value=""/>
+					<input type="hidden" name="dryRun" value="true"/>
+	
+					<div class="control-group">
+						<c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
+						<c:forEach var="branch" items="${branches}">
+							<c:if test="${branch ne branchName}">
+								<sec:authorize access="hasPagePermission(#projectName, #branch, #path, VIEW) and
+									hasPagePermission(#projectName, #branch, #path, EDIT_PAGE)">
+									
+									<label class="checkbox">
+										<input type="checkbox" name="branch" value="${branch}" onclick="updateCherryPickButton()"/>
+										<c:out value="${branch}"/>
+									</label>
+								</sec:authorize>
+							</c:if>
+						</c:forEach>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<a href="javascript:void(startCherryPick());" id="cherryPickButton" class="btn btn-primary"><spring:message code="button.preview"/></a>
+			<a href="javascript:void($('#cherrypick-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
+</sec:authorize>
 
 </dt:page>
 

@@ -27,14 +27,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CherryPickResult;
+import org.eclipse.jgit.api.CherryPickResult.CherryPickStatus;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RebaseCommand;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -679,17 +683,16 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
-			// FIXME: would love to use author details instead of committer, but JGit doesn't have getAuthoredTime()
-			
 			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
 			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
 			RevCommit commit = getNewestCommit(metaCommit, pageCommit);
 			
-			PersonIdent committer = commit.getCommitterIdent();
+			PersonIdent committer = commit.getAuthorIdent();
 			String lastEditedBy = null;
 			if (committer != null) {
 				lastEditedBy = committer.getName();
 			}
+			// TODO: would love to use authored time
 			Date lastEdited = new Date(commit.getCommitTime() * 1000L);
 
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
@@ -921,11 +924,12 @@ class PageStore implements IPageStore {
 	}
 	
 	private PageVersion toPageVersion(RevCommit commit) {
-		PersonIdent committer = commit.getCommitterIdent();
+		PersonIdent committer = commit.getAuthorIdent();
 		String lastEditedBy = null;
 		if (committer != null) {
 			lastEditedBy = committer.getName();
 		}
+		// TODO: would love to use authored time
 		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
 		String commitName = commit.getName();
 		return new PageVersion(commitName, lastEditedBy, lastEdited);
@@ -1020,6 +1024,159 @@ class PageStore implements IPageStore {
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
+	}
+
+	@Override
+	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
+			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
+			User user) throws IOException {
+
+		Assert.hasLength(projectName);
+		Assert.hasLength(path);
+		Assert.notEmpty(commits);
+		Assert.notEmpty(targetBranches);
+		Assert.notNull(conflictResolves);
+		Assert.notNull(user);
+
+		// always do a dry run first and return early if it fails
+		if (!dryRun) {
+			SortedMap<String, List<CommitCherryPickResult>> results = cherryPick(
+					projectName, path, commits, targetBranches, conflictResolves, true, user);
+			for (List<CommitCherryPickResult> branchResults : results.values()) {
+				for (CommitCherryPickResult result : branchResults) {
+					if (result.getStatus() != CommitCherryPickResult.Status.OK) {
+						return results;
+					}
+				}
+			}
+		}
+		
+		try {
+			SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
+			for (String targetBranch : targetBranches) {
+				List<CommitCherryPickResult> branchResults = cherryPick(
+						projectName, path, commits, targetBranch, conflictResolves, dryRun, user);
+				results.put(targetBranch, branchResults);
+			}
+			return results;
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		}
+	}
+
+	private List<CommitCherryPickResult> cherryPick(String projectName, String path, List<String> commits,
+			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun, User user)
+			throws IOException, GitAPIException {
+		
+		ILockedRepository repo = null;
+		List<CommitCherryPickResult> cherryPickResults = Lists.newArrayList();
+		boolean hadConflicts = false;
+		boolean failed = false;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, targetBranch);
+			
+			String tempBranchName = "_temp_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
+			Git git = Git.wrap(repo.r());
+			
+			git.branchCreate()
+				.setName(tempBranchName)
+				.setStartPoint(targetBranch)
+				.call();
+			
+			git.checkout()
+				.setName(tempBranchName)
+				.call();
+
+			loop: for (String commit : commits) {
+				PageVersion pageVersion = toPageVersion(CommitUtils.getCommit(repo.r(), commit));
+				if (!hadConflicts) {
+					CherryPickResult result = git.cherryPick()
+						.include(repo.r().resolve(commit))
+						.call();
+					CherryPickStatus status = result.getStatus();
+					switch (status) {
+						case OK:
+							cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK));
+							break;
+						case CONFLICTING:
+							{
+								File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+								File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+								File workingFile = toFile(pagesDir, path + PAGE_SUFFIX);
+
+								String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, commit);
+								if (resolveText != null) {
+									FileUtils.writeStringToFile(workingFile, resolveText, DocumentrConstants.ENCODING);
+									git.add()
+										.addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
+										.call();
+									PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+									git.commit()
+										.setAuthor(ident)
+										.setCommitter(ident)
+										.setMessage(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
+										.call();
+									cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK));
+								} else {
+									String text = FileUtils.readFileToString(workingFile, DocumentrConstants.ENCODING);
+									cherryPickResults.add(new CommitCherryPickResult(pageVersion, text));
+									hadConflicts = true;
+								}
+							}
+							break;
+						default:
+							failed = true;
+							break loop;
+					}
+				} else {
+					cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN));
+				}
+			}
+
+			if (hadConflicts || failed) {
+				git.reset()
+					.setMode(ResetCommand.ResetType.HARD)
+					.call();
+			}
+			
+			git.checkout()
+				.setName(targetBranch)
+				.call();
+			
+			if (!dryRun && !hadConflicts && !failed) {
+				git.merge()
+					.include(repo.r().resolve(tempBranchName))
+					.call();
+			}
+			
+			git.branchDelete()
+				.setBranchNames(tempBranchName)
+				.setForce(true)
+				.call();
+
+			if (failed) {
+				throw new IOException("cherry-picking failed"); //$NON-NLS-1$
+			}
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+
+		if (!dryRun && !hadConflicts && !failed) {
+			reindexPageAndChildPages(projectName, targetBranch, path);
+		}
+
+		return cherryPickResults;
+	}
+
+	private String getCherryPickConflictResolveText(Set<CommitCherryPickConflictResolve> conflictResolves,
+			String targetBranch, String commit) {
+		
+		for (CommitCherryPickConflictResolve resolve : conflictResolves) {
+			if (resolve.getTargetBranch().equals(targetBranch) && resolve.getCommit().equals(commit)) {
+				return resolve.getText();
+			}
+		}
+		return null;
 	}
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

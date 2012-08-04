@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.PageNotFoundException;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 /**
  * <p>documentr's {@link PermissionEvaluator}.</p>
@@ -56,6 +57,8 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	private IPageStore pageStore;
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private GlobalRepositoryManager repoManager;
 
 	@Override
 	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -185,6 +188,25 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 			} catch (PageNotFoundException e) {
 				throw new AuthenticationServiceException(e.getMessage(), e);
 			}
+		}
+		return false;
+	}
+	
+	public boolean hasPagePermissionInOtherBranches(Authentication authentication, String projectName,
+			String branchName, String path, Permission permission) {
+	
+		try {
+			List<String> branches = repoManager.listProjectBranches(projectName);
+			for (String branch : branches) {
+				if (!branch.equals(branchName)) {
+					boolean result = hasPagePermission(authentication, projectName, branch, path, permission);
+					if (result) {
+						return true;
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new AuthenticationServiceException(e.getMessage(), e);
 		}
 		return false;
 	}

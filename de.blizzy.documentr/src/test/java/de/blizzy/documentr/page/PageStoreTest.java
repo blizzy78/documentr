@@ -38,6 +38,7 @@ import org.gitective.core.CommitUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
@@ -465,6 +466,142 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(3, versions.size());
 	}
 	
+	@Test
+	public void cherryPickNonConflictingEdits() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+
+		page = Page.fromText("title", "aaa\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		page = Page.fromText("title", "aaa\nbbb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
+				PROJECT, PAGE, Lists.newArrayList(commit1, commit2), Sets.newHashSet(BRANCH_2),
+				Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER);
+		List<CommitCherryPickResult> branchResults = results.get(BRANCH_2);
+		CommitCherryPickResult commit1Result = branchResults.get(0);
+		assertEquals(commit1, commit1Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit1Result.getStatus());
+		assertNull(commit1Result.getConflictText());
+		CommitCherryPickResult commit2Result = branchResults.get(1);
+		assertEquals(commit2, commit2Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit2Result.getStatus());
+		assertNull(commit2Result.getConflictText());
+		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
+		assertEquals("aaa\nbbb\nc\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void cherryPickConflictingEdits() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nxxx\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_2, PAGE, page, null, USER);
+
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		page = Page.fromText("title", "aaa\nbbb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+
+		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
+				PROJECT, PAGE, Lists.newArrayList(commit1, commit2, commit3), Sets.newHashSet(BRANCH_2),
+				Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER);
+		List<CommitCherryPickResult> branchResults = results.get(BRANCH_2);
+		CommitCherryPickResult commit1Result = branchResults.get(0);
+		assertEquals(commit1, commit1Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit1Result.getStatus());
+		assertNull(commit1Result.getConflictText());
+		CommitCherryPickResult commit2Result = branchResults.get(1);
+		assertEquals(commit2, commit2Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.CONFLICT, commit2Result.getStatus());
+		assertEquals("aaa\nb\nc\nd\ne\nf\ng\n<<<<<<< OURS\nxxx\n=======\nhhh\n>>>>>>> THEIRS\ni\n", //$NON-NLS-1$
+				commit2Result.getConflictText());
+		CommitCherryPickResult commit3Result = branchResults.get(2);
+		assertEquals(commit3, commit3Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.UNKNOWN, commit3Result.getStatus());
+		assertNull(commit3Result.getConflictText());
+		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
+		assertEquals("a\nb\nc\nd\ne\nf\ng\nxxx\ni\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void cherryPickConflictingEditsWithConflictResolves() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nxxx\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_2, PAGE, page, null, USER);
+		
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		page = Page.fromText("title", "aaa\nbbb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet(
+				new CommitCherryPickConflictResolve(BRANCH_2, commit2, "aaa\nb\nc\nd\ne\nf\ng\nhhh xxx\ni\n")); //$NON-NLS-1$
+		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
+				PROJECT, PAGE, Lists.newArrayList(commit1, commit2, commit3), Sets.newHashSet(BRANCH_2),
+				resolves, false, USER);
+		List<CommitCherryPickResult> branchResults = results.get(BRANCH_2);
+		CommitCherryPickResult commit1Result = branchResults.get(0);
+		assertEquals(commit1, commit1Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit1Result.getStatus());
+		assertNull(commit1Result.getConflictText());
+		CommitCherryPickResult commit2Result = branchResults.get(1);
+		assertEquals(commit2, commit2Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit2Result.getStatus());
+		assertNull(commit2Result.getConflictText());
+		CommitCherryPickResult commit3Result = branchResults.get(2);
+		assertEquals(commit3, commit3Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit3Result.getStatus());
+		assertNull(commit3Result.getConflictText());
+		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
+		assertEquals("aaa\nbbb\nc\nd\ne\nf\ng\nhhh xxx\ni\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void cherryPickDryRunMustNotModifyPage() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+
+		page = Page.fromText("title", "aaa\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		pageStore.cherryPick(PROJECT, PAGE, Lists.newArrayList(commit), Sets.newHashSet(BRANCH_2),
+				Collections.<CommitCherryPickConflictResolve>emptySet(), true, USER);
+		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
+		assertEquals("a\nb\nc\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+
 	private void assertPageVersion(RevCommit commit, PageVersion version) {
 		assertEquals(commit.getName(), version.getCommitName());
 		assertEquals(commit.getCommitterIdent().getName(), version.getLastEditedBy());

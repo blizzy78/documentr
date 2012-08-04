@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -103,4 +104,13 @@ public interface IPageStore {
 	void reindexAllPages(String projectName) throws IOException;
 
 	void reindexAllPages(String projectName, String branchName) throws IOException;
+
+	@Caching(evict={
+			@CacheEvict(value="pageHTML", allEntries=true),
+			@CacheEvict(value="pageHeaderHTML", allEntries=true),
+			@CacheEvict(value="pageViewRestrictionRole", allEntries=true)
+	})
+	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
+			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
+			User user) throws IOException;
 }

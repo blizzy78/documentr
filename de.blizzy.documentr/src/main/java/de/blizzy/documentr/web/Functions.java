@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -132,7 +133,7 @@ public final class Functions {
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)
 			throws IOException {
 		
-		return PageUtil.getPagePathHierarchy(projectName, branchName, pagePath, pageStore);
+		return PageUtil.getPagePathHierarchy(projectName, branchName, Util.toRealPagePath(pagePath), pageStore);
 	}
 	
 	public static PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
@@ -203,6 +204,10 @@ public final class Functions {
 	public static String getLanguage() {
 		Locale locale = LocaleContextHolder.getLocale();
 		return locale.getLanguage();
+	}
+	
+	public static String escapeJavaScript(String s) {
+		return StringEscapeUtils.escapeEcmaScript(s);
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-modal-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-tab-2.0.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-collapse-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>

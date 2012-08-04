@@ -46,12 +46,20 @@ code {
 	color: #c00f40;
 }
 
-.modal.modal-wide {
-	width: 960px;
+.modal {
+	&.modal-wide {
+		width: 960px;
+		
+		textarea {
+			width: 920px;
+		}
+	}
 }
 
-table.table-documentr {
-	margin-bottom: 18px;
+table {
+	&.table-documentr {
+		margin-bottom: 18px;
+	}
 }
 
 .hero-unit.hero-single {
@@ -257,4 +265,26 @@ form {
 
 blockquote {
 	border-left-color: #08C;
+}
+
+.accordion {
+	&.cherry-pick-preview {
+		.accordion-group {
+			margin-bottom: 15px;
+		}
+	}
+}
+
+.cherry-pick-preview {
+	.status-ok {
+		color: #468847;
+	}
+	
+	.status-conflict {
+		color: #B94A48;
+	}
+
+	.status-unknown {
+		color: #808080;
+	}
 }

@@ -33,15 +33,24 @@ class TrimWriter {
 			String line;
 			boolean textarea = false;
 			boolean pre = false;
+			boolean notrim = false;
 			while ((line = in.readLine()) != null) {
-				if (line.contains("<textarea")) { //$NON-NLS-1$
+				String origLine = line;
+
+				line = StringUtils.replace(line, "__NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
+				line = StringUtils.replace(line, "__/NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
+				
+				if (origLine.contains("<textarea")) { //$NON-NLS-1$
 					textarea = true;
 				}
-				if (line.contains("<pre")) { //$NON-NLS-1$
+				if (origLine.contains("<pre")) { //$NON-NLS-1$
 					pre = true;
 				}
+				if (origLine.contains("__NOTRIM__")) { //$NON-NLS-1$
+					notrim = true;
+				}
 
-				if (textarea || pre) {
+				if (textarea || pre || notrim) {
 					writeln(line, out, encoding);
 				} else {
 					line = line.trim();
@@ -50,11 +59,14 @@ class TrimWriter {
 					}
 				}
 
-				if (line.contains("</textarea")) { //$NON-NLS-1$
+				if (origLine.contains("</textarea")) { //$NON-NLS-1$
 					textarea = false;
 				}
-				if (line.contains("</pre")) { //$NON-NLS-1$
+				if (origLine.contains("</pre")) { //$NON-NLS-1$
 					pre = false;
+				}
+				if (origLine.contains("__/NOTRIM__")) { //$NON-NLS-1$
+					notrim = false;
 				}
 			}
 		} finally {

@@ -18,7 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.page;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,14 +43,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.WebRequest;
 
-import com.google.inject.internal.Maps;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.inject.internal.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.AuthenticationUtil;
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.page.CommitCherryPickConflictResolve;
+import de.blizzy.documentr.page.CommitCherryPickResult;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.MergeConflict;
 import de.blizzy.documentr.page.Page;
@@ -55,6 +66,7 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PageUtil;
+import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.ErrorController;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
@@ -73,6 +85,8 @@ public class PageController {
 	private UserStore userStore;
 	@Autowired
 	private IPageRenderer pageRenderer;
+	@Autowired
+	private DocumentrPermissionEvaluator permissionEvaluator;
 	
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
@@ -212,7 +226,7 @@ public class PageController {
 		if ((oldPage == null) || !page.equals(oldPage)) {
 			User user = userStore.getUser(authentication.getName());
 			MergeConflict conflict = pageStore.savePage(form.getProjectName(), form.getBranchName(), path,
-					page, form.getCommit(), user);
+					page, StringUtils.defaultIfBlank(form.getCommit(), null), user);
 			if (conflict != null) {
 				form.setText(conflict.getText());
 				form.setCommit(conflict.getNewBaseCommit());
@@ -434,6 +448,98 @@ public class PageController {
 		
 		User user = userStore.getUser(authentication.getName());
 		pageStore.restorePageVersion(projectName, branchName, Util.toRealPagePath(path), version, user);
+	}
+	
+	@RequestMapping(value="/cherryPick/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
+			method=RequestMethod.POST)
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
+	public String cherryPick(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam String version1, @RequestParam String version2,
+			@RequestParam("branch") Set<String> targetBranches, @RequestParam boolean dryRun,
+			WebRequest request, Model model, Authentication authentication) throws IOException {
+
+		path = Util.toRealPagePath(path);
+
+		for (String targetBranch : targetBranches) {
+			if (!permissionEvaluator.hasPagePermission(
+					authentication, projectName, targetBranch, path, Permission.EDIT_PAGE)) {
+				
+				return ErrorController.forbidden();
+			}
+		}
+		
+		List<String> commits = getCommitsToCherryPick(projectName, branchName, path, version1, version2);
+		User user = userStore.getUser(authentication.getName());
+
+		Map<String, String[]> params = request.getParameterMap();
+		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet();
+		for (Map.Entry<String, String[]> entry : params.entrySet()) {
+			String name = entry.getKey();
+			if (name.startsWith("resolveText_")) { //$NON-NLS-1$
+				String branchCommit = StringUtils.substringAfter(name, "_"); //$NON-NLS-1$
+				String branch = StringUtils.substringBefore(branchCommit, "/"); //$NON-NLS-1$
+				String commit = StringUtils.substringAfter(branchCommit, "/"); //$NON-NLS-1$
+				String text = entry.getValue()[0];
+				CommitCherryPickConflictResolve resolve = new CommitCherryPickConflictResolve(branch, commit, text);
+				resolves.add(resolve);
+			}
+		}
+
+		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
+				projectName, path, commits, targetBranches, resolves, dryRun, user);
+
+		if (!dryRun) {
+			boolean allOk = true;
+			loop: for (List<CommitCherryPickResult> branchResults : results.values()) {
+				for (CommitCherryPickResult result : branchResults) {
+					if (result.getStatus() != CommitCherryPickResult.Status.OK) {
+						allOk = false;
+						break loop;
+					}
+				}
+			}
+			
+			if (allOk) {
+				return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
+						"/" + Util.toURLPagePath(path); //$NON-NLS-1$
+			}
+		}
+		
+		model.addAttribute("cherryPickResults", results); //$NON-NLS-1$
+		model.addAttribute("version1", version1); //$NON-NLS-1$
+		model.addAttribute("version2", version2); //$NON-NLS-1$
+		model.addAttribute("resolves", resolves); //$NON-NLS-1$
+		return "/project/branch/page/cherryPick"; //$NON-NLS-1$
+	}
+
+	private List<String> getCommitsToCherryPick(String projectName, String branchName, String path,
+			String version1, String version2) throws IOException {
+		
+		List<PageVersion> pageVersions = Lists.newArrayList(pageStore.listPageVersions(projectName, branchName, path));
+		Collections.reverse(pageVersions);
+		boolean include = false;
+		for (Iterator<PageVersion> iter = pageVersions.iterator(); iter.hasNext();) {
+			PageVersion version = iter.next();
+			if (!include) {
+				iter.remove();
+			}
+			
+			String commit = version.getCommitName();
+			if (commit.equals(version1)) {
+				include = true;
+			} else if (commit.equals(version2)) {
+				include = false;
+			}
+		}
+		Function<PageVersion, String> function = new Function<PageVersion, String>() {
+			@Override
+			public String apply(PageVersion version) {
+				return version.getCommitName();
+			}
+		};
+		return Lists.transform(pageVersions, function);
 	}
 	
 	void setPageStore(IPageStore pageStore) {
