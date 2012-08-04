@@ -685,6 +685,10 @@ class PageStore implements IPageStore {
 
 			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
 			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			if ((metaCommit == null) && (pageCommit == null)) {
+				throw new PageNotFoundException(projectName, branchName, path);
+			}
+			
 			RevCommit commit = getNewestCommit(metaCommit, pageCommit);
 			
 			PersonIdent committer = commit.getAuthorIdent();
