@@ -30,14 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="<c:url value="/css/bootstrap-2.0.4.min.css"/>" media="all"/>
-<link rel="stylesheet" href="<c:url value="/css/bootstrap-responsive-2.0.4.min.css"/>" media="all"/>
-<link rel="stylesheet" href="<c:url value="/css/prettify-20110601.css"/>" media="all"/>
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-button-2.0.4.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-dropdown-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-collapse-2.0.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
@@ -411,7 +406,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<table class="table table-bordered table-condensed">
 					<tbody>
 						<tr>
-							<td><table class="table table-bordered table-condensed"><thead><tr><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>7</td><td>8</td><td>9</td></tr></tbody></table></td>
+							<td><table class="table table-bordered table-condensed table-striped"><thead><tr><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>7</td><td>8</td><td>9</td></tr></tbody></table></td>
 							<td><pre><code>A | B | C<br/>--|---|--<br/>1 | 2 | 3<br/>4 | 5 | 6<br/>7 | 8 | 9</code></pre></td>
 						</tr>
 					</tbody>
