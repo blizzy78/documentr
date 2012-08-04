@@ -272,7 +272,7 @@ var documentr = {};
 		var footerEl = dlgEl.find('#' + id + '_footer');
 
 		function close() {
-			dlgEl.modal('hide');
+			dlgEl.hideModal();
 			dlgEl.remove();
 		}
 		

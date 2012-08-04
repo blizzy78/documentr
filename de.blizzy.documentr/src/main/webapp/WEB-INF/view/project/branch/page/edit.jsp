@@ -455,7 +455,7 @@ $(function() {
 
 <div class="modal" id="insert-link-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#insert-link-dialog').modal('hide');">×</button>
+		<button class="close" onclick="$('#insert-link-dialog').hideModal();">×</button>
 		<h3><spring:message code="title.insertLink"/></h3>
 	</div>
 	<div class="modal-body">
@@ -499,13 +499,13 @@ $(function() {
 	</div>
 	<div class="modal-footer">
 		<a id="insert-link-button" href="javascript:void(insertLink());" class="btn btn-primary"><spring:message code="button.insertLink"/></a>
-		<a href="javascript:void($('#insert-link-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		<a href="javascript:void($('#insert-link-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 
 <div class="modal" id="insert-image-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#insert-image-dialog').modal('hide');">×</button>
+		<button class="close" onclick="$('#insert-image-dialog').hideModal();">×</button>
 		<h3><spring:message code="title.insertImage"/></h3>
 	</div>
 	<div class="modal-body">
@@ -534,7 +534,7 @@ $(function() {
 	</div>
 	<div class="modal-footer">
 		<a id="insert-image-button" href="javascript:void(insertImage());" class="btn btn-primary"><spring:message code="button.insertImage"/></a>
-		<a href="javascript:void($('#insert-image-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		<a href="javascript:void($('#insert-image-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 

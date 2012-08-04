@@ -189,7 +189,7 @@ $(function() {
 
 <div class="modal modal-wide" id="changes-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#changes-dialog').modal('hide');">×</button>
+		<button class="close" onclick="$('#changes-dialog').hideModal();">×</button>
 		<h3><spring:message code="title.changes"/></h3>
 	</div>
 	<div class="modal-body" id="changes-dialog-body"></div>
@@ -197,14 +197,14 @@ $(function() {
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
 		</sec:authorize>
-		<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn"><spring:message code="button.close"/></a>
+		<a href="javascript:void($('#changes-dialog').hideModal());" class="btn"><spring:message code="button.close"/></a>
 	</div>
 </div>
 
 <sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
 	<div class="modal" id="cherrypick-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#cherrypick-dialog').modal('hide');">×</button>
+			<button class="close" onclick="$('#cherrypick-dialog').hideModal();">×</button>
 			<h3><spring:message code="title.copyChangesToOtherBranches"/></h3>
 		</div>
 		<div class="modal-body" id="cherrypick-dialog-body">
@@ -238,7 +238,7 @@ $(function() {
 		</div>
 		<div class="modal-footer">
 			<a href="javascript:void(startCherryPick());" id="cherryPickButton" class="btn btn-primary"><spring:message code="button.preview"/></a>
-			<a href="javascript:void($('#cherrypick-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+			<a href="javascript:void($('#cherrypick-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
 </sec:authorize>

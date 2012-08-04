@@ -180,7 +180,7 @@ function preview() {
 
 <div class="modal modal-wide" id="conflict-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#conflict-dialog').modal('hide');">×</button>
+		<button class="close" onclick="$('#conflict-dialog').hideModal();">×</button>
 		<h3><spring:message code="title.resolveConflict"/></h3>
 	</div>
 	<div class="modal-body">
@@ -188,7 +188,7 @@ function preview() {
 	</div>
 	<div class="modal-footer">
 		<a href="javascript:void(saveResolveText());" class="btn btn-primary"><spring:message code="button.save"/></a>
-		<a href="javascript:void($('#conflict-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		<a href="javascript:void($('#conflict-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 

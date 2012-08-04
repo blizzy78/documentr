@@ -470,7 +470,7 @@ $(function() {
 <sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
 	<div class="modal" id="copy-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#copy-dialog').modal('hide');">×</button>
+			<button class="close" onclick="$('#copy-dialog').hideModal();">×</button>
 			<h3><spring:message code="title.copyPageToBranch"/></h3>
 		</div>
 		<div class="modal-body">
@@ -496,7 +496,7 @@ $(function() {
 		</div>
 		<div class="modal-footer">
 			<a id="copyToBranchButton" href="javascript:$('#copyToBranchForm').submit();" class="btn btn-primary"><spring:message code="button.copy"/></a>
-			<a href="javascript:void($('#copy-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+			<a href="javascript:void($('#copy-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
 </sec:authorize>
@@ -504,7 +504,7 @@ $(function() {
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 	<div class="modal" id="relocate-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#relocate-dialog').modal('hide');">×</button>
+			<button class="close" onclick="$('#relocate-dialog').hideModal();">×</button>
 			<h3><spring:message code="title.relocatePage"/></h3>
 		</div>
 		<div class="modal-body">
@@ -523,7 +523,7 @@ $(function() {
 		</div>
 		<div class="modal-footer">
 			<a id="relocate-button" href="javascript:$('#relocateForm').submit();" class="btn btn-primary"><spring:message code="button.relocate"/></a>
-			<a href="javascript:void($('#relocate-dialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+			<a href="javascript:void($('#relocate-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</div>
 </sec:authorize>
@@ -531,7 +531,7 @@ $(function() {
 <sec:authorize access="isAuthenticated()">
 	<div class="modal modal-wide" id="changes-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#changes-dialog').modal('hide');">×</button>
+			<button class="close" onclick="$('#changes-dialog').hideModal();">×</button>
 			<h3><spring:message code="title.changes"/></h3>
 		</div>
 		<div class="modal-body" id="changes-dialog-body"></div>
@@ -539,7 +539,7 @@ $(function() {
 			<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 				<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
 			</sec:authorize>
-			<a href="javascript:void($('#changes-dialog').modal('hide'));" class="btn btn-primary"><spring:message code="button.close"/></a>
+			<a href="javascript:void($('#changes-dialog').hideModal());" class="btn btn-primary"><spring:message code="button.close"/></a>
 		</div>
 	</div>
 </sec:authorize>

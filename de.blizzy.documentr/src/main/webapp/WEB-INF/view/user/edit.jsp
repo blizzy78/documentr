@@ -177,7 +177,7 @@ function addRole() {
 	}
 	var roleName = formEl.find('select[name="roleName"]').val();
 
-	$('#addRoleDialog').modal('hide');
+	$('#addRoleDialog').hideModal();
 
 	authorities.push(createAuthority(type, targetId, roleName));
 	<%-- TODO: sort authorities again like UserStore does --%>
@@ -322,7 +322,7 @@ $(function() {
 
 <div class="modal" id="addRoleDialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#addRoleDialog').modal('hide');">×</button>
+		<button class="close" onclick="$('#addRoleDialog').hideModal();">×</button>
 		<h3><spring:message code="title.addRole"/></h3>
 	</div>
 	<div class="modal-body">
@@ -374,7 +374,7 @@ $(function() {
 	</div>
 	<div class="modal-footer">
 		<a href="javascript:void(addRole());" class="btn btn-primary"><spring:message code="button.add"/></a>
-		<a href="javascript:void($('#addRoleDialog').modal('hide'));" class="btn"><spring:message code="button.cancel"/></a>
+		<a href="javascript:void($('#addRoleDialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 
