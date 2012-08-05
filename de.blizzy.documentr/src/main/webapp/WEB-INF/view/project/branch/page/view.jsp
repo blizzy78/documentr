@@ -539,7 +539,7 @@ $(function() {
 			<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 				<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
 			</sec:authorize>
-			<a href="javascript:void($('#changes-dialog').hideModal());" class="btn btn-primary"><spring:message code="button.close"/></a>
+			<a href="javascript:void($('#changes-dialog').hideModal());" class="btn"><spring:message code="button.close"/></a>
 		</div>
 	</div>
 </sec:authorize>
