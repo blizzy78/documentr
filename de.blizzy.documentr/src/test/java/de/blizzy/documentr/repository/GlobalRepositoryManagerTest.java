@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
@@ -43,6 +44,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private GlobalRepositoryManager globalRepoManager;
 	private ProjectRepositoryManager repoManager;
 	private ILockedRepository repo;
+	private EventBus eventBus;
 
 	@Before
 	public void setUp() {
@@ -57,9 +59,12 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManagerFactory repoManagerFactory = mock(ProjectRepositoryManagerFactory.class);
 		when(repoManagerFactory.getManager(allReposDir, PROJECT)).thenReturn(repoManager);
 		
+		eventBus = mock(EventBus.class);
+		
 		globalRepoManager = new GlobalRepositoryManager();
 		globalRepoManager.setSettings(settings);
 		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
+		globalRepoManager.setEventBus(eventBus);
 		globalRepoManager.init();
 
 		repo = mock(ILockedRepository.class);

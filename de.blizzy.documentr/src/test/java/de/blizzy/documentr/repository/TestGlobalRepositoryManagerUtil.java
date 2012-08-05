@@ -17,30 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import java.io.File;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import com.google.common.eventbus.EventBus;
 
-@Component
-public class ProjectRepositoryManagerFactory {
-	@Autowired
-	private LockManager lockManager;
-	@Autowired
-	private EventBus eventBus;
+public final class TestGlobalRepositoryManagerUtil {
+	private TestGlobalRepositoryManagerUtil() {}
 	
-	ProjectRepositoryManager getManager(File reposDir, String projectName) {
-		Assert.notNull(reposDir);
-		Assert.hasLength(projectName);
-		
-		File projectDir = new File(reposDir, projectName);
-		return new ProjectRepositoryManager(projectName, projectDir, lockManager, eventBus);
-	}
-	
-	public void setLockManager(LockManager lockManager) {
-		this.lockManager = lockManager;
+	public static void setEventBus(GlobalRepositoryManager repoManager, EventBus eventBus) {
+		repoManager.setEventBus(eventBus);
 	}
 }

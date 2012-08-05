@@ -32,12 +32,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
+import com.google.common.eventbus.EventBus;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageChangedEvent;
+import de.blizzy.documentr.page.PagesDeletedEvent;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 public class PageIndexTest extends AbstractDocumentrTest {
@@ -57,6 +63,13 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private MarkdownProcessor markdownProcessor;
 	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private IPageStore pageStore;
+	@Mock
+	@SuppressWarnings("unused")
+	private EventBus eventBus;
+	@Mock
+	private GlobalRepositoryManager repoManager;
 	
 	@Before
 	public void setUp() throws IOException {
@@ -64,6 +77,8 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		
 		when(anonymousAuthenticationFactory.create("dummy")).thenReturn(authentication); //$NON-NLS-1$
+
+		when(repoManager.listProjects()).thenReturn(Collections.<String>emptyList());
 		
 		pageIndex.setAlwaysRefresh(true);
 		pageIndex.init();
@@ -79,9 +94,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	public void addAndFindPage() throws ParseException, IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
+			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
+		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 
 		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
 			.thenReturn(true);
@@ -101,9 +117,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	public void findPagesAndSuggestion() throws ParseException, IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
+			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
+		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		
 		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
 			.thenReturn(true);
@@ -126,9 +143,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	public void deletePages() throws IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
+			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
-		pageIndex.addPage(PROJECT, BRANCH, PAGE_PATH, page);
+		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		
 		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
 			.thenReturn(true);
@@ -138,7 +156,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			sleep(10);
 		}
 
-		pageIndex.deletePages(PROJECT, BRANCH, Collections.singleton(PAGE_PATH));
+		pageIndex.deletePages(new PagesDeletedEvent(PROJECT, BRANCH, Collections.singleton(PAGE_PATH)));
 
 		// wait for page to get deleted
 		while (pageIndex.getNumDocuments() > 0) {

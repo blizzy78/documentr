@@ -90,14 +90,21 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.PageChangedEvent;
 import de.blizzy.documentr.page.PageTextData;
+import de.blizzy.documentr.page.PagesDeletedEvent;
+import de.blizzy.documentr.repository.BranchCreatedEvent;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
@@ -141,6 +148,12 @@ public class PageIndex {
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
+	@Autowired
+	private EventBus eventBus;
+	@Autowired
+	private IPageStore pageStore;
+	@Autowired
+	private GlobalRepositoryManager repoManager;
 	private Analyzer defaultAnalyzer;
 	private Analyzer analyzer;
 	private File pageIndexDir;
@@ -180,10 +193,18 @@ public class PageIndex {
 			}
 		};
 		timer.schedule(refreshTask, 0, REFRESH_INTERVAL * 1000);
+		
+		eventBus.register(this);
+		
+		if (getNumDocuments() == 0) {
+			reindexEverything();
+		}
 	}
 	
 	@PreDestroy
 	public void destroy() {
+		eventBus.unregister(this);
+		
 		try {
 			threadPool.shutdown();
 			threadPool.awaitTermination(10, TimeUnit.MINUTES);
@@ -205,18 +226,28 @@ public class PageIndex {
 		IndexUtil.closeQuietly(directory);
 	}
 	
-	public void addPage(final String projectName, final String branchName, final String path, final Page page) {
-		Assert.hasLength(projectName);
-		Assert.hasLength(branchName);
-		Assert.hasLength(path);
-		Assert.notNull(page);
-		Assert.isTrue(page.getData() instanceof PageTextData);
-
+	private void reindexEverything() throws IOException {
+		for (String projectName : repoManager.listProjects()) {
+			for (String branchName : repoManager.listProjectBranches(projectName)) {
+				addPages(projectName, branchName);
+			}
+		}
+	}
+	
+	@Subscribe
+	public void addPage(PageChangedEvent event) {
+		String projectName = event.getProjectName();
+		String branchName = event.getBranchName();
+		String path = event.getPath();
+		addPage(projectName, branchName, path);
+	}
+	
+	private void addPage(final String projectName, final String branchName, final String path) {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				try {
-					addPageInternal(projectName, branchName, path, page);
+					addPageAsync(projectName, branchName, path);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (RuntimeException e) {
@@ -226,9 +257,40 @@ public class PageIndex {
 		};
 		threadPool.submit(runnable);
 	}
-	
-	private void addPageInternal(String projectName, String branchName, String path, Page page) throws IOException {
+
+	@Subscribe
+	public void addPages(BranchCreatedEvent event) {
+		String projectName = event.getProjectName();
+		String branchName = event.getBranchName();
+		addPages(projectName, branchName);
+	}
+
+	private void addPages(final String projectName, final String branchName) {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
+					for (String path : paths) {
+						addPageAsync(projectName, branchName, path);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		threadPool.submit(runnable);
+	}
+
+	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
+		Page page = pageStore.getPage(projectName, branchName, path, true);
+		
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		System.out.println("indexing page: " + fullPath);
+		
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create("dummy"); //$NON-NLS-1$
 		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
@@ -278,11 +340,12 @@ public class PageIndex {
 		return html;
 	}
 
-	public void deletePages(final String projectName, final String branchName, final Set<String> paths) {
-		Assert.hasLength(projectName);
-		Assert.hasLength(branchName);
-		Assert.notEmpty(paths);
-
+	@Subscribe
+	public void deletePages(PagesDeletedEvent event) {
+		deletePages(event.getProjectName(), event.getBranchName(), event.getPaths());
+	}
+	
+	private void deletePages(final String projectName, final String branchName, final Set<String> paths) {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
@@ -490,7 +553,7 @@ public class PageIndex {
 		}
 	}
 	
-	public int getNumDocuments() throws IOException {
+	int getNumDocuments() throws IOException {
 		DirectoryReader reader = null;
 		try {
 			if (alwaysRefresh) {

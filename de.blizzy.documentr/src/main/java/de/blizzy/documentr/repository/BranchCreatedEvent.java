@@ -17,30 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import java.io.File;
+public class BranchCreatedEvent {
+	private String projectName;
+	private String branchName;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
-import com.google.common.eventbus.EventBus;
-
-@Component
-public class ProjectRepositoryManagerFactory {
-	@Autowired
-	private LockManager lockManager;
-	@Autowired
-	private EventBus eventBus;
-	
-	ProjectRepositoryManager getManager(File reposDir, String projectName) {
-		Assert.notNull(reposDir);
-		Assert.hasLength(projectName);
-		
-		File projectDir = new File(reposDir, projectName);
-		return new ProjectRepositoryManager(projectName, projectDir, lockManager, eventBus);
+	public BranchCreatedEvent(String projectName, String branchName) {
+		this.projectName = projectName;
+		this.branchName = branchName;
 	}
 	
-	public void setLockManager(LockManager lockManager) {
-		this.lockManager = lockManager;
+	public String getProjectName() {
+		return projectName;
+	}
+	
+	public String getBranchName() {
+		return branchName;
 	}
 }

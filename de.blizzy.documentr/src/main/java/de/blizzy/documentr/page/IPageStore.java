@@ -101,10 +101,6 @@ public interface IPageStore {
 	void restorePageVersion(String projectName, String branchName, String path, String version, User user)
 			throws IOException;
 	
-	void reindexAllPages(String projectName) throws IOException;
-
-	void reindexAllPages(String projectName, String branchName) throws IOException;
-
 	@Caching(evict={
 			@CacheEvict(value="pageHTML", allEntries=true),
 			@CacheEvict(value="pageHeaderHTML", allEntries=true),
@@ -113,4 +109,6 @@ public interface IPageStore {
 	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
 			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
 			User user) throws IOException;
+
+	List<String> listAllPagePaths(String projectName, String branchName) throws IOException;
 }

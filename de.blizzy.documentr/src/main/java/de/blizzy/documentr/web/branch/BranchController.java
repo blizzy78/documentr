@@ -94,8 +94,6 @@ public class BranchController {
 					"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 		}
 		
-		pageStore.reindexAllPages(form.getProjectName(), form.getName());
-		
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 	}

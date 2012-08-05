@@ -52,6 +52,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import com.google.common.eventbus.EventBus;
+
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
@@ -149,6 +151,11 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 		OpenIDAuthenticationProvider authProvider = new OpenIDAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailsService);
 		return authProvider;
+	}
+	
+	@Bean
+	public EventBus eventBus() {
+		return new EventBus();
 	}
 	
 	@PreDestroy

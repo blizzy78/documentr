@@ -37,6 +37,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
@@ -47,12 +48,14 @@ class ProjectRepositoryManager {
 	private String projectName;
 	private File reposDir;
 	private LockManager lockManager;
+	private EventBus eventBus;
 	private File centralRepoDir;
 
-	ProjectRepositoryManager(String projectName, File reposDir, LockManager lockManager) {
+	ProjectRepositoryManager(String projectName, File reposDir, LockManager lockManager, EventBus eventBus) {
 		this.projectName = projectName;
 		this.reposDir = reposDir;
 		this.lockManager = lockManager;
+		this.eventBus = eventBus;
 		centralRepoDir = new File(reposDir, CENTRAL_REPO_NAME);
 	}
 	
@@ -237,6 +240,7 @@ class ProjectRepositoryManager {
 		// TODO: synchronization is not quite correct here, but should be okay in this edge case
 		if (listBranches().isEmpty()) {
 			ILock lock = lockManager.lockAll();
+			List<String> branches;
 			try {
 				File gitDir = new File(centralRepoDir, ".git"); //$NON-NLS-1$
 				FileUtils.forceDelete(gitDir);
@@ -260,7 +264,7 @@ class ProjectRepositoryManager {
 					RepositoryUtil.closeQuietly(centralRepo);
 				}
 				
-				List<String> branches = listBranches();
+				branches = listBranches();
 				for (String branchName : branches) {
 					File repoDir = new File(reposDir, branchName);
 					Repository repo = null;
@@ -282,6 +286,10 @@ class ProjectRepositoryManager {
 				}
 			} finally {
 				lockManager.unlock(lock);
+			}
+			
+			for (String branch : branches) {
+				eventBus.post(new BranchCreatedEvent(projectName, branch));
 			}
 		}
 	}

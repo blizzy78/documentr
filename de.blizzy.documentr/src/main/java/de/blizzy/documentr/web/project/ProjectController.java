@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -50,8 +49,6 @@ public class ProjectController {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private UserStore userStore;
-	@Autowired
-	private IPageStore pageStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasProjectPermission(#name, VIEW)")
@@ -94,7 +91,6 @@ public class ProjectController {
 	@ResponseBody
 	public void importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
 		repoManager.importSampleContents(name);
-		pageStore.reindexAllPages(name);
 	}
 
 	@ModelAttribute

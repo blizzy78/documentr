@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
@@ -64,16 +62,15 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
-import de.blizzy.documentr.search.PageIndex;
 
 @Component
 class PageStore implements IPageStore {
@@ -92,41 +89,7 @@ class PageStore implements IPageStore {
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
-	private PageIndex pageIndex;
-
-	@PostConstruct
-	public void init() throws IOException {
-		if (pageIndex.getNumDocuments() == 0) {
-			reindexAllPages();
-		}
-	}
-
-	private void reindexAllPages() throws IOException {
-		for (String projectName : repoManager.listProjects()) {
-			reindexAllPages(projectName);
-		}
-	}
-
-	@Override
-	public void reindexAllPages(String projectName) throws IOException {
-		for (String branchName : repoManager.listProjectBranches(projectName)) {
-			reindexAllPages(projectName, branchName);
-		}
-	}
-
-	@Override
-	public void reindexAllPages(String projectName, String branchName) throws IOException {
-		reindexPageAndChildPages(projectName, branchName, DocumentrConstants.HOME_PAGE_NAME);
-	}
-	
-	private void reindexPageAndChildPages(String projectName, String branchName, String path) throws IOException {
-		Page page = getPage(projectName, branchName, path, true);
-		pageIndex.addPage(projectName, branchName, path, page);
-		
-		for (String childPagePath : listChildPagePaths(projectName, branchName, path)) {
-			reindexPageAndChildPages(projectName, branchName, childPagePath);
-		}
-	}
+	private EventBus eventBus;
 
 	@Override
 	public MergeConflict savePage(String projectName, String branchName, String path, Page page, String baseCommit,
@@ -140,7 +103,9 @@ class PageStore implements IPageStore {
 		try {
 			MergeConflict conflict = savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page,
 					baseCommit, PAGES_DIR_NAME, user);
-			pageIndex.addPage(projectName, branchName, path, page);
+			if (conflict == null) {
+				eventBus.post(new PageChangedEvent(projectName, branchName, path));
+			}
 			return conflict;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -444,26 +409,45 @@ class PageStore implements IPageStore {
 		}
 	}
 	
+	@Override
+	public List<String> listAllPagePaths(String projectName, String branchName) throws IOException {
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			return listPagePaths(pagesDir, true);
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			RepositoryUtil.closeQuietly(repo);
+		}
+	}
+	
 	private List<String> listPagePaths(File pagesDir, boolean recursive) {
-		List<String> paths = listPagePathsInDir(pagesDir, recursive);
+		List<File> paths = listPageFilesInDir(pagesDir, recursive);
 		String prefix = pagesDir.getAbsolutePath() + File.separator;
 		final int prefixLen = prefix.length();
 		final int pageSuffixLen = PAGE_SUFFIX.length();
-		Function<String, String> function = new Function<String, String>() {
+		Function<File, String> function = new Function<File, String>() {
 			@Override
-			public String apply(String path) {
+			public String apply(File file) {
+				String path = file.getAbsolutePath();
 				path = path.substring(prefixLen, path.length() - pageSuffixLen);
 				path = path.replace('\\', '/');
 				return path;
 			}
 		};
-		paths = Lists.newArrayList(Lists.transform(paths, function));
-		Collections.sort(paths);
-		return paths;
+		List<String> pagePaths = Lists.newArrayList(Lists.transform(paths, function));
+		Collections.sort(pagePaths);
+		return pagePaths;
 	}
 
-	private List<String> listPagePathsInDir(File dir, boolean recursive) {
-		List<String> result = Lists.newArrayList();
+	private List<File> listPageFilesInDir(File dir, boolean recursive) {
+		List<File> result = Lists.newArrayList();
 		if (dir.isDirectory()) {
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -476,10 +460,10 @@ class PageStore implements IPageStore {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					if (recursive) {
-						result.addAll(listPagePathsInDir(file, true));
+						result.addAll(listPageFilesInDir(file, true));
 					}
 				} else {
-					result.add(file.getAbsolutePath());
+					result.add(file);
 				}
 			}
 		}
@@ -652,7 +636,7 @@ class PageStore implements IPageStore {
 		}
 
 		if (deleted) {
-			pageIndex.deletePages(projectName, branchName, Sets.newHashSet(oldPagePaths));
+			eventBus.post(new PagesDeletedEvent(projectName, branchName, Sets.newHashSet(oldPagePaths)));
 		}
 	}
 	
@@ -835,11 +819,10 @@ class PageStore implements IPageStore {
 
 		Set<String> allDeletedPagePaths = Sets.newHashSet(oldPagePaths);
 		allDeletedPagePaths.addAll(deletedPagePaths);
-		pageIndex.deletePages(projectName, branchName, Sets.newHashSet(allDeletedPagePaths));
+		eventBus.post(new PagesDeletedEvent(projectName, branchName, allDeletedPagePaths));
 		
 		for (String newPath : newPagePaths) {
-			Page page = getPage(projectName, branchName, newPath, true);
-			pageIndex.addPage(projectName, branchName, newPath, page);
+			eventBus.post(new PageChangedEvent(projectName, branchName, newPath));
 		}
 	}
 	
@@ -1022,8 +1005,7 @@ class PageStore implements IPageStore {
 			RepositoryUtil.closeQuietly(repo);
 		}
 
-		Page page = getPage(projectName, branchName, path, true);
-		pageIndex.addPage(projectName, branchName, path, page);
+		eventBus.post(new PageChangedEvent(projectName, branchName, path));
 	}
 	
 	@Override
@@ -1167,7 +1149,7 @@ class PageStore implements IPageStore {
 		}
 
 		if (!dryRun && !hadConflicts && !failed) {
-			reindexPageAndChildPages(projectName, targetBranch, path);
+			eventBus.post(new PageChangedEvent(projectName, targetBranch, path));
 		}
 
 		return cherryPickResults;
@@ -1188,7 +1170,7 @@ class PageStore implements IPageStore {
 		this.repoManager = repoManager;
 	}
 
-	void setPageIndex(PageIndex pageIndex) {
-		this.pageIndex = pageIndex;
+	void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
 }

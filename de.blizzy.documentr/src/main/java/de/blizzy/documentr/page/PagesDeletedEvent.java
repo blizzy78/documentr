@@ -15,32 +15,36 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.repository;
+package de.blizzy.documentr.page;
 
-import java.io.File;
+import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.google.common.eventbus.EventBus;
+public class PagesDeletedEvent {
+	private String projectName;
+	private String branchName;
+	private Set<String> paths;
 
-@Component
-public class ProjectRepositoryManagerFactory {
-	@Autowired
-	private LockManager lockManager;
-	@Autowired
-	private EventBus eventBus;
-	
-	ProjectRepositoryManager getManager(File reposDir, String projectName) {
-		Assert.notNull(reposDir);
+	public PagesDeletedEvent(String projectName, String branchName, Set<String> paths) {
 		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.notEmpty(paths);
 		
-		File projectDir = new File(reposDir, projectName);
-		return new ProjectRepositoryManager(projectName, projectDir, lockManager, eventBus);
+		this.projectName = projectName;
+		this.branchName = branchName;
+		this.paths = paths;
 	}
 	
-	public void setLockManager(LockManager lockManager) {
-		this.lockManager = lockManager;
+	public String getProjectName() {
+		return projectName;
+	}
+	
+	public String getBranchName() {
+		return branchName;
+	}
+	
+	public Set<String> getPaths() {
+		return paths;
 	}
 }

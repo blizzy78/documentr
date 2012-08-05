@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
@@ -42,6 +43,8 @@ public class GlobalRepositoryManager {
 	private Settings settings;
 	@Autowired
 	private ProjectRepositoryManagerFactory repoManagerFactory;
+	@Autowired
+	private EventBus eventBus;
 	private File reposDir;
 	
 	@PostConstruct
@@ -77,7 +80,9 @@ public class GlobalRepositoryManager {
 			throws IOException, GitAPIException {
 		
 		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
-		return repoManager.createBranchRepository(branchName, startingBranch);
+		ILockedRepository repo = repoManager.createBranchRepository(branchName, startingBranch);
+		eventBus.post(new BranchCreatedEvent(projectName, branchName));
+		return repo;
 	}
 	
 	public ILockedRepository getProjectBranchRepository(String projectName, String branchName) throws IOException, GitAPIException {
@@ -129,5 +134,9 @@ public class GlobalRepositoryManager {
 	
 	public void setRepositoryManagerFactory(ProjectRepositoryManagerFactory repoManagerFactory) {
 		this.repoManagerFactory = repoManagerFactory;
+	}
+
+	void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
 }
