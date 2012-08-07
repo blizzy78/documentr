@@ -131,8 +131,14 @@ table {
 	margin-bottom: 5px;
 }
 
-label.inline {
-	display: inline;
+label {
+	&.inline {
+		display: inline;
+	}
+	
+	&.disabled {
+		color: #808080;
+	}
 }
 
 dd {

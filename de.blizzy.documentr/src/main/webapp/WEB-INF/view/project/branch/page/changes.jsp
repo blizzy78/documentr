@@ -225,9 +225,16 @@ $(function() {
 								<sec:authorize access="hasPagePermission(#projectName, #branch, #path, VIEW) and
 									hasPagePermission(#projectName, #branch, #path, EDIT_PAGE)">
 									
-									<label class="checkbox">
-										<input type="checkbox" name="branch" value="${branch}" onclick="updateCherryPickButton()"/>
-										<c:out value="${branch}"/>
+									<c:set var="exists" value="${d:pageExists(projectName, branch, path)}"/>
+									<c:choose>
+										<c:when test="${!exists}"><c:set var="cssDisabled" value="disabled"/></c:when>
+										<c:otherwise><c:set var="cssDisabled" value=""/></c:otherwise>
+									</c:choose>
+									<label class="checkbox ${cssDisabled}">
+										<input type="checkbox" name="branch" value="${branch}" onclick="updateCherryPickButton()"
+											<c:if test="${!exists}">disabled="disabled"</c:if>
+											/>
+										<c:out value="${branch}"/> <c:if test="${!exists}">(<spring:message code="pageDoesNotExist"/>)</c:if>
 									</label>
 								</sec:authorize>
 							</c:if>

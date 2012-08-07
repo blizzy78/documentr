@@ -45,6 +45,7 @@ import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
+import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
@@ -208,6 +209,16 @@ public final class Functions {
 	
 	public static String escapeJavaScript(String s) {
 		return StringEscapeUtils.escapeEcmaScript(s);
+	}
+	
+	public static boolean pageExists(String projectName, String branchName, String path) {
+		try {
+			return pageStore.getPageMetadata(projectName, branchName, path) != null;
+		} catch (PageNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
