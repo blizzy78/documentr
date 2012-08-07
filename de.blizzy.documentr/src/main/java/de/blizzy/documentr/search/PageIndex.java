@@ -289,8 +289,6 @@ public class PageIndex {
 		
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		System.out.println("indexing page: " + fullPath);
-		
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create("dummy"); //$NON-NLS-1$
 		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
