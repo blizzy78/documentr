@@ -19,8 +19,6 @@ package de.blizzy.documentr.access;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.security.core.Authentication;
-
 /** {@link Authentication} utility methods. */
 public final class AuthenticationUtil {
 	private static final String AUTHENTICATION_CREATION_TIME = "authenticationCreationTime"; //$NON-NLS-1$
