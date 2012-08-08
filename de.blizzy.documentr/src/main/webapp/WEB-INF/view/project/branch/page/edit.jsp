@@ -222,9 +222,6 @@ function openInsertLinkDialog() {
 				checkBranchPermissions: 'VIEW',
 				showAttachments: true
 			})
-			.bind('loaded.jstree', function() {
-				showDialog();
-			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
 				if (node.data('type') === 'page') {
@@ -250,6 +247,8 @@ function openInsertLinkDialog() {
 				$('#insert-link-dialog').data('linkedPagePath', null);
 				updateInsertLinkButton();
 			});
+		
+		window.setTimeout(showDialog, 500);
 	} else {
 		showDialog();
 	}
@@ -309,9 +308,6 @@ function openInsertImageDialog() {
 				showPages: false,
 				showAttachments: true
 			})
-			.bind('loaded.jstree', function() {
-				showDialog();
-			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
 				var linkedImage = node.data('name');
@@ -322,6 +318,8 @@ function openInsertImageDialog() {
 				$('#insert-image-dialog').data('linkedImage', null);
 				updateInsertImageButton();
 			});
+
+		window.setTimeout(showDialog, 500);
 	} else {
 		showDialog();
 	}

@@ -110,9 +110,6 @@ function showRelocateDialog() {
 				checkBranchPermissions: 'EDIT_PAGE',
 				filterPage: '<c:out value="${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
 			})
-			.bind('loaded.jstree', function() {
-				showDialog();
-			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
 				var button = $('#relocate-button');
@@ -153,6 +150,7 @@ function showRelocateDialog() {
 				button.setButtonDisabled(true);
 			});
 
+		window.setTimeout(showDialog, 500);
 		$('#relocate-button').setButtonDisabled(true);
 	} else {
 		showDialog();
