@@ -319,7 +319,7 @@ function insertLink() {
 	if (attachment) {
 		link = '=' + linkedAttachment.path;
 	} else if (page) {
-		link = ':' + linkedPage.path;
+		link = linkedPage.path;
 	} else if (staticPage) {
 		link = '<c:url value="/page/"/>' + linkedStaticPage.projectName + '/' + linkedStaticPage.branchName + '/' +
 			linkedStaticPage.path.replace(/\//g, ',');

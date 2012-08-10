@@ -81,44 +81,6 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void renderWikiLinkToPage() {
-		when(context.getPageURI("foo")).thenReturn("fooPage"); //$NON-NLS-1$ //$NON-NLS-2$
-		WikiLinkNode node = new WikiLinkNode(":foo"); //$NON-NLS-1$
-		Rendering rendering = renderer.render(node);
-		assertEquals("fooPage", rendering.href); //$NON-NLS-1$
-		assertEquals("foo", rendering.text); //$NON-NLS-1$
-	}
-
-	@Test
-	public void renderWikiLinkToPageWithNoFollow() {
-		when(context.getPageURI("foo")).thenReturn("fooPage"); //$NON-NLS-1$ //$NON-NLS-2$
-		WikiLinkNode node = new WikiLinkNode(":foo | nofollow"); //$NON-NLS-1$
-		Rendering rendering = renderer.render(node);
-		assertEquals("fooPage", rendering.href); //$NON-NLS-1$
-		assertEquals("foo", rendering.text); //$NON-NLS-1$
-		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
-	}
-	
-	@Test
-	public void renderWikiLinkToPageWithText() {
-		when(context.getPageURI("foo")).thenReturn("fooPage"); //$NON-NLS-1$ //$NON-NLS-2$
-		WikiLinkNode node = new WikiLinkNode(":foo link text"); //$NON-NLS-1$
-		Rendering rendering = renderer.render(node);
-		assertEquals("fooPage", rendering.href); //$NON-NLS-1$
-		assertEquals("link text", rendering.text); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void renderWikiLinkToPageWithTextAndNoFollow() {
-		when(context.getPageURI("foo")).thenReturn("fooPage"); //$NON-NLS-1$ //$NON-NLS-2$
-		WikiLinkNode node = new WikiLinkNode(":foo link text | nofollow"); //$NON-NLS-1$
-		Rendering rendering = renderer.render(node);
-		assertEquals("fooPage", rendering.href); //$NON-NLS-1$
-		assertEquals("link text", rendering.text); //$NON-NLS-1$
-		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
-	}
-
-	@Test
 	public void renderWikiLinkToAttachment() {
 		when(context.getAttachmentURI("foo")).thenReturn("fooAttachment"); //$NON-NLS-1$ //$NON-NLS-2$
 		WikiLinkNode node = new WikiLinkNode("=foo"); //$NON-NLS-1$

@@ -44,10 +44,6 @@ class DocumentrLinkRenderer extends LinkRenderer {
 	 * [[URI | nofollow]]
 	 * [[URI link text]]
 	 * [[URI link text | nofollow]]
-	 * [[:page]]
-	 * [[:page | nofollow]]
-	 * [[:page link text]]
-	 * [[:page link text | nofollow]]
 	 * [[=attachment]]
 	 * [[=attachment | nofollow]]
 	 * [[=attachment link text]]
@@ -68,15 +64,11 @@ class DocumentrLinkRenderer extends LinkRenderer {
 			String params = StringUtils.substringAfter(text, "|").trim(); //$NON-NLS-1$
 			text = StringUtils.substringBefore(text, "|"); //$NON-NLS-1$
 
-			if (uri.startsWith(":") || uri.startsWith("=")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (uri.startsWith("=")) { //$NON-NLS-1$
 				if (StringUtils.isBlank(text)) {
 					text = uri.substring(1);
 				}
-			}
-			
-			if (uri.startsWith(":")) { //$NON-NLS-1$
-				uri = context.getPageURI(uri.substring(1));
-			} else if (uri.startsWith("=")) { //$NON-NLS-1$
+
 				uri = context.getAttachmentURI(uri.substring(1));
 			} else {
 				if (StringUtils.isBlank(text)) {
@@ -86,10 +78,6 @@ class DocumentrLinkRenderer extends LinkRenderer {
 
 			text = text.trim();
 			
-			if (uri.startsWith(":")) { //$NON-NLS-1$
-				uri = context.getPageURI(uri.substring(1));
-			}
-
 			if (params.equalsIgnoreCase("nofollow")) { //$NON-NLS-1$
 				noFollow = true;
 			}
