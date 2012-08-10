@@ -19,11 +19,24 @@ package de.blizzy.documentr.web.access;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AccessControllerTest {
 	@Test
 	public void login() {
 		assertEquals("/login", new AccessController().login()); //$NON-NLS-1$
+	}
+
+	@Test
+	@Ignore
+	public void loginError() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void loginForbidden() {
+		// TODO: implement test
 	}
 }

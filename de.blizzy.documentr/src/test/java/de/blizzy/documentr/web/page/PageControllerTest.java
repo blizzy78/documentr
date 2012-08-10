@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.security.core.Authentication;
@@ -470,5 +471,11 @@ public class PageControllerTest {
 		pageController.restoreVersion(PROJECT, BRANCH, PAGE_PATH_URL, "version", authenticatedAuthentication); //$NON-NLS-1$
 		
 		verify(pageStore).restorePageVersion(PROJECT, BRANCH, PAGE_PATH, "version", USER); //$NON-NLS-1$
+	}
+	
+	@Test
+	@Ignore
+	public void cherryPick() {
+		// TODO: implement test
 	}
 }
