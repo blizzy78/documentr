@@ -439,11 +439,16 @@ public class PageControllerTest {
 		
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication)) //$NON-NLS-1$
 			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
+
+		PageMetadata metadata = mock(PageMetadata.class);
+		when(metadata.getCommit()).thenReturn("newCommit"); //$NON-NLS-1$
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(metadata);
 		
 		HttpSession session = mock(HttpSession.class);
 		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
 				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, session); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("newCommit", result.get("commit")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage("title", "x\na\nb\nc\nz\n"), eq("commit"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
