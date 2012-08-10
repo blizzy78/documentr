@@ -185,11 +185,18 @@ function showMarkdownHelp() {
 }
 
 function updateInsertLinkButton() {
+	var attachment = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
+	var page = $('#insert-link-dialog .nav-tabs li:eq(1)').hasClass('active');
+	var staticPage = $('#insert-link-dialog .nav-tabs li:eq(2)').hasClass('active');
+	var external = $('#insert-link-dialog .nav-tabs li:eq(3)').hasClass('active');
+	var linkedAttachment = $('#insert-link-dialog').data('linkedAttachment');
 	var linkedPage = $('#insert-link-dialog').data('linkedPage');
-	var url = $('#insert-link-dialog input[name="url"]').val();
-	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
-	var valid = (internal && documentr.isSomething(linkedPage)) ||
-		(!internal && (url.length > 0));
+	var linkedStaticPage = $('#insert-link-dialog').data('linkedStaticPage');
+	var url = $('#insert-link-dialog input[name="externalLinkUrl"]').val();
+	var valid = (attachment && documentr.isSomething(linkedAttachment)) ||
+		(page && documentr.isSomething(linkedPage)) ||
+		(staticPage && documentr.isSomething(linkedStaticPage)) ||
+		(external && (url.length > 0));
 	$('#insert-link-button').setButtonDisabled(!valid);
 }
 
@@ -199,9 +206,9 @@ function openInsertLinkDialog() {
 	var end = textEl[0].selectionEnd;
 	var text = textEl.val();
 	var linkText = text.substring(start, end);
-	$('#insert-link-linktext').val(linkText);
-	$('#insert-link-dialog input[name="url"]').val('');
-	$('#insert-link-dialog input[name="externalLinkText"]').val(linkText);
+	$('#insert-attachment-link-text, #insert-page-link-text, #insert-static-page-link-text, #insert-link-dialog input[name="externalLinkText"]')
+		.val(linkText);
+	$('#insert-link-dialog input[name="externalLinkUrl"]').val('');
 	$('#insert-link-dialog .nav-tabs a:first').tab('show');
 
 	function showDialog() {
@@ -209,9 +216,53 @@ function openInsertLinkDialog() {
 		$('#insert-link-dialog').showModal();
 	}
 
-	var treeEl = $('#linked-page-tree');
-	if (treeEl.children().length === 0) {
-		documentr.createPageTree(treeEl, {
+	if ($('#linked-attachment-tree').children().length === 0) {
+		documentr.createPageTree($('#linked-attachment-tree'), {
+				start: {
+					type: 'page',
+					projectName: '<c:out value="${projectName}"/>',
+					branchName: '<c:out value="${branchName}"/>',
+					pagePath: '<c:out value="${path}"/>'
+				},
+				checkBranchPermissions: 'VIEW',
+				showPages: false,
+				showAttachments: true
+			})
+			.bind('select_node.jstree', function(event, data) {
+				var node = data.rslt.obj;
+				var linkedAttachment = {
+					path: node.data('name')
+				};
+				$('#insert-link-dialog').data('linkedAttachment', linkedAttachment);
+				updateInsertLinkButton();
+			})
+			.bind('deselect_node.jstree', function() {
+				$('#insert-link-dialog').data('linkedAttachment', null);
+				updateInsertLinkButton();
+			});
+
+		documentr.createPageTree($('#linked-page-tree'), {
+				start: {
+					type: 'branch',
+					projectName: '<c:out value="${projectName}"/>',
+					branchName: '<c:out value="${branchName}"/>'
+				},
+				checkBranchPermissions: 'VIEW'
+			})
+			.bind('select_node.jstree', function(event, data) {
+				var node = data.rslt.obj;
+				var linkedPage = {
+					path: node.data('path').replace(/\//g, ',')
+				};
+				$('#insert-link-dialog').data('linkedPage', linkedPage);
+				updateInsertLinkButton();
+			})
+			.bind('deselect_node.jstree', function() {
+				$('#insert-link-dialog').data('linkedPage', null);
+				updateInsertLinkButton();
+			});
+
+		documentr.createPageTree($('#linked-static-page-tree'), {
 				start: {
 					type: 'application'
 				},
@@ -219,32 +270,20 @@ function openInsertLinkDialog() {
 					projects: false,
 					branches: false
 				},
-				checkBranchPermissions: 'VIEW',
-				showAttachments: true
+				checkBranchPermissions: 'VIEW'
 			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
-				if (node.data('type') === 'page') {
-					var linkedPage = {
-						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
-							node.data('path').replace(/\//g, ','),
-						pageType: 'page'
-					};
-					$('#insert-link-dialog').data('linkedPage', linkedPage);
-				} else if (node.data('type') === 'attachment') {
-					var linkedPage = {
-						path: node.data('projectName') + '/' + node.data('branchName') + '/' +
-							node.data('pagePath').replace(/\//g, ',') + '/' + node.data('name'),
-						pageType: 'attachment'
-					};
-					$('#insert-link-dialog').data('linkedPage', linkedPage);
-				} else {
-					$('#insert-link-dialog').data('linkedPagePath', null);
-				}
+				var linkedStaticPage = {
+					projectName: node.data('projectName'),
+					branchName: node.data('branchName'),
+					path: node.data('path')
+				};
+				$('#insert-link-dialog').data('linkedStaticPage', linkedStaticPage);
 				updateInsertLinkButton();
 			})
 			.bind('deselect_node.jstree', function() {
-				$('#insert-link-dialog').data('linkedPagePath', null);
+				$('#insert-link-dialog').data('linkedStaticPage', null);
 				updateInsertLinkButton();
 			});
 		
@@ -257,22 +296,40 @@ function openInsertLinkDialog() {
 function insertLink() {
 	$('#insert-link-dialog').hideModal();
 
-	var internal = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
+	var attachment = $('#insert-link-dialog .nav-tabs li:eq(0)').hasClass('active');
+	var page = $('#insert-link-dialog .nav-tabs li:eq(1)').hasClass('active');
+	var staticPage = $('#insert-link-dialog .nav-tabs li:eq(2)').hasClass('active');
+	var external = $('#insert-link-dialog .nav-tabs li:eq(3)').hasClass('active');
+	var linkedAttachment = $('#insert-link-dialog').data('linkedAttachment');
 	var linkedPage = $('#insert-link-dialog').data('linkedPage');
-	var linkText = internal ? $('#insert-link-linktext').val() : $('#insert-link-dialog input[name="externalLinkText"]').val();
+	var linkedStaticPage = $('#insert-link-dialog').data('linkedStaticPage');
+	var url = $('#insert-link-dialog input[name="externalLinkUrl"]').val();
+
+	var linkText;
+	if (attachment) {
+		linkText = $('#insert-attachment-link-text').val();
+	} else if (page) {
+		linkText = $('#insert-page-link-text').val();
+	} else if (staticPage) {
+		linkText = $('#insert-static-page-link-text').val();
+	} else {
+		linkText = $('#insert-link-dialog input[name="externalLinkText"]').val();
+	}
+	var link;
+	if (attachment) {
+		link = '=' + linkedAttachment.path;
+	} else if (page) {
+		link = ':' + linkedPage.path;
+	} else if (staticPage) {
+		link = '<c:url value="/page/"/>' + linkedStaticPage.projectName + '/' + linkedStaticPage.branchName + '/' +
+			linkedStaticPage.path.replace(/\//g, ',');
+	} else {
+		link = url;
+	}
+
 	var textEl = $('#text');
 	var start = textEl[0].selectionStart;
 	var end = textEl[0].selectionEnd;
-	var link;
-	if (internal) {
-		if (linkedPage.pageType === 'page') {
-			link = '<c:url value="/page/"/>' + linkedPage.path;
-		} else {
-			link = '<c:url value="/attachment/"/>' + linkedPage.path;
-		}
-	} else {
-		link = $('#insert-link-dialog input[name="url"]').val();
-	}
 	var text = textEl.val();
 	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
 	start = start + link.length + 3;
@@ -459,12 +516,29 @@ $(function() {
 	<div class="modal-body">
 		<form id="insertLinkForm" action="" method="POST" class="form-horizontal">
 			<ul class="nav nav-tabs">
-				<li class="active"><a href="#insert-link-internal"><spring:message code="title.pageOrAttachment"/></a></li>
-				<li><a href="#insert-link-external"><spring:message code="title.externalWebPage"/></a></li>
+				<li class="active"><a href="#insert-attachment-link"><spring:message code="title.attachment"/></a></li>
+				<li><a href="#insert-page-link"><spring:message code="title.page"/></a></li>
+				<li><a href="#insert-static-page-link"><spring:message code="title.pageStatic"/></a></li>
+				<li><a href="#insert-external-link"><spring:message code="title.externalWebPage"/></a></li>
 			</ul>
 
 			<div class="tab-content">
-				<fieldset id="insert-link-internal" class="tab-pane active">
+				<fieldset id="insert-attachment-link" class="tab-pane active">
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
+						<div class="controls">
+							<div id="linked-attachment-tree"></div>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkText"/>:</label>
+						<div class="controls">
+							<input type="text" id="insert-attachment-link-text" class="input-xlarge"/>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset id="insert-page-link" class="tab-pane">
 					<div class="control-group">
 						<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
 						<div class="controls">
@@ -474,15 +548,31 @@ $(function() {
 					<div class="control-group">
 						<label class="control-label"><spring:message code="label.linkText"/>:</label>
 						<div class="controls">
-							<input type="text" id="insert-link-linktext" class="input-xlarge"/>
+							<input type="text" id="insert-page-link-text" class="input-xlarge"/>
 						</div>
 					</div>
 				</fieldset>
-				<fieldset id="insert-link-external" class="tab-pane">
+
+				<fieldset id="insert-static-page-link" class="tab-pane">
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkedPage"/>:</label>
+						<div class="controls">
+							<div id="linked-static-page-tree"></div>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label"><spring:message code="label.linkText"/>:</label>
+						<div class="controls">
+							<input type="text" id="insert-static-page-link-text" class="input-xlarge"/>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset id="insert-external-link" class="tab-pane">
 					<div class="control-group">
 						<label class="control-label"><spring:message code="label.url"/>:</label>
 						<div class="controls">
-							<input type="text" name="url" class="input-xlarge" onkeyup="updateInsertLinkButton()"/>
+							<input type="text" name="externalLinkUrl" class="input-xlarge" onkeyup="updateInsertLinkButton()"/>
 						</div>
 					</div>
 					<div class="control-group">

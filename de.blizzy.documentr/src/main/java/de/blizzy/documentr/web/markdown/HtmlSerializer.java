@@ -40,7 +40,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	private HtmlSerializerContext context;
 
 	public HtmlSerializer(HtmlSerializerContext context) {
-		super(new DocumentrLinkRenderer());
+		super(new DocumentrLinkRenderer(context));
 		
 		this.context = context;
 	}

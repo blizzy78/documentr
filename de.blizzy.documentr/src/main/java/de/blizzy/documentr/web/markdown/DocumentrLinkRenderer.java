@@ -24,10 +24,19 @@ import org.pegdown.LinkRenderer;
 import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.Node;
 import org.pegdown.ast.WikiLinkNode;
+import org.springframework.util.Assert;
 
 import de.blizzy.documentr.Util;
 
 class DocumentrLinkRenderer extends LinkRenderer {
+	private HtmlSerializerContext context;
+
+	DocumentrLinkRenderer(HtmlSerializerContext context) {
+		Assert.notNull(context);
+		
+		this.context = context;
+	}
+	
 	/*
 	 * allows the following Wiki-style links:
 	 * 
@@ -35,6 +44,14 @@ class DocumentrLinkRenderer extends LinkRenderer {
 	 * [[URI | nofollow]]
 	 * [[URI link text]]
 	 * [[URI link text | nofollow]]
+	 * [[:page]]
+	 * [[:page | nofollow]]
+	 * [[:page link text]]
+	 * [[:page link text | nofollow]]
+	 * [[=attachment]]
+	 * [[=attachment | nofollow]]
+	 * [[=attachment link text]]
+	 * [[=attachment link text | nofollow]]
 	 * [[#Headline]]
 	 */
 	@Override
@@ -51,11 +68,28 @@ class DocumentrLinkRenderer extends LinkRenderer {
 			String params = StringUtils.substringAfter(text, "|").trim(); //$NON-NLS-1$
 			text = StringUtils.substringBefore(text, "|"); //$NON-NLS-1$
 
-			if (StringUtils.isBlank(text)) {
-				text = uri;
+			if (uri.startsWith(":") || uri.startsWith("=")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (StringUtils.isBlank(text)) {
+					text = uri.substring(1);
+				}
 			}
+			
+			if (uri.startsWith(":")) { //$NON-NLS-1$
+				uri = context.getPageURI(uri.substring(1));
+			} else if (uri.startsWith("=")) { //$NON-NLS-1$
+				uri = context.getAttachmentURI(uri.substring(1));
+			} else {
+				if (StringUtils.isBlank(text)) {
+					text = uri;
+				}
+			}
+
 			text = text.trim();
 			
+			if (uri.startsWith(":")) { //$NON-NLS-1$
+				uri = context.getPageURI(uri.substring(1));
+			}
+
 			if (params.equalsIgnoreCase("nofollow")) { //$NON-NLS-1$
 				noFollow = true;
 			}
@@ -70,6 +104,7 @@ class DocumentrLinkRenderer extends LinkRenderer {
 	/*
 	 * allows the following link:
 	 * 
+	 * [text](:page)
 	 * [text](#Headline)
 	 */
 	@Override
@@ -78,6 +113,11 @@ class DocumentrLinkRenderer extends LinkRenderer {
 			List<Node> children = node.getChildren();
 			Node child = !children.isEmpty() ? children.get(0) : null;
 			String url = "#" + Util.simplifyForURL(node.url.substring(1)); //$NON-NLS-1$
+			node = new ExpLinkNode(node.title, url, child);
+		} else if (node.url.startsWith(":")) { //$NON-NLS-1$
+			List<Node> children = node.getChildren();
+			Node child = !children.isEmpty() ? children.get(0) : null;
+			String url = context.getPageURI(node.url.substring(1));
 			node = new ExpLinkNode(node.title, url, child);
 		}
 		return super.render(node, text);
