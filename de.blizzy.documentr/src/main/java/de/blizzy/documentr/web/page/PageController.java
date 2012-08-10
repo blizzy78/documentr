@@ -431,9 +431,12 @@ public class PageController {
 			session.setAttribute("conflict.branchName", branchName); //$NON-NLS-1$
 			session.setAttribute("conflict.path", path); //$NON-NLS-1$
 		} else {
+			String newCommit = pageStore.getPageMetadata(projectName, branchName, path).getCommit();
+
 			String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
 			html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
 			result.put("html", html); //$NON-NLS-1$
+			result.put("commit", newCommit); //$NON-NLS-1$
 		}
 		return result;
 	}

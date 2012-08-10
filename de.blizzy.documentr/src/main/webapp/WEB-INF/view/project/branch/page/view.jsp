@@ -33,6 +33,12 @@ pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
 
 <dt:headerJS>
 
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
+
+var currentCommit = '<c:out value="${commit}"/>';
+
+</sec:authorize>
+
 <sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
 
 function showCopyToBranchDialog() {
@@ -190,13 +196,14 @@ function saveInlineEditor() {
 		data: {
 			markdown: formEl.find('textarea').val(),
 			range: $(textEl).attr('data-text-range'),
-			commit: '<c:out value="${commit}"/>'
+			commit: currentCommit
 		},
 		success: function(result) {
 			if (documentr.isSomething(result.conflict) && result.conflict) {
 				window.location.href = '<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>';
 			} else {
 				$('#pageText').html(result.html);
+				currentCommit = result.commit;
 				toggleHideFloatingElements(false);
 				prettyPrint();
 				$('#inlineEditorToolbar').hide();
@@ -222,7 +229,7 @@ function startInlineEditor(textEl, range) {
 	cancelInlineEditor();
 
 	$.ajax({
-		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/<c:out value="${commit}"/>/json',
+		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/' + currentCommit + '/json',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
