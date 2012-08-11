@@ -39,7 +39,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
@@ -49,6 +51,7 @@ import org.springframework.validation.BindingResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.User;
@@ -62,7 +65,7 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
-public class PageControllerTest {
+public class PageControllerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE_PATH = DocumentrConstants.HOME_PAGE_NAME + "/page"; //$NON-NLS-1$
@@ -71,48 +74,47 @@ public class PageControllerTest {
 	private static final String PARENT_PAGE = DocumentrConstants.HOME_PAGE_NAME;
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
+	@Mock
 	private IPageStore pageStore;
+	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
+	private UserStore userStore;
+	@Mock
 	private IPageRenderer pageRenderer;
+	@Mock
 	private MarkdownProcessor markdownProcessor;
-	private PageController pageController;
+	@Mock
 	private Authentication authenticatedAuthentication;
+	@Mock
 	private Authentication anonymousAuthentication;
+	@Mock
+	private HttpSession session;
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private HttpServletResponse response;
+	@Mock
+	private Model model;
+	@InjectMocks
+	private PageController pageController;
 
 	@Before
 	@SuppressWarnings("boxing")
 	public void setUp() throws IOException {
-		pageStore = mock(IPageStore.class);
-		repoManager = mock(GlobalRepositoryManager.class);
-		
-		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		pageRenderer = mock(IPageRenderer.class);
-		markdownProcessor = mock(MarkdownProcessor.class);
-		
-		pageController = new PageController();
-		pageController.setPageStore(pageStore);
-		pageController.setGlobalRepositoryManager(repoManager);
-		pageController.setMarkdownProcessor(markdownProcessor);
-		pageController.setUserStore(userStore);
-		pageController.setPageRenderer(pageRenderer);
-
-		authenticatedAuthentication = mock(Authentication.class);
 		when(authenticatedAuthentication.isAuthenticated()).thenReturn(true);
 		when(authenticatedAuthentication.getName()).thenReturn(USER.getLoginName());
 
-		anonymousAuthentication = mock(Authentication.class);
 		when(authenticatedAuthentication.isAuthenticated()).thenReturn(false);
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPage() throws IOException {
-		HttpSession session = mock(HttpSession.class);
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		when(request.getSession()).thenReturn(session);
 		
@@ -122,10 +124,8 @@ public class PageControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPageMustReturnNormallyIfModified() throws IOException {
-		HttpSession session = mock(HttpSession.class);
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
@@ -134,8 +134,6 @@ public class PageControllerTest {
 	}
 	
 	private void getPage(HttpServletRequest request) throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-
 		Date lastModified = new Date();
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(
 				new PageMetadata("user", lastModified, 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -145,7 +143,6 @@ public class PageControllerTest {
 		TestPageUtil.setParentPagePath(page, PARENT_PAGE);
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
 		
-		Model model = mock(Model.class);
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response);
 		SecurityContextHolder.clearContext();
@@ -162,15 +159,11 @@ public class PageControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPageMustReturn404IfNotFound() throws IOException {
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
-		
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		SecurityContextHolder.setContext(createSecurityContext(authenticatedAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
 		SecurityContextHolder.clearContext();
@@ -181,23 +174,18 @@ public class PageControllerTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void getPageMustReturn304IfNotModified() throws IOException {
-		HttpSession session = mock(HttpSession.class);
 		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 2).getTime().getTime());
 
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
-		
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		TestPageUtil.clearProjectEditTimes();
 
-		Model model = mock(Model.class);
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
 		SecurityContextHolder.clearContext();
@@ -207,7 +195,6 @@ public class PageControllerTest {
 	
 	@Test
 	public void createPage() {
-		Model model = mock(Model.class);
 		String view = pageController.createPage(PROJECT, BRANCH, PARENT_PAGE, model);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		
@@ -223,8 +210,6 @@ public class PageControllerTest {
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH))
 			.thenReturn(new PageMetadata("user", new Date(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		Model model = mock(Model.class);
-		HttpSession session = mock(HttpSession.class);
 		String view = pageController.editPage(PROJECT, BRANCH, PAGE_PATH_URL, model, session);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		
@@ -237,8 +222,6 @@ public class PageControllerTest {
 		when(pageStore.getPage(eq(PROJECT), eq(BRANCH), eq("nonexistent"), anyBoolean())) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
-		HttpSession session = mock(HttpSession.class);
 		String view = pageController.editPage(PROJECT, BRANCH, "nonexistent", model, session); //$NON-NLS-1$
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
@@ -250,7 +233,6 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
@@ -266,7 +248,6 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", "viewRole", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
@@ -281,7 +262,6 @@ public class PageControllerTest {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		Model model = mock(Model.class);
 		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -305,7 +285,6 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text", null, null); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
 		String pathUrl = Util.toURLPagePath(path);
@@ -325,7 +304,6 @@ public class PageControllerTest {
 		
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		Model model = mock(Model.class);
 		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 
 		verify(pageStore, never()).savePage(
@@ -338,7 +316,6 @@ public class PageControllerTest {
 		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text", null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
@@ -445,7 +422,6 @@ public class PageControllerTest {
 		when(metadata.getCommit()).thenReturn("newCommit"); //$NON-NLS-1$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(metadata);
 		
-		HttpSession session = mock(HttpSession.class);
 		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
 				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, session); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -457,7 +433,6 @@ public class PageControllerTest {
 	
 	@Test
 	public void getPageChanges() {
-		Model model = mock(Model.class);
 		String view = pageController.getPageChanges(PROJECT, BRANCH, PAGE_PATH_URL, model);
 		assertEquals("/project/branch/page/changes", view); //$NON-NLS-1$
 		
