@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	<scm>
 		<connection>scm:git:git://github.com/blizzy78/documentr.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:blizzy78/documentr.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/blizzy78/documentr.git</developerConnection>
 		<url>https://github.com/blizzy78/documentr</url>
 	</scm>
 	
