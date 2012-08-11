@@ -28,7 +28,7 @@ public class CommitCherryPickResult {
 	private Status status;
 	private String conflictText;
 
-	CommitCherryPickResult(PageVersion pageVersion, Status status) {
+	public CommitCherryPickResult(PageVersion pageVersion, Status status) {
 		Assert.notNull(pageVersion);
 		Assert.notNull(status);
 		
@@ -36,7 +36,7 @@ public class CommitCherryPickResult {
 		this.status = status;
 	}
 	
-	CommitCherryPickResult(PageVersion pageVersion, String conflictText) {
+	public CommitCherryPickResult(PageVersion pageVersion, String conflictText) {
 		Assert.notNull(pageVersion);
 		Assert.notNull(conflictText);
 

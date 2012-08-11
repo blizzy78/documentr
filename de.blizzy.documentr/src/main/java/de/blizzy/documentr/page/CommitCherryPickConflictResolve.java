@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
 public class CommitCherryPickConflictResolve {
@@ -44,5 +46,29 @@ public class CommitCherryPickConflictResolve {
 	
 	public String getText() {
 		return text;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		} else if ((o != null) && o.getClass().equals(getClass())) {
+			CommitCherryPickConflictResolve other = (CommitCherryPickConflictResolve) o;
+			return new EqualsBuilder()
+				.append(targetBranch, other.targetBranch)
+				.append(commit, other.commit)
+				.append(text, other.text)
+				.isEquals();
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(targetBranch)
+			.append(commit)
+			.append(text)
+			.toHashCode();
 	}
 }

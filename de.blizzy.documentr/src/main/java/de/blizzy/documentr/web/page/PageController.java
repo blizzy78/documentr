@@ -475,6 +475,10 @@ public class PageController {
 		}
 		
 		List<String> commits = getCommitsToCherryPick(projectName, branchName, path, version1, version2);
+		if (commits.isEmpty()) {
+			throw new IllegalArgumentException("no commits to cherry-pick"); //$NON-NLS-1$
+		}
+		
 		User user = userStore.getUser(authentication.getName());
 
 		Map<String, String[]> params = request.getParameterMap();
@@ -493,6 +497,9 @@ public class PageController {
 
 		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
 				projectName, path, commits, targetBranches, resolves, dryRun, user);
+		if (results.keySet().size() != targetBranches.size()) {
+			throw new IllegalStateException();
+		}
 
 		if (!dryRun) {
 			boolean allOk = true;
@@ -522,6 +529,24 @@ public class PageController {
 			String version1, String version2) throws IOException {
 		
 		List<PageVersion> pageVersions = Lists.newArrayList(pageStore.listPageVersions(projectName, branchName, path));
+		boolean foundVersion1 = false;
+		boolean foundVersion2 = false;
+		for (PageVersion pageVersion : pageVersions) {
+			String commit = pageVersion.getCommitName();
+			if (!foundVersion1 && commit.equals(version1)) {
+				foundVersion1 = true;
+			}
+			if (!foundVersion2 && commit.equals(version2)) {
+				foundVersion2 = true;
+			}
+			if (foundVersion1 && foundVersion2) {
+				break;
+			}
+		}
+		if (!foundVersion1 || !foundVersion2) {
+			throw new IllegalArgumentException("one of version1 or version2 not found in version history of page"); //$NON-NLS-1$
+		}
+		
 		Collections.reverse(pageVersions);
 		boolean include = false;
 		for (Iterator<PageVersion> iter = pageVersions.iterator(); iter.hasNext();) {

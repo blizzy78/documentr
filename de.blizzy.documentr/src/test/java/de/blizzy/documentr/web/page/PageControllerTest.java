@@ -28,8 +28,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +39,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -47,19 +48,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.WebRequest;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Util;
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.page.CommitCherryPickConflictResolve;
+import de.blizzy.documentr.page.CommitCherryPickResult;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
+import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.page.TestPageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
@@ -96,6 +104,8 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	private HttpServletResponse response;
 	@Mock
 	private Model model;
+	@Mock
+	private DocumentrPermissionEvaluator permissionEvaluator;
 	@InjectMocks
 	private PageController pageController;
 
@@ -449,8 +459,117 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@Ignore
-	public void cherryPick() {
-		// TODO: implement test
+	@SuppressWarnings("boxing")
+	public void cherryPick() throws IOException {
+		when(permissionEvaluator.hasPagePermission(
+				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
+				.thenReturn(true);
+		@SuppressWarnings("nls")
+		List<PageVersion> pageVersions = Lists.newArrayList(
+				new PageVersion("version5", "user", new Date()),
+				new PageVersion("version4", "user", new Date()),
+				new PageVersion("version3", "user", new Date()),
+				new PageVersion("version2", "user", new Date()),
+				new PageVersion("version1", "user", new Date()));
+		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
+		
+		@SuppressWarnings("nls")
+		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						CommitCherryPickResult.Status.OK),
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						CommitCherryPickResult.Status.OK));
+		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
+		results.put("targetBranch", branchResults); //$NON-NLS-1$
+		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
+				.thenReturn(results);
+
+		WebRequest webRequest = mock(WebRequest.class);
+		
+		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
+	}
+	
+	@Test
+	@SuppressWarnings("boxing")
+	public void cherryPickWithConflicts() throws IOException {
+		when(permissionEvaluator.hasPagePermission(
+				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
+				.thenReturn(true);
+		@SuppressWarnings("nls")
+		List<PageVersion> pageVersions = Lists.newArrayList(
+				new PageVersion("version5", "user", new Date()),
+				new PageVersion("version4", "user", new Date()),
+				new PageVersion("version3", "user", new Date()),
+				new PageVersion("version2", "user", new Date()),
+				new PageVersion("version1", "user", new Date()));
+		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
+
+		@SuppressWarnings("nls")
+		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						CommitCherryPickResult.Status.OK),
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						"conflictText"));
+		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
+		results.put("targetBranch", branchResults); //$NON-NLS-1$
+		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
+				.thenReturn(results);
+		
+		WebRequest webRequest = mock(WebRequest.class);
+		
+		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+		assertEquals("/project/branch/page/cherryPick", view); //$NON-NLS-1$
+
+		verify(model).addAttribute("cherryPickResults", results); //$NON-NLS-1$
+		verify(model).addAttribute("version1", "version2"); //$NON-NLS-1$ //$NON-NLS-2$
+		verify(model).addAttribute("version2", "version4"); //$NON-NLS-1$ //$NON-NLS-2$
+		verify(model).addAttribute("resolves", Collections.emptySet()); //$NON-NLS-1$
+	}
+	
+	@Test
+	@SuppressWarnings("boxing")
+	public void cherryPickWithConflictsAndResolveTexts() throws IOException {
+		when(permissionEvaluator.hasPagePermission(
+				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
+				.thenReturn(true);
+		@SuppressWarnings("nls")
+		List<PageVersion> pageVersions = Lists.newArrayList(
+				new PageVersion("version5", "user", new Date()),
+				new PageVersion("version4", "user", new Date()),
+				new PageVersion("version3", "user", new Date()),
+				new PageVersion("version2", "user", new Date()),
+				new PageVersion("version1", "user", new Date()));
+		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
+		
+		@SuppressWarnings("nls")
+		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet(
+				new CommitCherryPickConflictResolve("targetBranch", "version3", "resolveText"));
+		@SuppressWarnings("nls")
+		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						CommitCherryPickResult.Status.OK),
+				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
+						CommitCherryPickResult.Status.OK));
+		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
+		results.put("targetBranch", branchResults); //$NON-NLS-1$
+		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), resolves, false, USER)) //$NON-NLS-1$
+				.thenReturn(results);
+		
+		WebRequest webRequest = mock(WebRequest.class);
+		Map<String, String[]> params = Maps.newHashMap();
+		params.put("resolveText_targetBranch/version3", new String[] { "resolveText" }); //$NON-NLS-1$ //$NON-NLS-2$
+		when(webRequest.getParameterMap()).thenReturn(params);
+		
+		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertRedirect(view);
 	}
 }

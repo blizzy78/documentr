@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -47,5 +48,23 @@ public class CommitCherryPickConflictResolveTest {
 	@Test
 	public void getText() {
 		assertEquals(TEXT, resolve.getText());
+	}
+	
+	@Test
+	@SuppressWarnings("nls")
+	public void testEquals() {
+		assertEqualsContract(
+				new CommitCherryPickConflictResolve("branch", "commit", "text"),
+				new CommitCherryPickConflictResolve("branch", "commit", "text"),
+				new CommitCherryPickConflictResolve("branch", "commit", "text"),
+				new CommitCherryPickConflictResolve("branch", "commit", "text2"));
+	}
+
+	@Test
+	@SuppressWarnings("nls")
+	public void testHashCode() {
+		assertHashCodeContract(
+				new CommitCherryPickConflictResolve("branch", "commit", "text"),
+				new CommitCherryPickConflictResolve("branch", "commit", "text"));
 	}
 }
