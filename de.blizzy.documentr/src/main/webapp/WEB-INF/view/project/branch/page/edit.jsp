@@ -36,6 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:headerJS>
 
+var allTags = [];
+var allTagsLoaded = false;
+
 function togglePreview() {
 	var previewEl = $('#preview');
 	if (previewEl.length === 0) {
@@ -484,18 +487,37 @@ $(function() {
 		updateInsertLinkButton();
 	});
 	
-	$('#newTagInput').keydown(function(e) {
-		if (e.which == 13) {
-			e.preventDefault();
-
+	$('#newTagInput')
+		.typeahead({
+			source: allTags
+		})
+		.keydown(function(e) {
 			var el = $('#newTagInput');
-			var newTag = $.trim(el.val());
-			el.val('');
-			if (newTag.length > 0) {
-				addTag(newTag);
+			var typeaheadShown = el.data('typeahead').shown;
+			if (e.which == 13) {
+				if (!typeaheadShown) {
+					e.preventDefault();
+		
+					var newTag = $.trim(el.val());
+					el.val('');
+					if (newTag.length > 0) {
+						addTag(newTag);
+					}
+				}
+			} else if (!allTagsLoaded) {
+				allTagsLoaded = true;
+				$.ajax({
+					url: '<c:url value="/search/tags/json"/>',
+					type: 'GET',
+					dataType: 'json',
+					success: function(result) {
+						$(result).each(function() {
+							allTags.push(this);
+						});
+					}
+				});
 			}
-		}
-	});
+		});
 	
 	hookTags();
 });
@@ -599,7 +621,7 @@ $(function() {
 					--%></c:forEach>
 					<br/>
 				</c:if>
-				<input type="text" id="newTagInput" placeholder="<spring:message code="enterNewTag"/>" class="input-large"/>
+				<input type="text" id="newTagInput" placeholder="<spring:message code="enterNewTag"/>" class="input-large" autocomplete="off"/>
 			</div>
 		</div>
 		<div id="viewRestrictionRoleFieldset" class="control-group">

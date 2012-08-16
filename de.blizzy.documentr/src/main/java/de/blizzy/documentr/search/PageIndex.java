@@ -56,8 +56,11 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Filter;
@@ -79,6 +82,7 @@ import org.apache.lucene.search.spell.SuggestMode;
 import org.apache.lucene.search.spell.SuggestWord;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
 import org.cyberneko.html.HTMLEntities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +92,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
@@ -96,6 +101,7 @@ import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageChangedEvent;
@@ -288,7 +294,7 @@ public class PageIndex {
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		String text = ((PageTextData) page.getData()).getText();
-		Authentication authentication = authenticationFactory.create("dummy"); //$NON-NLS-1$
+		Authentication authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
 		text = removeHtmlTags(text);
 		text = replaceHtmlEntities(text);
@@ -519,6 +525,34 @@ public class PageIndex {
 	private void cleanupFragments(String[] fragments) {
 		for (int i = 0; i < fragments.length; i++) {
 			fragments[i] = fragments[i].replaceAll("^[,\\.]+", StringUtils.EMPTY).trim(); //$NON-NLS-1$
+		}
+	}
+	
+	public Set<String> getAllTags() throws IOException {
+		DirectoryReader reader = null;
+		try {
+			if (alwaysRefresh) {
+				refreshBlocking();
+			}
+
+			// TODO: does not honor permissions - returns all tags regardless of whether they are only
+			// used in documents the user can't see or not
+			
+			reader = readerManager.acquire();
+			Terms terms = MultiFields.getTerms(reader, "tag"); //$NON-NLS-1$
+			Set<String> tags = Sets.newHashSet();
+			if (terms != null) {
+				TermsEnum termsEnum = terms.iterator(null);
+				BytesRef ref;
+				while ((ref = termsEnum.next()) != null) {
+					tags.add(ref.utf8ToString());
+				}
+			}
+			return tags;
+		} finally {
+			if (reader != null) {
+				readerManager.release(reader);
+			}
 		}
 	}
 	

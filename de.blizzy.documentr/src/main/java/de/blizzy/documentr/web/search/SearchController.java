@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.search;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.search.PageIndex;
 import de.blizzy.documentr.search.SearchResult;
 
@@ -52,7 +55,7 @@ public class SearchController {
 
 		// TODO: why can authentication be null here?
 		if (authentication == null) {
-			authentication = authenticationFactory.create("dummy"); //$NON-NLS-1$
+			authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		}
 		
 		try {
@@ -64,5 +67,12 @@ public class SearchController {
 			// TODO
 		}
 		return "/search/result"; //$NON-NLS-1$
+	}
+	
+	@RequestMapping(value="/tags/json", method=RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("permitAll")
+	public Set<String> getAllTags() throws IOException {
+		return pageIndex.getAllTags();
 	}
 }

@@ -39,6 +39,7 @@ import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageChangedEvent;
@@ -76,7 +77,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		File dataDir = createTempDir();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		
-		when(anonymousAuthenticationFactory.create("dummy")).thenReturn(authentication); //$NON-NLS-1$
+		when(anonymousAuthenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME)).thenReturn(authentication);
 
 		when(repoManager.listProjects()).thenReturn(Collections.<String>emptyList());
 		
