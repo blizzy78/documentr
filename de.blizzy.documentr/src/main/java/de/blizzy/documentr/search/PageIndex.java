@@ -125,6 +125,15 @@ public class PageIndex {
 		}
 	}
 	
+	private static final String FULL_PATH = "fullPath"; //$NON-NLS-1$
+	private static final String PROJECT = "project"; //$NON-NLS-1$
+	private static final String BRANCH = "branch"; //$NON-NLS-1$
+	private static final String PATH = "path"; //$NON-NLS-1$
+	private static final String TAG = "tag"; //$NON-NLS-1$
+	private static final String TITLE = "title"; //$NON-NLS-1$
+	private static final String TEXT = "text"; //$NON-NLS-1$
+	private static final String ALL_TEXT = "allText"; //$NON-NLS-1$
+	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
 	private static final int NUM_FRAGMENTS = 5;
 	private static final int FRAGMENT_SIZE = 50;
@@ -179,7 +188,7 @@ public class PageIndex {
 
 		defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
 		Map<String, Analyzer> fieldAnalyzers = Maps.newHashMap();
-		fieldAnalyzers.put("allTextSuggestions", new StandardAnalyzer(Version.LUCENE_40)); //$NON-NLS-1$
+		fieldAnalyzers.put(ALL_TEXT_SUGGESTIONS, new StandardAnalyzer(Version.LUCENE_40));
 		analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, fieldAnalyzers);
 
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
@@ -253,9 +262,9 @@ public class PageIndex {
 				try {
 					addPageAsync(projectName, branchName, path);
 				} catch (IOException e) {
-					e.printStackTrace();
+					// TODO: log exception
 				} catch (RuntimeException e) {
-					e.printStackTrace();
+					// TODO: log exception
 				}
 			}
 		};
@@ -279,9 +288,9 @@ public class PageIndex {
 						addPageAsync(projectName, branchName, path);
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					// TODO: log exception
 				} catch (RuntimeException e) {
-					e.printStackTrace();
+					// TODO: log exception
 				}
 			}
 		};
@@ -300,27 +309,27 @@ public class PageIndex {
 		text = replaceHtmlEntities(text);
 
 		Document doc = new Document();
-		doc.add(new StringField("fullPath", fullPath, Store.NO)); //$NON-NLS-1$
-		doc.add(new StringField("project", projectName, Store.YES)); //$NON-NLS-1$
-		doc.add(new StringField("branch", branchName, Store.YES)); //$NON-NLS-1$
-		doc.add(new StringField("path", path, Store.YES)); //$NON-NLS-1$
+		doc.add(new StringField(FULL_PATH, fullPath, Store.NO));
+		doc.add(new StringField(PROJECT, projectName, Store.YES));
+		doc.add(new StringField(BRANCH, branchName, Store.YES));
+		doc.add(new StringField(PATH, path, Store.YES));
 		for (String tag : page.getTags()) {
-			doc.add(new StringField("tag", tag, Store.NO)); //$NON-NLS-1$
+			doc.add(new StringField(TAG, tag, Store.NO));
 		}
-		doc.add(new TextField("title", page.getTitle(), Store.YES)); //$NON-NLS-1$
-		doc.add(new TextField("text", text, Store.YES)); //$NON-NLS-1$
-		doc.add(new TextField("allText", page.getTitle(), Store.NO)); //$NON-NLS-1$
-		doc.add(new TextField("allText", text, Store.NO)); //$NON-NLS-1$
+		doc.add(new TextField(TITLE, page.getTitle(), Store.YES));
+		doc.add(new TextField(TEXT, text, Store.YES));
+		doc.add(new TextField(ALL_TEXT, page.getTitle(), Store.NO));
+		doc.add(new TextField(ALL_TEXT, text, Store.NO));
 		for (String tag : page.getTags()) {
-			doc.add(new TextField("allText", tag, Store.NO)); //$NON-NLS-1$
+			doc.add(new TextField(ALL_TEXT, tag, Store.NO));
 		}
-		doc.add(new TextField("allTextSuggestions", page.getTitle(), Store.NO)); //$NON-NLS-1$
-		doc.add(new TextField("allTextSuggestions", text, Store.NO)); //$NON-NLS-1$
+		doc.add(new TextField(ALL_TEXT_SUGGESTIONS, page.getTitle(), Store.NO));
+		doc.add(new TextField(ALL_TEXT_SUGGESTIONS, text, Store.NO));
 		for (String tag : page.getTags()) {
-			doc.add(new TextField("allTextSuggestions", tag, Store.NO)); //$NON-NLS-1$
+			doc.add(new TextField(ALL_TEXT_SUGGESTIONS, tag, Store.NO));
 		}
 
-		writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
+		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
 		writer.commit();
 	}
 	
@@ -384,7 +393,7 @@ public class PageIndex {
 		try {
 			for (String path : paths) {
 				String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
-				writer.deleteDocuments(new Term("fullPath", fullPath)); //$NON-NLS-1$
+				writer.deleteDocuments(new Term(FULL_PATH, fullPath));
 				dirty = true;
 			}
 		} finally {
@@ -419,7 +428,7 @@ public class PageIndex {
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
 			throws ParseException, IOException {
 		
-		QueryParser parser = new QueryParser(Version.LUCENE_40, "allText", analyzer); //$NON-NLS-1$
+		QueryParser parser = new QueryParser(Version.LUCENE_40, ALL_TEXT, analyzer);
 		Query query = parser.parse(searchText);
 		List<SearchHit> hits = Lists.newArrayList();
 		IndexReader reader = searcher.getIndexReader();
@@ -435,14 +444,14 @@ public class PageIndex {
 		for (int i = start; i < end; i++) {
 			int docId = docs.scoreDocs[i].doc;
 			Document doc = reader.document(docId);
-			String projectName = doc.get("project"); //$NON-NLS-1$
-			String branchName = doc.get("branch"); //$NON-NLS-1$
-			String path = doc.get("path"); //$NON-NLS-1$
-			String title = doc.get("title"); //$NON-NLS-1$
-			String text = doc.get("text"); //$NON-NLS-1$
+			String projectName = doc.get(PROJECT);
+			String branchName = doc.get(BRANCH);
+			String path = doc.get(PATH);
+			String title = doc.get(TITLE);
+			String text = doc.get(TEXT);
 			TokenStream tokenStream = null;
 			try {
-				tokenStream = TokenSources.getAnyTokenStream(reader, docId, "text", doc, analyzer); //$NON-NLS-1$
+				tokenStream = TokenSources.getAnyTokenStream(reader, docId, TEXT, doc, analyzer);
 				String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
 				cleanupFragments(fragments);
 				String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
@@ -465,7 +474,7 @@ public class PageIndex {
 		
 		TokenStream tokenStream = null;
 		try {
-			tokenStream = analyzer.tokenStream("allTextSuggestions", new StringReader(searchText)); //$NON-NLS-1$
+			tokenStream = analyzer.tokenStream(ALL_TEXT_SUGGESTIONS, new StringReader(searchText));
 			tokenStream.addAttribute(CharTermAttribute.class);
 			tokenStream.addAttribute(OffsetAttribute.class);
 			tokenStream.reset();
@@ -496,7 +505,7 @@ public class PageIndex {
 		DirectSpellChecker spellChecker = new DirectSpellChecker();
 		IndexReader reader = searcher.getIndexReader();
 		for (WordPosition word : words) {
-			Term term = new Term("allTextSuggestions", word.word); //$NON-NLS-1$
+			Term term = new Term(ALL_TEXT_SUGGESTIONS, word.word);
 			SuggestWord[] suggestions = spellChecker.suggestSimilar(term, 1, reader, SuggestMode.SUGGEST_MORE_POPULAR);
 			if (suggestions.length > 0) {
 				String suggestedWord = suggestions[0].string;
@@ -539,7 +548,7 @@ public class PageIndex {
 			// used in documents the user can't see or not
 			
 			reader = readerManager.acquire();
-			Terms terms = MultiFields.getTerms(reader, "tag"); //$NON-NLS-1$
+			Terms terms = MultiFields.getTerms(reader, TAG);
 			Set<String> tags = Sets.newHashSet();
 			if (terms != null) {
 				TermsEnum termsEnum = terms.iterator(null);
