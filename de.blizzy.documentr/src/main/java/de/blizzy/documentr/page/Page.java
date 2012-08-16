@@ -123,6 +123,7 @@ public class Page {
 			.append(title)
 			.append(data)
 			.append(contentType)
+			.append(tags)
 			.append(viewRestrictionRole)
 			.toHashCode();
 	}
