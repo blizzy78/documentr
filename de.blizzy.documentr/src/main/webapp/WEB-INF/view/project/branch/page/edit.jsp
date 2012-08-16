@@ -36,41 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:headerJS>
 
-<c:if test="${empty pageForm.path}">
-$(function() {
-	var el = $('#pageForm').find('#title');
-	el.blur(function() {
-		var pinPathButton = $('#pinPathButton');
-		if (!pinPathButton.hasClass('active')) {
-			var fieldset = $('#pathFieldset');
-			fieldset.removeClass('warning').removeClass('error');
-			$('#pathExistsWarning').remove();
-	
-			var value = el.val();
-			if (value.length > 0) {
-				$.ajax({
-					url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
-					type: 'POST',
-					dataType: 'json',
-					data: {
-						title: value
-					},
-					success: function(result) {
-						$('#pageForm').find('#path').val(result.path);
-						if (result.exists) {
-							fieldset.addClass('warning');
-							fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
-								'<spring:message code="page.path.exists"/></span>'));
-						}
-						$('#pinPathButton').removeClass('disabled').removeClass('active');
-					}
-				});
-			}
-		}
-	});
-});
-</c:if>
-
 function togglePreview() {
 	var previewEl = $('#preview');
 	if (previewEl.length === 0) {
@@ -173,10 +138,10 @@ function insertMacro(insertText) {
 }
 
 function toggleFullscreen() {
-	$('#titleFieldset, #pathFieldset, #textLabel, #viewRestrictionRoleFieldset').toggle();
+	$('#titleFieldset, #pathFieldset, #textLabel, #tagsFieldset, #viewRestrictionRoleFieldset').toggle();
 	var textEl = $('#text');
 	var rows = textEl.attr('rows');
-	textEl.attr('rows', (rows == 29) ? '20' : '29');
+	textEl.attr('rows', (rows == 30) ? '20' : '30');
 }
 
 function showMarkdownHelp() {
@@ -402,12 +367,137 @@ function insertImage() {
 	textEl.focus();
 }
 
+function addTag(tag) {
+	var tags = [];
+	$('#pageForm input[name="tags"]').each(function() {
+		var tag = $(this).val();
+		tags.push(tag);
+	});
+	
+	if ($.inArray(tag, tags) < 0) {
+		$('#pageForm input[name="tags"]').remove();
+	
+		tags.push(tag);
+		
+		var formEl = $('#pageForm');
+		$(tags).each(function() {
+			var tag = this;
+			var el = $('<input type="hidden" name="tags"/>');
+			formEl.append(el);
+			el.val(tag);
+		});
+		
+		updateTags();
+	}
+}
+
+function updateTags() {
+	var tags = [];
+	$('#pageForm input[name="tags"]').each(function() {
+		var tag = $(this).val();
+		tags.push(tag);
+	});
+
+	tags.sort();
+
+	$('#tagsContainer .tag, #tagsContainer br').remove();
+	var inputEl = $('#newTagInput');
+	$(tags).each(function() {
+		var tag = this;
+		var tagEl = $('<div class="tag">');
+		tagEl.attr('data-tag', tag);
+		tagEl.text(tag);
+		var closeEl = $('<div class="close">&#x00D7</div>');
+		tagEl.append(closeEl);
+		inputEl.before(tagEl);
+	});
+	
+	if (tags.length > 0) {
+		inputEl.before($('<br/>'));
+		hookTags();
+	}
+}
+
+function deleteTag(tagToDelete) {
+	$('#pageForm input[name="tags"]').each(function() {
+		var el = $(this);
+		var tag = el.val();
+		if (tag === tagToDelete) {
+			el.remove();
+		}
+	});
+	updateTags();
+}
+
+function hookTags() {
+	$('#tagsContainer .tag').each(function() {
+		var tagEl = $(this);
+		var tag = tagEl.attr('data-tag');
+		tagEl.off('click', '.close');
+		tagEl.on('click', '.close', {
+			tag: tag
+		}, function(e) {
+			deleteTag(e.data.tag);
+		});
+	});
+}
+
 $(function() {
+	<c:if test="${empty pageForm.path}">
+	
+		var el = $('#pageForm').find('#title');
+		el.blur(function() {
+			var pinPathButton = $('#pinPathButton');
+			if (!pinPathButton.hasClass('active')) {
+				var fieldset = $('#pathFieldset');
+				fieldset.removeClass('warning').removeClass('error');
+				$('#pathExistsWarning').remove();
+		
+				var value = el.val();
+				if (value.length > 0) {
+					$.ajax({
+						url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							title: value
+						},
+						success: function(result) {
+							$('#pageForm').find('#path').val(result.path);
+							if (result.exists) {
+								fieldset.addClass('warning');
+								fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
+									'<spring:message code="page.path.exists"/></span>'));
+							}
+							$('#pinPathButton').removeClass('disabled').removeClass('active');
+						}
+					});
+				}
+			}
+		});
+	
+	</c:if>
+
 	$('#insert-link-dialog .nav-tabs a').click(function(e) {
 		e.preventDefault();
 		$(this).tab('show');
 		updateInsertLinkButton();
 	});
+	
+	$('#newTagInput').keydown(function(e) {
+		if (e.which == 13) {
+			e.preventDefault();
+
+			var el = $('#newTagInput');
+			var newTag = $.trim(el.val());
+			el.val('');
+			if (newTag.length > 0) {
+				addTag(newTag);
+			}
+		}
+	});
+	
+	hookTags();
 });
 
 </dt:headerJS>
@@ -442,19 +532,27 @@ $(function() {
 	<fieldset>
 		<form:hidden path="parentPagePath"/>
 		<form:hidden path="commit"/>
+		<c:forEach var="tag" items="${pageForm.tags}">
+			<input type="hidden" name="tags" value="<c:out value="${tag}"/>"/>
+		</c:forEach>
+		
 		<c:set var="errorText"><form:errors path="title"/></c:set>
 		<div id="titleFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="title" cssClass="control-label"><spring:message code="label.title"/>:</form:label>
-			<form:input path="title" cssClass="input-xlarge"/>
-			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			<div class="controls">
+				<form:input path="title" cssClass="input-xlarge"/>
+				<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			</div>
 		</div>
 		<div id="pathFieldset" class="control-group">
 			<form:hidden path="path"/>
 			<form:label path="path" cssClass="control-label"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
-			<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
-			<c:if test="${empty pageForm.path}">
-				<a id="pinPathButton" class="btn disabled" data-toggle="button" href="javascript:;" title="<spring:message code="button.pinPath"/>"><i class="icon-lock"></i></a>
-			</c:if>
+			<div class="controls">
+				<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
+				<c:if test="${empty pageForm.path}">
+					<a id="pinPathButton" class="btn disabled" data-toggle="button" href="javascript:;" title="<spring:message code="button.pinPath"/>"><i class="icon-lock"></i></a>
+				</c:if>
+			</div>
 		</div>
 		<div class="control-group">
 			<form:label id="textLabel" path="text" cssClass="control-label"><spring:message code="label.contents"/>:</form:label>
@@ -492,13 +590,27 @@ $(function() {
 				<form:textarea id="text" path="text" cssClass="span11 code" rows="20"/>
 			</div>
 		</div>
+		<div id="tagsFieldset" class="control-group">
+			<label class="control-label"><spring:message code="label.tags"/>:</label>
+			<div class="controls" id="tagsContainer">
+				<c:if test="${!empty pageForm.tags}">
+					<c:forEach var="tag" items="${pageForm.tags}"><%--
+						--%><div class="tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><div class="close">&#x00D7</div></div><%--
+					--%></c:forEach>
+					<br/>
+				</c:if>
+				<input type="text" id="newTagInput" placeholder="<spring:message code="enterNewTag"/>" class="input-large"/>
+			</div>
+		</div>
 		<div id="viewRestrictionRoleFieldset" class="control-group">
 			<form:label path="viewRestrictionRole" cssClass="control-label"><spring:message code="label.visibleForRole"/>:</form:label>
-			<form:select path="viewRestrictionRole">
-				<form:option value="">(<spring:message code="everyone"/>)</form:option>
-				<c:set var="roles" value="${d:listRoles()}"/>
-				<form:options items="${roles}"/>
-			</form:select>
+			<div class="controls">
+				<form:select path="viewRestrictionRole">
+					<form:option value="">(<spring:message code="everyone"/>)</form:option>
+					<c:set var="roles" value="${d:listRoles()}"/>
+					<form:options items="${roles}"/>
+				</form:select>
+			</div>
 		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>

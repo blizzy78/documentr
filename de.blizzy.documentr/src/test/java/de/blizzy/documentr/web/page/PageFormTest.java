@@ -19,6 +19,8 @@ package de.blizzy.documentr.web.page;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,12 +33,13 @@ public class PageFormTest {
 	private static final String TEXT = "text"; //$NON-NLS-1$
 	private static final String VIEW_ROLE = "viewRole"; //$NON-NLS-1$
 	private static final String COMMIT = "commit"; //$NON-NLS-1$
+	private static final String[] TAGS = { "tag1", "tag2", "tag3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private PageForm form;
 
 	@Before
 	public void setUp() {
-		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE, COMMIT);
+		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE, COMMIT, TAGS);
 	}
 	
 	@Test
@@ -77,5 +80,10 @@ public class PageFormTest {
 	@Test
 	public void getCommit() {
 		assertEquals(COMMIT, form.getCommit());
+	}
+	
+	@Test
+	public void getTags() {
+		assertTrue(Arrays.equals(TAGS, form.getTags()));
 	}
 }

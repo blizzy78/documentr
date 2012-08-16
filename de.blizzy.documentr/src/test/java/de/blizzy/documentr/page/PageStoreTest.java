@@ -474,12 +474,14 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("title", "a\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		sleep(1000); // must wait because commit time is stored in seconds
 
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
 
 		page = Page.fromText("title", "aaa\nb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
 		page = Page.fromText("title", "aaa\nbbb\nc\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
@@ -506,6 +508,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		sleep(1000); // must wait because commit time is stored in seconds
 
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
 		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nxxx\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -514,9 +517,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
 		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
 		page = Page.fromText("title", "aaa\nbbb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
@@ -548,6 +553,7 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
 		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		sleep(1000); // must wait because commit time is stored in seconds
 		
 		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
 		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nxxx\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -556,9 +562,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
 		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
 		page = Page.fromText("title", "aaa\nbbb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();

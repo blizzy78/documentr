@@ -16,30 +16,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-pre.changes {
-	background-color: inherit;
-	border: 0;
-	padding: 0;
-	
-	ins,
-	del {
-		margin-left: 2px;
-		margin-right: 2px;
-		padding-left: 2px;
-		padding-right: 2px;
-		border-radius: 2px 2px 2px 2px;
-	}
-	
-	ins {
-		background-color: #e6ffe6;
-	}
-	
-	del {
-		background-color: #ffe6e6;
-	}
-	
-	del + ins,
-	ins + del {
-		margin-left: 0px;
+pre {
+	.changes {
+		background-color: inherit;
+		border: 0;
+		padding: 0;
+		
+		ins,
+		del {
+			margin-left: 2px;
+			margin-right: 2px;
+			padding-left: 2px;
+			padding-right: 2px;
+			border-radius: 2px 2px 2px 2px;
+		}
+		
+		ins {
+			background-color: #e6ffe6;
+		}
+		
+		del {
+			background-color: #ffe6e6;
+		}
+		
+		del + ins,
+		ins + del {
+			margin-left: 0px;
+		}
 	}
 }

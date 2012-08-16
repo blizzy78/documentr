@@ -149,4 +149,12 @@ public final class TestUtil {
 	public static String removeTextRange(String html) {
 		return html.replaceAll(" data-text-range=\"[0-9]+,[0-9]+\"", StringUtils.EMPTY); //$NON-NLS-1$
 	}
+	
+	public static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+	}
 }

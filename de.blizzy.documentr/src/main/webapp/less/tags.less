@@ -16,15 +16,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "bootstrap-2.0.4/bootstrap.less";
-@import "bootstrap-2.0.4/responsive.less";
-
-@import "prettify-20110601.less";
-
-@import "styles.less";
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "markdown-help.less";
-@import "tags.less";
-
-@import "macros/macros.less";
+.tag {
+	display: inline-block;
+	padding: 2px 5px 2px 5px;
+	background-color: #e5f3fa;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	border-radius: 2px 2px 2px 2px;
+	color: #005580;
+	margin-right: 5px;
+	margin-bottom: 3px;
+	
+	.close {
+		display: inline;
+		float: none;
+		line-height: inherit;
+		font-size: 12px;
+		padding-left: 4px;
+	}
+}

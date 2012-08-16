@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.page;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -143,7 +145,8 @@ public class PageController {
 			@PathVariable String parentPagePath, Model model) {
 
 		PageForm form = new PageForm(projectName, branchName, null,
-				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY, null);
+				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY, null,
+				ArrayUtils.EMPTY_STRING_ARRAY);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -178,9 +181,11 @@ public class PageController {
 				commit = conflict.getNewBaseCommit();
 			}
 
+			String[] tags = page.getTags().toArray(ArrayUtils.EMPTY_STRING_ARRAY);
+			Arrays.sort(tags);
 			PageForm form = new PageForm(projectName, branchName, path, page.getParentPagePath(),
 					page.getTitle(), text, (viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY,
-					commit);
+					commit, tags);
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			if (conflict != null) {
 				model.addAttribute("mergeConflict", Boolean.TRUE); //$NON-NLS-1$
@@ -215,6 +220,7 @@ public class PageController {
 		if (StringUtils.isBlank(path)) {
 			path = parentPagePath + "/" + Util.simplifyForURL(form.getTitle()); //$NON-NLS-1$
 		}
+		page.setTags(Sets.newHashSet(form.getTags()));
 		page.setViewRestrictionRole(StringUtils.isNotBlank(form.getViewRestrictionRole()) ?
 				form.getViewRestrictionRole() : null);
 		
@@ -245,12 +251,16 @@ public class PageController {
 			@RequestParam(required=false) String path, @RequestParam(required=false) String parentPagePath,
 			@RequestParam(required=false) String title, @RequestParam(required=false) String text,
 			@RequestParam(required=false) String viewRestrictionRole,
-			@RequestParam(required=false) String commit) {
-		
+			@RequestParam(required=false) String commit,
+			@RequestParam(required=false) String[] tags) {
+
+		if (tags == null) {
+			tags = ArrayUtils.EMPTY_STRING_ARRAY;
+		}
 		return ((path != null) && (title != null) && (text != null)) ?
 				new PageForm(projectName, branchName, path, parentPagePath, title, text,
 						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY,
-						Strings.emptyToNull(commit)) :
+						Strings.emptyToNull(commit), tags) :
 				null;
 	}
 	

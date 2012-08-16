@@ -60,8 +60,6 @@ import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -175,7 +173,7 @@ public class PageIndex {
 
 		defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
 		Map<String, Analyzer> fieldAnalyzers = Maps.newHashMap();
-		fieldAnalyzers.put("allText", new StandardAnalyzer(Version.LUCENE_40)); //$NON-NLS-1$
+		fieldAnalyzers.put("allTextSuggestions", new StandardAnalyzer(Version.LUCENE_40)); //$NON-NLS-1$
 		analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, fieldAnalyzers);
 
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
@@ -300,12 +298,23 @@ public class PageIndex {
 		doc.add(new StringField("project", projectName, Store.YES)); //$NON-NLS-1$
 		doc.add(new StringField("branch", branchName, Store.YES)); //$NON-NLS-1$
 		doc.add(new StringField("path", path, Store.YES)); //$NON-NLS-1$
+		for (String tag : page.getTags()) {
+			doc.add(new StringField("tag", tag, Store.NO)); //$NON-NLS-1$
+		}
 		doc.add(new TextField("title", page.getTitle(), Store.YES)); //$NON-NLS-1$
 		doc.add(new TextField("text", text, Store.YES)); //$NON-NLS-1$
 		doc.add(new TextField("allText", page.getTitle(), Store.NO)); //$NON-NLS-1$
 		doc.add(new TextField("allText", text, Store.NO)); //$NON-NLS-1$
-		writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
+		for (String tag : page.getTags()) {
+			doc.add(new TextField("allText", tag, Store.NO)); //$NON-NLS-1$
+		}
+		doc.add(new TextField("allTextSuggestions", page.getTitle(), Store.NO)); //$NON-NLS-1$
+		doc.add(new TextField("allTextSuggestions", text, Store.NO)); //$NON-NLS-1$
+		for (String tag : page.getTags()) {
+			doc.add(new TextField("allTextSuggestions", tag, Store.NO)); //$NON-NLS-1$
+		}
 
+		writer.updateDocument(new Term("fullPath", fullPath), doc); //$NON-NLS-1$
 		writer.commit();
 	}
 	
@@ -404,14 +413,8 @@ public class PageIndex {
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
 			throws ParseException, IOException {
 		
-		QueryParser titleParser = new QueryParser(Version.LUCENE_40, "title", analyzer); //$NON-NLS-1$
-		Query titleQuery = titleParser.parse(searchText);
-		QueryParser textParser = new QueryParser(Version.LUCENE_40, "text", analyzer); //$NON-NLS-1$
-		Query textQuery = textParser.parse(searchText);
-		
-		BooleanQuery query = new BooleanQuery();
-		query.add(titleQuery, Occur.SHOULD);
-		query.add(textQuery, Occur.SHOULD);
+		QueryParser parser = new QueryParser(Version.LUCENE_40, "allText", analyzer); //$NON-NLS-1$
+		Query query = parser.parse(searchText);
 		List<SearchHit> hits = Lists.newArrayList();
 		IndexReader reader = searcher.getIndexReader();
 		Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
@@ -456,7 +459,7 @@ public class PageIndex {
 		
 		TokenStream tokenStream = null;
 		try {
-			tokenStream = analyzer.tokenStream("allText", new StringReader(searchText)); //$NON-NLS-1$
+			tokenStream = analyzer.tokenStream("allTextSuggestions", new StringReader(searchText)); //$NON-NLS-1$
 			tokenStream.addAttribute(CharTermAttribute.class);
 			tokenStream.addAttribute(OffsetAttribute.class);
 			tokenStream.reset();
@@ -487,7 +490,7 @@ public class PageIndex {
 		DirectSpellChecker spellChecker = new DirectSpellChecker();
 		IndexReader reader = searcher.getIndexReader();
 		for (WordPosition word : words) {
-			Term term = new Term("allText", word.word); //$NON-NLS-1$
+			Term term = new Term("allTextSuggestions", word.word); //$NON-NLS-1$
 			SuggestWord[] suggestions = spellChecker.suggestSimilar(term, 1, reader, SuggestMode.SUGGEST_MORE_POPULAR);
 			if (suggestions.length > 0) {
 				String suggestedWord = suggestions[0].string;

@@ -17,13 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.util.Assert;
 
 public class Page {
 	private String parentPagePath;
 	private String title;
 	private String contentType;
+	private Set<String> tags = Collections.emptySet();
 	private String viewRestrictionRole;
 	private PageData data;
 
@@ -62,8 +67,22 @@ public class Page {
 	public String getContentType() {
 		return contentType;
 	}
+
+	public Set<String> getTags() {
+		return tags;
+	}
 	
+	public void setTags(Set<String> tags) {
+		Assert.notNull(tags);
+		
+		this.tags = tags;
+	}
+
 	public void setViewRestrictionRole(String viewRestrictionRole) {
+		if (viewRestrictionRole != null) {
+			Assert.hasLength(viewRestrictionRole);
+		}
+		
 		this.viewRestrictionRole = viewRestrictionRole;
 	}
 	
@@ -90,6 +109,7 @@ public class Page {
 				.append(title, other.title)
 				.append(data, other.data)
 				.append(contentType, other.contentType)
+				.append(tags, other.tags)
 				.append(viewRestrictionRole, other.viewRestrictionRole)
 				.isEquals();
 		}
