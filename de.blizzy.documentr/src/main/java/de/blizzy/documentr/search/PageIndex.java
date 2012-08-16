@@ -314,7 +314,7 @@ public class PageIndex {
 		doc.add(new StringField(BRANCH, branchName, Store.YES));
 		doc.add(new StringField(PATH, path, Store.YES));
 		for (String tag : page.getTags()) {
-			doc.add(new StringField(TAG, tag, Store.NO));
+			doc.add(new StringField(TAG, tag, Store.YES));
 		}
 		doc.add(new TextField(TITLE, page.getTitle(), Store.YES));
 		doc.add(new TextField(TEXT, text, Store.YES));
@@ -449,13 +449,16 @@ public class PageIndex {
 			String path = doc.get(PATH);
 			String title = doc.get(TITLE);
 			String text = doc.get(TEXT);
+			String[] tagsArray = doc.getValues(TAG);
+			List<String> tags = Lists.newArrayList(tagsArray);
+			Collections.sort(tags);
 			TokenStream tokenStream = null;
 			try {
 				tokenStream = TokenSources.getAnyTokenStream(reader, docId, TEXT, doc, analyzer);
 				String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
 				cleanupFragments(fragments);
 				String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
-				SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText);
+				SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText, tags);
 				hits.add(hit);
 			} catch (InvalidTokenOffsetsException e) {
 				// ignore

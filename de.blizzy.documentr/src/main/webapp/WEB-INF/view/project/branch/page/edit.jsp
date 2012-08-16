@@ -407,10 +407,10 @@ function updateTags() {
 	var inputEl = $('#newTagInput');
 	$(tags).each(function() {
 		var tag = this;
-		var tagEl = $('<div class="tag">');
+		var tagEl = $('<span class="tag"/>');
 		tagEl.attr('data-tag', tag);
 		tagEl.text(tag);
-		var closeEl = $('<div class="close">&#x00D7</div>');
+		var closeEl = $('<span class="close">&#x00D7</span>');
 		tagEl.append(closeEl);
 		inputEl.before(tagEl);
 	});
@@ -617,7 +617,7 @@ $(function() {
 			<div class="controls" id="tagsContainer">
 				<c:if test="${!empty pageForm.tags}">
 					<c:forEach var="tag" items="${pageForm.tags}"><%--
-						--%><div class="tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><div class="close">&#x00D7</div></div><%--
+						--%><span class="tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><span class="close">&#x00D7</span></span><%--
 					--%></c:forEach>
 					<br/>
 				</c:if>

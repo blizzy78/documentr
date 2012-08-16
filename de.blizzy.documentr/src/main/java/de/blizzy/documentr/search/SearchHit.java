@@ -17,19 +17,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
+import java.util.List;
+
 public class SearchHit {
 	private String projectName;
 	private String branchName;
 	private String path;
 	private String title;
 	private String textHtml;
+	private List<String> tags;
 
-	SearchHit(String projectName, String branchName, String path, String title, String textHtml) {
+	SearchHit(String projectName, String branchName, String path, String title, String textHtml, List<String> tags) {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
 		this.title = title;
 		this.textHtml = textHtml;
+		this.tags = tags;
 	}
 	
 	public String getProjectName() {
@@ -50,5 +54,9 @@ public class SearchHit {
 	
 	public String getTextHtml() {
 		return textHtml;
+	}
+	
+	public List<String> getTags() {
+		return tags;
 	}
 }

@@ -19,8 +19,12 @@ package de.blizzy.documentr.search;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 public class SearchHitTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -28,12 +32,13 @@ public class SearchHitTest {
 	private static final String PAGE_PATH = "foo/bar"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String TEXT_HTML = "textHtml"; //$NON-NLS-1$
+	private static final List<String> TAGS = Lists.newArrayList("tag1", "tag2", "tag3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	private SearchHit searchHit;
 	
 	@Before
 	public void setUp() {
-		searchHit = new SearchHit(PROJECT, BRANCH, PAGE_PATH, TITLE, TEXT_HTML);
+		searchHit = new SearchHit(PROJECT, BRANCH, PAGE_PATH, TITLE, TEXT_HTML, TAGS);
 	}
 	
 	@Test
@@ -59,5 +64,10 @@ public class SearchHitTest {
 	@Test
 	public void getTextHtml() {
 		assertEquals(TEXT_HTML, searchHit.getTextHtml());
+	}
+	
+	@Test
+	public void getTags() {
+		assertEquals(TAGS, searchHit.getTags());
 	}
 }

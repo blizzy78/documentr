@@ -19,6 +19,7 @@ package de.blizzy.documentr.search;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -29,8 +30,8 @@ import com.google.common.collect.Lists;
 public class SearchResultTest {
 	@SuppressWarnings("nls")
 	private static final List<SearchHit> HITS = Lists.newArrayList(
-			new SearchHit("project", "branch", "foo/bar", "title", "textHtml"),
-			new SearchHit("project", "branch", "foo/bar/baz", "title2", "textHtml2"));
+			new SearchHit("project", "branch", "foo/bar", "title", "textHtml", Collections.<String>emptyList()),
+			new SearchHit("project", "branch", "foo/bar/baz", "title2", "textHtml2", Collections.<String>emptyList()));
 	private static final int TOTAL_HITS = HITS.size();
 	private static final int HITS_PER_PAGE = 30;
 	
