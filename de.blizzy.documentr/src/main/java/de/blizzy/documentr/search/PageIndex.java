@@ -541,15 +541,11 @@ public class PageIndex {
 			readerManager.maybeRefreshBlocking();
 		} catch (IOException e) {
 			// ignore
-		} catch (InterruptedException e) {
-			// ignore
 		}
 		
 		try {
 			searcherManager.maybeRefreshBlocking();
 		} catch (IOException e) {
-			// ignore
-		} catch (InterruptedException e) {
 			// ignore
 		}
 	}
