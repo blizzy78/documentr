@@ -72,7 +72,12 @@ public class SearchController {
 	@RequestMapping(value="/tags/json", method=RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("permitAll")
-	public Set<String> getAllTags() throws IOException {
-		return pageIndex.getAllTags();
+	public Set<String> getAllTags(Authentication authentication) throws IOException {
+		// TODO: why can authentication be null here?
+		if (authentication == null) {
+			authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
+		}
+		
+		return pageIndex.getAllTags(authentication);
 	}
 }

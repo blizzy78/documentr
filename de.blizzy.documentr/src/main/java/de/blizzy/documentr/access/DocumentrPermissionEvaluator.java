@@ -20,6 +20,7 @@ package de.blizzy.documentr.access;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
@@ -211,6 +214,22 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		return false;
 	}
 	
+	public Set<String> getBranchesForPermission(Authentication authentication, Permission permission) {
+		try {
+			Set<String> branches = Sets.newHashSet();
+			for (String project : repoManager.listProjects()) {
+				for (String branch : repoManager.listProjectBranches(project)) {
+					if (hasBranchPermission(authentication, project, branch, permission)) {
+						branches.add(project + "/" + branch); //$NON-NLS-1$
+					}
+				}
+			}
+			return branches;
+		} catch (IOException e) {
+			throw new AuthenticationServiceException(e.getMessage(), e);
+		}
+	}
+
 	private boolean hasRoleOnBranch(Authentication authentication, String projectName, String branchName,
 			String roleName) throws IOException {
 

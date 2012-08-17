@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
+import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -32,6 +33,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
@@ -71,6 +74,8 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private EventBus eventBus;
 	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
+	private UserStore userStore;
 	
 	@Before
 	public void setUp() throws IOException {
@@ -91,7 +96,6 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void addAndFindPage() throws ParseException, IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
@@ -100,8 +104,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 
-		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
-			.thenReturn(true);
+		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
+			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
+		
+		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
 		
 		// wait for page to get indexed
 		while (pageIndex.getNumDocuments() == 0) {
@@ -114,7 +120,6 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void findPagesAndSuggestion() throws ParseException, IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
@@ -123,8 +128,10 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		
-		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
-			.thenReturn(true);
+		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
+			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
+	
+		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
 		
 		// wait for page to get indexed
 		while (pageIndex.getNumDocuments() == 0) {
@@ -140,7 +147,6 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void deletePages() throws IOException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
@@ -148,9 +154,6 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
-		
-		when(permissionEvaluator.hasPagePermission(authentication, PROJECT, BRANCH, PAGE_PATH, Permission.VIEW))
-			.thenReturn(true);
 		
 		// wait for page to get indexed
 		while (pageIndex.getNumDocuments() == 0) {
@@ -162,14 +165,6 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		// wait for page to get deleted
 		while (pageIndex.getNumDocuments() > 0) {
 			sleep(10);
-		}
-	}
-
-	private void sleep(long milliseconds) {
-		try {
-			Thread.sleep(milliseconds);
-		} catch (InterruptedException e) {
-			// ignore
 		}
 	}
 }

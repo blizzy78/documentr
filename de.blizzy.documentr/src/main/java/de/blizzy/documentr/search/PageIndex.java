@@ -20,6 +20,7 @@ package de.blizzy.documentr.search;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -63,10 +65,14 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -82,7 +88,9 @@ import org.apache.lucene.search.spell.SuggestMode;
 import org.apache.lucene.search.spell.SuggestWord;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.Version;
 import org.cyberneko.html.HTMLEntities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,15 +133,17 @@ public class PageIndex {
 		}
 	}
 	
+	static final String PROJECT = "project"; //$NON-NLS-1$
+	static final String BRANCH = "branch"; //$NON-NLS-1$
+	static final String PATH = "path"; //$NON-NLS-1$
+
 	private static final String FULL_PATH = "fullPath"; //$NON-NLS-1$
-	private static final String PROJECT = "project"; //$NON-NLS-1$
-	private static final String BRANCH = "branch"; //$NON-NLS-1$
-	private static final String PATH = "path"; //$NON-NLS-1$
 	private static final String TAG = "tag"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
 	private static final String ALL_TEXT = "allText"; //$NON-NLS-1$
 	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
+	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
 	private static final int NUM_FRAGMENTS = 5;
 	private static final int FRAGMENT_SIZE = 50;
@@ -167,6 +177,8 @@ public class PageIndex {
 	private IPageStore pageStore;
 	@Autowired
 	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private UserStore userStore;
 	private Analyzer defaultAnalyzer;
 	private Analyzer analyzer;
 	private File pageIndexDir;
@@ -316,6 +328,10 @@ public class PageIndex {
 		for (String tag : page.getTags()) {
 			doc.add(new StringField(TAG, tag, Store.YES));
 		}
+		String viewRestrictionRole = page.getViewRestrictionRole();
+		if (StringUtils.isNotBlank(viewRestrictionRole)) {
+			doc.add(new StringField(VIEW_RESTRICTION_ROLE, viewRestrictionRole, Store.NO));
+		}
 		doc.add(new TextField(TITLE, page.getTitle(), Store.YES));
 		doc.add(new TextField(TEXT, text, Store.YES));
 		doc.add(new TextField(ALL_TEXT, page.getTitle(), Store.NO));
@@ -432,7 +448,8 @@ public class PageIndex {
 		Query query = parser.parse(searchText);
 		List<SearchHit> hits = Lists.newArrayList();
 		IndexReader reader = searcher.getIndexReader();
-		Filter filter = new PagePermissionFilter(authentication, Permission.VIEW, permissionEvaluator);
+		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
+		Filter filter = new PagePermissionFilter(visibleDocIds);
 		TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
 		Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
 		Scorer scorer = new QueryScorer(query);
@@ -540,32 +557,71 @@ public class PageIndex {
 		}
 	}
 	
-	public Set<String> getAllTags() throws IOException {
-		DirectoryReader reader = null;
+	public Set<String> getAllTags(Authentication authentication) throws IOException {
+		IndexReader reader = null;
+		IndexSearcher searcher = null;
 		try {
 			if (alwaysRefresh) {
 				refreshBlocking();
 			}
 
-			// TODO: does not honor permissions - returns all tags regardless of whether they are only
-			// used in documents the user can't see or not
-			
-			reader = readerManager.acquire();
-			Terms terms = MultiFields.getTerms(reader, TAG);
+			searcher = searcherManager.acquire();
+			Bits visibleDocs = getVisibleDocIds(searcher, authentication);
 			Set<String> tags = Sets.newHashSet();
-			if (terms != null) {
-				TermsEnum termsEnum = terms.iterator(null);
-				BytesRef ref;
-				while ((ref = termsEnum.next()) != null) {
-					tags.add(ref.utf8ToString());
+			if (visibleDocs.length() > 0) {
+				reader = searcher.getIndexReader();
+				Terms terms = MultiFields.getTerms(reader, TAG);
+				if (terms != null) {
+					TermsEnum termsEnum = terms.iterator(null);
+					BytesRef ref;
+					while ((ref = termsEnum.next()) != null) {
+						DocsEnum docsEnum = termsEnum.docs(visibleDocs, null, 0);
+						if (docsEnum.nextDoc() != DocIdSetIterator.NO_MORE_DOCS) {
+							tags.add(ref.utf8ToString());
+						}
+					}
 				}
 			}
 			return tags;
 		} finally {
-			if (reader != null) {
-				readerManager.release(reader);
+			if (searcher != null) {
+				searcherManager.release(searcher);
 			}
 		}
+	}
+	
+	private Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException {
+		Set<String> branches = permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW);
+		BitSet docIds = new BitSet();
+		if (!branches.isEmpty()) {
+			// collect document IDs of all visible documents (via view permission on branches)
+			BooleanQuery allBranchesQuery = new BooleanQuery();
+			for (String projectAndBranch : branches) {
+				String projectName = StringUtils.substringBefore(projectAndBranch, "/"); //$NON-NLS-1$
+				String branchName = StringUtils.substringAfter(projectAndBranch, "/"); //$NON-NLS-1$
+				TermQuery projectQuery = new TermQuery(new Term(PROJECT, projectName));
+				TermQuery branchQuery = new TermQuery(new Term(BRANCH, branchName));
+				BooleanQuery projectAndBranchQuery = new BooleanQuery();
+				projectAndBranchQuery.add(projectQuery, BooleanClause.Occur.MUST);
+				projectAndBranchQuery.add(branchQuery, BooleanClause.Occur.MUST);
+				allBranchesQuery.add(projectAndBranchQuery, BooleanClause.Occur.SHOULD);
+			}
+			AbstractDocIdsCollector collector = new AllDocIdsCollector();
+			searcher.search(allBranchesQuery, collector);
+			docIds = collector.getDocIds();
+
+			// remove all inaccessible document IDs (via view restriction roles on pages)
+			Set<String> roles = Sets.newHashSet(userStore.listRoles());
+			BooleanQuery allRolesQuery = new BooleanQuery();
+			for (String role : roles) {
+				TermQuery roleQuery = new TermQuery(new Term(VIEW_RESTRICTION_ROLE, role));
+				allRolesQuery.add(roleQuery, BooleanClause.Occur.SHOULD);
+			}
+			collector = new InaccessibleDocIdsCollector(authentication, Permission.VIEW, permissionEvaluator);
+			searcher.search(allRolesQuery, collector);
+			docIds.andNot(collector.getDocIds());
+		}
+		return new DocIdBitSet(docIds);
 	}
 	
 	private void refresh() {
