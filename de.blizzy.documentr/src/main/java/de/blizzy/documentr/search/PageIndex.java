@@ -272,7 +272,7 @@ public class PageIndex {
 			@Override
 			public void run() {
 				try {
-					addPageAsync(projectName, branchName, path);
+					addPageAsync(projectName, branchName, path, true);
 				} catch (IOException e) {
 					// TODO: log exception
 				} catch (RuntimeException e) {
@@ -294,22 +294,32 @@ public class PageIndex {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				boolean dirty = false;
 				try {
 					List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
 					for (String path : paths) {
-						addPageAsync(projectName, branchName, path);
+						addPageAsync(projectName, branchName, path, false);
+						dirty = true;
 					}
 				} catch (IOException e) {
 					// TODO: log exception
 				} catch (RuntimeException e) {
 					// TODO: log exception
+				} finally {
+					if (dirty) {
+						try {
+							writer.commit();
+						} catch (IOException e) {
+							// TODO: log exception
+						}
+					}
 				}
 			}
 		};
 		threadPool.submit(runnable);
 	}
 
-	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
+	private void addPageAsync(String projectName, String branchName, String path, boolean commit) throws IOException {
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -346,7 +356,10 @@ public class PageIndex {
 		}
 
 		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
-		writer.commit();
+		
+		if (commit) {
+			writer.commit();
+		}
 	}
 	
 	private String removeHtmlTags(String html) {
