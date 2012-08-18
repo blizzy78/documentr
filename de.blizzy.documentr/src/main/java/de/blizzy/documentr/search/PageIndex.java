@@ -448,16 +448,8 @@ public class PageIndex {
 			};
 			Future<SearchResult> findFuture = threadPool.submit(findCallable);
 			
-			Callable<SearchTextSuggestion> suggestionCallable = new Callable<SearchTextSuggestion>() {
-				@Override
-				public SearchTextSuggestion call() throws ParseException, IOException {
-					return getSearchTextSuggestion(searchText, authentication, indexSearcher);
-				}
-			};
-			Future<SearchTextSuggestion> suggestionFuture = threadPool.submit(suggestionCallable);
-			
+			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, indexSearcher);
 			SearchResult result = findFuture.get();
-			SearchTextSuggestion suggestion = suggestionFuture.get();
 			result.setSuggestion(suggestion);
 			return result;
 		} catch (InterruptedException e) {
@@ -482,20 +474,17 @@ public class PageIndex {
 			throws ParseException, IOException {
 		
 		Future<Query> queryFuture = threadPool.submit(new ParseQueryTask(searchText, analyzer));
-		Future<Bits> visibleDocsFuture = threadPool.submit(new GetVisibleDocIdsTask(searcher, authentication, this));
+		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
+		
 		Query query;
-		Bits visibleDocIds;
 		try {
 			query = queryFuture.get();
-			visibleDocIds = visibleDocsFuture.get();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (ExecutionException e) {
 			Throwable cause = e.getCause();
 			if (cause instanceof ParseException) {
 				throw (ParseException) cause;
-			} else if (cause instanceof IOException) {
-				throw (IOException) cause;
 			} else {
 				throw Util.toRuntimeException(cause);
 			}

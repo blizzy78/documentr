@@ -19,7 +19,8 @@ package de.blizzy.documentr.search;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,8 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.springframework.security.core.Authentication;
+
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -48,8 +51,9 @@ class GetVisibleBranchDocIdsTask implements Callable<BitSet> {
 
 	@Override
 	public BitSet call() throws IOException {
-		Set<String> branches = permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW);
+		List<String> branches = Lists.newArrayList(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW));
 		if (!branches.isEmpty()) {
+			Collections.sort(branches);
 			BooleanQuery allBranchesQuery = new BooleanQuery();
 			for (String projectAndBranch : branches) {
 				String projectName = StringUtils.substringBefore(projectAndBranch, "/"); //$NON-NLS-1$

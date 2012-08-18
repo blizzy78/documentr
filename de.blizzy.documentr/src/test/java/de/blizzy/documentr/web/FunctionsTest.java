@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,7 @@ import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
+import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
@@ -65,6 +67,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
+	private static final Locale LOCALE = Locale.US;
 	
 	@Mock
 	private GlobalRepositoryManager repoManager;
@@ -99,7 +102,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		
 		SecurityContextHolder.setContext(securityContext);
 
-		LocaleContextHolder.setLocale(Locale.US);
+		LocaleContextHolder.setLocale(LOCALE);
 	}
 
 	@After
@@ -163,6 +166,14 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE, authentication)) //$NON-NLS-1$
 			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		assertEquals("htmlWithMacros", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getPageHeaderHTML() throws IOException {
+		when(pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, authentication)).thenReturn("headerHtml"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("headerHtml", PROJECT, BRANCH, PAGE, authentication)) //$NON-NLS-1$
+			.thenReturn("headerHtmlWithMacros"); //$NON-NLS-1$
+		assertEquals("headerHtmlWithMacros", Functions.getPageHeaderHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -270,5 +281,25 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(messageSource.getMessage(anyString(), (Object[]) isNull(), Matchers.<Locale>any())).thenReturn("title"); //$NON-NLS-1$
 		
 		assertEquals(descs, Sets.newHashSet(Functions.getMacros()));
+	}
+	
+	@Test
+	public void getLanguage() {
+		assertEquals(LOCALE.getLanguage(), Functions.getLanguage());
+	}
+	
+	@Test
+	public void escapeJavaScript() {
+		assertEquals(StringEscapeUtils.escapeEcmaScript("\"'{}"), Functions.escapeJavaScript("\"'{}")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void pageExists() throws IOException {
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(mock(PageMetadata.class));
+		assertTrue(Functions.pageExists(PROJECT, BRANCH, PAGE));
+		
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenThrow(PageNotFoundException.class);
+		assertFalse(Functions.pageExists(PROJECT, BRANCH, PAGE));
 	}
 }

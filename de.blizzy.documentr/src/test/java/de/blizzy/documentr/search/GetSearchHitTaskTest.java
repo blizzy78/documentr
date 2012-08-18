@@ -20,37 +20,35 @@ package de.blizzy.documentr.search;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.BitSet;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.Version;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 
-public class PagePermissionFilterTest extends AbstractDocumentrTest {
+public class GetSearchHitTaskTest extends AbstractDocumentrTest {
 	private IndexReader reader;
-	private PagePermissionFilter filter;
 	private Directory directory;
+	private GetSearchHitTask task;
 
 	@Before
 	public void setUp() throws IOException {
@@ -60,17 +58,16 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		IndexWriter writer = new IndexWriter(directory, writerConfig);
-		writer.addDocument(createDocument("project", "branch1", "home")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		writer.addDocument(createDocument("project", "branch2", "home")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		writer.addDocument(createDocument("project", "branch", "home", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				new String[] { "tag1", "tag2" }, //$NON-NLS-1$ //$NON-NLS-2$
+				"title", "some text")); //$NON-NLS-1$ //$NON-NLS-2$ 
 		writer.commit();
 		writer.close(true);
 		
 		reader = DirectoryReader.open(directory);
 		
-		BitSet docs = new BitSet();
-		docs.set(1);
-		Bits docIds = new DocIdBitSet(docs);
-		filter = new PagePermissionFilter(docIds);
+		Query query = new TermQuery(new Term("text", "some")); //$NON-NLS-1$ //$NON-NLS-2$
+		task = new GetSearchHitTask(query, reader, 0, analyzer);
 	}
 	
 	@After
@@ -80,20 +77,28 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void getDocIdSet() throws IOException {
-		IndexSearcher searcher = new IndexSearcher(reader);
-		Query query = new TermQuery(new Term("path", "home")); //$NON-NLS-1$ //$NON-NLS-2$
-		TopDocs docs = searcher.search(query, filter, 2);
-		assertEquals(1, docs.totalHits);
-		Document doc = reader.document(docs.scoreDocs[0].doc);
-		assertEquals("branch2", doc.get(PageIndex.BRANCH)); //$NON-NLS-1$
+	public void call() throws IOException {
+		SearchHit hit = task.call();
+		assertEquals("project", hit.getProjectName()); //$NON-NLS-1$
+		assertEquals("branch", hit.getBranchName()); //$NON-NLS-1$
+		assertEquals("home", hit.getPath()); //$NON-NLS-1$
+		assertEquals("title", hit.getTitle()); //$NON-NLS-1$
+		assertEquals("<strong>some</strong> text", hit.getTextHtml()); //$NON-NLS-1$
+		assertEquals(Lists.newArrayList("tag1", "tag2"), hit.getTags()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	private Document createDocument(String projectName, String branchName, String path) {
+	private Document createDocument(String projectName, String branchName, String path, String[] tags,
+			String title, String text) {
+		
 		Document doc = new Document();
 		doc.add(new StringField(PageIndex.PROJECT, projectName, Store.YES));
 		doc.add(new StringField(PageIndex.BRANCH, branchName, Store.YES));
 		doc.add(new StringField(PageIndex.PATH, path, Store.YES));
+		for (String tag : tags) {
+			doc.add(new StringField(PageIndex.TAG, tag, Store.YES));
+		}
+		doc.add(new TextField(PageIndex.TITLE, title, Store.YES));
+		doc.add(new TextField(PageIndex.TEXT, text, Store.YES));
 		return doc;
 	}
 }

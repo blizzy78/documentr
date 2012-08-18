@@ -17,25 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
-import java.util.concurrent.Callable;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.util.Bits;
-import org.springframework.security.core.Authentication;
-
-class GetVisibleDocIdsTask implements Callable<Bits> {
-	private Authentication authentication;
-	private PageIndex pageIndex;
-	private IndexSearcher searcher;
-
-	GetVisibleDocIdsTask(IndexSearcher searcher, Authentication authentication, PageIndex pageIndex) {
-		this.searcher = searcher;
-		this.authentication = authentication;
-		this.pageIndex = pageIndex;
-	}
-	
-	@Override
-	public Bits call() throws Exception {
-		return pageIndex.getVisibleDocIds(searcher, authentication);
+public class AllDocIdsCollectorTest {
+	@Test
+	@Ignore
+	public void collect() {
+		// TODO: implement test
 	}
 }

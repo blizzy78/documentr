@@ -28,6 +28,7 @@ import java.util.Collections;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -166,5 +167,11 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		while (pageIndex.getNumDocuments() > 0) {
 			sleep(10);
 		}
+	}
+	
+	@Test
+	@Ignore
+	public void getAllTags() {
+		// TODO: implement test
 	}
 }

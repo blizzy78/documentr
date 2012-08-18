@@ -19,7 +19,7 @@ package de.blizzy.documentr.search;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.lucene.index.Term;
@@ -28,8 +28,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.springframework.security.core.Authentication;
-
-import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -54,7 +52,7 @@ class GetInaccessibleDocIdsTask implements Callable<BitSet> {
 
 	@Override
 	public BitSet call() throws IOException {
-		Set<String> roles = Sets.newHashSet(userStore.listRoles());
+		List<String> roles = userStore.listRoles();
 		BooleanQuery allRolesQuery = new BooleanQuery();
 		for (String role : roles) {
 			TermQuery roleQuery = new TermQuery(new Term(PageIndex.VIEW_RESTRICTION_ROLE, role));
