@@ -18,58 +18,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.search;
 
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TermQuery;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.access.UserStore;
 
-class InaccessibleDocIdsCollector extends AbstractDocIdsCollector {
-	private static final Set<String> FIELDS = Sets.newHashSet(PageIndex.PROJECT, PageIndex.BRANCH, PageIndex.PATH);
-	
+class GetInaccessibleDocIdsTask implements Callable<BitSet> {
+	private IndexSearcher searcher;
 	private Permission permission;
 	private Authentication authentication;
+	private UserStore userStore;
 	private DocumentrPermissionEvaluator permissionEvaluator;
-	private AtomicReader reader;
-	private int docBase;
 
-	InaccessibleDocIdsCollector(Permission permission, Authentication authentication,
-			DocumentrPermissionEvaluator permissionEvaluator) {
+	GetInaccessibleDocIdsTask(IndexSearcher searcher, Permission permission, Authentication authentication,
+			UserStore userStore, DocumentrPermissionEvaluator permissionEvaluator) {
 		
+		this.searcher = searcher;
 		this.permission = permission;
 		this.authentication = authentication;
+		this.userStore = userStore;
 		this.permissionEvaluator = permissionEvaluator;
 	}
-	
+
 	@Override
-	public void setScorer(org.apache.lucene.search.Scorer scorer) {
-	}
-	
-	@Override
-	public void setNextReader(AtomicReaderContext context) {
-		reader = context.reader();
-		docBase = context.docBase;
-	}
-	
-	@Override
-	public void collect(int doc) throws IOException {
-		Document document = reader.document(doc, FIELDS);
-		String projectName = document.get(PageIndex.PROJECT);
-		String branchName = document.get(PageIndex.BRANCH);
-		String path = document.get(PageIndex.PATH);
-		if (!permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission)) {
-			docIds.set(docBase + doc);
+	public BitSet call() throws IOException {
+		Set<String> roles = Sets.newHashSet(userStore.listRoles());
+		BooleanQuery allRolesQuery = new BooleanQuery();
+		for (String role : roles) {
+			TermQuery roleQuery = new TermQuery(new Term(PageIndex.VIEW_RESTRICTION_ROLE, role));
+			allRolesQuery.add(roleQuery, BooleanClause.Occur.SHOULD);
 		}
-	}
-	
-	@Override
-	public boolean acceptsDocsOutOfOrder() {
-		return true;
+		AbstractDocIdsCollector collector = new InaccessibleDocIdsCollector(
+				permission, authentication, permissionEvaluator);
+		searcher.search(allRolesQuery, collector);
+		return collector.getDocIds();
 	}
 }

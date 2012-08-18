@@ -17,37 +17,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
-import java.util.List;
+import java.util.concurrent.Callable;
 
-public class SearchResult {
-	private List<SearchHit> hits;
-	private int totalHits;
-	private int hitsPerPage;
-	private SearchTextSuggestion suggestion;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.util.Bits;
+import org.springframework.security.core.Authentication;
 
-	public SearchResult(List<SearchHit> hits, int totalHits, int hitsPerPage) {
-		this.hits = hits;
-		this.totalHits = totalHits;
-		this.hitsPerPage = hitsPerPage;
-	}
-	
-	public List<SearchHit> getHits() {
-		return hits;
-	}
-	
-	public int getTotalHits() {
-		return totalHits;
-	}
-	
-	public int getHitsPerPage() {
-		return hitsPerPage;
-	}
+class GetVisibleDocIdsTask implements Callable<Bits> {
+	private Authentication authentication;
+	private PageIndex pageIndex;
+	private IndexSearcher searcher;
 
-	void setSuggestion(SearchTextSuggestion suggestion) {
-		this.suggestion = suggestion;
+	GetVisibleDocIdsTask(IndexSearcher searcher, Authentication authentication, PageIndex pageIndex) {
+		this.searcher = searcher;
+		this.authentication = authentication;
+		this.pageIndex = pageIndex;
 	}
 	
-	public SearchTextSuggestion getSuggestion() {
-		return suggestion;
+	@Override
+	public Bits call() throws Exception {
+		return pageIndex.getVisibleDocIds(searcher, authentication);
 	}
 }

@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -64,25 +64,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.highlight.Formatter;
-import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
-import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.Scorer;
-import org.apache.lucene.search.highlight.SimpleFragmenter;
-import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
-import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
-import org.apache.lucene.search.highlight.TokenSources;
 import org.apache.lucene.search.spell.DirectSpellChecker;
 import org.apache.lucene.search.spell.SuggestMode;
 import org.apache.lucene.search.spell.SuggestWord;
@@ -103,6 +89,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;
@@ -136,18 +127,17 @@ public class PageIndex {
 	static final String PROJECT = "project"; //$NON-NLS-1$
 	static final String BRANCH = "branch"; //$NON-NLS-1$
 	static final String PATH = "path"; //$NON-NLS-1$
+	static final String ALL_TEXT = "allText"; //$NON-NLS-1$
+	static final String TAG = "tag"; //$NON-NLS-1$
+	static final String TITLE = "title"; //$NON-NLS-1$
+	static final String TEXT = "text"; //$NON-NLS-1$
+	static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 
 	private static final String FULL_PATH = "fullPath"; //$NON-NLS-1$
-	private static final String TAG = "tag"; //$NON-NLS-1$
-	private static final String TITLE = "title"; //$NON-NLS-1$
-	private static final String TEXT = "text"; //$NON-NLS-1$
-	private static final String ALL_TEXT = "allText"; //$NON-NLS-1$
 	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
-	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
-	private static final int NUM_FRAGMENTS = 5;
-	private static final int FRAGMENT_SIZE = 50;
 	private static final int REFRESH_INTERVAL = 30; // seconds
+	private static final int THREAD_POOL_THREADS = 8;
 	@SuppressWarnings("nls")
 	private static final String[] REMOVE_HTML_TAGS = {
 		"(<br(?: .*?)?(?:/)?>)", "\n$1",
@@ -182,7 +172,9 @@ public class PageIndex {
 	private Analyzer defaultAnalyzer;
 	private Analyzer analyzer;
 	private File pageIndexDir;
-	private ExecutorService threadPool = Executors.newFixedThreadPool(4);
+	private ListeningExecutorService threadPool = MoreExecutors.listeningDecorator(
+			Executors.newFixedThreadPool(THREAD_POOL_THREADS,
+					new ThreadFactoryBuilder().setNameFormat("Page Index (%d)").build())); //$NON-NLS-1$
 	private Directory directory;
 	private IndexWriter writer;
 	private ReaderManager readerManager;
@@ -432,7 +424,9 @@ public class PageIndex {
 		}
 	}
 
-	public SearchResult findPages(String searchText, int page, Authentication authentication) throws ParseException, IOException {
+	public SearchResult findPages(final String searchText, final int page, final Authentication authentication)
+			throws ParseException, IOException {
+		
 		Assert.hasLength(searchText);
 		Assert.isTrue(page >= 1);
 		Assert.notNull(authentication);
@@ -442,11 +436,41 @@ public class PageIndex {
 			if (alwaysRefresh) {
 				refreshBlocking();
 			}
+			
 			searcher = searcherManager.acquire();
-			SearchResult result = findPages(searchText, page, authentication, searcher);
-			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, searcher);
+			final IndexSearcher indexSearcher = searcher;
+
+			Callable<SearchResult> findCallable = new Callable<SearchResult>() {
+				@Override
+				public SearchResult call() throws ParseException, IOException {
+					return findPages(searchText, page, authentication, indexSearcher);
+				}
+			};
+			Future<SearchResult> findFuture = threadPool.submit(findCallable);
+			
+			Callable<SearchTextSuggestion> suggestionCallable = new Callable<SearchTextSuggestion>() {
+				@Override
+				public SearchTextSuggestion call() throws ParseException, IOException {
+					return getSearchTextSuggestion(searchText, authentication, indexSearcher);
+				}
+			};
+			Future<SearchTextSuggestion> suggestionFuture = threadPool.submit(suggestionCallable);
+			
+			SearchResult result = findFuture.get();
+			SearchTextSuggestion suggestion = suggestionFuture.get();
 			result.setSuggestion(suggestion);
 			return result;
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof ParseException) {
+				throw (ParseException) cause;
+			} else if (cause instanceof IOException) {
+				throw (IOException) cause;
+			} else {
+				throw Util.toRuntimeException(cause);
+			}
 		} finally {
 			if (searcher != null) {
 				searcherManager.release(searcher);
@@ -457,47 +481,51 @@ public class PageIndex {
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
 			throws ParseException, IOException {
 		
-		QueryParser parser = new QueryParser(Version.LUCENE_40, ALL_TEXT, analyzer);
-		Query query = parser.parse(searchText);
-		List<SearchHit> hits = Lists.newArrayList();
-		IndexReader reader = searcher.getIndexReader();
-		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
-		Filter filter = new PagePermissionFilter(visibleDocIds);
-		TopDocs docs = searcher.search(query, filter, HITS_PER_PAGE * page);
-		Formatter formatter = new SimpleHTMLFormatter("<strong>", "</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
-		Scorer scorer = new QueryScorer(query);
-		Highlighter highlighter = new Highlighter(formatter, scorer);
-		highlighter.setTextFragmenter(new SimpleFragmenter(FRAGMENT_SIZE));
-		highlighter.setEncoder(new SimpleHTMLEncoder());
-		int start = HITS_PER_PAGE * (page - 1);
-		int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
-		for (int i = start; i < end; i++) {
-			int docId = docs.scoreDocs[i].doc;
-			Document doc = reader.document(docId);
-			String projectName = doc.get(PROJECT);
-			String branchName = doc.get(BRANCH);
-			String path = doc.get(PATH);
-			String title = doc.get(TITLE);
-			String text = doc.get(TEXT);
-			String[] tagsArray = doc.getValues(TAG);
-			List<String> tags = Lists.newArrayList(tagsArray);
-			Collections.sort(tags);
-			TokenStream tokenStream = null;
-			try {
-				tokenStream = TokenSources.getAnyTokenStream(reader, docId, TEXT, doc, analyzer);
-				String[] fragments = highlighter.getBestFragments(tokenStream, text, NUM_FRAGMENTS);
-				cleanupFragments(fragments);
-				String highlightedText = Util.join(fragments, " <strong>...</strong> "); //$NON-NLS-1$
-				SearchHit hit = new SearchHit(projectName, branchName, path, title, highlightedText, tags);
-				hits.add(hit);
-			} catch (InvalidTokenOffsetsException e) {
-				// ignore
-			} finally {
-				IndexUtil.closeQuietly(tokenStream);
+		Future<Query> queryFuture = threadPool.submit(new ParseQueryTask(searchText, analyzer));
+		Future<Bits> visibleDocsFuture = threadPool.submit(new GetVisibleDocIdsTask(searcher, authentication, this));
+		Query query;
+		Bits visibleDocIds;
+		try {
+			query = queryFuture.get();
+			visibleDocIds = visibleDocsFuture.get();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof ParseException) {
+				throw (ParseException) cause;
+			} else if (cause instanceof IOException) {
+				throw (IOException) cause;
+			} else {
+				throw Util.toRuntimeException(cause);
 			}
 		}
+		TopDocs docs = searcher.search(query, new PagePermissionFilter(visibleDocIds), HITS_PER_PAGE * page);
+
+		int start = HITS_PER_PAGE * (page - 1);
+		int end = Math.min(HITS_PER_PAGE * page, docs.scoreDocs.length);
+		IndexReader reader = searcher.getIndexReader();
+		List<ListenableFuture<SearchHit>> hitFutures = Lists.newArrayList();
+		for (int i = start; i < end; i++) {
+			ListenableFuture<SearchHit> hitFuture = threadPool.submit(new GetSearchHitTask(
+					query, reader, docs.scoreDocs[i].doc, analyzer));
+			hitFutures.add(hitFuture);
+		}
 		
-		return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
+		try {
+			ListenableFuture<List<SearchHit>> allHitsFuture = Futures.allAsList(hitFutures);
+			List<SearchHit> hits = allHitsFuture.get();
+			return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof IOException) {
+				throw (IOException) cause;
+			} else {
+				throw Util.toRuntimeException(cause);
+			}
+		}
 	}
 
 	private SearchTextSuggestion getSearchTextSuggestion(String searchText, Authentication authentication,
@@ -564,12 +592,6 @@ public class PageIndex {
 		return null;
 	}
 
-	private void cleanupFragments(String[] fragments) {
-		for (int i = 0; i < fragments.length; i++) {
-			fragments[i] = fragments[i].replaceAll("^[,\\.]+", StringUtils.EMPTY).trim(); //$NON-NLS-1$
-		}
-	}
-	
 	public Set<String> getAllTags(Authentication authentication) throws IOException {
 		IndexReader reader = null;
 		IndexSearcher searcher = null;
@@ -603,36 +625,26 @@ public class PageIndex {
 		}
 	}
 	
-	private Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException {
+	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException {
 		Set<String> branches = permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW);
 		BitSet docIds = new BitSet();
 		if (!branches.isEmpty()) {
-			// collect document IDs of all visible documents (via view permission on branches)
-			BooleanQuery allBranchesQuery = new BooleanQuery();
-			for (String projectAndBranch : branches) {
-				String projectName = StringUtils.substringBefore(projectAndBranch, "/"); //$NON-NLS-1$
-				String branchName = StringUtils.substringAfter(projectAndBranch, "/"); //$NON-NLS-1$
-				TermQuery projectQuery = new TermQuery(new Term(PROJECT, projectName));
-				TermQuery branchQuery = new TermQuery(new Term(BRANCH, branchName));
-				BooleanQuery projectAndBranchQuery = new BooleanQuery();
-				projectAndBranchQuery.add(projectQuery, BooleanClause.Occur.MUST);
-				projectAndBranchQuery.add(branchQuery, BooleanClause.Occur.MUST);
-				allBranchesQuery.add(projectAndBranchQuery, BooleanClause.Occur.SHOULD);
+			Future<BitSet> branchPagesFuture = threadPool.submit(new GetVisibleBranchDocIdsTask(branches, searcher));
+			Future<BitSet> inaccessibleDocsFuture = threadPool.submit(new GetInaccessibleDocIdsTask(
+					searcher, Permission.VIEW, authentication, userStore, permissionEvaluator));
+			try {
+				docIds.or(branchPagesFuture.get());
+				docIds.andNot(inaccessibleDocsFuture.get());
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				Throwable cause = e.getCause();
+				if (cause instanceof IOException) {
+					throw (IOException) cause;
+				} else {
+					throw Util.toRuntimeException(cause);
+				}
 			}
-			AbstractDocIdsCollector collector = new AllDocIdsCollector();
-			searcher.search(allBranchesQuery, collector);
-			docIds = collector.getDocIds();
-
-			// remove all inaccessible document IDs (via view restriction roles on pages)
-			Set<String> roles = Sets.newHashSet(userStore.listRoles());
-			BooleanQuery allRolesQuery = new BooleanQuery();
-			for (String role : roles) {
-				TermQuery roleQuery = new TermQuery(new Term(VIEW_RESTRICTION_ROLE, role));
-				allRolesQuery.add(roleQuery, BooleanClause.Occur.SHOULD);
-			}
-			collector = new InaccessibleDocIdsCollector(authentication, Permission.VIEW, permissionEvaluator);
-			searcher.search(allRolesQuery, collector);
-			docIds.andNot(collector.getDocIds());
 		}
 		return new DocIdBitSet(docIds);
 	}

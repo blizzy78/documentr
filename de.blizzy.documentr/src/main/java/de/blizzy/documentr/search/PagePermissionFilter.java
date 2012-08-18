@@ -38,10 +38,13 @@ class PagePermissionFilter extends Filter {
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) {
 		int docBase = context.docBase;
 		BitSet result = new BitSet();
-		for (int i = 0; i < visibleDocIdsLength; i++) {
+		int acceptDocsLen = (acceptDocs != null) ? acceptDocs.length() : -1;
+		for (int i = docBase; i < visibleDocIdsLength; i++) {
 			int resultIdx = i - docBase;
-			if ((resultIdx >= 0) &&
-				visibleDocIds.get(i) &&
+			if ((acceptDocsLen >= 0) && (resultIdx >= acceptDocsLen)) {
+				break;
+			}
+			if (visibleDocIds.get(i) &&
 				((acceptDocs == null) || acceptDocs.get(resultIdx))) {
 				
 				result.set(resultIdx);

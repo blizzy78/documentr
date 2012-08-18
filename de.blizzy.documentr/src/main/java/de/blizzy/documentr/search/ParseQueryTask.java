@@ -17,37 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
-import java.util.List;
+import java.util.concurrent.Callable;
 
-public class SearchResult {
-	private List<SearchHit> hits;
-	private int totalHits;
-	private int hitsPerPage;
-	private SearchTextSuggestion suggestion;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Version;
 
-	public SearchResult(List<SearchHit> hits, int totalHits, int hitsPerPage) {
-		this.hits = hits;
-		this.totalHits = totalHits;
-		this.hitsPerPage = hitsPerPage;
-	}
-	
-	public List<SearchHit> getHits() {
-		return hits;
-	}
-	
-	public int getTotalHits() {
-		return totalHits;
-	}
-	
-	public int getHitsPerPage() {
-		return hitsPerPage;
+class ParseQueryTask implements Callable<Query> {
+	private String searchText;
+	private Analyzer analyzer;
+
+	ParseQueryTask(String searchText, Analyzer analyzer) {
+		this.searchText = searchText;
+		this.analyzer = analyzer;
 	}
 
-	void setSuggestion(SearchTextSuggestion suggestion) {
-		this.suggestion = suggestion;
-	}
-	
-	public SearchTextSuggestion getSuggestion() {
-		return suggestion;
+	@Override
+	public Query call() throws ParseException {
+		QueryParser parser = new QueryParser(Version.LUCENE_40, PageIndex.ALL_TEXT, analyzer);
+		return parser.parse(searchText);
 	}
 }
