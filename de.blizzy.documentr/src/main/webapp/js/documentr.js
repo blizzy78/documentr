@@ -348,6 +348,27 @@ var documentr = {};
 		});
 	};
 	
+	documentr.fixTwitterCss = function() {
+		var twitterCssEl = null;
+		var documentrCssEl = null;
+		$('link[rel="stylesheet"]').each(function() {
+			var el = $(this);
+			var href = el.attr('href');
+			if (documentr.isSomething(href)) {
+				if (href.indexOf('.twimg.com') > 0) {
+					twitterCssEl = el;
+				} else if (href.indexOf('/documentr.css') > 0) {
+					documentrCssEl = el;
+				}
+			}
+		});
+		if ((twitterCssEl !== null) && (documentrCssEl !== null)) {
+			twitterCssEl.detach();
+			documentrCssEl.before(twitterCssEl);
+		}
+		$('.twtr-widget').removeAttr('id');
+	};
+	
 	
 	$.fn.extend({
 		showModal: function(options) {

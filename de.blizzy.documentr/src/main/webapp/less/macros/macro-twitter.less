@@ -16,8 +16,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "macro-alert.less";
-@import "macro-googledocs.less";
-@import "macro-neighbors.less";
-@import "macro-panel.less";
-@import "macro-twitter.less";
+.twtr-widget {
+	font-family: inherit !important;
+	font-size: inherit !important;
+
+	.twtr-doc {
+		background-color: #e5f3fa !important;
+	}
+
+	.twtr-hd {
+		padding: 0 !important;
+		padding-top: 1px !important;
+	}
+	
+	.twtr-timeline {
+		background-color: white !important;
+	}
+	
+	.twtr-join-conv {
+		&:hover {
+			color: #005580 !important;
+		}
+	
+		color: #08c !important;
+	}
+}

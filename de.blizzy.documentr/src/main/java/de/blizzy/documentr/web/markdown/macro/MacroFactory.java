@@ -37,6 +37,7 @@ import de.blizzy.documentr.web.markdown.macro.impl.NeighborsMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.PanelMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.PanelRowMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
+import de.blizzy.documentr.web.markdown.macro.impl.TwitterMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.UnknownMacroMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.VimeoMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.YoutubeMacro;
@@ -54,6 +55,7 @@ public class MacroFactory {
 		put(PanelMacro.DESCRIPTOR);
 		put(PanelRowMacro.DESCRIPTOR);
 		put(TableOfContentsMacro.DESCRIPTOR);
+		put(TwitterMacro.DESCRIPTOR);
 		put(VimeoMacro.DESCRIPTOR);
 		put(YoutubeMacro.DESCRIPTOR);
 	}
