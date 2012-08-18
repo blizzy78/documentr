@@ -39,7 +39,7 @@ public class TwitterMacro extends AbstractMacro {
 				"interval: 15000," +
 				"title: ''," +
 				"subject: ''," +
-				"width: 250," +
+				"width: 300," +
 				"height: 300," +
 				"features: {" +
 					"scrollbar: true," +
