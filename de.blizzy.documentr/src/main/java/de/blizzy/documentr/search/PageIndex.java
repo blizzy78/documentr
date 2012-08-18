@@ -626,27 +626,24 @@ public class PageIndex {
 	}
 	
 	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException {
-		Set<String> branches = permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW);
-		BitSet docIds = new BitSet();
-		if (!branches.isEmpty()) {
-			Future<BitSet> branchPagesFuture = threadPool.submit(new GetVisibleBranchDocIdsTask(branches, searcher));
-			Future<BitSet> inaccessibleDocsFuture = threadPool.submit(new GetInaccessibleDocIdsTask(
-					searcher, Permission.VIEW, authentication, userStore, permissionEvaluator));
-			try {
-				docIds.or(branchPagesFuture.get());
-				docIds.andNot(inaccessibleDocsFuture.get());
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (ExecutionException e) {
-				Throwable cause = e.getCause();
-				if (cause instanceof IOException) {
-					throw (IOException) cause;
-				} else {
-					throw Util.toRuntimeException(cause);
-				}
+		Future<BitSet> branchPagesFuture = threadPool.submit(new GetVisibleBranchDocIdsTask(
+				searcher, authentication, permissionEvaluator));
+		Future<BitSet> inaccessibleDocsFuture = threadPool.submit(new GetInaccessibleDocIdsTask(
+				searcher, Permission.VIEW, authentication, userStore, permissionEvaluator));
+		try {
+			BitSet docIds = branchPagesFuture.get();
+			docIds.andNot(inaccessibleDocsFuture.get());
+			return new DocIdBitSet(docIds);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof IOException) {
+				throw (IOException) cause;
+			} else {
+				throw Util.toRuntimeException(cause);
 			}
 		}
-		return new DocIdBitSet(docIds);
 	}
 	
 	private void refresh() {

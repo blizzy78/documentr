@@ -28,31 +28,44 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
+import org.springframework.security.core.Authentication;
+
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.Permission;
 
 class GetVisibleBranchDocIdsTask implements Callable<BitSet> {
-	private Set<String> branches;
 	private IndexSearcher searcher;
+	private Authentication authentication;
+	private DocumentrPermissionEvaluator permissionEvaluator;
 
-	GetVisibleBranchDocIdsTask(Set<String> branches, IndexSearcher searcher) {
-		this.branches = branches;
+	GetVisibleBranchDocIdsTask(IndexSearcher searcher, Authentication authentication,
+			DocumentrPermissionEvaluator permissionEvaluator) {
+		
 		this.searcher = searcher;
+		this.authentication = authentication;
+		this.permissionEvaluator = permissionEvaluator;
 	}
 
 	@Override
 	public BitSet call() throws IOException {
-		BooleanQuery allBranchesQuery = new BooleanQuery();
-		for (String projectAndBranch : branches) {
-			String projectName = StringUtils.substringBefore(projectAndBranch, "/"); //$NON-NLS-1$
-			String branchName = StringUtils.substringAfter(projectAndBranch, "/"); //$NON-NLS-1$
-			TermQuery projectQuery = new TermQuery(new Term(PageIndex.PROJECT, projectName));
-			TermQuery branchQuery = new TermQuery(new Term(PageIndex.BRANCH, branchName));
-			BooleanQuery projectAndBranchQuery = new BooleanQuery();
-			projectAndBranchQuery.add(projectQuery, BooleanClause.Occur.MUST);
-			projectAndBranchQuery.add(branchQuery, BooleanClause.Occur.MUST);
-			allBranchesQuery.add(projectAndBranchQuery, BooleanClause.Occur.SHOULD);
+		Set<String> branches = permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW);
+		if (!branches.isEmpty()) {
+			BooleanQuery allBranchesQuery = new BooleanQuery();
+			for (String projectAndBranch : branches) {
+				String projectName = StringUtils.substringBefore(projectAndBranch, "/"); //$NON-NLS-1$
+				String branchName = StringUtils.substringAfter(projectAndBranch, "/"); //$NON-NLS-1$
+				TermQuery projectQuery = new TermQuery(new Term(PageIndex.PROJECT, projectName));
+				TermQuery branchQuery = new TermQuery(new Term(PageIndex.BRANCH, branchName));
+				BooleanQuery projectAndBranchQuery = new BooleanQuery();
+				projectAndBranchQuery.add(projectQuery, BooleanClause.Occur.MUST);
+				projectAndBranchQuery.add(branchQuery, BooleanClause.Occur.MUST);
+				allBranchesQuery.add(projectAndBranchQuery, BooleanClause.Occur.SHOULD);
+			}
+			AbstractDocIdsCollector collector = new AllDocIdsCollector();
+			searcher.search(allBranchesQuery, collector);
+			return collector.getDocIds();
+		} else {
+			return new BitSet(1);
 		}
-		AbstractDocIdsCollector collector = new AllDocIdsCollector();
-		searcher.search(allBranchesQuery, collector);
-		return collector.getDocIds();
 	}
 }
