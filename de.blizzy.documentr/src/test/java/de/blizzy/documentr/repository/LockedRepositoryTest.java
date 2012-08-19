@@ -32,30 +32,30 @@ public class LockedRepositoryTest {
 	
 	@Test
 	public void lockAndUnlockProjectCentral() {
-		LockKey lockKey = new LockKey("project", null, true); //$NON-NLS-1$
-		when(lockManager.lockProjectCentral("project")).thenReturn(lockKey); //$NON-NLS-1$
+		Lock lock = new Lock(Thread.currentThread());
+		when(lockManager.lockProjectCentral("project")).thenReturn(lock); //$NON-NLS-1$
 
 		ILockedRepository repo = LockedRepository.lockProjectCentral("project", lockManager); //$NON-NLS-1$
 		repo.close();
 		
-		verify(lockManager).unlock(lockKey);
+		verify(lockManager).unlock(lock);
 	}
 	
 	@Test
 	public void lockAndUnlockProjectBranch() {
-		LockKey lockKey = new LockKey("project", "branch", false); //$NON-NLS-1$ //$NON-NLS-2$
-		when(lockManager.lockProjectBranch("project", "branch")).thenReturn(lockKey); //$NON-NLS-1$ //$NON-NLS-2$
+		Lock lock = new Lock(Thread.currentThread());
+		when(lockManager.lockProjectBranch("project", "branch")).thenReturn(lock); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		ILockedRepository repo = LockedRepository.lockProjectBranch("project", "branch", lockManager); //$NON-NLS-1$ //$NON-NLS-2$
 		repo.close();
 		
-		verify(lockManager).unlock(lockKey);
+		verify(lockManager).unlock(lock);
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void rMustThrowIllegalStateExceptionIfNoRepository() {
-		LockKey lockKey = new LockKey("project", null, true); //$NON-NLS-1$
-		when(lockManager.lockProjectCentral("project")).thenReturn(lockKey); //$NON-NLS-1$
+		Lock lock = new Lock(Thread.currentThread());
+		when(lockManager.lockProjectCentral("project")).thenReturn(lock); //$NON-NLS-1$
 
 		ILockedRepository repo = LockedRepository.lockProjectCentral("project", lockManager); //$NON-NLS-1$
 		repo.r();
