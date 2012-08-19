@@ -52,4 +52,11 @@ public class LockManagerTest {
 		Lock lock = new Lock(Thread.currentThread());
 		lockManager.unlock(lock);
 	}
+
+	@Test(expected=IllegalStateException.class)
+	public void unlockTooOften() {
+		ILock lock = lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
+		lockManager.unlock(lock);
+		lockManager.unlock(lock);
+	}
 }
