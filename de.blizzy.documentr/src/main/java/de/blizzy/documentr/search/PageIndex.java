@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,6 +140,7 @@ public class PageIndex {
 	private static final int HITS_PER_PAGE = 20;
 	private static final int REFRESH_INTERVAL = 30; // seconds
 	private static final int THREAD_POOL_THREADS = 8;
+	private static final int INTERACTIVE_TIMEOUT = 5; // seconds
 	@SuppressWarnings("nls")
 	private static final String[] REMOVE_HTML_TAGS = {
 		"(<br(?: .*?)?(?:/)?>)", "\n$1",
@@ -181,6 +184,7 @@ public class PageIndex {
 	private SearcherManager searcherManager;
 	private Timer timer = new Timer();
 	private boolean alwaysRefresh;
+	private AtomicBoolean dirty = new AtomicBoolean();
 	
 	@PostConstruct
 	public void init() throws IOException {
@@ -210,6 +214,20 @@ public class PageIndex {
 			}
 		};
 		timer.schedule(refreshTask, 0, REFRESH_INTERVAL * 1000);
+		
+		TimerTask commitTask = new TimerTask() {
+			@Override
+			public void run() {
+				if (dirty.getAndSet(false)) {
+					try {
+						writer.commit();
+					} catch (IOException e) {
+						// TODO: log exception
+					}
+				}
+			}
+		};
+		timer.schedule(commitTask, 0, REFRESH_INTERVAL * 1000);
 		
 		eventBus.register(this);
 		
@@ -264,7 +282,7 @@ public class PageIndex {
 			@Override
 			public void run() {
 				try {
-					addPageAsync(projectName, branchName, path, true);
+					addPageAsync(projectName, branchName, path);
 				} catch (IOException e) {
 					// TODO: log exception
 				} catch (RuntimeException e) {
@@ -279,39 +297,33 @@ public class PageIndex {
 	public void addPages(BranchCreatedEvent event) {
 		String projectName = event.getProjectName();
 		String branchName = event.getBranchName();
-		addPages(projectName, branchName);
+		try {
+			addPages(projectName, branchName);
+		} catch (IOException e) {
+			// TODO: log exception
+		}
 	}
 
-	private void addPages(final String projectName, final String branchName) {
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				boolean dirty = false;
-				try {
-					List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
-					for (String path : paths) {
-						addPageAsync(projectName, branchName, path, false);
-						dirty = true;
-					}
-				} catch (IOException e) {
-					// TODO: log exception
-				} catch (RuntimeException e) {
-					// TODO: log exception
-				} finally {
-					if (dirty) {
-						try {
-							writer.commit();
-						} catch (IOException e) {
-							// TODO: log exception
-						}
+	private void addPages(final String projectName, final String branchName) throws IOException {
+		List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
+		for (final String path : paths) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						addPageAsync(projectName, branchName, path);
+					} catch (IOException e) {
+						// TODO: log exception
+					} catch (RuntimeException e) {
+						// TODO: log exception
 					}
 				}
-			}
-		};
-		threadPool.submit(runnable);
+			};
+			threadPool.submit(runnable);
+		}
 	}
 
-	private void addPageAsync(String projectName, String branchName, String path, boolean commit) throws IOException {
+	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -349,8 +361,10 @@ public class PageIndex {
 
 		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
 		
-		if (commit) {
+		if (alwaysRefresh) {
 			writer.commit();
+		} else {
+			dirty.set(true);
 		}
 	}
 	
@@ -419,19 +433,24 @@ public class PageIndex {
 			}
 		} finally {
 			if (dirty) {
-				writer.commit();
+				if (alwaysRefresh) {
+					writer.commit();
+				} else {
+					this.dirty.set(true);
+				}
 			}
 		}
 	}
 
 	public SearchResult findPages(final String searchText, final int page, final Authentication authentication)
-			throws ParseException, IOException {
+			throws ParseException, IOException, TimeoutException {
 		
 		Assert.hasLength(searchText);
 		Assert.isTrue(page >= 1);
 		Assert.notNull(authentication);
 
 		IndexSearcher searcher = null;
+		Future<SearchResult> findFuture = null;
 		try {
 			if (alwaysRefresh) {
 				refreshBlocking();
@@ -442,14 +461,14 @@ public class PageIndex {
 
 			Callable<SearchResult> findCallable = new Callable<SearchResult>() {
 				@Override
-				public SearchResult call() throws ParseException, IOException {
+				public SearchResult call() throws ParseException, IOException, TimeoutException {
 					return findPages(searchText, page, authentication, indexSearcher);
 				}
 			};
-			Future<SearchResult> findFuture = threadPool.submit(findCallable);
+			findFuture = threadPool.submit(findCallable);
 			
 			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, indexSearcher);
-			SearchResult result = findFuture.get();
+			SearchResult result = findFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
 			result.setSuggestion(suggestion);
 			return result;
 		} catch (InterruptedException e) {
@@ -460,10 +479,15 @@ public class PageIndex {
 				throw (ParseException) cause;
 			} else if (cause instanceof IOException) {
 				throw (IOException) cause;
+			} else if (cause instanceof TimeoutException) {
+				throw (TimeoutException) cause;
 			} else {
 				throw Util.toRuntimeException(cause);
 			}
 		} finally {
+			if (findFuture != null) {
+				findFuture.cancel(false);
+			}
 			if (searcher != null) {
 				searcherManager.release(searcher);
 			}
@@ -471,14 +495,14 @@ public class PageIndex {
 	}
 	
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
-			throws ParseException, IOException {
+			throws ParseException, IOException, TimeoutException {
 		
 		Future<Query> queryFuture = threadPool.submit(new ParseQueryTask(searchText, analyzer));
 		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
 		
 		Query query;
 		try {
-			query = queryFuture.get();
+			query = queryFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (ExecutionException e) {
@@ -488,6 +512,8 @@ public class PageIndex {
 			} else {
 				throw Util.toRuntimeException(cause);
 			}
+		} finally {
+			queryFuture.cancel(false);
 		}
 		TopDocs docs = searcher.search(query, new PagePermissionFilter(visibleDocIds), HITS_PER_PAGE * page);
 
@@ -503,7 +529,7 @@ public class PageIndex {
 		
 		try {
 			ListenableFuture<List<SearchHit>> allHitsFuture = Futures.allAsList(hitFutures);
-			List<SearchHit> hits = allHitsFuture.get();
+			List<SearchHit> hits = allHitsFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
 			return new SearchResult(hits, docs.totalHits, HITS_PER_PAGE);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -514,11 +540,15 @@ public class PageIndex {
 			} else {
 				throw Util.toRuntimeException(cause);
 			}
+		} finally {
+			for (ListenableFuture<SearchHit> hitFuture : hitFutures) {
+				hitFuture.cancel(false);
+			}
 		}
 	}
 
 	private SearchTextSuggestion getSearchTextSuggestion(String searchText, Authentication authentication,
-			IndexSearcher searcher) throws IOException, ParseException {
+			IndexSearcher searcher) throws IOException, ParseException, TimeoutException {
 		
 		List<WordPosition> words = Lists.newArrayList();
 		
@@ -581,7 +611,7 @@ public class PageIndex {
 		return null;
 	}
 
-	public Set<String> getAllTags(Authentication authentication) throws IOException {
+	public Set<String> getAllTags(Authentication authentication) throws IOException, TimeoutException {
 		IndexReader reader = null;
 		IndexSearcher searcher = null;
 		try {
@@ -614,14 +644,14 @@ public class PageIndex {
 		}
 	}
 	
-	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException {
+	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException, TimeoutException {
 		Future<BitSet> branchPagesFuture = threadPool.submit(new GetVisibleBranchDocIdsTask(
 				searcher, authentication, permissionEvaluator));
 		Future<BitSet> inaccessibleDocsFuture = threadPool.submit(new GetInaccessibleDocIdsTask(
 				searcher, Permission.VIEW, authentication, userStore, permissionEvaluator));
 		try {
-			BitSet docIds = branchPagesFuture.get();
-			docIds.andNot(inaccessibleDocsFuture.get());
+			BitSet docIds = branchPagesFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
+			docIds.andNot(inaccessibleDocsFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS));
 			return new DocIdBitSet(docIds);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -632,6 +662,9 @@ public class PageIndex {
 			} else {
 				throw Util.toRuntimeException(cause);
 			}
+		} finally {
+			branchPagesFuture.cancel(false);
+			inaccessibleDocsFuture.cancel(false);
 		}
 	}
 	

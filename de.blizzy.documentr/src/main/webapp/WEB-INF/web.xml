@@ -44,4 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<error-code>500</error-code>
 		<location>/WEB-INF/view/error.jsp</location>
 	</error-page>
+
+	<error-page>
+		<error-code>503</error-code>
+		<location>/WEB-INF/view/error.jsp</location>
+	</error-page>
 </web-app>

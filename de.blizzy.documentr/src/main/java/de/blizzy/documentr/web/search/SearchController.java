@@ -19,6 +19,7 @@ package de.blizzy.documentr.web.search;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.search.PageIndex;
 import de.blizzy.documentr.search.SearchResult;
+import de.blizzy.documentr.web.ErrorController;
 
 @Controller
 @RequestMapping("/search")
@@ -65,6 +67,8 @@ public class SearchController {
 			model.addAttribute("page", page); //$NON-NLS-1$
 		} catch (ParseException e) {
 			// TODO
+		} catch (TimeoutException e) {
+			return ErrorController.timeout();
 		}
 		return "/search/result"; //$NON-NLS-1$
 	}
@@ -72,7 +76,7 @@ public class SearchController {
 	@RequestMapping(value="/tags/json", method=RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("permitAll")
-	public Set<String> getAllTags(Authentication authentication) throws IOException {
+	public Set<String> getAllTags(Authentication authentication) throws IOException, TimeoutException {
 		// TODO: why can authentication be null here?
 		if (authentication == null) {
 			authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);

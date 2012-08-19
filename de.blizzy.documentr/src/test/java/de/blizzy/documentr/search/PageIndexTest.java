@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
@@ -97,7 +98,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void addAndFindPage() throws ParseException, IOException {
+	public void addAndFindPage() throws ParseException, IOException, TimeoutException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
@@ -121,7 +122,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	public void findPagesAndSuggestion() throws ParseException, IOException {
+	public void findPagesAndSuggestion() throws ParseException, IOException, TimeoutException {
 		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))

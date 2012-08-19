@@ -37,6 +37,10 @@ public class ErrorController {
 		return "/sendError"; //$NON-NLS-1$
 	}
 	
+	public static String timeout() {
+		return "forward:/error/" + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "/timeout"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
 	public static String notFound(String messageKey) {
 		Assert.hasLength(messageKey);
 		

@@ -140,106 +140,113 @@ class PageStore implements IPageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			Git git = Git.wrap(repo.r());
-
-			String headCommit = CommitUtils.getHead(repo.r()).getName();
-			if (baseCommit != null) {
-				if (headCommit.equals(baseCommit)) {
-					baseCommit = null;
-				}
-			}
-			
-			String editBranchName = "_edit_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
-			if (baseCommit != null) {
-				git.branchCreate()
-					.setName(editBranchName)
-					.setStartPoint(baseCommit)
-					.call();
-
-				git.checkout()
-					.setName(editBranchName)
-					.call();
-			}
-			
-			Map<String, Object> metaMap = new HashMap<String, Object>();
-			metaMap.put(TITLE, page.getTitle());
-			metaMap.put(CONTENT_TYPE, page.getContentType());
-			if (!page.getTags().isEmpty()) {
-				metaMap.put(TAGS, page.getTags());
-			}
-			metaMap.put(VIEW_RESTRICTION_ROLE, page.getViewRestrictionRole());
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			String json = gson.toJson(metaMap);
-			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = new File(workingDir, rootDir);
-			File workingFile = toFile(pagesDir, path + META_SUFFIX);
-			FileUtils.write(workingFile, json, Charsets.UTF_8);
-
-			PageData pageData = page.getData();
-			if (pageData != null) {
-				workingFile = toFile(pagesDir, path + suffix);
-				FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
-			}
-			
-			AddCommand addCommand = git.add()
-				.addFilepattern(rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
-			if (pageData != null) {
-				addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
-			}
-			addCommand.call();
-
-			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
-			git.commit()
-				.setAuthor(ident)
-				.setCommitter(ident)
-				.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
-
-			MergeConflict conflict = null;
-			
-			if (baseCommit != null) {
-				git.rebase()
-					.setUpstream(branchName)
-					.call();
-
-				if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
-					String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
-					conflict = new MergeConflict(text, headCommit);
-					
-					git.rebase()
-						.setOperation(RebaseCommand.Operation.ABORT)
-						.call();
-				}
-				
-				git.checkout()
-					.setName(branchName)
-					.call();
-
-				if (conflict == null) {
-					git.merge()
-						.include(repo.r().resolve(editBranchName))
-						.call();
-				}
-				
-				git.branchDelete()
-					.setBranchNames(editBranchName)
-					.setForce(true)
-					.call();
-			}
-			
-			if (conflict == null) {
-				git.push().call();
-			}
-			
-			page.setParentPagePath(getParentPagePath(path, repo.r()));
-
-			if (conflict == null) {
-				PageUtil.updateProjectEditTime(projectName);
-			}
-			
-			return conflict;
+			return savePageInternal(projectName, branchName, path, suffix, page, baseCommit, rootDir, user, repo, true);
 		} finally {
 			RepositoryUtil.closeQuietly(repo);
 		}
+	}
+
+	private MergeConflict savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
+			String baseCommit, String rootDir, User user, ILockedRepository repo, boolean push)
+			throws IOException, GitAPIException {
+		
+		Git git = Git.wrap(repo.r());
+
+		String headCommit = CommitUtils.getHead(repo.r()).getName();
+		if (baseCommit != null) {
+			if (headCommit.equals(baseCommit)) {
+				baseCommit = null;
+			}
+		}
+		
+		String editBranchName = "_edit_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
+		if (baseCommit != null) {
+			git.branchCreate()
+				.setName(editBranchName)
+				.setStartPoint(baseCommit)
+				.call();
+
+			git.checkout()
+				.setName(editBranchName)
+				.call();
+		}
+		
+		Map<String, Object> metaMap = new HashMap<String, Object>();
+		metaMap.put(TITLE, page.getTitle());
+		metaMap.put(CONTENT_TYPE, page.getContentType());
+		if (!page.getTags().isEmpty()) {
+			metaMap.put(TAGS, page.getTags());
+		}
+		metaMap.put(VIEW_RESTRICTION_ROLE, page.getViewRestrictionRole());
+		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		String json = gson.toJson(metaMap);
+		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+		File pagesDir = new File(workingDir, rootDir);
+		File workingFile = toFile(pagesDir, path + META_SUFFIX);
+		FileUtils.write(workingFile, json, Charsets.UTF_8);
+
+		PageData pageData = page.getData();
+		if (pageData != null) {
+			workingFile = toFile(pagesDir, path + suffix);
+			FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
+		}
+		
+		AddCommand addCommand = git.add()
+			.addFilepattern(rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
+		if (pageData != null) {
+			addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
+		}
+		addCommand.call();
+
+		PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+		git.commit()
+			.setAuthor(ident)
+			.setCommitter(ident)
+			.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
+
+		MergeConflict conflict = null;
+		
+		if (baseCommit != null) {
+			git.rebase()
+				.setUpstream(branchName)
+				.call();
+
+			if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
+				String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
+				conflict = new MergeConflict(text, headCommit);
+				
+				git.rebase()
+					.setOperation(RebaseCommand.Operation.ABORT)
+					.call();
+			}
+			
+			git.checkout()
+				.setName(branchName)
+				.call();
+
+			if (conflict == null) {
+				git.merge()
+					.include(repo.r().resolve(editBranchName))
+					.call();
+			}
+			
+			git.branchDelete()
+				.setBranchNames(editBranchName)
+				.setForce(true)
+				.call();
+		}
+		
+		if (push && (conflict == null)) {
+			git.push().call();
+		}
+		
+		page.setParentPagePath(getParentPagePath(path, repo.r()));
+
+		if (conflict == null) {
+			PageUtil.updateProjectEditTime(projectName);
+		}
+		
+		return conflict;
 	}
 	
 	private File toFile(File baseDir, String path) {
