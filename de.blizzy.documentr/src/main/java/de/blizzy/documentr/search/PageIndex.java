@@ -348,15 +348,14 @@ public class PageIndex {
 		}
 		doc.add(new TextField(TITLE, page.getTitle(), Store.YES));
 		doc.add(new TextField(TEXT, text, Store.YES));
-		doc.add(new TextField(ALL_TEXT, page.getTitle(), Store.NO));
-		doc.add(new TextField(ALL_TEXT, text, Store.NO));
-		for (String tag : page.getTags()) {
-			doc.add(new TextField(ALL_TEXT, tag, Store.NO));
-		}
-		doc.add(new TextField(ALL_TEXT_SUGGESTIONS, page.getTitle(), Store.NO));
-		doc.add(new TextField(ALL_TEXT_SUGGESTIONS, text, Store.NO));
-		for (String tag : page.getTags()) {
-			doc.add(new TextField(ALL_TEXT_SUGGESTIONS, tag, Store.NO));
+		for (String field : new String[] { ALL_TEXT, ALL_TEXT_SUGGESTIONS }) {
+			doc.add(new TextField(field, projectName, Store.NO));
+			doc.add(new TextField(field, branchName, Store.NO));
+			doc.add(new TextField(field, page.getTitle(), Store.NO));
+			doc.add(new TextField(field, text, Store.NO));
+			for (String tag : page.getTags()) {
+				doc.add(new TextField(field, tag, Store.NO));
+			}
 		}
 
 		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
