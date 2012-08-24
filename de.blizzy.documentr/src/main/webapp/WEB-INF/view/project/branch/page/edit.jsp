@@ -403,11 +403,11 @@ function updateTags() {
 
 	tags.sort();
 
-	$('#tagsContainer .tag, #tagsContainer br').remove();
+	$('#tagsContainer .page-tag, #tagsContainer br').remove();
 	var inputEl = $('#newTagInput');
 	$(tags).each(function() {
 		var tag = this;
-		var tagEl = $('<span class="tag"/>');
+		var tagEl = $('<span class="page-tag"/>');
 		tagEl.attr('data-tag', tag);
 		tagEl.text(tag);
 		var closeEl = $('<span class="close">&#x00D7</span>');
@@ -433,7 +433,7 @@ function deleteTag(tagToDelete) {
 }
 
 function hookTags() {
-	$('#tagsContainer .tag').each(function() {
+	$('#tagsContainer .page-tag').each(function() {
 		var tagEl = $(this);
 		var tag = tagEl.attr('data-tag');
 		tagEl.off('click', '.close');
@@ -617,7 +617,7 @@ $(function() {
 			<div class="controls" id="tagsContainer">
 				<c:if test="${!empty pageForm.tags}">
 					<c:forEach var="tag" items="${pageForm.tags}"><%--
-						--%><span class="tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><span class="close">&#x00D7</span></span><%--
+						--%><span class="page-tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><span class="close">&#x00D7</span></span><%--
 					--%></c:forEach>
 					<br/>
 				</c:if>

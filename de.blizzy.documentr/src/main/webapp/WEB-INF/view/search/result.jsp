@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<p class="search-hit">
 				<a rel="nofollow" class="title" href="<c:url value="/page/${hit.projectName}/${hit.branchName}/${d:toURLPagePath(hit.path)}"/>"><c:out value="${hit.title}"/></a>
 				<c:forEach var="tag" items="${hit.tags}"><%--
-					--%><span class="tag small"><c:out value="${tag}"/></span><%--
+					--%><span class="page-tag small"><c:out value="${tag}"/></span><%--
 				--%></c:forEach>
 				<br/>
 				<a rel="nofollow" class="pagePath" href="<c:url value="/page/${hit.projectName}/${hit.branchName}/${d:toURLPagePath(hit.path)}"/>"><c:out value="${hit.projectName}/${hit.branchName}/${d:toURLPagePath(hit.path)}"/></a><br/>
