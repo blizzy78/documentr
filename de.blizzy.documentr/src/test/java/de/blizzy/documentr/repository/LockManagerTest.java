@@ -47,6 +47,18 @@ public class LockManagerTest {
 		lockManager.unlock(lock);
 	}
 
+	@Test
+	public void lockWhileHoldingAllLock() {
+		lockManager.lockAll();
+		lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Test
+	public void lockAllWhileHoldingLock() {
+		lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
+		lockManager.lockAll();
+	}
+	
 	@Test(expected=IllegalStateException.class)
 	public void unlockWithUnknownLock() {
 		Lock lock = new Lock(Thread.currentThread());

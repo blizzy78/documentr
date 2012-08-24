@@ -54,7 +54,7 @@ public class LockManager {
 				for (;;) {
 					lock = allLock;
 					if (((lock == null) || (lock.getLockingThread() == thread)) &&
-						locks.isEmpty()) {
+						(locks.isEmpty() || areAllLocksHeldBy(thread))) {
 						
 						break;
 					}
@@ -73,7 +73,7 @@ public class LockManager {
 			} else {
 				for (;;) {
 					lock = locks.get(key);
-					if ((allLock == null) &&
+					if (((allLock == null) || (allLock.getLockingThread() == thread)) &&
 						((lock == null) || (lock.getLockingThread() == thread))) {
 						
 						break;
@@ -95,6 +95,18 @@ public class LockManager {
 			lock.increaseUseCount();
 		}
 		return lock;
+	}
+	
+	private boolean areAllLocksHeldBy(Thread thread) {
+		if (!locks.isEmpty()) {
+			for (Lock lock : locks.values()) {
+				if (lock.getLockingThread() != thread) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	void unlock(ILock lock) {
