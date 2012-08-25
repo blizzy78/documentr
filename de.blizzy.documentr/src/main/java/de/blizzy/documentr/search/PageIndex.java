@@ -25,11 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -82,6 +79,7 @@ import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.Version;
 import org.cyberneko.html.HTMLEntities;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -94,8 +92,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.Util;
@@ -139,7 +135,6 @@ public class PageIndex {
 	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
 	private static final int REFRESH_INTERVAL = 30; // seconds
-	private static final int THREAD_POOL_THREADS = 8;
 	private static final int INTERACTIVE_TIMEOUT = 5; // seconds
 	@SuppressWarnings("nls")
 	private static final String[] REMOVE_HTML_TAGS = {
@@ -172,18 +167,15 @@ public class PageIndex {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private ListeningExecutorService taskExecutor;
 	private Analyzer defaultAnalyzer;
 	private Analyzer analyzer;
 	private File pageIndexDir;
-	private ListeningExecutorService threadPool = MoreExecutors.listeningDecorator(
-			Executors.newFixedThreadPool(THREAD_POOL_THREADS,
-					new ThreadFactoryBuilder().setNameFormat("Page Index (%d)").build())); //$NON-NLS-1$
 	private Directory directory;
 	private IndexWriter writer;
 	private ReaderManager readerManager;
 	private SearcherManager searcherManager;
-	private Timer timer = new Timer();
-	private boolean alwaysRefresh;
 	private AtomicBoolean dirty = new AtomicBoolean();
 	
 	@PostConstruct
@@ -207,28 +199,6 @@ public class PageIndex {
 		readerManager = new ReaderManager(directory);
 		searcherManager = new SearcherManager(directory, null);
 		
-		TimerTask refreshTask = new TimerTask() {
-			@Override
-			public void run() {
-				refresh();
-			}
-		};
-		timer.schedule(refreshTask, 0, REFRESH_INTERVAL * 1000);
-		
-		TimerTask commitTask = new TimerTask() {
-			@Override
-			public void run() {
-				if (dirty.getAndSet(false)) {
-					try {
-						writer.commit();
-					} catch (IOException e) {
-						// TODO: log exception
-					}
-				}
-			}
-		};
-		timer.schedule(commitTask, 0, REFRESH_INTERVAL * 1000);
-		
 		eventBus.register(this);
 		
 		if (getNumDocuments() == 0) {
@@ -240,13 +210,6 @@ public class PageIndex {
 	public void destroy() {
 		eventBus.unregister(this);
 		
-		try {
-			threadPool.shutdown();
-			threadPool.awaitTermination(10, TimeUnit.MINUTES);
-		} catch (InterruptedException e) {
-			// ignore
-		}
-		timer.cancel();
 		try {
 			searcherManager.close();
 		} catch (IOException e) {
@@ -290,7 +253,7 @@ public class PageIndex {
 				}
 			}
 		};
-		threadPool.submit(runnable);
+		taskExecutor.submit(runnable);
 	}
 
 	@Subscribe
@@ -319,7 +282,7 @@ public class PageIndex {
 					}
 				}
 			};
-			threadPool.submit(runnable);
+			taskExecutor.submit(runnable);
 		}
 	}
 
@@ -359,12 +322,7 @@ public class PageIndex {
 		}
 
 		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
-		
-		if (alwaysRefresh) {
-			writer.commit();
-		} else {
-			dirty.set(true);
-		}
+		dirty.set(true);
 	}
 	
 	private String removeHtmlTags(String html) {
@@ -412,7 +370,7 @@ public class PageIndex {
 				}
 			}
 		};
-		Future<?> future = threadPool.submit(runnable);
+		Future<?> future = taskExecutor.submit(runnable);
 		try {
 			future.get();
 		} catch (InterruptedException e) {
@@ -432,11 +390,7 @@ public class PageIndex {
 			}
 		} finally {
 			if (dirty) {
-				if (alwaysRefresh) {
-					writer.commit();
-				} else {
-					this.dirty.set(true);
-				}
+				this.dirty.set(true);
 			}
 		}
 	}
@@ -451,10 +405,6 @@ public class PageIndex {
 		IndexSearcher searcher = null;
 		Future<SearchResult> findFuture = null;
 		try {
-			if (alwaysRefresh) {
-				refreshBlocking();
-			}
-			
 			searcher = searcherManager.acquire();
 			final IndexSearcher indexSearcher = searcher;
 
@@ -464,7 +414,7 @@ public class PageIndex {
 					return findPages(searchText, page, authentication, indexSearcher);
 				}
 			};
-			findFuture = threadPool.submit(findCallable);
+			findFuture = taskExecutor.submit(findCallable);
 			
 			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, indexSearcher);
 			SearchResult result = findFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
@@ -496,7 +446,7 @@ public class PageIndex {
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
 			throws ParseException, IOException, TimeoutException {
 		
-		Future<Query> queryFuture = threadPool.submit(new ParseQueryTask(searchText, analyzer));
+		Future<Query> queryFuture = taskExecutor.submit(new ParseQueryTask(searchText, analyzer));
 		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
 		
 		Query query;
@@ -521,7 +471,7 @@ public class PageIndex {
 		IndexReader reader = searcher.getIndexReader();
 		List<ListenableFuture<SearchHit>> hitFutures = Lists.newArrayList();
 		for (int i = start; i < end; i++) {
-			ListenableFuture<SearchHit> hitFuture = threadPool.submit(new GetSearchHitTask(
+			ListenableFuture<SearchHit> hitFuture = taskExecutor.submit(new GetSearchHitTask(
 					query, reader, docs.scoreDocs[i].doc, analyzer));
 			hitFutures.add(hitFuture);
 		}
@@ -614,10 +564,6 @@ public class PageIndex {
 		IndexReader reader = null;
 		IndexSearcher searcher = null;
 		try {
-			if (alwaysRefresh) {
-				refreshBlocking();
-			}
-
 			searcher = searcherManager.acquire();
 			Bits visibleDocs = getVisibleDocIds(searcher, authentication);
 			Set<String> tags = Sets.newHashSet();
@@ -644,9 +590,9 @@ public class PageIndex {
 	}
 	
 	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException, TimeoutException {
-		Future<BitSet> branchPagesFuture = threadPool.submit(new GetVisibleBranchDocIdsTask(
+		Future<BitSet> branchPagesFuture = taskExecutor.submit(new GetVisibleBranchDocIdsTask(
 				searcher, authentication, permissionEvaluator));
-		Future<BitSet> inaccessibleDocsFuture = threadPool.submit(new GetInaccessibleDocIdsTask(
+		Future<BitSet> inaccessibleDocsFuture = taskExecutor.submit(new GetInaccessibleDocIdsTask(
 				searcher, Permission.VIEW, authentication, userStore, permissionEvaluator));
 		try {
 			BitSet docIds = branchPagesFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
@@ -667,7 +613,8 @@ public class PageIndex {
 		}
 	}
 	
-	private void refresh() {
+	@Scheduled(fixedDelay=REFRESH_INTERVAL * 1000)
+	void refresh() {
 		try {
 			readerManager.maybeRefresh();
 		} catch (IOException e) {
@@ -681,34 +628,28 @@ public class PageIndex {
 		}
 	}
 	
-	private void refreshBlocking() {
-		try {
-			readerManager.maybeRefreshBlocking();
-		} catch (IOException e) {
-			// ignore
-		}
-		
-		try {
-			searcherManager.maybeRefreshBlocking();
-		} catch (IOException e) {
-			// ignore
+	@Scheduled(fixedDelay=REFRESH_INTERVAL * 1000)
+	void commit() {
+		if (dirty.getAndSet(false)) {
+			try {
+				writer.commit();
+			} catch (IOException e) {
+				// TODO: log exception
+			}
 		}
 	}
 	
 	int getNumDocuments() throws IOException {
 		DirectoryReader reader = null;
 		try {
-			if (alwaysRefresh) {
-				refreshBlocking();
-			}
 			reader = readerManager.acquire();
 			return reader.numDocs();
 		} finally {
 			readerManager.release(reader);
 		}
 	}
-	
-	void setAlwaysRefresh(boolean alwaysRefresh) {
-		this.alwaysRefresh = alwaysRefresh;
+
+	void setTaskExecutor(ListeningExecutorService taskExecutor) {
+		this.taskExecutor = taskExecutor;
 	}
 }

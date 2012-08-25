@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
-import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -38,6 +37,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
@@ -87,8 +87,9 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		when(anonymousAuthenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME)).thenReturn(authentication);
 
 		when(repoManager.listProjects()).thenReturn(Collections.<String>emptyList());
+
+		pageIndex.setTaskExecutor(MoreExecutors.sameThreadExecutor());
 		
-		pageIndex.setAlwaysRefresh(true);
 		pageIndex.init();
 	}
 	
@@ -105,16 +106,13 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
+		pageIndex.commit();
+		pageIndex.refresh();
 
 		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
 			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
 		
 		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
-		
-		// wait for page to get indexed
-		while (pageIndex.getNumDocuments() == 0) {
-			sleep(10);
-		}
 		
 		SearchResult result = pageIndex.findPages("html", 1, authentication); //$NON-NLS-1$
 		assertEquals(1, result.getTotalHits());
@@ -129,16 +127,13 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
+		pageIndex.commit();
+		pageIndex.refresh();
 		
 		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
 			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
 	
 		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
-		
-		// wait for page to get indexed
-		while (pageIndex.getNumDocuments() == 0) {
-			sleep(10);
-		}
 		
 		SearchResult result = pageIndex.findPages("htlm", 1, authentication); //$NON-NLS-1$
 		SearchTextSuggestion suggestion = result.getSuggestion();
@@ -156,18 +151,13 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
+		pageIndex.commit();
+		pageIndex.refresh();
 		
-		// wait for page to get indexed
-		while (pageIndex.getNumDocuments() == 0) {
-			sleep(10);
-		}
-
 		pageIndex.deletePages(new PagesDeletedEvent(PROJECT, BRANCH, Collections.singleton(PAGE_PATH)));
-
-		// wait for page to get deleted
-		while (pageIndex.getNumDocuments() > 0) {
-			sleep(10);
-		}
+		pageIndex.commit();
+		pageIndex.refresh();
+		assertEquals(0, pageIndex.getNumDocuments());
 	}
 	
 	@Test

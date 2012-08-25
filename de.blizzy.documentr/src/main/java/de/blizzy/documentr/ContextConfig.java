@@ -19,8 +19,10 @@ package de.blizzy.documentr;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.PreDestroy;
 import javax.servlet.Filter;
 
 import net.sf.ehcache.Cache;
@@ -36,6 +38,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -53,6 +58,9 @@ import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
@@ -61,13 +69,10 @@ import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 /** Spring application context configuration. */
 @Configuration
 @EnableWebMvc
+@EnableScheduling
 @ComponentScan("de.blizzy.documentr")
 @ImportResource({ "classpath:/applicationContext-security.xml", "classpath:/applicationContext-cache.xml" })
-public class ContextConfig extends WebMvcConfigurerAdapter {
-	private static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
-	
-	private net.sf.ehcache.CacheManager ehCacheManager;
-	
+public class ContextConfig extends WebMvcConfigurerAdapter implements SchedulingConfigurer {
 	@Bean
 	public ViewResolver viewResolver() {
 		UrlBasedViewResolver resolver = new UrlBasedViewResolver();
@@ -98,13 +103,13 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new Sha512PasswordEncoder(100000);
 	}
-	
-	@Bean
-	public CacheManager cacheManager(Settings settings) throws IOException {
-		File cacheDir = new File(settings.getDocumentrDataDir(), CACHE_DIR_NAME);
+
+	@Bean(destroyMethod="shutdown")
+	public net.sf.ehcache.CacheManager ehCacheManager(Settings settings) throws IOException {
+		File cacheDir = new File(settings.getDocumentrDataDir(), DocumentrConstants.CACHE_DIR_NAME);
 		FileUtils.forceMkdir(cacheDir);
 
-		ehCacheManager = net.sf.ehcache.CacheManager.newInstance();
+		net.sf.ehcache.CacheManager ehCacheManager = net.sf.ehcache.CacheManager.newInstance();
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
 			.name("pageHTML") //$NON-NLS-1$
 			.diskStorePath(cacheDir.getAbsolutePath())
@@ -129,7 +134,11 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 			.maxEntriesLocalHeap(1000)
 			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
 			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
-		
+		return ehCacheManager;
+	}
+	
+	@Bean
+	public CacheManager cacheManager(net.sf.ehcache.CacheManager ehCacheManager) {
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
 		cacheManager.setCacheManager(ehCacheManager);
 
@@ -158,10 +167,17 @@ public class ContextConfig extends WebMvcConfigurerAdapter {
 		return new EventBus();
 	}
 	
-	@PreDestroy
-	public void destroy() {
-		if (ehCacheManager != null) {
-			ehCacheManager.shutdown();
-		}
+	@Bean(destroyMethod="shutdown")
+	public ListeningExecutorService taskExecutor() {
+		ThreadFactory threadFactory = new ThreadFactoryBuilder()
+			.setNameFormat("Task Executor (%d)").build(); //$NON-NLS-1$
+		ExecutorService executorService = Executors.newScheduledThreadPool(
+				DocumentrConstants.TASK_EXECUTOR_THREADS, threadFactory);
+		return MoreExecutors.listeningDecorator(executorService);
+	}
+
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		taskRegistrar.setScheduler(taskExecutor());
 	}
 }
