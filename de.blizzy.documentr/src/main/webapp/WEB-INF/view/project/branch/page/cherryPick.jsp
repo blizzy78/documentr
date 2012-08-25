@@ -147,8 +147,8 @@ function preview() {
 			<c:forEach var="result" items="${branchResults}">
 				<c:set var="status"><c:out value="${result.status}"/></c:set>
 				<c:choose>
-					<c:when test="${status eq 'OK'}"><c:set var="cssStatus" value="status-ok"/></c:when>
-					<c:when test="${status eq 'CONFLICT'}"><c:set var="cssStatus" value="status-conflict"/></c:when>
+					<c:when test="${status eq 'OK'}"><c:set var="cssStatus" value="success"/></c:when>
+					<c:when test="${status eq 'CONFLICT'}"><c:set var="cssStatus" value="error"/></c:when>
 					<c:otherwise><c:set var="cssStatus" value="status-unknown"/></c:otherwise>
 				</c:choose>
 				<tr class="${cssStatus}">
@@ -184,7 +184,7 @@ function preview() {
 		<h3><spring:message code="title.resolveConflict"/></h3>
 	</div>
 	<div class="modal-body">
-		<textarea id="conflictText" rows="20" class="code"></textarea>
+		<textarea id="conflictText" rows="19" class="code"></textarea>
 	</div>
 	<div class="modal-footer">
 		<a href="javascript:void(saveResolveText());" class="btn btn-primary"><spring:message code="button.save"/></a>

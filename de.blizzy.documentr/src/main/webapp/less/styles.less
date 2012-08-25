@@ -51,7 +51,7 @@ code {
 		width: 960px;
 		
 		textarea {
-			width: 920px;
+			width: 916px;
 		}
 	}
 }
@@ -209,10 +209,14 @@ form {
 	}
 }
 
-.site-search {
-	form {
-		margin-top: 7px;
-		margin-bottom: 0;
+#siteSearch {
+	margin: 0;
+	
+	input {
+		padding: 1px 6px;
+		height: 18px;
+		font-size: 11px;
+		line-height: 13px;
 	}
 }
 
@@ -221,7 +225,7 @@ form {
 
 	.title {
 		font-size: 15px;
-		line-height: 18px;
+		line-height: 20px;
 		margin-right: 10px;
 	}
 	
@@ -274,23 +278,7 @@ blockquote {
 	border-left-color: #08C;
 }
 
-.accordion {
-	&.cherry-pick-preview {
-		.accordion-group {
-			margin-bottom: 15px;
-		}
-	}
-}
-
 .cherry-pick-preview {
-	.status-ok {
-		color: #468847;
-	}
-	
-	.status-conflict {
-		color: #B94A48;
-	}
-
 	.status-unknown {
 		color: #808080;
 	}

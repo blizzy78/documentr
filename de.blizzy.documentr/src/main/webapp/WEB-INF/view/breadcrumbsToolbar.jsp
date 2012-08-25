@@ -22,8 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <li class="btn-toolbar pull-right">
 	<div class="btn-group">
-		<c:if test="${!empty requestScope._showSiteSearch}"><c:set var="cssActive" value="active"/></c:if>
-		<a href="javascript:void(documentr.toggleSiteSearch())" class="btn btn-mini ${cssActive}" data-toggle="button" title="<spring:message code="button.search"/>"><i class="icon-search"></i> <span class="caret"></span></a>
+		<form id="siteSearch" class="form-search" action="<c:url value="/search/page"/>" method="GET">
+			<input type="text" name="q" class="search-query input-large" value="<c:out value="${requestScope._showSiteSearch}"/>"
+				placeholder="<spring:message code="searchTermsPlaceholder"/>"/>
+		</form>
 	</div>
 
 	<div class="btn-group">

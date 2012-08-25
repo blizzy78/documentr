@@ -28,8 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<jsp:doBody/>
 					<jsp:include page="/WEB-INF/view/breadcrumbsToolbar.jsp"/>
 				</ul>
-	
-				<jsp:include page="/WEB-INF/view/siteSearch.jsp"/>
 			</div>
 		</div>
 	</nav>
