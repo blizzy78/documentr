@@ -27,6 +27,7 @@ import javax.servlet.Filter;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -105,30 +106,31 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	}
 
 	@Bean(destroyMethod="shutdown")
+	@SuppressWarnings("deprecation")
 	public net.sf.ehcache.CacheManager ehCacheManager(Settings settings) throws IOException {
 		File cacheDir = new File(settings.getDocumentrDataDir(), DocumentrConstants.CACHE_DIR_NAME);
 		FileUtils.forceMkdir(cacheDir);
 
-		net.sf.ehcache.CacheManager ehCacheManager = net.sf.ehcache.CacheManager.newInstance();
+		net.sf.ehcache.CacheManager ehCacheManager = net.sf.ehcache.CacheManager.newInstance(
+				new net.sf.ehcache.config.Configuration()
+					.diskStore(new DiskStoreConfiguration()
+							.path(cacheDir.getAbsolutePath())));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
-			.name("pageHTML") //$NON-NLS-1$
-			.diskStorePath(cacheDir.getAbsolutePath())
+			.name("page_html") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(1000)
 			.maxBytesLocalDisk(100, MemoryUnit.MEGABYTES)
 			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
-			.name("pageHeaderHTML") //$NON-NLS-1$
-			.diskStorePath(cacheDir.getAbsolutePath())
+			.name("page_header_html") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(100)
 			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
 			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
-			.name("pageViewRestrictionRole") //$NON-NLS-1$
-			.diskStorePath(cacheDir.getAbsolutePath())
+			.name("page_view_restriction_role") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(1000)

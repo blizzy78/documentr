@@ -23,9 +23,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 
 public interface IPageRenderer {
-	@Cacheable(value="pageHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	@Cacheable(value="page_html", key="#projectName + '/' + #branchName + '/' + #path")
 	String getHtml(String projectName, String branchName, String path, Authentication authentication) throws IOException;
 
-	@Cacheable(value="pageHeaderHTML", key="#projectName + '/' + #branchName + '/' + #path")
+	@Cacheable(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path")
 	String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication) throws IOException;
 }
