@@ -51,11 +51,11 @@ public class NeighborsMacro extends AbstractMacro {
 		if (context.getPagePath() != null) {
 			try {
 				StringBuilder buf = new StringBuilder();
-				buf.append("<div class=\"neighbors-box\"><ul class=\"neighbors\">"); //$NON-NLS-1$
+				buf.append("<ul class=\"well well-small nav nav-list pull-right\">"); //$NON-NLS-1$
 				buf.append(printParent(
 						printLinkListItem(context.getPagePath(), context.getPagePath()),
 						context.getPagePath(), context.getPagePath()));
-				buf.append("</ul></div>"); //$NON-NLS-1$
+				buf.append("</ul>"); //$NON-NLS-1$
 				return buf.toString();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -83,7 +83,7 @@ public class NeighborsMacro extends AbstractMacro {
 				parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(parentPage.getTitle())
 					.append("</a>") //$NON-NLS-1$
-					.append("<ul>"); //$NON-NLS-1$
+					.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
 				
 				if (path.equals(currentPagePath)) {
 					List<String> siblingPaths = pageStore.listChildPagePaths(
@@ -112,17 +112,18 @@ public class NeighborsMacro extends AbstractMacro {
 		HtmlSerializerContext context = getHtmlSerializerContext();
 		IPageStore pageStore = getMacroContext().getPageStore();
 		Page page = pageStore.getPage(context.getProjectName(), context.getBranchName(), path, false);
+		String uri = context.getPageURI(path);
 		if (path.equals(currentPagePath)) {
-			buf.append("<li class=\"active\">").append(page.getTitle()); //$NON-NLS-1$
-			buf.append(printChildren(path, currentPagePath));
-			buf.append("</li>"); //$NON-NLS-1$
+			buf.append("<li class=\"active\"><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
+				.append(page.getTitle())
+				.append(printChildren(path, currentPagePath))
+				.append("</a></li>"); //$NON-NLS-1$
 		} else {
 			Authentication authentication = context.getAuthentication();
 			DocumentrPermissionEvaluator permissionEvaluator = getMacroContext().getPermissionEvaluator();
 			if (permissionEvaluator.hasPagePermission(authentication, context.getProjectName(),
 					context.getBranchName(), path, Permission.VIEW)) {
 
-				String uri = context.getPageURI(path);
 				buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(page.getTitle())
 					.append("</a></li>"); //$NON-NLS-1$
@@ -137,7 +138,7 @@ public class NeighborsMacro extends AbstractMacro {
 		IPageStore pageStore = getMacroContext().getPageStore();
 		List<String> childPaths = pageStore.listChildPagePaths(context.getProjectName(), context.getBranchName(), path);
 		if (!childPaths.isEmpty()) {
-			buf.append("<ul>"); //$NON-NLS-1$
+			buf.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
 			for (String childPath : childPaths) {
 				buf.append(printLinkListItem(childPath, currentPagePath));
 			}
