@@ -406,11 +406,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<webResources>
-						<excludes>
-							<exclude>src/test/resources/**</exclude>
-						</excludes>
-					</webResources>
 					<packagingExcludes>**/.gitignore, less/**</packagingExcludes>
 				</configuration>
 			</plugin>
