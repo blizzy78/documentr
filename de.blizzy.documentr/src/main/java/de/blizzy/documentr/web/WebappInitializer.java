@@ -24,6 +24,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.servlet.SessionTrackingMode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -35,8 +37,12 @@ import de.blizzy.documentr.web.filter.RequestEncodingFilter;
 import de.blizzy.documentr.web.filter.TrimFilter;
 
 public class WebappInitializer implements WebApplicationInitializer {
+	private static final Logger log = LoggerFactory.getLogger(WebappInitializer.class);
+	
 	@Override
 	public void onStartup(ServletContext context) {
+		log.info("initializing documentr web application"); //$NON-NLS-1$
+		
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
 		appContext.setServletContext(context);
 		appContext.setConfigLocation(ContextConfig.class.getName());

@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -41,6 +44,8 @@ import de.blizzy.documentr.web.ErrorController;
 @Controller
 @RequestMapping("/search")
 public class SearchController {
+	private static final Logger log = LoggerFactory.getLogger(SearchController.class);
+	
 	@Autowired
 	private PageIndex pageIndex;
 	@Autowired
@@ -66,7 +71,7 @@ public class SearchController {
 			model.addAttribute("searchResult", result); //$NON-NLS-1$
 			model.addAttribute("page", page); //$NON-NLS-1$
 		} catch (ParseException e) {
-			// TODO
+			log.warn(StringUtils.EMPTY, e);
 		} catch (TimeoutException e) {
 			return ErrorController.timeout();
 		}

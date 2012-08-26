@@ -19,16 +19,21 @@ package de.blizzy.documentr.web.markdown;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.Util;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageTextData;
 
 @Component
 public class PageRenderer implements IPageRenderer {
+	private static final Logger log = LoggerFactory.getLogger(PageRenderer.class);
+	
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired
@@ -37,6 +42,11 @@ public class PageRenderer implements IPageRenderer {
 	@Override
 	public String getHtml(String projectName, String branchName, String path, Authentication authentication)
 			throws IOException {
+
+		if (log.isInfoEnabled()) {
+			log.info("rendering page {}/{}/{} for user {}", //$NON-NLS-1$
+					new Object[] { projectName, branchName, Util.toURLPagePath(path), authentication.getName() });
+		}
 		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
@@ -46,6 +56,11 @@ public class PageRenderer implements IPageRenderer {
 	@Override
 	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication)
 			throws IOException {
+
+		if (log.isInfoEnabled()) {
+			log.info("rendering page {}/{}/{} header for user {}", //$NON-NLS-1$
+					new Object[] { projectName, branchName, Util.toURLPagePath(path), authentication.getName() });
+		}
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();

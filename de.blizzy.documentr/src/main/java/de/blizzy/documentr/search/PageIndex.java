@@ -78,6 +78,8 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.Version;
 import org.cyberneko.html.HTMLEntities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -131,6 +133,8 @@ public class PageIndex {
 	static final String TEXT = "text"; //$NON-NLS-1$
 	static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 
+	private static final Logger log = LoggerFactory.getLogger(PageIndex.class);
+	
 	private static final String FULL_PATH = "fullPath"; //$NON-NLS-1$
 	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
@@ -225,6 +229,8 @@ public class PageIndex {
 	}
 	
 	private void reindexEverything() throws IOException {
+		log.info("reindexing everything"); //$NON-NLS-1$
+		
 		for (String projectName : repoManager.listProjects()) {
 			for (String branchName : repoManager.listProjectBranches(projectName)) {
 				addPages(projectName, branchName);
@@ -247,9 +253,9 @@ public class PageIndex {
 				try {
 					addPageAsync(projectName, branchName, path);
 				} catch (IOException e) {
-					// TODO: log exception
+					log.error(StringUtils.EMPTY, e);
 				} catch (RuntimeException e) {
-					// TODO: log exception
+					log.error(StringUtils.EMPTY, e);
 				}
 			}
 		};
@@ -263,7 +269,7 @@ public class PageIndex {
 		try {
 			addPages(projectName, branchName);
 		} catch (IOException e) {
-			// TODO: log exception
+			log.error(StringUtils.EMPTY, e);
 		}
 	}
 
@@ -276,9 +282,9 @@ public class PageIndex {
 					try {
 						addPageAsync(projectName, branchName, path);
 					} catch (IOException e) {
-						// TODO: log exception
+						log.error(StringUtils.EMPTY, e);
 					} catch (RuntimeException e) {
-						// TODO: log exception
+						log.error(StringUtils.EMPTY, e);
 					}
 				}
 			};
@@ -287,10 +293,10 @@ public class PageIndex {
 	}
 
 	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
-		Page page = pageStore.getPage(projectName, branchName, path, true);
-		
 		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.info("indexing page {}", fullPath); //$NON-NLS-1$
 		
+		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
@@ -366,7 +372,7 @@ public class PageIndex {
 				try {
 					deletePagesInternal(projectName, branchName, paths);
 				} catch (IOException e) {
-					// ignore
+					log.error(StringUtils.EMPTY, e);
 				}
 			}
 		};
@@ -385,6 +391,7 @@ public class PageIndex {
 		try {
 			for (String path : paths) {
 				String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+				log.info("deleting page {}", fullPath); //$NON-NLS-1$
 				writer.deleteDocuments(new Term(FULL_PATH, fullPath));
 				dirty = true;
 			}
@@ -618,13 +625,13 @@ public class PageIndex {
 		try {
 			readerManager.maybeRefresh();
 		} catch (IOException e) {
-			// ignore
+			log.warn(StringUtils.EMPTY, e);
 		}
 		
 		try {
 			searcherManager.maybeRefresh();
 		} catch (IOException e) {
-			// ignore
+			log.warn(StringUtils.EMPTY, e);
 		}
 	}
 	
@@ -634,7 +641,7 @@ public class PageIndex {
 			try {
 				writer.commit();
 			} catch (IOException e) {
-				// TODO: log exception
+				log.error(StringUtils.EMPTY, e);
 			}
 		}
 	}

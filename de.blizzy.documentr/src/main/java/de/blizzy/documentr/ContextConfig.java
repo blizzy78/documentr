@@ -113,6 +113,8 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 
 		net.sf.ehcache.CacheManager ehCacheManager = net.sf.ehcache.CacheManager.newInstance(
 				new net.sf.ehcache.config.Configuration()
+					.name("Ehcache") //$NON-NLS-1$
+					.updateCheck(false)
 					.diskStore(new DiskStoreConfiguration()
 							.path(cacheDir.getAbsolutePath())));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
