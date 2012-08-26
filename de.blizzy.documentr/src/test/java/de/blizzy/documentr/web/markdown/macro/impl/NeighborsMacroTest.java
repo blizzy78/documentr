@@ -139,30 +139,28 @@ public class NeighborsMacroTest {
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")
 		String html =
-				"<div class=\"neighbors-box\">" +
-					"<ul class=\"neighbors\">" +
-						"<li>" +
-							"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "\">" + DocumentrConstants.HOME_PAGE_NAME + "</a>" +
-							"<ul>" +
-								"<li>" +
-									"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo</a>" +
-									"<ul>" +
-										"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa</a></li>" +
-										"<li class=\"active\">" +
-											DocumentrConstants.HOME_PAGE_NAME + "/foo/bar" +
-											"<ul>" +
-												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" +
-												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" +
-												"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>" +
-											"</ul>" +
-										"</li>" +
-										"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb</a></li>" +
-									"</ul>" +
-								"</li>" +
-							"</ul>" +
-						"</li>" +
-					"</ul>" +
-				"</div>";
+				"<ul class=\"well well-small nav nav-list pull-right\">" +
+					"<li>" +
+						"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "\">" + DocumentrConstants.HOME_PAGE_NAME + "</a>" +
+						"<ul class=\"nav nav-list\">" +
+							"<li>" +
+								"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo</a>" +
+								"<ul class=\"nav nav-list\">" +
+									"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa</a></li>" +
+									"<li class=\"active\">" +
+										"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar</a>" +
+										"<ul class=\"nav nav-list\">" +
+											"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" +
+											"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" +
+											"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>" +
+										"</ul>" +
+									"</li>" +
+									"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb</a></li>" +
+								"</ul>" +
+							"</li>" +
+						"</ul>" +
+					"</li>" +
+				"</ul>";
 		assertEquals(html, macro.getHtml(null));
 	}
 

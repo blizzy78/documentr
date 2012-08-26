@@ -116,8 +116,9 @@ public class NeighborsMacro extends AbstractMacro {
 		if (path.equals(currentPagePath)) {
 			buf.append("<li class=\"active\"><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 				.append(page.getTitle())
+				.append("</a>") //$NON-NLS-1$
 				.append(printChildren(path, currentPagePath))
-				.append("</a></li>"); //$NON-NLS-1$
+				.append("</li>"); //$NON-NLS-1$
 		} else {
 			Authentication authentication = context.getAuthentication();
 			DocumentrPermissionEvaluator permissionEvaluator = getMacroContext().getPermissionEvaluator();
