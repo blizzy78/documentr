@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
-import de.blizzy.documentr.NotFoundException;
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.NotFoundException;
+import de.blizzy.documentr.util.Util;
 
 public class PageNotFoundException extends NotFoundException {
 	private String projectName;

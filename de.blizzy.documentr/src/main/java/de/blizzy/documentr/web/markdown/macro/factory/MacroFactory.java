@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.factory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,9 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 import de.blizzy.documentr.web.markdown.macro.impl.AlertMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.ColorMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.GoogleDocsMacro;

@@ -59,13 +59,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<function>
 		<name>toRealPagePath</name>
-		<function-class>de.blizzy.documentr.Util</function-class>
+		<function-class>de.blizzy.documentr.util.Util</function-class>
 		<function-signature>java.lang.String toRealPagePath(java.lang.String)</function-signature>
 	</function>
 
 	<function>
 		<name>toURLPagePath</name>
-		<function-class>de.blizzy.documentr.Util</function-class>
+		<function-class>de.blizzy.documentr.util.Util</function-class>
 		<function-signature>java.lang.String toURLPagePath(java.lang.String)</function-signature>
 	</function>
 
@@ -89,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<function>
 		<name>join</name>
-		<function-class>de.blizzy.documentr.Util</function-class>
+		<function-class>de.blizzy.documentr.util.Util</function-class>
 		<function-signature>String join(java.lang.Object, java.lang.String)</function-signature>
 	</function>
 

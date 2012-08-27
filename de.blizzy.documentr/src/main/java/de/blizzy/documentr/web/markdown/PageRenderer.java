@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageTextData;
+import de.blizzy.documentr.util.Util;
 
 @Component
-public class PageRenderer implements IPageRenderer {
+class PageRenderer implements IPageRenderer {
 	private static final Logger log = LoggerFactory.getLogger(PageRenderer.class);
 	
 	@Autowired

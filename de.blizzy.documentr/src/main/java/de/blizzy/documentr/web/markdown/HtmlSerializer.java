@@ -31,7 +31,7 @@ import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.VerbatimNode;
 
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializer extends ToHtmlSerializer {

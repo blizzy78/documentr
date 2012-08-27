@@ -57,7 +57,6 @@ import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.User;
@@ -71,6 +70,7 @@ import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.page.TestPageUtil;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 

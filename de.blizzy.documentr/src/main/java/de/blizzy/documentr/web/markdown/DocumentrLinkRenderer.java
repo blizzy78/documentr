@@ -26,7 +26,7 @@ import org.pegdown.ast.Node;
 import org.pegdown.ast.WikiLinkNode;
 import org.springframework.util.Assert;
 
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.Util;
 
 class DocumentrLinkRenderer extends LinkRenderer {
 	private HtmlSerializerContext context;

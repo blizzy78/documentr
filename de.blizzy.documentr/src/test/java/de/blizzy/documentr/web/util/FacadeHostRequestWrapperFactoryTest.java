@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.util;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +29,7 @@ import org.mockito.Mock;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
 public class FacadeHostRequestWrapperFactoryTest extends AbstractDocumentrTest {
 	private static final String URI = "/foo/bar.html?baz=qux&quux=quuux"; //$NON-NLS-1$

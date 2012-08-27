@@ -26,8 +26,8 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.Util;
 
 /** documentr's {@link SecurityExpressionRoot} for use in JSP and security annotations. */
 public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {

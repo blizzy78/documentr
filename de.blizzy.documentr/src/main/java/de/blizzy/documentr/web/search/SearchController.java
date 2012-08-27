@@ -39,7 +39,7 @@ import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.search.PageIndex;
 import de.blizzy.documentr.search.SearchResult;
-import de.blizzy.documentr.web.ErrorController;
+import de.blizzy.documentr.web.util.ErrorController;
 
 @Controller
 @RequestMapping("/search")

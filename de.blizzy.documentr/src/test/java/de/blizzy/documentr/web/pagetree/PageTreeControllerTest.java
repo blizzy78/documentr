@@ -34,12 +34,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.Util;
 
 public class PageTreeControllerTest {
 	private GlobalRepositoryManager repoManager;

@@ -35,7 +35,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContextTest {

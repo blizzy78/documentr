@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import de.blizzy.documentr.NotFoundException;
+import de.blizzy.documentr.util.NotFoundException;
 
 /** Thrown when no user is found that has a specific OpenID. */
 public class OpenIdNotFoundException extends NotFoundException {

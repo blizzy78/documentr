@@ -36,8 +36,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.FileLengthFormat;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.UserNotFoundException;
@@ -49,10 +47,12 @@ import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.FileLengthFormat;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
 
 @Component
 public final class Functions {

@@ -33,8 +33,8 @@ import org.springframework.security.openid.OpenIDConsumer;
 import org.springframework.security.openid.OpenIDConsumerException;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
 public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTest {
 	@InjectMocks

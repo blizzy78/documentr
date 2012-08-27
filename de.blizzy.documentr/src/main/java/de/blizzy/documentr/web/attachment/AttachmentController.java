@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.AuthenticationUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -49,6 +48,7 @@ import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageUtil;
+import de.blizzy.documentr.util.Util;
 
 @Controller
 @RequestMapping("/attachment")

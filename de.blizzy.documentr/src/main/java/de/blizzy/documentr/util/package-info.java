@@ -17,4 +17,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /** Generic utility. */
-package de.blizzy.documentr;
+package de.blizzy.documentr.util;

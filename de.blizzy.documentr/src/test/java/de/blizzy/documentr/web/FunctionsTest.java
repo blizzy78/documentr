@@ -59,7 +59,7 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
 import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
 import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
 

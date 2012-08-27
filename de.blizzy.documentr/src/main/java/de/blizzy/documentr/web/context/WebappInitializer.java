@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.context;
 
 import java.util.EnumSet;
 
@@ -32,7 +32,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import de.blizzy.documentr.ContextConfig;
+import de.blizzy.documentr.context.ContextConfig;
 import de.blizzy.documentr.web.filter.RequestEncodingFilter;
 import de.blizzy.documentr.web.filter.TrimFilter;
 

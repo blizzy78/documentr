@@ -64,8 +64,11 @@ public final class DocumentrConstants {
 	/** URL of the sample contents repository. */
 	public static final String SAMPLE_REPO_URL = "http://sample.documentr.org/sample.git"; //$NON-NLS-1$
 
-	static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
-	static final int TASK_EXECUTOR_THREADS = 8;
+	/** Name of the cache data directory. */
+	public static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
+	
+	/** Number of threads the task executor thread pool uses. */
+	public static final int TASK_EXECUTOR_THREADS = 8;
 
 	private DocumentrConstants() {}
 }

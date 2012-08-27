@@ -29,7 +29,7 @@ import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.WikiLinkNode;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.Util;
 
 public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 	@Mock

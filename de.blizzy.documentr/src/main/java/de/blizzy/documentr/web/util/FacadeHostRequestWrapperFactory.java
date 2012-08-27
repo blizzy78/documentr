@@ -15,14 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr;
+package de.blizzy.documentr.web.util;
 
-/** Thrown when an object is not found. */
-public abstract class NotFoundException extends RuntimeException {
-	protected NotFoundException() {
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import de.blizzy.documentr.Settings;
+
+@Component
+public class FacadeHostRequestWrapperFactory {
+	@Autowired
+	private Settings settings;
+	
+	public HttpServletRequest create(HttpServletRequest request) {
+		return new FacadeHostRequestWrapper(request, settings.getHost(), settings.getPort());
 	}
 	
-	protected NotFoundException(String msg) {
-		super(msg);
+	void setSettings(Settings settings) {
+		this.settings = settings;
 	}
 }

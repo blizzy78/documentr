@@ -45,8 +45,8 @@ import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.OpenIdNotFoundException;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.web.FacadeHostRequestWrapper;
-import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapper;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
 @Controller
 @RequestMapping("/accountOpenId")

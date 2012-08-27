@@ -40,7 +40,7 @@ import org.apache.lucene.search.highlight.TokenSources;
 
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.Util;
+import de.blizzy.documentr.util.Util;
 
 class GetSearchHitTask implements Callable<SearchHit> {
 	private static final int NUM_FRAGMENTS = 5;

@@ -96,7 +96,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -108,6 +107,7 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PagesDeletedEvent;
 import de.blizzy.documentr.repository.BranchCreatedEvent;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component

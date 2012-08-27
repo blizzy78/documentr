@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.openid.OpenIDAuthenticationFilter;
 
-import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
 public class DocumentrOpenIdAuthenticationFilter extends OpenIDAuthenticationFilter {
 	@Autowired

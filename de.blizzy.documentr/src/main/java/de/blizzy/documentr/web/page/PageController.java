@@ -54,7 +54,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.Util;
 import de.blizzy.documentr.access.AuthenticationUtil;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -71,9 +70,10 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.web.ErrorController;
+import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
+import de.blizzy.documentr.web.util.ErrorController;
 
 @Controller
 @RequestMapping("/page")

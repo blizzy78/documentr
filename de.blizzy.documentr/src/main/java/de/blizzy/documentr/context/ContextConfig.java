@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr;
+package de.blizzy.documentr.context;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +63,8 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import de.blizzy.documentr.DocumentrConstants;
+import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;

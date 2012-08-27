@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.web.util;
 
 import static de.blizzy.documentr.TestUtil.*;
 import static org.junit.Assert.*;
@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.Model;
+
+import de.blizzy.documentr.web.util.ErrorController;
 
 public class ErrorControllerTest {
 	private ErrorController errorController;
