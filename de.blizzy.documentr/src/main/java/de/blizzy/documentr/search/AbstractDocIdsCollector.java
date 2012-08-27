@@ -22,7 +22,7 @@ import java.util.BitSet;
 import org.apache.lucene.search.Collector;
 
 abstract class AbstractDocIdsCollector extends Collector {
-	protected BitSet docIds = new BitSet();
+	private BitSet docIds = new BitSet();
 	
 	BitSet getDocIds() {
 		return docIds;

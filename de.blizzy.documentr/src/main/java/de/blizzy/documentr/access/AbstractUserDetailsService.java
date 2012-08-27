@@ -43,7 +43,7 @@ abstract class AbstractUserDetailsService implements UserDetailsService {
 	 * construct its result.
 	 */
 	@Override
-	public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String loginName) {
 		if (loginName.equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
 			throw new UsernameNotFoundException("user not found: " + loginName); //$NON-NLS-1$
 		}

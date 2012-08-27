@@ -15,23 +15,28 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.access;
+package de.blizzy.documentr.search;
 
-import java.io.IOException;
+class WordPosition {
+	private String word;
+	private int start;
+	private int end;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-
-/** User details service that resolves users by one of their OpenIDs. */
-@Component("openIdUserDetailsService")
-public class OpenIdUserDetailsService extends AbstractUserDetailsService {
-	/** Returns the {@link User} that has a specified OpenID. */
-	@Override
-	User loadUser(String openId) throws IOException {
-		try {
-			return getUserStore().getUserByOpenId(openId);
-		} catch (OpenIdNotFoundException e) {
-			throw new UsernameNotFoundException("unknown OpenID: " + openId, e); //$NON-NLS-1$
-		}
+	WordPosition(String word, int start, int end) {
+		this.word = word;
+		this.start = start;
+		this.end = end;
+	}
+	
+	String getWord() {
+		return word;
+	}
+	
+	int getStart() {
+		return start;
+	}
+	
+	int getEnd() {
+		return end;
 	}
 }

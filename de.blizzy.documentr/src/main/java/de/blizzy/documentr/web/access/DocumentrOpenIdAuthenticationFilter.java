@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.openid.OpenIDAuthenticationFilter;
 
 import de.blizzy.documentr.web.FacadeHostRequestWrapperFactory;
@@ -34,9 +33,8 @@ public class DocumentrOpenIdAuthenticationFilter extends OpenIDAuthenticationFil
 	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
 
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request,
-			HttpServletResponse response) throws AuthenticationException,
-			IOException {
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 
 		HttpServletRequest requestWrapper = facadeHostRequestWrapperFactory.create(request);
 		return super.attemptAuthentication(requestWrapper, response);

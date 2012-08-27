@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -25,12 +26,12 @@ public class PageData {
 	private String contentType;
 	
 	public PageData(byte[] data, String contentType) {
-		this.data = data;
+		this.data = ArrayUtils.clone(data);
 		this.contentType = contentType;
 	}
 	
 	public byte[] getData() {
-		return data;
+		return ArrayUtils.clone(data);
 	}
 	
 	public String getContentType() {

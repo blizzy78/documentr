@@ -19,6 +19,7 @@ package de.blizzy.documentr.web.page;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import de.blizzy.documentr.validation.annotation.BranchNameNotBlacklisted;
@@ -65,7 +66,7 @@ public class PageForm {
 		this.text = text;
 		this.viewRestrictionRole = viewRestrictionRole;
 		this.commit = commit;
-		this.tags = tags;
+		this.tags = ArrayUtils.clone(tags);
 	}
 	
 	public String getProjectName() {
@@ -109,6 +110,6 @@ public class PageForm {
 	}
 	
 	public String[] getTags() {
-		return tags;
+		return ArrayUtils.clone(tags);
 	}
 }

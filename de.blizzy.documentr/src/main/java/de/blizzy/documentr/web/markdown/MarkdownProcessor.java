@@ -209,7 +209,7 @@ public class MarkdownProcessor {
 			}
 			start += startMarkerPrefix.length();
 			
-			int end = html.indexOf("_", start); //$NON-NLS-1$
+			int end = html.indexOf('_', start);
 			if (end < 0) {
 				break;
 			}

@@ -15,23 +15,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.access;
+package de.blizzy.documentr.search;
 
-import java.io.IOException;
+import static junit.framework.Assert.*;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.junit.Before;
+import org.junit.Test;
 
-/** User details service that resolves users by one of their OpenIDs. */
-@Component("openIdUserDetailsService")
-public class OpenIdUserDetailsService extends AbstractUserDetailsService {
-	/** Returns the {@link User} that has a specified OpenID. */
-	@Override
-	User loadUser(String openId) throws IOException {
-		try {
-			return getUserStore().getUserByOpenId(openId);
-		} catch (OpenIdNotFoundException e) {
-			throw new UsernameNotFoundException("unknown OpenID: " + openId, e); //$NON-NLS-1$
-		}
+public class WordPositionTest {
+	private static final String WORD = "word"; //$NON-NLS-1$
+	private static final int START = 123;
+	private static final int END = 234;
+	
+	private WordPosition position;
+
+	@Before
+	public void setUp() {
+		position = new WordPosition(WORD, START, END);
+	}
+	
+	@Test
+	public void getWord() {
+		assertEquals(WORD, position.getWord());
+	}
+	
+	@Test
+	public void getStart() {
+		assertEquals(START, position.getStart());
+	}
+	
+	@Test
+	public void getEnd() {
+		assertEquals(END, position.getEnd());
 	}
 }

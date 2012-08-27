@@ -31,7 +31,7 @@ public class LoginNameUserDetailsService extends AbstractUserDetailsService {
 		try {
 			return getUserStore().getUser(loginName);
 		} catch (UserNotFoundException e) {
-			throw new UsernameNotFoundException("unknown user name: " + loginName); //$NON-NLS-1$
+			throw new UsernameNotFoundException("unknown user name: " + loginName, e); //$NON-NLS-1$
 		}
 	}
 }

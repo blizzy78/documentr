@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  */
 public class Sha512PasswordEncoder implements PasswordEncoder {
 	private int iterations;
-	private SecureRandom RANDOM = new SecureRandom();
+	private SecureRandom random = new SecureRandom();
 
 	/**
 	 * Constructs a new SHA-512 password encoder.
@@ -43,7 +43,7 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 		
 		this.iterations = iterations;
 		
-		RANDOM.setSeed(System.currentTimeMillis());
+		random.setSeed(System.currentTimeMillis());
 	}
 
 	/**
@@ -54,10 +54,10 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 	 */
 	@Override
 	public String encodePassword(String rawPass, Object salt) {
-		salt = String.valueOf(getRandomLong());
+		String newSalt = String.valueOf(getRandomLong());
 		PasswordEncoder digestEncoder = createDigestEncoder(iterations);
-		String encPass = digestEncoder.encodePassword(rawPass, salt);
-		return encPass + "{" + salt + "}{" + String.valueOf(iterations) + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String encPass = digestEncoder.encodePassword(rawPass, newSalt);
+		return encPass + "{" + newSalt + "}{" + String.valueOf(iterations) + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -72,13 +72,13 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
 		int saltStartPos = StringUtils.indexOf(encPass, "{") + 1; //$NON-NLS-1$
 		int saltEndPos = StringUtils.indexOf(encPass, "}", saltStartPos); //$NON-NLS-1$
-		salt = encPass.substring(saltStartPos, saltEndPos);
+		String newSalt = encPass.substring(saltStartPos, saltEndPos);
 		int iterationsStartPos = StringUtils.indexOf(encPass, "{", saltEndPos + 1) + 1; //$NON-NLS-1$
 		int iterationsEndPos = StringUtils.indexOf(encPass, "}", iterationsStartPos); //$NON-NLS-1$
 		int iterations = Integer.parseInt(encPass.substring(iterationsStartPos, iterationsEndPos));
 		encPass = encPass.substring(0, saltStartPos - 1);
 		PasswordEncoder digestEncoder = createDigestEncoder(iterations);
-		return digestEncoder.isPasswordValid(encPass, rawPass, salt);
+		return digestEncoder.isPasswordValid(encPass, rawPass, newSalt);
 	}
 
 	private PasswordEncoder createDigestEncoder(int iterations) {
@@ -89,8 +89,8 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 	}
 	
 	private long getRandomLong() {
-		synchronized (RANDOM) {
-			return RANDOM.nextLong();
+		synchronized (random) {
+			return random.nextLong();
 		}
 	}
 }

@@ -33,7 +33,7 @@ public class AbstractDocIdsCollectorTest {
 
 		@Override
 		public void collect(int doc) {
-			docIds.set(doc);
+			getDocIds().set(doc);
 		}
 
 		@Override

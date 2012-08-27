@@ -112,18 +112,6 @@ import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
 public class PageIndex {
-	private static final class WordPosition {
-		String word;
-		int start;
-		int end;
-
-		WordPosition(String word, int start, int end) {
-			this.word = word;
-			this.start = start;
-			this.end = end;
-		}
-	}
-	
 	static final String PROJECT = "project"; //$NON-NLS-1$
 	static final String BRANCH = "branch"; //$NON-NLS-1$
 	static final String PATH = "path"; //$NON-NLS-1$
@@ -173,9 +161,7 @@ public class PageIndex {
 	private UserStore userStore;
 	@Autowired
 	private ListeningExecutorService taskExecutor;
-	private Analyzer defaultAnalyzer;
 	private Analyzer analyzer;
-	private File pageIndexDir;
 	private Directory directory;
 	private IndexWriter writer;
 	private ReaderManager readerManager;
@@ -185,12 +171,12 @@ public class PageIndex {
 	@PostConstruct
 	public void init() throws IOException {
 		File indexDir = new File(settings.getDocumentrDataDir(), "index"); //$NON-NLS-1$
-		pageIndexDir = new File(indexDir, "page"); //$NON-NLS-1$
+		File pageIndexDir = new File(indexDir, "page"); //$NON-NLS-1$
 		FileUtils.forceMkdir(pageIndexDir);
 		
 		directory = FSDirectory.open(pageIndexDir);
 
-		defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
+		Analyzer defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
 		Map<String, Analyzer> fieldAnalyzers = Maps.newHashMap();
 		fieldAnalyzers.put(ALL_TEXT_SUGGESTIONS, new StandardAnalyzer(Version.LUCENE_40));
 		analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, fieldAnalyzers);
@@ -542,12 +528,14 @@ public class PageIndex {
 		DirectSpellChecker spellChecker = new DirectSpellChecker();
 		IndexReader reader = searcher.getIndexReader();
 		for (WordPosition word : words) {
-			Term term = new Term(ALL_TEXT_SUGGESTIONS, word.word);
+			Term term = new Term(ALL_TEXT_SUGGESTIONS, word.getWord());
 			SuggestWord[] suggestions = spellChecker.suggestSimilar(term, 1, reader, SuggestMode.SUGGEST_MORE_POPULAR);
 			if (suggestions.length > 0) {
 				String suggestedWord = suggestions[0].string;
-				suggestedSearchText.replace(word.start, word.end, suggestedWord);
-				suggestedSearchTextHtml.replace(word.start, word.end,
+				int start = word.getStart();
+				int end = word.getEnd();
+				suggestedSearchText.replace(start, end, suggestedWord);
+				suggestedSearchTextHtml.replace(start, end,
 						startMarker + StringEscapeUtils.escapeHtml4(suggestedWord) + endMarker);
 				
 				foundSuggestions = true;

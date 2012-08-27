@@ -17,21 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import java.io.IOException;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-
-/** User details service that resolves users by one of their OpenIDs. */
-@Component("openIdUserDetailsService")
-public class OpenIdUserDetailsService extends AbstractUserDetailsService {
-	/** Returns the {@link User} that has a specified OpenID. */
-	@Override
-	User loadUser(String openId) throws IOException {
-		try {
-			return getUserStore().getUserByOpenId(openId);
-		} catch (OpenIdNotFoundException e) {
-			throw new UsernameNotFoundException("unknown OpenID: " + openId, e); //$NON-NLS-1$
-		}
+public class RoleGrantedAuthorityComparatorTest {
+	@Test
+	@Ignore
+	public void compare() {
+		// TODO: implement test
 	}
 }

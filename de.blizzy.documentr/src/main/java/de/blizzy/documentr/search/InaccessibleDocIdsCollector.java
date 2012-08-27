@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.search.Scorer;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Sets;
@@ -48,7 +49,7 @@ class InaccessibleDocIdsCollector extends AbstractDocIdsCollector {
 	}
 	
 	@Override
-	public void setScorer(org.apache.lucene.search.Scorer scorer) {
+	public void setScorer(Scorer scorer) {
 	}
 	
 	@Override
@@ -64,7 +65,7 @@ class InaccessibleDocIdsCollector extends AbstractDocIdsCollector {
 		String branchName = document.get(PageIndex.BRANCH);
 		String path = document.get(PageIndex.PATH);
 		if (!permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission)) {
-			docIds.set(docBase + doc);
+			getDocIds().set(docBase + doc);
 		}
 	}
 	

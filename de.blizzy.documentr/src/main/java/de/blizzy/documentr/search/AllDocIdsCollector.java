@@ -29,7 +29,7 @@ class AllDocIdsCollector extends AbstractDocIdsCollector {
 
 	@Override
 	public void collect(int doc) {
-		docIds.set(docBase + doc);
+		getDocIds().set(docBase + doc);
 	}
 
 	@Override

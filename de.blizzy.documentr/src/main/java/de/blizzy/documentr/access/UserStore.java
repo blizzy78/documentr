@@ -22,7 +22,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -412,28 +411,7 @@ public class UserStore {
 				}
 			}
 			
-			Collections.sort(authorities, new Comparator<RoleGrantedAuthority>() {
-				@Override
-				public int compare(RoleGrantedAuthority rga1, RoleGrantedAuthority rga2) {
-					GrantedAuthorityTarget target1 = rga1.getTarget();
-					GrantedAuthorityTarget target2 = rga2.getTarget();
-					Type type1 = target1.getType();
-					Type type2 = target2.getType();
-					int result = Integer.valueOf(type1.ordinal()).compareTo(Integer.valueOf(type2.ordinal()));
-					if (result != 0) {
-						return result;
-					}
-					
-					String targetId1 = target1.getTargetId();
-					String targetId2 = target2.getTargetId();
-					result = targetId1.compareToIgnoreCase(targetId2);
-					if (result != 0) {
-						return result;
-					}
-					
-					return rga1.getRoleName().compareToIgnoreCase(rga2.getRoleName());
-				}
-			});
+			Collections.sort(authorities, new RoleGrantedAuthorityComparator());
 			
 			return authorities;
 		} finally {

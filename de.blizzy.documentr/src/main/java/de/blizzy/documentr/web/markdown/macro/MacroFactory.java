@@ -65,7 +65,7 @@ public class MacroFactory {
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
-	private static final void put(MacroDescriptor desc) {
+	private static void put(MacroDescriptor desc) {
 		MACROS.put(desc.getName(), desc);
 	}
 	

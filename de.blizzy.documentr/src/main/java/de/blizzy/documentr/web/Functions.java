@@ -62,32 +62,32 @@ public final class Functions {
 	private static IPageRenderer pageRenderer;
 	private static MarkdownProcessor markdownProcessor;
 	private static MessageSource messageSource;
-	private static  MacroFactory macroFactory;
+	private static MacroFactory macroFactory;
 	
 	@Autowired
-	private GlobalRepositoryManager _repoManager;
+	private GlobalRepositoryManager wiredRepoManager;
 	@Autowired
-	private IPageStore _pageStore;
+	private IPageStore wiredPageStore;
 	@Autowired
-	private UserStore _userStore;
+	private UserStore wiredUserStore;
 	@Autowired
-	private IPageRenderer _pageRenderer;
+	private IPageRenderer wiredPageRenderer;
 	@Autowired
-	private MarkdownProcessor _markdownProcessor;
+	private MarkdownProcessor wiredMarkdownProcessor;
 	@Autowired
-	private MessageSource _messageSource;
+	private MessageSource wiredMessageSource;
 	@Autowired
-	private MacroFactory _macroFactory;
+	private MacroFactory wiredMacroFactory;
 	
 	@PostConstruct
 	public void init() {
-		pageStore = _pageStore;
-		repoManager = _repoManager;
-		userStore = _userStore;
-		pageRenderer = _pageRenderer;
-		markdownProcessor = _markdownProcessor;
-		messageSource = _messageSource;
-		macroFactory = _macroFactory;
+		pageStore = wiredPageStore;
+		repoManager = wiredRepoManager;
+		userStore = wiredUserStore;
+		pageRenderer = wiredPageRenderer;
+		markdownProcessor = wiredMarkdownProcessor;
+		messageSource = wiredMessageSource;
+		macroFactory = wiredMacroFactory;
 	}
 
 	public static List<String> listProjects() {

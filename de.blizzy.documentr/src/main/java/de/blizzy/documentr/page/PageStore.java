@@ -153,10 +153,8 @@ class PageStore implements IPageStore {
 		Git git = Git.wrap(repo.r());
 
 		String headCommit = CommitUtils.getHead(repo.r()).getName();
-		if (baseCommit != null) {
-			if (headCommit.equals(baseCommit)) {
-				baseCommit = null;
-			}
+		if ((baseCommit != null) && headCommit.equals(baseCommit)) {
+			baseCommit = null;
 		}
 		
 		String editBranchName = "_edit_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$

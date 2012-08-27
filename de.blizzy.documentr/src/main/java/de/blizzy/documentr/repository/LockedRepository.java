@@ -20,7 +20,7 @@ package de.blizzy.documentr.repository;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.util.Assert;
 
-class LockedRepository implements ILockedRepository {
+final class LockedRepository implements ILockedRepository {
 	private ILock lock;
 	private LockManager lockManager;
 	private Repository repo;
