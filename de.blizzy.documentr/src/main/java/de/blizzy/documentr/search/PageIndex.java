@@ -260,22 +260,10 @@ public class PageIndex {
 		}
 	}
 
-	private void addPages(final String projectName, final String branchName) throws IOException {
+	private void addPages(String projectName, String branchName) throws IOException {
 		List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
-		for (final String path : paths) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						addPageAsync(projectName, branchName, path);
-					} catch (IOException e) {
-						log.error(StringUtils.EMPTY, e);
-					} catch (RuntimeException e) {
-						log.error(StringUtils.EMPTY, e);
-					}
-				}
-			};
-			taskExecutor.submit(runnable);
+		for (String path : paths) {
+			addPage(projectName, branchName, path);
 		}
 	}
 
