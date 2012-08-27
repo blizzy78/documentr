@@ -30,83 +30,96 @@ public class LockManager {
 	private Lock allLock;
 
 	ILock lockAll() {
-		return lock(new LockKey(null, null, false), true);
+		LockKey key = new LockKey(null, null, false);
+		return lock(key, true);
 	}
 	
 	ILock lockProjectCentral(String projectName) {
 		Assert.hasLength(projectName);
 		
-		return lock(new LockKey(projectName, null, true), false);
+		LockKey key = new LockKey(projectName, null, true);
+		return lock(key, false);
 	}
 
 	ILock lockProjectBranch(String projectName, String branchName) {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		
-		return lock(new LockKey(projectName, branchName, false), false);
+		LockKey key = new LockKey(projectName, branchName, false);
+		return lock(key, false);
 	}
 
 	private ILock lock(LockKey key, boolean all) {
-		Thread thread = Thread.currentThread();
 		Lock lock;
 		synchronized (locks) {
-			if (all) {
-				for (;;) {
-					lock = allLock;
-					if (((lock == null) || (lock.getLockingThread() == thread)) &&
-						(locks.isEmpty() || areAllLocksHeldBy(thread))) {
-						
-						break;
-					}
-
-					try {
-						locks.wait();
-					} catch (InterruptedException e) {
-						// ignore
-					}
-				}
-				
-				if (lock == null) {
-					lock = new Lock(thread);
-					allLock = lock;
-				}
-			} else {
-				for (;;) {
-					lock = locks.get(key);
-					if (((allLock == null) || (allLock.getLockingThread() == thread)) &&
-						((lock == null) || (lock.getLockingThread() == thread))) {
-						
-						break;
-					}
-					
-					try {
-						locks.wait();
-					} catch (InterruptedException e) {
-						// ignore
-					}
-				}
-
-				if (lock == null) {
-					lock = new Lock(thread);
-					locks.put(key, lock);
-				}
-			}
-
+			lock = all ? lockAllInternal() : lockInternal(key);
 			lock.increaseUseCount();
 		}
 		return lock;
 	}
 	
-	private boolean areAllLocksHeldBy(Thread thread) {
+	private Lock lockAllInternal() {
+		Lock lock;
+		Thread thread = Thread.currentThread();
+		for (;;) {
+			lock = allLock;
+			if (((lock == null) || (lock.getLockingThread() == thread)) &&
+				areAllLocksHeldByCurrentThread()) {
+				
+				break;
+			}
+
+			try {
+				locks.wait();
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+		
+		if (lock == null) {
+			lock = new Lock(thread);
+			allLock = lock;
+		}
+		
+		return lock;
+	}
+	
+	private Lock lockInternal(LockKey key) {
+		Lock lock;
+		Thread thread = Thread.currentThread();
+		for (;;) {
+			lock = locks.get(key);
+			if (((allLock == null) || (allLock.getLockingThread() == thread)) &&
+				((lock == null) || (lock.getLockingThread() == thread))) {
+				
+				break;
+			}
+			
+			try {
+				locks.wait();
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+
+		if (lock == null) {
+			lock = new Lock(thread);
+			locks.put(key, lock);
+		}
+		
+		return lock;
+	}
+	
+	private boolean areAllLocksHeldByCurrentThread() {
+		Thread thread = Thread.currentThread();
 		if (!locks.isEmpty()) {
 			for (Lock lock : locks.values()) {
 				if (lock.getLockingThread() != thread) {
 					return false;
 				}
 			}
-			return true;
 		}
-		return false;
+		return true;
 	}
 	
 	void unlock(ILock lock) {
