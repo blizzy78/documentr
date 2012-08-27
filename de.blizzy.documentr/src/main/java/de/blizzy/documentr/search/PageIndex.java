@@ -205,6 +205,7 @@ public class PageIndex {
 		
 		eventBus.register(this);
 		
+		log.debug("checking if index is empty"); //$NON-NLS-1$
 		if (getNumDocuments() == 0) {
 			reindexEverything();
 		}

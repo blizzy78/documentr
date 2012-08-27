@@ -6,9 +6,15 @@
 		</encoder>
 	</appender>
 
+	<logger name="org.openid4java.server.RealmVerifier" level="ERROR"/>
+
+	<if condition='isDefined("documentr.debug")'>
+		<then>
+			<logger name="de.blizzy.documentr" level="DEBUG"/>
+		</then>
+	</if>
+
 	<root level="WARN">
 		<appender-ref ref="stdout"/>
 	</root>
-	
-	<logger name="de.blizzy.documentr" level="DEBUG"/>
 </configuration>
