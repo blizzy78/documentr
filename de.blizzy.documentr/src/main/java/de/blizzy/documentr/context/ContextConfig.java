@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Filter;
 
@@ -104,7 +105,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new Sha512PasswordEncoder(100000);
+		return new Sha512PasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_ITERATIONS);
 	}
 
 	@Bean(destroyMethod="shutdown")
@@ -125,21 +126,21 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(1000)
 			.maxBytesLocalDisk(100, MemoryUnit.MEGABYTES)
-			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
+			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
 			.name("page_header_html") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(100)
 			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
-			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
+			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
 			.name("page_view_restriction_role") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)
 			.maxEntriesLocalHeap(1000)
 			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
-			.timeToIdleSeconds(30L * 24L * 60L * 60L)));
+			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
 		return ehCacheManager;
 	}
 	

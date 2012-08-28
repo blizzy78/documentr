@@ -82,5 +82,8 @@ public final class DocumentrConstants {
 	/** Suffix of a metadata file in a repository. */
 	public static final String META_SUFFIX = ".meta"; //$NON-NLS-1$
 
+	/** Number of iterations the password encoder must perform. */
+	public static final int PASSWORD_ENCODER_ITERATIONS = 100000;
+
 	private DocumentrConstants() {}
 }

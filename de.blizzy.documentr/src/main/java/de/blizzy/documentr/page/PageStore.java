@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -684,7 +685,7 @@ class PageStore implements IPageStore {
 				lastEditedBy = committer.getName();
 			}
 			// TODO: would love to use authored time
-			Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+			Date lastEdited = new Date(TimeUnit.MILLISECONDS.convert(commit.getCommitTime(), TimeUnit.SECONDS));
 
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File rootDirFile = new File(workingDir, rootDir);

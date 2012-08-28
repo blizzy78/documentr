@@ -31,6 +31,10 @@ import org.springframework.context.MessageSource;
  * @see #format(long)
  */
 public class FileLengthFormat extends Format {
+	private static final long KB = 1024;
+	private static final long MB = KB * 1024;
+	private static final long GB = MB * 1024;
+	
 	private MessageSource messageSource;
 	private Locale locale;
 
@@ -52,18 +56,18 @@ public class FileLengthFormat extends Format {
 		}
 
 		long length = ((Number) obj).longValue();
-		if (length < 1024L) {
+		if (length < KB) {
 			toAppendTo.append(messageSource.getMessage(
 					"sizeX.bytes", new Object[] { formatNumber(length) }, locale)); //$NON-NLS-1$
-		} else if (length < 1024000L) {
+		} else if (length < MB) {
 			toAppendTo.append(messageSource.getMessage(
-					"sizeX.kb", new Object[] { formatNumber(length / 1024d) }, locale)); //$NON-NLS-1$
-		} else if (length < 1048576000L) {
+					"sizeX.kb", new Object[] { formatNumber(length / (double) KB) }, locale)); //$NON-NLS-1$
+		} else if (length < GB) {
 			toAppendTo.append(messageSource.getMessage(
-					"sizeX.mb", new Object[] { formatNumber(length / 1024d / 1024d) }, locale)); //$NON-NLS-1$
+					"sizeX.mb", new Object[] { formatNumber(length / (double) MB) }, locale)); //$NON-NLS-1$
 		} else {
 			toAppendTo.append(messageSource.getMessage(
-					"sizeX.gb", new Object[] { formatNumber(length / 1024d / 1024d / 1024d) }, locale)); //$NON-NLS-1$
+					"sizeX.gb", new Object[] { formatNumber(length / (double) GB) }, locale)); //$NON-NLS-1$
 		}
 
 		return toAppendTo;

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -70,7 +71,7 @@ public final class PageUtil {
 			lastEditedBy = committer.getName();
 		}
 		// TODO: would love to use authored time
-		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+		Date lastEdited = new Date(TimeUnit.MILLISECONDS.convert(commit.getCommitTime(), TimeUnit.SECONDS));
 		String commitName = commit.getName();
 		return new PageVersion(commitName, lastEditedBy, lastEdited);
 	}

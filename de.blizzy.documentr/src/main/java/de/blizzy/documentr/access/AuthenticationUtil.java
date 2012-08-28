@@ -17,7 +17,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.http.HttpSession;
+
+import org.springframework.security.core.Authentication;
 
 /** {@link Authentication} utility methods. */
 public final class AuthenticationUtil {
@@ -33,6 +37,12 @@ public final class AuthenticationUtil {
 	/** Retrieves the creation time of the current user's {@link Authentication} from their session. */
 	public static long getAuthenticationCreationTime(HttpSession session) {
 		Long time = (Long) session.getAttribute(AUTHENTICATION_CREATION_TIME);
-		return (time != null) ? time.longValue() / 1000L * 1000L : 0;
+		if (time != null) {
+			// shave off milliseconds
+			long seconds = TimeUnit.SECONDS.convert(time.longValue(), TimeUnit.MILLISECONDS);
+			return TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS);
+		} else {
+			return 0;
+		}
 	}
 }

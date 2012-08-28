@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro.impl;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.MultiValueMap;
@@ -63,7 +64,7 @@ public class GoogleDocsMacro extends AbstractMacro {
 					.queryParam("id", id) //$NON-NLS-1$
 					.queryParam("start", "false") //$NON-NLS-1$ //$NON-NLS-2$
 					.queryParam("loop", "false") //$NON-NLS-1$ //$NON-NLS-2$
-					.queryParam("delayms", "3000") //$NON-NLS-1$ //$NON-NLS-2$
+					.queryParam("delayms", String.valueOf(TimeUnit.MILLISECONDS.convert(3, TimeUnit.SECONDS))) //$NON-NLS-1$
 					.build();
 			return buildIframe(components);
 		} else if (path.startsWith("/drawings/")) { //$NON-NLS-1$
