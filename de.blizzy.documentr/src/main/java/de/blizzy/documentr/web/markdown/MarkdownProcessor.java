@@ -54,7 +54,14 @@ public class MarkdownProcessor {
 		
 		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
 		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE)
+		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
+		
+		Pattern.compile(
+				"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
+				"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
+				"<ul class=\"thumbnails\">(<li class=\"span3\">" +
+				"<a class=\"thumbnail\" (?:[^>]+)>)",
+				Pattern.DOTALL)
 	};
 	@SuppressWarnings("nls")
 	private static final String[] CLEANUP_REPLACE_WITH = {
@@ -65,7 +72,9 @@ public class MarkdownProcessor {
 		
 		"<div $1$2",
 		"<ul $1$2",
-		"<ol $1$2"
+		"<ol $1$2",
+		
+		"$1$2"
 	};
 	
 	@Autowired

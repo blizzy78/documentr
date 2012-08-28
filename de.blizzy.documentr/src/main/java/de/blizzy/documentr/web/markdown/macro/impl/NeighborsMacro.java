@@ -19,7 +19,6 @@ package de.blizzy.documentr.web.markdown.macro.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
@@ -35,15 +34,6 @@ import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
 public class NeighborsMacro extends AbstractMacro {
 	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("neighbors", //$NON-NLS-1$
 			NeighborsMacro.class, "{{neighbors/}}"); //$NON-NLS-1$
-
-	@SuppressWarnings("nls")
-	private static final Pattern CLEANUP_RE = Pattern.compile(
-			"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
-			"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
-			"<ul class=\"thumbnails\">(<li class=\"span3\">" +
-			"<a class=\"thumbnail\" (?:[^>]+)>)",
-			Pattern.DOTALL);
-	private static final String CLEANUP_REPLACE_WITH = "$1$2"; //$NON-NLS-1$
 
 	@Override
 	public String getHtml(String body) {
@@ -148,11 +138,6 @@ public class NeighborsMacro extends AbstractMacro {
 		return buf;
 	}
 
-	@Override
-	public String cleanupHTML(String html) {
-		return CLEANUP_RE.matcher(html).replaceAll(CLEANUP_REPLACE_WITH);
-	}
-	
 	@Override
 	public boolean isCacheable() {
 		return false;
