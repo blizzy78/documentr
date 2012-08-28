@@ -61,6 +61,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.CommitCherryPickConflictResolve;
 import de.blizzy.documentr.page.CommitCherryPickResult;
+import de.blizzy.documentr.page.ICherryPicker;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.MergeConflict;
 import de.blizzy.documentr.page.Page;
@@ -80,6 +81,8 @@ import de.blizzy.documentr.web.util.ErrorController;
 public class PageController {
 	@Autowired
 	private IPageStore pageStore;
+	@Autowired
+	private ICherryPicker cherryPicker;
 	@Autowired
 	private GlobalRepositoryManager repoManager;
 	@Autowired
@@ -505,7 +508,7 @@ public class PageController {
 			}
 		}
 
-		Map<String, List<CommitCherryPickResult>> results = pageStore.cherryPick(
+		Map<String, List<CommitCherryPickResult>> results = cherryPicker.cherryPick(
 				projectName, path, commits, targetBranches, resolves, dryRun, user);
 		if (results.keySet().size() != targetBranches.size()) {
 			throw new IllegalStateException();

@@ -19,8 +19,12 @@ package de.blizzy.documentr.page;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -57,5 +61,17 @@ public final class PageUtil {
 	public static long getProjectEditTime(String projectName) {
 		Long time = projectEditTimes.get(projectName);
 		return (time != null) ? time.longValue() : -1;
+	}
+
+	public static PageVersion toPageVersion(RevCommit commit) {
+		PersonIdent committer = commit.getAuthorIdent();
+		String lastEditedBy = null;
+		if (committer != null) {
+			lastEditedBy = committer.getName();
+		}
+		// TODO: would love to use authored time
+		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
+		String commitName = commit.getName();
+		return new PageVersion(commitName, lastEditedBy, lastEdited);
 	}
 }

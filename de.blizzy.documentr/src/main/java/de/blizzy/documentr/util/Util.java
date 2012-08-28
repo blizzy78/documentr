@@ -133,4 +133,12 @@ public final class Util {
 			return new RuntimeException(t);
 		}
 	}
+
+	public static File toFile(File baseDir, String path) {
+		File result = baseDir;
+		for (String part : path.split("/")) { //$NON-NLS-1$
+			result = new File(result, part);
+		}
+		return result;
+	}
 }

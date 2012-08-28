@@ -27,16 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CherryPickResult;
-import org.eclipse.jgit.api.CherryPickResult.CherryPickStatus;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RebaseCommand;
-import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.StopWalkException;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -67,10 +63,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
+import de.blizzy.documentr.util.Util;
 
 @Component
 class PageStore implements IPageStore {
@@ -78,10 +76,6 @@ class PageStore implements IPageStore {
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 	private static final String PAGE_DATA = "pageData"; //$NON-NLS-1$
-	private static final String META_SUFFIX = ".meta"; //$NON-NLS-1$
-	private static final String PAGE_SUFFIX = ".page"; //$NON-NLS-1$
-	private static final String PAGES_DIR_NAME = "pages"; //$NON-NLS-1$
-	private static final String ATTACHMENTS_DIR_NAME = "attachments"; //$NON-NLS-1$
 	private static final String VERSION_LATEST = "latest"; //$NON-NLS-1$
 	private static final String VERSION_PREVIOUS = "previous"; //$NON-NLS-1$
 	private static final String TAGS = "tags"; //$NON-NLS-1$
@@ -102,8 +96,8 @@ class PageStore implements IPageStore {
 		Assert.notNull(user);
 		
 		try {
-			MergeConflict conflict = savePageInternal(projectName, branchName, path, PAGE_SUFFIX, page,
-					baseCommit, PAGES_DIR_NAME, user);
+			MergeConflict conflict = savePageInternal(projectName, branchName, path, DocumentrConstants.PAGE_SUFFIX, page,
+					baseCommit, DocumentrConstants.PAGES_DIR_NAME, user);
 			if (conflict == null) {
 				eventBus.post(new PageChangedEvent(projectName, branchName, path));
 			}
@@ -127,8 +121,8 @@ class PageStore implements IPageStore {
 		getPage(projectName, branchName, pagePath, false);
 		
 		try {
-			savePageInternal(projectName, branchName, pagePath + "/" + name, PAGE_SUFFIX, attachment, //$NON-NLS-1$
-					null, ATTACHMENTS_DIR_NAME, user);
+			savePageInternal(projectName, branchName, pagePath + "/" + name, DocumentrConstants.PAGE_SUFFIX, attachment, //$NON-NLS-1$
+					null, DocumentrConstants.ATTACHMENTS_DIR_NAME, user);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		}
@@ -180,17 +174,17 @@ class PageStore implements IPageStore {
 		String json = gson.toJson(metaMap);
 		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 		File pagesDir = new File(workingDir, rootDir);
-		File workingFile = toFile(pagesDir, path + META_SUFFIX);
+		File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.META_SUFFIX);
 		FileUtils.write(workingFile, json, Charsets.UTF_8);
 
 		PageData pageData = page.getData();
 		if (pageData != null) {
-			workingFile = toFile(pagesDir, path + suffix);
+			workingFile = Util.toFile(pagesDir, path + suffix);
 			FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
 		}
 		
 		AddCommand addCommand = git.add()
-			.addFilepattern(rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
+			.addFilepattern(rootDir + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 		if (pageData != null) {
 			addCommand.addFilepattern(rootDir + "/" + path + suffix); //$NON-NLS-1$
 		}
@@ -247,14 +241,6 @@ class PageStore implements IPageStore {
 		return conflict;
 	}
 	
-	private File toFile(File baseDir, String path) {
-		File result = baseDir;
-		for (String part : path.split("/")) { //$NON-NLS-1$
-			result = new File(result, part);
-		}
-		return result;
-	}
-	
 	@Override
 	public Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException {
 		return getPage(projectName, branchName, path, null, loadData);
@@ -270,7 +256,7 @@ class PageStore implements IPageStore {
 		}
 
 		try {
-			Map<String, Object> pageMap = getPageData(projectName, branchName, path, PAGES_DIR_NAME, commit, loadData);
+			Map<String, Object> pageMap = getPageData(projectName, branchName, path, DocumentrConstants.PAGES_DIR_NAME, commit, loadData);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
@@ -301,14 +287,14 @@ class PageStore implements IPageStore {
 			
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
-			File workingFile = toFile(pagesDir, path + META_SUFFIX);
+			File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.META_SUFFIX);
 			if (!workingFile.isFile()) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
 			
 			String json;
 			if (commit != null) {
-				json = BlobUtils.getContent(repo.r(), commit, PAGES_DIR_NAME + "/" + path + META_SUFFIX); //$NON-NLS-1$
+				json = BlobUtils.getContent(repo.r(), commit, DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 			} else {
 				json = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 			}
@@ -316,10 +302,10 @@ class PageStore implements IPageStore {
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			
 			if (loadData) {
-				workingFile = toFile(pagesDir, path + PAGE_SUFFIX);
+				workingFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 				byte[] data;
 				if (commit != null) {
-					data = BlobUtils.getRawContent(repo.r(), commit, PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+					data = BlobUtils.getRawContent(repo.r(), commit, DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 				} else {
 					data = FileUtils.readFileToByteArray(workingFile);
 				}
@@ -346,8 +332,8 @@ class PageStore implements IPageStore {
 	
 	private String getParentPagePath(String path, Repository repo) {
 		File workingDir = RepositoryUtil.getWorkingDir(repo);
-		File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-		File pageFile = toFile(pagesDir, path + PAGE_SUFFIX);
+		File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
+		File pageFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 		File dir = pageFile.getParentFile();
 		StringBuilder buf = new StringBuilder();
 		while (!dir.equals(pagesDir)) {
@@ -371,7 +357,7 @@ class PageStore implements IPageStore {
 
 		try {
 			Map<String, Object> pageMap = getPageData(projectName, branchName, pagePath + "/" + name, //$NON-NLS-1$
-					ATTACHMENTS_DIR_NAME, null, true);
+					DocumentrConstants.ATTACHMENTS_DIR_NAME, null, true);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
@@ -397,21 +383,21 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
-			File pageAttachmentsDir = toFile(attachmentsDir, pagePath);
+			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
+			File pageAttachmentsDir = Util.toFile(attachmentsDir, pagePath);
 			List<String> names = Collections.emptyList();
 			if (pageAttachmentsDir.isDirectory()) {
 				FileFilter filter = new FileFilter() {
 					@Override
 					public boolean accept(File file) {
-						return file.isFile() && file.getName().endsWith(META_SUFFIX);
+						return file.isFile() && file.getName().endsWith(DocumentrConstants.META_SUFFIX);
 					}
 				};
 				List<File> files = Lists.newArrayList(pageAttachmentsDir.listFiles(filter));
 				Function<File, String> function = new Function<File, String>() {
 					@Override
 					public String apply(File file) {
-						return StringUtils.substringBeforeLast(file.getName(), META_SUFFIX);
+						return StringUtils.substringBeforeLast(file.getName(), DocumentrConstants.META_SUFFIX);
 					}
 				};
 				names = Lists.newArrayList(Lists.transform(files, function));
@@ -434,7 +420,7 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 			return listPagePaths(pagesDir, true);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -447,7 +433,7 @@ class PageStore implements IPageStore {
 		List<File> paths = listPageFilesInDir(pagesDir, recursive);
 		String prefix = pagesDir.getAbsolutePath() + File.separator;
 		final int prefixLen = prefix.length();
-		final int pageSuffixLen = PAGE_SUFFIX.length();
+		final int pageSuffixLen = DocumentrConstants.PAGE_SUFFIX.length();
 		Function<File, String> function = new Function<File, String>() {
 			@Override
 			public String apply(File file) {
@@ -468,7 +454,7 @@ class PageStore implements IPageStore {
 			FileFilter filter = new FileFilter() {
 				@Override
 				public boolean accept(File pathname) {
-					return (pathname.isFile() && pathname.getName().endsWith(PAGE_SUFFIX)) ||
+					return (pathname.isFile() && pathname.getName().endsWith(DocumentrConstants.PAGE_SUFFIX)) ||
 							pathname.isDirectory();
 				}
 			};
@@ -508,7 +494,7 @@ class PageStore implements IPageStore {
 		Set<String> branchesWithCommit = Collections.emptySet();
 		try {
 			centralRepo = repoManager.getProjectCentralRepository(projectName);
-			String repoPath = PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX; //$NON-NLS-1$
+			String repoPath = DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX; //$NON-NLS-1$
 			RevCommit commit = CommitUtils.getLastCommit(centralRepo.r(), branchName, repoPath);
 			if (commit != null) {
 				// get all branches where this commit is in their history
@@ -567,7 +553,7 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = toFile(new File(workingDir, PAGES_DIR_NAME), path);
+			File pagesDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), path);
 			List<String> paths = Lists.newArrayList(listPagePaths(pagesDir, false));
 			Function<String, String> function = new Function<String, String>() {
 				@Override
@@ -598,9 +584,9 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
-			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
+			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 
-			File oldSubPagesDir = toFile(pagesDir, path);
+			File oldSubPagesDir = Util.toFile(pagesDir, path);
 			oldPagePaths = listPagePaths(oldSubPagesDir, true);
 			oldPagePaths = Lists.newArrayList(Lists.transform(oldPagePaths, new Function<String, String>() {
 				@Override
@@ -610,24 +596,24 @@ class PageStore implements IPageStore {
 			}));
 			oldPagePaths.add(path);
 
-			File file = toFile(pagesDir, path + PAGE_SUFFIX);
+			File file = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
 			}
-			file = toFile(pagesDir, path + META_SUFFIX);
+			file = Util.toFile(pagesDir, path + DocumentrConstants.META_SUFFIX);
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
 			}
-			file = toFile(pagesDir, path);
+			file = Util.toFile(pagesDir, path);
 			if (file.isDirectory()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
 			}
 			
-			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
-			file = toFile(attachmentsDir, path);
+			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
+			file = Util.toFile(attachmentsDir, path);
 			if (file.isDirectory()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
@@ -662,7 +648,7 @@ class PageStore implements IPageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		
-		return getPageMetadataInternal(projectName, branchName, path, PAGES_DIR_NAME);
+		return getPageMetadataInternal(projectName, branchName, path, DocumentrConstants.PAGES_DIR_NAME);
 	}
 
 	@Override
@@ -674,7 +660,7 @@ class PageStore implements IPageStore {
 		Assert.hasLength(path);
 		Assert.hasLength(name);
 		
-		return getPageMetadataInternal(projectName, branchName, path + "/" + name, ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
+		return getPageMetadataInternal(projectName, branchName, path + "/" + name, DocumentrConstants.ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
 	}
 	
 	private PageMetadata getPageMetadataInternal(String projectName, String branchName, String path, String rootDir)
@@ -684,8 +670,8 @@ class PageStore implements IPageStore {
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
-			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + META_SUFFIX); //$NON-NLS-1$
-			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
+			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			if ((metaCommit == null) && (pageCommit == null)) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
@@ -702,7 +688,7 @@ class PageStore implements IPageStore {
 
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File rootDirFile = new File(workingDir, rootDir);
-			File file = toFile(rootDirFile, path + PAGE_SUFFIX);
+			File file = Util.toFile(rootDirFile, path + DocumentrConstants.PAGE_SUFFIX);
 			
 			return new PageMetadata(lastEditedBy, lastEdited, file.length(), commit.getName());
 		} catch (GitAPIException e) {
@@ -751,7 +737,7 @@ class PageStore implements IPageStore {
 
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
-			File oldSubPagesDir = toFile(new File(workingDir, PAGES_DIR_NAME), path);
+			File oldSubPagesDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), path);
 			oldPagePaths = listPagePaths(oldSubPagesDir, true);
 			oldPagePaths = Lists.newArrayList(Lists.transform(oldPagePaths, new Function<String, String>() {
 				@Override
@@ -761,7 +747,7 @@ class PageStore implements IPageStore {
 			}));
 			oldPagePaths.add(path);
 
-			File deletedPagesSubDir = toFile(new File(workingDir, PAGES_DIR_NAME), newPagePath);
+			File deletedPagesSubDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), newPagePath);
 			deletedPagePaths = listPagePaths(deletedPagesSubDir, true);
 			deletedPagePaths = Lists.newArrayList(Lists.transform(deletedPagePaths, new Function<String, String>() {
 				@Override
@@ -774,40 +760,40 @@ class PageStore implements IPageStore {
 			Git git = Git.wrap(repo.r());
 			AddCommand addCommand = git.add();
 
-			for (String dirName : Sets.newHashSet(PAGES_DIR_NAME, ATTACHMENTS_DIR_NAME)) {
+			for (String dirName : Sets.newHashSet(DocumentrConstants.PAGES_DIR_NAME, DocumentrConstants.ATTACHMENTS_DIR_NAME)) {
 				File dir = new File(workingDir, dirName);
 				
-				File newSubPagesDir = toFile(dir, newPagePath);
+				File newSubPagesDir = Util.toFile(dir, newPagePath);
 				if (newSubPagesDir.exists()) {
 					git.rm().addFilepattern(dirName + "/" + newPagePath).call(); //$NON-NLS-1$
 				}
-				File newPageFile = toFile(dir, newPagePath + PAGE_SUFFIX);
+				File newPageFile = Util.toFile(dir, newPagePath + DocumentrConstants.PAGE_SUFFIX);
 				if (newPageFile.exists()) {
-					git.rm().addFilepattern(dirName + "/" + newPagePath + PAGE_SUFFIX).call(); //$NON-NLS-1$
+					git.rm().addFilepattern(dirName + "/" + newPagePath + DocumentrConstants.PAGE_SUFFIX).call(); //$NON-NLS-1$
 				}
-				File newMetaFile = toFile(dir, newPagePath + META_SUFFIX);
+				File newMetaFile = Util.toFile(dir, newPagePath + DocumentrConstants.META_SUFFIX);
 				if (newMetaFile.exists()) {
-					git.rm().addFilepattern(dirName + "/" + newPagePath + META_SUFFIX).call(); //$NON-NLS-1$
+					git.rm().addFilepattern(dirName + "/" + newPagePath + DocumentrConstants.META_SUFFIX).call(); //$NON-NLS-1$
 				}
 				
-				File newParentPageDir = toFile(dir, newParentPagePath);
-				File subPagesDir = toFile(dir, path);
+				File newParentPageDir = Util.toFile(dir, newParentPagePath);
+				File subPagesDir = Util.toFile(dir, path);
 				if (subPagesDir.exists()) {
 					FileUtils.copyDirectoryToDirectory(subPagesDir, newParentPageDir);
 					git.rm().addFilepattern(dirName + "/" + path).call(); //$NON-NLS-1$
 					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				File pageFile = toFile(dir, path + PAGE_SUFFIX);
+				File pageFile = Util.toFile(dir, path + DocumentrConstants.PAGE_SUFFIX);
 				if (pageFile.exists()) {
 					FileUtils.copyFileToDirectory(pageFile, newParentPageDir);
-					git.rm().addFilepattern(dirName + "/" + path + PAGE_SUFFIX).call(); //$NON-NLS-1$
-					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + PAGE_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
+					git.rm().addFilepattern(dirName + "/" + path + DocumentrConstants.PAGE_SUFFIX).call(); //$NON-NLS-1$
+					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				File metaFile = toFile(dir, path + META_SUFFIX);
+				File metaFile = Util.toFile(dir, path + DocumentrConstants.META_SUFFIX);
 				if (metaFile.exists()) {
 					FileUtils.copyFileToDirectory(metaFile, newParentPageDir);
-					git.rm().addFilepattern(dirName + "/" + path + META_SUFFIX).call(); //$NON-NLS-1$
-					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + META_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
+					git.rm().addFilepattern(dirName + "/" + path + DocumentrConstants.META_SUFFIX).call(); //$NON-NLS-1$
+					addCommand.addFilepattern(dirName + "/" + newParentPagePath + "/" + pageName + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 
@@ -858,7 +844,7 @@ class PageStore implements IPageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String filePath = PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX; //$NON-NLS-1$
+			String filePath = DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX; //$NON-NLS-1$
 			
 			Set<String> realVersions = Sets.newHashSet();
 			for (String version : versions) {
@@ -911,14 +897,14 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 
 			CommitFinder finder = new CommitFinder(repo.r());
-			TreeFilter pathFilter = PathFilterUtils.or(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			TreeFilter pathFilter = PathFilterUtils.or(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			finder.setFilter(pathFilter);
 			CommitListFilter commits = new CommitListFilter();
 			finder.setMatcher(new AndCommitFilter(new CommitLimitFilter(50), commits));
 			finder.find();
 			
 			for (RevCommit commit : commits.getCommits()) {
-				result.add(toPageVersion(commit));
+				result.add(PageUtil.toPageVersion(commit));
 			}
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -928,18 +914,6 @@ class PageStore implements IPageStore {
 		return result;
 	}
 	
-	private PageVersion toPageVersion(RevCommit commit) {
-		PersonIdent committer = commit.getAuthorIdent();
-		String lastEditedBy = null;
-		if (committer != null) {
-			lastEditedBy = committer.getName();
-		}
-		// TODO: would love to use authored time
-		Date lastEdited = new Date(commit.getCommitTime() * 1000L);
-		String commitName = commit.getName();
-		return new PageVersion(commitName, lastEditedBy, lastEdited);
-	}
-
 	@Override
 	public void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException {
@@ -955,14 +929,14 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
-			File attachmentsDir = new File(workingDir, ATTACHMENTS_DIR_NAME);
+			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
 			boolean deleted = false;
-			File file = toFile(attachmentsDir, pagePath + "/" + name + PAGE_SUFFIX); //$NON-NLS-1$
+			File file = Util.toFile(attachmentsDir, pagePath + "/" + name + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
 			}
-			file = toFile(attachmentsDir, pagePath + "/" + name + META_SUFFIX); //$NON-NLS-1$
+			file = Util.toFile(attachmentsDir, pagePath + "/" + name + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
 				deleted = true;
@@ -999,21 +973,21 @@ class PageStore implements IPageStore {
 		ILockedRepository repo = null;
 		try {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
-			String text = BlobUtils.getContent(repo.r(), version, PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX); //$NON-NLS-1$
+			String text = BlobUtils.getContent(repo.r(), version, DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-			File file = toFile(pagesDir, path + PAGE_SUFFIX);
+			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
+			File file = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 			FileUtils.writeStringToFile(file, text, Charsets.UTF_8.name());
 			
 			Git git = Git.wrap(repo.r());
 			git.add()
-				.addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
+				.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
 				.call();
 			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
-				.setMessage(PAGES_DIR_NAME + "/" + path) //$NON-NLS-1$
+				.setMessage(DocumentrConstants.PAGES_DIR_NAME + "/" + path) //$NON-NLS-1$
 				.call();
 			git.push().call();
 		} catch (GitAPIException e) {
@@ -1028,159 +1002,6 @@ class PageStore implements IPageStore {
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
-	}
-
-	@Override
-	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
-			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
-			User user) throws IOException {
-
-		Assert.hasLength(projectName);
-		Assert.hasLength(path);
-		Assert.notEmpty(commits);
-		Assert.notEmpty(targetBranches);
-		Assert.notNull(conflictResolves);
-		Assert.notNull(user);
-
-		// always do a dry run first and return early if it fails
-		if (!dryRun) {
-			SortedMap<String, List<CommitCherryPickResult>> results = cherryPick(
-					projectName, path, commits, targetBranches, conflictResolves, true, user);
-			for (List<CommitCherryPickResult> branchResults : results.values()) {
-				for (CommitCherryPickResult result : branchResults) {
-					if (result.getStatus() != CommitCherryPickResult.Status.OK) {
-						return results;
-					}
-				}
-			}
-		}
-		
-		try {
-			SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
-			for (String targetBranch : targetBranches) {
-				List<CommitCherryPickResult> branchResults = cherryPick(
-						projectName, path, commits, targetBranch, conflictResolves, dryRun, user);
-				results.put(targetBranch, branchResults);
-			}
-			return results;
-		} catch (GitAPIException e) {
-			throw new IOException(e);
-		}
-	}
-
-	private List<CommitCherryPickResult> cherryPick(String projectName, String path, List<String> commits,
-			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun, User user)
-			throws IOException, GitAPIException {
-		
-		ILockedRepository repo = null;
-		List<CommitCherryPickResult> cherryPickResults = Lists.newArrayList();
-		boolean hadConflicts = false;
-		boolean failed = false;
-		try {
-			repo = repoManager.getProjectBranchRepository(projectName, targetBranch);
-			
-			String tempBranchName = "_temp_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
-			Git git = Git.wrap(repo.r());
-			
-			git.branchCreate()
-				.setName(tempBranchName)
-				.setStartPoint(targetBranch)
-				.call();
-			
-			git.checkout()
-				.setName(tempBranchName)
-				.call();
-
-			loop: for (String commit : commits) {
-				PageVersion pageVersion = toPageVersion(CommitUtils.getCommit(repo.r(), commit));
-				if (!hadConflicts) {
-					CherryPickResult result = git.cherryPick()
-						.include(repo.r().resolve(commit))
-						.call();
-					CherryPickStatus status = result.getStatus();
-					switch (status) {
-						case OK:
-							cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK));
-							break;
-						case CONFLICTING:
-							{
-								File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-								File pagesDir = new File(workingDir, PAGES_DIR_NAME);
-								File workingFile = toFile(pagesDir, path + PAGE_SUFFIX);
-
-								String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, commit);
-								if (resolveText != null) {
-									FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
-									git.add()
-										.addFilepattern(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
-										.call();
-									PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
-									git.commit()
-										.setAuthor(ident)
-										.setCommitter(ident)
-										.setMessage(PAGES_DIR_NAME + "/" + path + PAGE_SUFFIX) //$NON-NLS-1$
-										.call();
-									cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK));
-								} else {
-									String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
-									cherryPickResults.add(new CommitCherryPickResult(pageVersion, text));
-									hadConflicts = true;
-								}
-							}
-							break;
-						default:
-							failed = true;
-							break loop;
-					}
-				} else {
-					cherryPickResults.add(new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN));
-				}
-			}
-
-			if (hadConflicts || failed) {
-				git.reset()
-					.setMode(ResetCommand.ResetType.HARD)
-					.call();
-			}
-			
-			git.checkout()
-				.setName(targetBranch)
-				.call();
-			
-			if (!dryRun && !hadConflicts && !failed) {
-				git.merge()
-					.include(repo.r().resolve(tempBranchName))
-					.call();
-			}
-			
-			git.branchDelete()
-				.setBranchNames(tempBranchName)
-				.setForce(true)
-				.call();
-
-			if (failed) {
-				throw new IOException("cherry-picking failed"); //$NON-NLS-1$
-			}
-		} finally {
-			RepositoryUtil.closeQuietly(repo);
-		}
-
-		if (!dryRun && !hadConflicts && !failed) {
-			eventBus.post(new PageChangedEvent(projectName, targetBranch, path));
-		}
-
-		return cherryPickResults;
-	}
-
-	private String getCherryPickConflictResolveText(Set<CommitCherryPickConflictResolve> conflictResolves,
-			String targetBranch, String commit) {
-		
-		for (CommitCherryPickConflictResolve resolve : conflictResolves) {
-			if (resolve.getTargetBranch().equals(targetBranch) && resolve.getCommit().equals(commit)) {
-				return resolve.getText();
-			}
-		}
-		return null;
 	}
 
 	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

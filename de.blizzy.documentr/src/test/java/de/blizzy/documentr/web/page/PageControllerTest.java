@@ -63,6 +63,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.CommitCherryPickConflictResolve;
 import de.blizzy.documentr.page.CommitCherryPickResult;
+import de.blizzy.documentr.page.ICherryPicker;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
@@ -85,6 +86,8 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	
 	@Mock
 	private IPageStore pageStore;
+	@Mock
+	private ICherryPicker cherryPicker;
 	@Mock
 	private GlobalRepositoryManager repoManager;
 	@Mock
@@ -489,7 +492,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						CommitCherryPickResult.Status.OK));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
 
@@ -524,7 +527,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						"conflictText"));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
 		
@@ -566,7 +569,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						CommitCherryPickResult.Status.OK));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(pageStore.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), resolves, false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
 		

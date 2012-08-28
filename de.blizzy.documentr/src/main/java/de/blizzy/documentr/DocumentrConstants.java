@@ -70,5 +70,17 @@ public final class DocumentrConstants {
 	/** Number of threads the task executor thread pool uses. */
 	public static final int TASK_EXECUTOR_THREADS = 8;
 
+	/** Name of the pages directory inside a repository. */
+	public static final String PAGES_DIR_NAME = "pages"; //$NON-NLS-1$
+
+	/** Name of the attachments directory inside a repository. */
+	public static final String ATTACHMENTS_DIR_NAME = "attachments"; //$NON-NLS-1$
+
+	/** Suffix of a page/attachment file in a repository. */
+	public static final String PAGE_SUFFIX = ".page"; //$NON-NLS-1$
+
+	/** Suffix of a metadata file in a repository. */
+	public static final String META_SUFFIX = ".meta"; //$NON-NLS-1$
+
 	private DocumentrConstants() {}
 }

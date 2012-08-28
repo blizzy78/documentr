@@ -30,7 +30,6 @@ import org.junit.Test.None;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.util.Util;
 
 public class UtilTest extends AbstractDocumentrTest {
 	@Test
@@ -91,5 +90,13 @@ public class UtilTest extends AbstractDocumentrTest {
 		Util.deleteQuietly(dir);
 		
 		out.close();
+	}
+	
+	@Test
+	public void toFile() {
+		File dir = new File("."); //$NON-NLS-1$
+		File result = Util.toFile(dir, "x/y/z"); //$NON-NLS-1$
+		File expectedFile = new File(new File(new File(dir, "x"), "y"), "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals(expectedFile, result);
 	}
 }
