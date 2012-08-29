@@ -31,8 +31,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -107,6 +105,7 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PagesDeletedEvent;
 import de.blizzy.documentr.repository.BranchCreatedEvent;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
@@ -129,19 +128,19 @@ public class PageIndex {
 	private static final int REFRESH_INTERVAL = 30; // seconds
 	private static final int INTERACTIVE_TIMEOUT = 5; // seconds
 	@SuppressWarnings("nls")
-	private static final String[] REMOVE_HTML_TAGS = {
-		"(<br(?: .*?)?(?:/)?>)", "\n$1",
-		"(<p(?: .*?)?>)", "\n$1",
-		"(<pre(?: .*?)?>)", "\n$1",
-		"(<div(?: .*?)?>)", "\n$1",
-		"(<ol(?: .*?)?>)", "\n$1",
-		"(<ul(?: .*?)?>)", "\n$1",
-		"(<dl(?: .*?)?>)", "\n$1",
-		"(<td(?: .*?)?>)", "\n$1",
-		"(<h[0-9]+(?: .*?)?>)", "\n$1",
-		"<script.*?>.*?</script>", StringUtils.EMPTY,
-		"<.*?>", StringUtils.EMPTY
-	};
+	private static final List<Replacement> REMOVE_HTML_TAGS = Lists.newArrayList(
+		Replacement.dotAllNoCase("(<br(?: .*?)?(?:/)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<p(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<pre(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<div(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<ol(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<ul(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<dl(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<td(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("(<h[0-9]+(?: .*?)?>)", "\n$1"),
+		Replacement.dotAllNoCase("<script.*?>.*?</script>", StringUtils.EMPTY),
+		Replacement.dotAllNoCase("<.*?>", StringUtils.EMPTY)
+	);
 	
 	@Autowired
 	private Settings settings;
@@ -307,12 +306,8 @@ public class PageIndex {
 	}
 	
 	private String removeHtmlTags(String html) {
-		for (int i = 0; i < REMOVE_HTML_TAGS.length; i += 2) {
-			String re = REMOVE_HTML_TAGS[i];
-			String replaceWith = REMOVE_HTML_TAGS[i + 1];
-			Pattern pattern = Pattern.compile(re, Pattern.DOTALL + Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(html);
-			html = matcher.replaceAll(replaceWith);
+		for (Replacement replacement : REMOVE_HTML_TAGS) {
+			html = replacement.replaceAll(html);
 		}
 		return html;
 	}

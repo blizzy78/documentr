@@ -20,7 +20,6 @@ package de.blizzy.documentr.web.markdown;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Parboiled;
@@ -35,6 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
+
+import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
@@ -46,36 +48,23 @@ public class MarkdownProcessor {
 
 	private static final String TEXT_RANGE_RE = "data-text-range=\"[0-9]+,[0-9]+\""; //$NON-NLS-1$
 	@SuppressWarnings("nls")
-	private static final Pattern[] CLEANUP_RE = {
-		Pattern.compile("<p>(<p(?!re).*?</p>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p>(<div.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p>(<ul.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p>(<ol.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		
-		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		Pattern.compile("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", Pattern.DOTALL + Pattern.CASE_INSENSITIVE),
-		
-		Pattern.compile(
-				"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
-				"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
-				"<ul class=\"thumbnails\">(<li class=\"span3\">" +
-				"<a class=\"thumbnail\" (?:[^>]+)>)",
-				Pattern.DOTALL)
-	};
-	@SuppressWarnings("nls")
-	private static final String[] CLEANUP_REPLACE_WITH = {
-		"$1",
-		"$1",
-		"$1",
-		"$1",
-		
-		"<div $1$2",
-		"<ul $1$2",
-		"<ol $1$2",
-		
-		"$1$2"
-	};
+	private static final List<Replacement> CLEANUP = Lists.newArrayList(
+			Replacement.dotAllNoCase("<p>(<p(?!re).*?</p>)</p>", "$1"),
+			Replacement.dotAllNoCase("<p>(<div.*?</div>)</p>", "$1"),
+			Replacement.dotAllNoCase("<p>(<ul.*?</ul>)</p>", "$1"),
+			Replacement.dotAllNoCase("<p>(<ol.*?</ol>)</p>", "$1"),
+			
+			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", "<div $1$2"),
+			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", "<ul $1$2"),
+			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", "<ol $1$2"),
+			
+			Replacement.dotAllNoCase(
+					"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
+					"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
+					"<ul class=\"thumbnails\">(<li class=\"span3\">" +
+					"<a class=\"thumbnail\" (?:[^>]+)>)",
+					"$1$2")
+	);
 	
 	@Autowired
 	private MacroFactory macroFactory;
@@ -255,8 +244,8 @@ public class MarkdownProcessor {
 	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations, boolean cacheable) {
 		for (;;) {
 			String newHtml = html;
-			for (int i = 0; i < CLEANUP_RE.length; i++) {
-				newHtml = CLEANUP_RE[i].matcher(newHtml).replaceAll(CLEANUP_REPLACE_WITH[i]);
+			for (Replacement replacement : CLEANUP) {
+				newHtml = replacement.replaceAll(newHtml);
 			}
 			for (MacroInvocation macroInvocation : macroInvocations) {
 				IMacro macro = macroInvocation.getMacro();
