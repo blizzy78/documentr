@@ -496,7 +496,11 @@ public class PageIndex {
 			tokenStream.end();
 		} finally {
 			if (tokenStream != null) {
-				tokenStream.close();
+				try {
+					tokenStream.close();
+				} catch (IOException e) {
+					// ignore
+				}
 			}
 		}
 		
