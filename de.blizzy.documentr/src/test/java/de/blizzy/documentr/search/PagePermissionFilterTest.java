@@ -45,6 +45,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.io.Closeables;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 
 public class PagePermissionFilterTest extends AbstractDocumentrTest {
@@ -74,9 +76,9 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 	}
 	
 	@After
-	public void tearDown() throws IOException {
-		reader.close();
-		directory.close();
+	public void tearDown() {
+		Closeables.closeQuietly(reader);
+		Closeables.closeQuietly(directory);
 	}
 	
 	@Test

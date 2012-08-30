@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.Test.None;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 
@@ -89,7 +90,7 @@ public class UtilTest extends AbstractDocumentrTest {
 		
 		Util.deleteQuietly(dir);
 		
-		out.close();
+		Closeables.closeQuietly(out);
 	}
 	
 	@Test

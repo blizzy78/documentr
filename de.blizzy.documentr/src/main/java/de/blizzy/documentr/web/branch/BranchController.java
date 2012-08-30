@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.common.io.Closeables;
+
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -43,7 +45,6 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
-import de.blizzy.documentr.repository.RepositoryUtil;
 
 @Controller
 @RequestMapping("/branch")
@@ -82,7 +83,7 @@ public class BranchController {
 		try {
 			repo = repoManager.createProjectBranchRepository(form.getProjectName(), form.getName(), form.getStartingBranch());
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 		
 		if (firstBranch) {

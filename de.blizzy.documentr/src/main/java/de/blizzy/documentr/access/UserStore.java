@@ -45,6 +45,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.StringMap;
@@ -84,7 +85,7 @@ public class UserStore {
 		} catch (IllegalStateException e) {
 			// okay
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 		
 		if (created) {
@@ -150,7 +151,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -172,7 +173,7 @@ public class UserStore {
 			
 			return getUser(loginName, json);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -218,7 +219,7 @@ public class UserStore {
 			Collections.sort(users);
 			return users;
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -261,7 +262,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -288,7 +289,7 @@ public class UserStore {
 			Collections.sort(users);
 			return users;
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -319,7 +320,7 @@ public class UserStore {
 			Role role = new Role(roleName, rolePermissions);
 			return role;
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -376,7 +377,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -415,7 +416,7 @@ public class UserStore {
 			
 			return authorities;
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -448,7 +449,7 @@ public class UserStore {
 			
 			throw new OpenIdNotFoundException(openId);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 

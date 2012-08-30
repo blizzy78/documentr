@@ -34,16 +34,6 @@ public final class RepositoryUtil {
 		}
 	}
 	
-	public static void closeQuietly(ILockedRepository repo) {
-		if (repo != null) {
-			try {
-				repo.close();
-			} catch (RuntimeException e) {
-				// ignore
-			}
-		}
-	}
-	
 	public static File getWorkingDir(Repository repo) {
 		return repo.getDirectory().getParentFile();
 	}

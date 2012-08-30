@@ -89,6 +89,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -200,18 +201,10 @@ public class PageIndex {
 	public void destroy() {
 		eventBus.unregister(this);
 		
-		try {
-			searcherManager.close();
-		} catch (IOException e) {
-			// ignore
-		}
-		try {
-			readerManager.close();
-		} catch (IOException e) {
-			// ignore
-		}
-		IndexUtil.closeQuietly(writer);
-		IndexUtil.closeQuietly(directory);
+		Closeables.closeQuietly(searcherManager);
+		Closeables.closeQuietly(readerManager);
+		Closeables.closeQuietly(writer);
+		Closeables.closeQuietly(directory);
 	}
 	
 	private void reindexEverything() throws IOException {
@@ -495,13 +488,7 @@ public class PageIndex {
 			}
 			tokenStream.end();
 		} finally {
-			if (tokenStream != null) {
-				try {
-					tokenStream.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
+			Closeables.closeQuietly(tokenStream);
 		}
 		
 		Collections.reverse(words);

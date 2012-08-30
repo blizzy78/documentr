@@ -17,9 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import java.io.Closeable;
+
 import org.eclipse.jgit.lib.Repository;
 
-public interface ILockedRepository {
+public interface ILockedRepository extends Closeable {
 	Repository r();
-	void close();
 }

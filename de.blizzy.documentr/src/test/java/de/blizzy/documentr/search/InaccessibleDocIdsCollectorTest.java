@@ -45,6 +45,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
+import com.google.common.io.Closeables;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -77,9 +79,9 @@ public class InaccessibleDocIdsCollectorTest extends AbstractDocumentrTest {
 	}
 	
 	@After
-	public void tearDown() throws IOException {
-		reader.close();
-		directory.close();
+	public void tearDown() {
+		Closeables.closeQuietly(reader);
+		Closeables.closeQuietly(directory);
 	}
 	
 	@Test

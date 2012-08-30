@@ -23,8 +23,9 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.io.Closeables;
 
 class TrimWriter {
 	void write(String text, OutputStream out, Charset charset) throws IOException {
@@ -71,7 +72,7 @@ class TrimWriter {
 				}
 			}
 		} finally {
-			IOUtils.closeQuietly(in);
+			Closeables.closeQuietly(in);
 		}
 	}
 

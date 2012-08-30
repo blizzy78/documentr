@@ -22,6 +22,8 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.io.Closeables;
+
 public class LockedRepositoryTest {
 	private LockManager lockManager;
 
@@ -36,7 +38,7 @@ public class LockedRepositoryTest {
 		when(lockManager.lockProjectCentral("project")).thenReturn(lock); //$NON-NLS-1$
 
 		ILockedRepository repo = LockedRepository.lockProjectCentral("project", lockManager); //$NON-NLS-1$
-		repo.close();
+		Closeables.closeQuietly(repo);
 		
 		verify(lockManager).unlock(lock);
 	}
@@ -47,7 +49,7 @@ public class LockedRepositoryTest {
 		when(lockManager.lockProjectBranch("project", "branch")).thenReturn(lock); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		ILockedRepository repo = LockedRepository.lockProjectBranch("project", "branch", lockManager); //$NON-NLS-1$ //$NON-NLS-2$
-		repo.close();
+		Closeables.closeQuietly(repo);
 		
 		verify(lockManager).unlock(lock);
 	}

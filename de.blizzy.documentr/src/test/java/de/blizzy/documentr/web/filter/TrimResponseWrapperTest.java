@@ -28,10 +28,10 @@ import java.util.Arrays;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Closeables;
 
 public class TrimResponseWrapperTest {
 	@Test
@@ -56,7 +56,7 @@ public class TrimResponseWrapperTest {
 			out = wrapper.getOutputStream();
 			out.write(data);
 		} finally {
-			IOUtils.closeQuietly(out);
+			Closeables.closeQuietly(out);
 		}
 		
 		assertTrue(Arrays.equals(data, wrapper.getData()));
@@ -75,7 +75,7 @@ public class TrimResponseWrapperTest {
 			wrapper.setContentType("text/plain"); //$NON-NLS-1$
 			out.write(data);
 		} finally {
-			IOUtils.closeQuietly(out);
+			Closeables.closeQuietly(out);
 		}
 		
 		assertTrue(Arrays.equals(data, wrapper.getData()));
@@ -96,7 +96,7 @@ public class TrimResponseWrapperTest {
 			out = wrapper.getWriter();
 			out.write(s);
 		} finally {
-			IOUtils.closeQuietly(out);
+			Closeables.closeQuietly(out);
 		}
 		
 		assertTrue(Arrays.equals(s.getBytes(Charsets.UTF_8), wrapper.getData()));

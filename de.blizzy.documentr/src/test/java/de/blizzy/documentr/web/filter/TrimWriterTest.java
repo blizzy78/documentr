@@ -22,10 +22,10 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Closeables;
 
 public class TrimWriterTest {
 	@Test
@@ -49,7 +49,7 @@ public class TrimWriterTest {
 					"  zzz \t  \r\n";
 			writer.write(text, out, Charsets.UTF_8);
 		} finally {
-			IOUtils.closeQuietly(out);
+			Closeables.closeQuietly(out);
 		}
 		
 		String result = new String(out.toByteArray(), Charsets.UTF_8);

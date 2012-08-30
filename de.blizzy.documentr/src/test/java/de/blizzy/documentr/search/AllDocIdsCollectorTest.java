@@ -42,6 +42,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.io.Closeables;
+
 public class AllDocIdsCollectorTest {
 	private Directory directory;
 	private IndexReader reader;
@@ -64,9 +66,9 @@ public class AllDocIdsCollectorTest {
 	}
 
 	@After
-	public void tearDown() throws IOException {
-		reader.close();
-		directory.close();
+	public void tearDown() {
+		Closeables.closeQuietly(reader);
+		Closeables.closeQuietly(directory);
 	}
 
 	@Test

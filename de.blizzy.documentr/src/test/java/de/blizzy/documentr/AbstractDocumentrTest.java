@@ -30,9 +30,9 @@ import org.junit.Before;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.repository.ILockedRepository;
-import de.blizzy.documentr.repository.RepositoryUtil;
 
 public abstract class AbstractDocumentrTest {
 	private static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
@@ -53,7 +53,7 @@ public abstract class AbstractDocumentrTest {
 	@After
 	public void deleteTempDirs() {
 		for (ILockedRepository repo : repositories) {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 		repositories.clear();
 		

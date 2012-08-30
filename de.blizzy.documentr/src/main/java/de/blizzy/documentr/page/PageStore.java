@@ -60,6 +60,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -137,7 +138,7 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			return savePageInternal(projectName, branchName, path, suffix, page, baseCommit, rootDir, user, repo, true);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -327,7 +328,7 @@ class PageStore implements IPageStore {
 			
 			return pageMap;
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -408,7 +409,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -426,7 +427,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -513,7 +514,7 @@ class PageStore implements IPageStore {
 				}
 			}
 		} finally {
-			RepositoryUtil.closeQuietly(centralRepo);
+			Closeables.closeQuietly(centralRepo);
 		}
 		
 		List<String> branches = Lists.newArrayList(branchesWithCommit);
@@ -567,7 +568,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -635,7 +636,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 
 		if (deleted) {
@@ -695,7 +696,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -818,7 +819,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 
 		Set<String> allDeletedPagePaths = Sets.newHashSet(oldPagePaths);
@@ -879,7 +880,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 		return result;
 	}
@@ -910,7 +911,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 		return result;
 	}
@@ -958,7 +959,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 	}
 	
@@ -994,7 +995,7 @@ class PageStore implements IPageStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			RepositoryUtil.closeQuietly(repo);
+			Closeables.closeQuietly(repo);
 		}
 
 		eventBus.post(new PageChangedEvent(projectName, branchName, path));

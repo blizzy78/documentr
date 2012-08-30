@@ -39,6 +39,7 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TokenSources;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.util.Util;
 
@@ -85,7 +86,7 @@ class GetSearchHitTask implements Callable<SearchHit> {
 		} catch (InvalidTokenOffsetsException e) {
 			// ignore
 		} finally {
-			IndexUtil.closeQuietly(tokenStream);
+			Closeables.closeQuietly(tokenStream);
 		}
 		return new SearchHit(projectName, branchName, path, title, highlightedText, tags);
 	}
