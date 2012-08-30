@@ -174,8 +174,7 @@ class CherryPicker implements ICherryPicker {
 			throws IOException, GitAPIException {
 		
 		CommitCherryPickResult cherryPickResult;
-		Git git = Git.wrap(repo.r());
-		CherryPickResult result = git.cherryPick()
+		CherryPickResult result = Git.wrap(repo.r()).cherryPick()
 				.include(repo.r().resolve(pageVersion.getCommitName()))
 				.call();
 		CherryPickStatus status = result.getStatus();
@@ -184,35 +183,43 @@ class CherryPicker implements ICherryPicker {
 				cherryPickResult = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
 				break;
 			case CONFLICTING:
-				{
-					File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-					File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
-					File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
-
-					String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, pageVersion.getCommitName());
-					if (resolveText != null) {
-						FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
-						git.add()
-							.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
-							.call();
-						PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
-						git.commit()
-							.setAuthor(ident)
-							.setCommitter(ident)
-							.setMessage(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
-							.call();
-						cherryPickResult = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
-					} else {
-						String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
-						cherryPickResult = new CommitCherryPickResult(pageVersion, text);
-					}
-				}
+				cherryPickResult = tryResolveConflict(repo, path, pageVersion, targetBranch, conflictResolves, user);
 				break;
 			default:
 				cherryPickResult = null;
 				break;
 		}
 		return cherryPickResult;
+	}
+
+	private CommitCherryPickResult tryResolveConflict(ILockedRepository repo, String path, PageVersion pageVersion,
+			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, User user)
+			throws IOException, GitAPIException {
+		
+		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+		File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
+		File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
+
+		String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, pageVersion.getCommitName());
+		CommitCherryPickResult result;
+		if (resolveText != null) {
+			FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
+			Git git = Git.wrap(repo.r());
+			git.add()
+				.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+				.call();
+			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+				.call();
+			result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
+		} else {
+			String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
+			result = new CommitCherryPickResult(pageVersion, text);
+		}
+		return result;
 	}
 
 	private String getCherryPickConflictResolveText(Set<CommitCherryPickConflictResolve> conflictResolves,
