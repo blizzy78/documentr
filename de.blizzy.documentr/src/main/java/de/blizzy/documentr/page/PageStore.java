@@ -50,6 +50,8 @@ import org.gitective.core.filter.commit.AndCommitFilter;
 import org.gitective.core.filter.commit.CommitFilter;
 import org.gitective.core.filter.commit.CommitLimitFilter;
 import org.gitective.core.filter.commit.CommitListFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -74,6 +76,8 @@ import de.blizzy.documentr.util.Util;
 
 @Component
 class PageStore implements IPageStore {
+	private static final Logger log = LoggerFactory.getLogger(PageStore.class);
+	
 	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
@@ -257,8 +261,15 @@ class PageStore implements IPageStore {
 			Assert.hasLength(commit);
 		}
 
+		if (log.isDebugEnabled()) {
+			log.debug("loading page {}/{}/{}, commit: {}, loadData: {}", new Object[] { //$NON-NLS-1$
+					projectName, branchName, Util.toURLPagePath(path), commit, Boolean.valueOf(loadData)
+			});
+		}
+
 		try {
-			Map<String, Object> pageMap = getPageData(projectName, branchName, path, DocumentrConstants.PAGES_DIR_NAME, commit, loadData);
+			Map<String, Object> pageMap = getPageData(projectName, branchName, path, DocumentrConstants.PAGES_DIR_NAME,
+					commit, loadData);
 			String parentPagePath = (String) pageMap.get(PARENT_PAGE_PATH);
 			String title = (String) pageMap.get(TITLE);
 			String contentType = (String) pageMap.get(CONTENT_TYPE);
