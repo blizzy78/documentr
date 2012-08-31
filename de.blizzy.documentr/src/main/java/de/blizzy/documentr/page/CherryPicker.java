@@ -227,7 +227,7 @@ class CherryPicker implements ICherryPicker {
 			String targetBranch, String commit) {
 		
 		for (CommitCherryPickConflictResolve resolve : conflictResolves) {
-			if (resolve.getTargetBranch().equals(targetBranch) && resolve.getCommit().equals(commit)) {
+			if (resolve.isApplicable(targetBranch, commit)) {
 				return resolve.getText();
 			}
 		}

@@ -51,6 +51,13 @@ public class CommitCherryPickConflictResolveTest {
 	}
 	
 	@Test
+	public void isApplicable() {
+		assertTrue(resolve.isApplicable(BRANCH, COMMIT));
+		assertFalse(resolve.isApplicable("branch2", COMMIT)); //$NON-NLS-1$
+		assertFalse(resolve.isApplicable(BRANCH, "commit2")); //$NON-NLS-1$
+	}
+	
+	@Test
 	@SuppressWarnings("nls")
 	public void testEquals() {
 		assertEqualsContract(
