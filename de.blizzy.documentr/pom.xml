@@ -385,6 +385,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.3.2</version>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/integration-test/java</source>
+								<source>src/slow-test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		
 		<pluginManagement>
