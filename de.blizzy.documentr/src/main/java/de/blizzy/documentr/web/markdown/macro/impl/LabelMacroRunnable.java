@@ -15,22 +15,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public abstract class AbstractMarkdownMacro extends AbstractMacro {
+class LabelMacroRunnable implements IMacroRunnable {
 	@Override
-	public final String getHtml(String body) {
-		String markdown = getMarkdown(body);
-		if (StringUtils.isNotBlank(markdown)) {
-			HtmlSerializerContext context = getHtmlSerializerContext();
-			return context.markdownToHTML(markdown);
-		}
-		return null;
+	public String getHtml(IMacroContext macroContext) {
+		String params = macroContext.getParameters();
+		String type = StringUtils.substringBefore(params, " ").trim(); //$NON-NLS-1$
+		String text = StringUtils.substringAfter(params, " ").trim(); //$NON-NLS-1$
+		return "<span class=\"label label-" + StringEscapeUtils.escapeHtml4(type) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				StringEscapeUtils.escapeHtml4(text) + "</span>"; //$NON-NLS-1$
 	}
-	
-	protected abstract String getMarkdown(String body);
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
+	}
 }

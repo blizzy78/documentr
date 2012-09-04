@@ -15,40 +15,41 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import org.apache.commons.lang3.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
-public class AbstractMarkdownMacroTest {
-	private static final class TestMacro extends AbstractMarkdownMacro {
-		@Override
-		protected String getMarkdown(String body) {
-			return getParameters();
-		}
+public class AbstractMarkdownMacroRunnableTest extends AbstractDocumentrTest {
+	@Mock
+	private IMacroContext context;
+	@Mock
+	private HtmlSerializerContext htmlSerializerContext;
+
+	@Before
+	public void setUp() {
+		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 	}
 	
 	@Test
 	public void getHtml() {
-		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
-		when(context.markdownToHTML(anyString())).thenReturn("markdown"); //$NON-NLS-1$
-		
-		TestMacro macro = new TestMacro();
-		macro.setHtmlSerializerContext(context);
-		
-		macro.setParameters(null);
-		assertNull(macro.getHtml(null));
+		when(htmlSerializerContext.markdownToHTML("markdown")).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		macro.setParameters(StringUtils.EMPTY);
-		assertNull(macro.getHtml(null));
+		AbstractMarkdownMacroRunnable runnable = new AbstractMarkdownMacroRunnable() {
+			@Override
+			String getMarkdown(IMacroContext macroContext) {
+				return "markdown"; //$NON-NLS-1$
+			}
+		};
 
-		macro.setParameters("foo"); //$NON-NLS-1$
-		assertEquals("markdown", macro.getHtml(null)); //$NON-NLS-1$
+		assertEquals("html", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

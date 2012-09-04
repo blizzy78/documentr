@@ -15,33 +15,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.factory;
+package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.util.Assert;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-class MacroContext implements IMacroContext {
-	private IPageStore pageStore;
-	private DocumentrPermissionEvaluator permissionEvaluator;
-
-	MacroContext(IPageStore pageStore, DocumentrPermissionEvaluator permissionEvaluator) {
-		Assert.notNull(pageStore);
-		Assert.notNull(permissionEvaluator);
-
-		this.pageStore = pageStore;
-		this.permissionEvaluator = permissionEvaluator;
+class YoutubeMacroRunnable implements IMacroRunnable {
+	@Override
+	public String getHtml(IMacroContext macroContext) {
+		String videoId = macroContext.getParameters().trim();
+		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getQueryParams().get("v").get(0); //$NON-NLS-1$
+		}
+		
+		return "<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/" + videoId + //$NON-NLS-1$
+				"?rel=0\" frameborder=\"0\" allowfullscreen></iframe>"; //$NON-NLS-1$
 	}
 
 	@Override
-	public IPageStore getPageStore() {
-		return pageStore;
-	}
-
-	@Override
-	public DocumentrPermissionEvaluator getPermissionEvaluator() {
-		return permissionEvaluator;
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

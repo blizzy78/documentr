@@ -600,7 +600,7 @@ $(function() {
 							<c:set var="macros" value="${d:getMacros()}"/>
 							<c:forEach var="macro" items="${macros}">
 								<dt:dropdownEntry>
-									<li><a href="javascript:insertMacro('<c:out value="${macro.insertText}"/>');"><spring:message code="${macro.titleKey}"/> <div class="macro-description"><spring:message code="${macro.descriptionKey}"/></div></a></li>
+									<li><a href="javascript:insertMacro('<c:out value="${d:escapeJavaScript(macro.insertText)}"/>');"><c:out value="${macro.title}"/> <div class="macro-description"><c:out value="${macro.description}"/></div></a></li>
 								</dt:dropdownEntry>
 							</c:forEach>
 						</ul>

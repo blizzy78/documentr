@@ -32,11 +32,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.google.common.collect.Lists;
-
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.util.Util;
-import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContextTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -131,21 +128,14 @@ public class HtmlSerializerContextTest {
 	
 	@Test
 	public void addAndGetMacroInvocations() {
-		MacroInvocation invocation1 = mock(MacroInvocation.class);
-		when(markdownProcessor.getMacroInvocation("foo", "params", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
-			.thenReturn(invocation1);
-		MacroInvocation invocation2 = mock(MacroInvocation.class);
-		when(markdownProcessor.getMacroInvocation("bar", null, htmlSerializerContext)) //$NON-NLS-1$
-			.thenReturn(invocation2);
-		MacroInvocation invocation3 = mock(MacroInvocation.class);
-		when(markdownProcessor.getMacroInvocation("bar", "params2", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
-			.thenReturn(invocation3);
-		
-		htmlSerializerContext.addMacroInvocation("foo", "params"); //$NON-NLS-1$ //$NON-NLS-2$
-		htmlSerializerContext.addMacroInvocation("bar", null); //$NON-NLS-1$
-		htmlSerializerContext.addMacroInvocation("bar", "params2"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		List<MacroInvocation> result = htmlSerializerContext.getMacroInvocations();
-		assertEquals(Lists.newArrayList(invocation1, invocation2, invocation3), result);
+		MacroInvocation invocation = htmlSerializerContext.addMacroInvocation("foo", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("foo", invocation.getMacroName()); //$NON-NLS-1$
+		assertEquals("params", invocation.getParameters()); //$NON-NLS-1$
+
+		List<MacroInvocation> invocations = htmlSerializerContext.getMacroInvocations();
+		assertEquals(1, invocations.size());
+		invocation = invocations.get(0);
+		assertEquals("foo", invocation.getMacroName()); //$NON-NLS-1$
+		assertEquals("params", invocation.getParameters()); //$NON-NLS-1$
 	}
 }

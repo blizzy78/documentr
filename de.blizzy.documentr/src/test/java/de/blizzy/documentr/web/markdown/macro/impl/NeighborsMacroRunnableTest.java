@@ -30,12 +30,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -45,7 +47,7 @@ import de.blizzy.documentr.page.TestPageUtil;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
-public class NeighborsMacroTest {
+public class NeighborsMacroRunnableTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String INACCESSIBLE_PAGE_PATH = DocumentrConstants.HOME_PAGE_NAME + "/foo/inaccessible"; //$NON-NLS-1$
@@ -70,15 +72,19 @@ public class NeighborsMacroTest {
 		DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb/b1",
 		INACCESSIBLE_PAGE_PATH
 	};
-	
+
+	@Mock
 	private IPageStore pageStore;
+	@Mock
 	private HtmlSerializerContext htmlSerializerContext;
-	private IMacroContext macroContext;
+	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private IMacroContext context;
+	private NeighborsMacroRunnable runnable;
 
 	@Before
 	public void setUp() throws IOException {
-		htmlSerializerContext = mock(HtmlSerializerContext.class);
 		when(htmlSerializerContext.getPageURI(anyString())).then(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
@@ -86,15 +92,14 @@ public class NeighborsMacroTest {
 			}
 		});
 		
-		pageStore = mock(IPageStore.class);
 		setupPages();
 
-		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
 		setupPagePermissions();
 		
-		macroContext = mock(IMacroContext.class);
-		when(macroContext.getPageStore()).thenReturn(pageStore);
-		when(macroContext.getPermissionEvaluator()).thenReturn(permissionEvaluator);
+		when(context.getPageStore()).thenReturn(pageStore);
+		when(context.getPermissionEvaluator()).thenReturn(permissionEvaluator);
+		
+		runnable = new NeighborsMacroRunnable();
 	}
 	
 	private void setupPages() throws IOException {
@@ -131,10 +136,8 @@ public class NeighborsMacroTest {
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(DocumentrConstants.HOME_PAGE_NAME + "/foo/bar"); //$NON-NLS-1$
-		
-		NeighborsMacro macro = new NeighborsMacro();
-		macro.setHtmlSerializerContext(htmlSerializerContext);
-		macro.setMacroContext(macroContext);
+
+		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 		
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")
@@ -161,7 +164,7 @@ public class NeighborsMacroTest {
 						"</ul>" +
 					"</li>" +
 				"</ul>";
-		assertEquals(html, macro.getHtml(null));
+		assertEquals(html, runnable.getHtml(context));
 	}
 
 	private void setupPages(String... pagePaths) throws IOException {

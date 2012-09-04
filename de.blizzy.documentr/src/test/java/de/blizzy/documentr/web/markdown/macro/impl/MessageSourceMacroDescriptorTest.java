@@ -17,20 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
-
-import org.junit.Test;
-
-public class YoutubeMacroTest {
-	@Test
-	public void getHtml() {
-		YoutubeMacro macro = new YoutubeMacro();
-		macro.setParameters("video123"); //$NON-NLS-1$
-		assertEquals("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/video123?" + //$NON-NLS-1$
-				"rel=0\" frameborder=\"0\" allowfullscreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
-
-		macro.setParameters("http://www.youtube.com/watch?v=video123&feature=g-vrec"); //$NON-NLS-1$
-		assertEquals("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/video123?" + //$NON-NLS-1$
-				"rel=0\" frameborder=\"0\" allowfullscreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
-	}
+public class MessageSourceMacroDescriptorTest {
+	// TODO: implement tests
 }

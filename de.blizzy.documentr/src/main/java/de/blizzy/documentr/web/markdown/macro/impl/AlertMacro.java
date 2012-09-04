@@ -17,25 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class AlertMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("alert", //$NON-NLS-1$
-			AlertMacro.class, "{{alert TYPE}}[TEXT]{{/alert}}"); //$NON-NLS-1$
+@Component
+public class AlertMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("alert", beanFactory) //$NON-NLS-1$
+			.insertText("{{alert TYPE}}[TEXT]{{/alert}}"); //$NON-NLS-1$
+	}
 
 	@Override
-	public String getHtml(String body) {
-		body = StringUtils.defaultString(body);
-		
-		String type = getParameters();
-		String typeClass = StringUtils.EMPTY;
-		if (StringUtils.isNotBlank(type)) {
-			typeClass = " alert-" + StringEscapeUtils.escapeHtml4(type); //$NON-NLS-1$
-		}
-		return "<div class=\"alert" + typeClass + "\">" + body + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public IMacroRunnable createRunnable() {
+		return new AlertMacroRunnable();
 	}
 }

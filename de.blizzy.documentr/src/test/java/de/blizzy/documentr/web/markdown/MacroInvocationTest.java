@@ -15,17 +15,39 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.impl;
+package de.blizzy.documentr.web.markdown;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
 
-public class ColorMacroTest {
+public class MacroInvocationTest {
+	private MacroInvocation invocation;
+
+	@Before
+	public void setUp() {
+		invocation = new MacroInvocation("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
 	@Test
-	public void getHtml() {
-		ColorMacro macro = new ColorMacro();
-		macro.setParameters("#880000"); //$NON-NLS-1$
-		assertEquals("<span style=\"color: #880000;\">body</span>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
+	public void getMacroName() {
+		assertEquals("macro", invocation.getMacroName()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getParameters() {
+		assertEquals("params", invocation.getParameters()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getStartMarker() {
+		assertTrue(StringUtils.isNotBlank(invocation.getStartMarker()));
+	}
+	
+	@Test
+	public void getEndMarker() {
+		assertTrue(StringUtils.isNotBlank(invocation.getEndMarker()));
 	}
 }

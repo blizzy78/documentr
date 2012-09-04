@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -31,7 +30,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -58,10 +56,8 @@ import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
-import de.blizzy.documentr.web.markdown.macro.impl.LabelMacro;
-import de.blizzy.documentr.web.markdown.macro.impl.TableOfContentsMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -275,12 +271,27 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getMacros() {
-		Set<MacroDescriptor> descs = Sets.newHashSet(LabelMacro.DESCRIPTOR, TableOfContentsMacro.DESCRIPTOR);
+		IMacroDescriptor descriptor1 = mock(IMacroDescriptor.class);
+		when(descriptor1.getTitle(LOCALE)).thenReturn("title1"); //$NON-NLS-1$
+		when(descriptor1.getDescription(LOCALE)).thenReturn("description1"); //$NON-NLS-1$
+		when(descriptor1.getInsertText()).thenReturn("insertText1"); //$NON-NLS-1$
+
+		IMacroDescriptor descriptor2 = mock(IMacroDescriptor.class);
+		when(descriptor2.getTitle(LOCALE)).thenReturn("title2"); //$NON-NLS-1$
+		when(descriptor2.getDescription(LOCALE)).thenReturn("description2"); //$NON-NLS-1$
+		when(descriptor2.getInsertText()).thenReturn("insertText2"); //$NON-NLS-1$
+		
+		Set<IMacroDescriptor> descs = Sets.newHashSet(descriptor1, descriptor2);
 		when(macroFactory.getDescriptors()).thenReturn(descs);
 
-		when(messageSource.getMessage(anyString(), (Object[]) isNull(), Matchers.<Locale>any())).thenReturn("title"); //$NON-NLS-1$
-		
-		assertEquals(descs, Sets.newHashSet(Functions.getMacros()));
+		List<JspMacroDescriptor> result = Functions.getMacros();
+		assertEquals(2, result.size());
+		assertEquals(descriptor1.getTitle(LOCALE), result.get(0).getTitle());
+		assertEquals(descriptor1.getDescription(LOCALE), result.get(0).getDescription());
+		assertEquals(descriptor1.getInsertText(), result.get(0).getInsertText());
+		assertEquals(descriptor2.getTitle(LOCALE), result.get(1).getTitle());
+		assertEquals(descriptor2.getDescription(LOCALE), result.get(1).getDescription());
+		assertEquals(descriptor2.getInsertText(), result.get(1).getInsertText());
 	}
 	
 	@Test

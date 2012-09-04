@@ -17,24 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class PanelMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("panel", //$NON-NLS-1$
-			PanelMacro.class, "{{panel WIDTH (border)}}[CONTENTS]{{/panel}}"); //$NON-NLS-1$
+@Component
+public class PanelMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("panel", beanFactory) //$NON-NLS-1$
+			.insertText("{{panel WIDTH (border)}}[CONTENTS]{{/panel}}"); //$NON-NLS-1$
+	}
 
 	@Override
-	public String getHtml(String body) {
-		String width = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
-		boolean border = StringUtils.indexOf(getParameters(), " border") >= 0; //$NON-NLS-1$
-		return "<div class=\"span" + StringEscapeUtils.escapeHtml4(width) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
-				(border ? "<div class=\"span12 panel-border\">" : StringUtils.EMPTY) + //$NON-NLS-1$
-				body +
-				(border ? "</div>" : StringUtils.EMPTY) + //$NON-NLS-1$
-				"</div>"; //$NON-NLS-1$
+	public IMacroRunnable createRunnable() {
+		return new PanelMacroRunnable();
 	}
 }

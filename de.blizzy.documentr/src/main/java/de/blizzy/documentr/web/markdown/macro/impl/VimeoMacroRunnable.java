@@ -17,27 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-@Component
-public class PanelRowMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
+class VimeoMacroRunnable implements IMacroRunnable {
 	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("panelrow", beanFactory) //$NON-NLS-1$
-			.insertText("{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+	public String getHtml(IMacroContext macroContext) {
+		String videoId = macroContext.getParameters().trim();
+		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);
+		}
+		
+		return "<iframe src=\"http://player.vimeo.com/video/" + videoId + "\" " + //$NON-NLS-1$ //$NON-NLS-2$
+				"width=\"500\" height=\"281\" frameborder=\"0\" " + //$NON-NLS-1$
+				"webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"; //$NON-NLS-1$
 	}
 
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

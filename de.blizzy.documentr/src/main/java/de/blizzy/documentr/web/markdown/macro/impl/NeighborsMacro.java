@@ -17,155 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import java.io.IOException;
-import java.util.List;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.access.Permission;
-import de.blizzy.documentr.page.IPageStore;
-import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.util.Util;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
-
-public class NeighborsMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("neighbors", //$NON-NLS-1$
-			NeighborsMacro.class, "{{neighbors/}}"); //$NON-NLS-1$
-
-	private static final Logger log = LoggerFactory.getLogger(NeighborsMacro.class);
-
-	private String projectName;
-	private String branchName;
-	private String path;
-
+@Component
+public class NeighborsMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
 	@Override
-	public String getHtml(String body) {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		path = context.getPagePath();
-		if (path != null) {
-			projectName = context.getProjectName();
-			branchName = context.getBranchName();
-			
-			if (log.isInfoEnabled()) {
-				log.info("rendering neighbors for page: {}/{}/{}, user: {}", new Object[] { //$NON-NLS-1$
-						projectName, branchName, Util.toURLPagePath(path), context.getAuthentication().getName()
-				});
-			}
-
-			try {
-				StringBuilder buf = new StringBuilder();
-				buf.append("<ul class=\"well well-small nav nav-list pull-right\">") //$NON-NLS-1$
-					.append(printParent(printLinkListItem(path), path))
-					.append("</ul>"); //$NON-NLS-1$
-				return buf.toString();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			return StringUtils.EMPTY;
-		}
-	}
-	
-	private CharSequence printParent(CharSequence inner, String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		IPageStore pageStore = getMacroContext().getPageStore();
-		Page page = pageStore.getPage(projectName, branchName, path, false);
-		if (page.getParentPagePath() != null) {
-			if (hasViewPermission(page.getParentPagePath())) {
-				StringBuilder parentBuf = new StringBuilder();
-				Page parentPage = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false);
-				String uri = getHtmlSerializerContext().getPageURI(page.getParentPagePath());
-				parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-					.append(parentPage.getTitle())
-					.append("</a>") //$NON-NLS-1$
-					.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
-				
-				if (path.equals(this.path)) {
-					List<String> siblingPaths = pageStore.listChildPagePaths(
-							projectName, branchName, page.getParentPagePath());
-					for (String siblingPath : siblingPaths) {
-						parentBuf.append(siblingPath.equals(path) ?
-								inner :
-								printLinkListItem(siblingPath));
-					}
-				} else {
-					parentBuf.append(inner);
-				}
-				parentBuf.append("</ul>") //$NON-NLS-1$
-					.append("</li>"); //$NON-NLS-1$
-				
-				buf.append(printParent(parentBuf, page.getParentPagePath()));
-			}
-		} else {
-			buf.append(inner);
-		}
-		return buf;
-	}
-
-	private CharSequence printLinkListItem(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		IPageStore pageStore = getMacroContext().getPageStore();
-		Page page = pageStore.getPage(projectName, branchName, path, false);
-		String title = page.getTitle();
-		if (path.equals(this.path)) {
-			buf.append(printActiveLinkListItem(path, title));
-		} else {
-			buf.append(printRegularLinkListItem(path, title));
-		}
-		return buf;
-	}
-
-	private CharSequence printActiveLinkListItem(String path, String title) throws IOException {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		String uri = context.getPageURI(path);
-		StringBuilder buf = new StringBuilder();
-		buf.append("<li class=\"active\"><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-			.append(title)
-			.append("</a>") //$NON-NLS-1$
-			.append(printChildren(path))
-			.append("</li>"); //$NON-NLS-1$
-		return buf;
-	}
-
-	private CharSequence printRegularLinkListItem(String path, String title) {
-		StringBuilder buf = new StringBuilder();
-		if (hasViewPermission(path)) {
-			String uri = getHtmlSerializerContext().getPageURI(path);
-			buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(title)
-				.append("</a></li>"); //$NON-NLS-1$
-		}
-		return buf;
-	}
-
-	private CharSequence printChildren(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		IPageStore pageStore = getMacroContext().getPageStore();
-		List<String> childPaths = pageStore.listChildPagePaths(projectName, branchName, path);
-		if (!childPaths.isEmpty()) {
-			buf.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
-			for (String childPath : childPaths) {
-				buf.append(printLinkListItem(childPath));
-			}
-			buf.append("</ul>"); //$NON-NLS-1$
-		}
-		return buf;
-	}
-	
-	private boolean hasViewPermission(String path) {
-		DocumentrPermissionEvaluator permissionEvaluator = getMacroContext().getPermissionEvaluator();
-		Authentication authentication = getHtmlSerializerContext().getAuthentication();
-		return permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, Permission.VIEW);
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("neighbors", beanFactory) //$NON-NLS-1$
+			.insertText("{{neighbors/}}").cacheable(false); //$NON-NLS-1$
 	}
 
 	@Override
-	public boolean isCacheable() {
-		return false;
+	public IMacroRunnable createRunnable() {
+		return new NeighborsMacroRunnable();
 	}
 }

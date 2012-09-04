@@ -30,6 +30,7 @@ import org.pegdown.ast.Node;
 import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.RootNode;
 import org.pegdown.ast.SuperNode;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,9 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
-import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
 public class MarkdownProcessor {
@@ -68,6 +70,8 @@ public class MarkdownProcessor {
 	
 	@Autowired
 	private MacroFactory macroFactory;
+	@Autowired
+	private BeanFactory beanFactory;
 
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
 			Authentication authentication) {
@@ -109,12 +113,16 @@ public class MarkdownProcessor {
 		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
 		int nonCacheableMacroIdx = 1;
 		for (MacroInvocation invocation : macroInvocations) {
-			IMacro macro = invocation.getMacro();
+			IMacro macro = macroFactory.get(invocation.getMacroName());
+			IMacroDescriptor macroDescriptor = macro.getDescriptor();
 			String startMarker = invocation.getStartMarker();
 			String endMarker = invocation.getEndMarker();
 			String body = StringUtils.substringBetween(html, startMarker, endMarker);
-			if (macro.isCacheable()) {
-				String macroHtml = StringUtils.defaultString(macro.getHtml(body));
+			if (macroDescriptor.isCacheable()) {
+				MacroContext macroContext = MacroContext.create(invocation.getMacroName(), invocation.getParameters(),
+						body, context, beanFactory);
+				IMacroRunnable macroRunnable = macro.createRunnable();
+				String macroHtml = StringUtils.defaultString(macroRunnable.getHtml(macroContext));
 				html = StringUtils.replace(html, startMarker + body + endMarker, macroHtml);
 			} else if (nonCacheableMacros) {
 				String macroName = invocation.getMacroName();
@@ -229,13 +237,15 @@ public class MarkdownProcessor {
 			String body = StringUtils.substringAfter(macroCallWithBody, bodyMarker);
 			String macroName = StringUtils.substringBefore(macroCall, " "); //$NON-NLS-1$
 			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
-			IMacro macro = macroFactory.get(macroName, params, context);
+			IMacro macro = macroFactory.get(macroName);
+			MacroContext macroContext = MacroContext.create(macroName, params, body, context, beanFactory);
+			IMacroRunnable macroRunnable = macro.createRunnable();
 
 			html = StringUtils.replace(html,
 					startMarkerPrefix + idx + "__" + macroCallWithBody + endMarkerPrefix + idx + "__", //$NON-NLS-1$ //$NON-NLS-2$
-					macro.getHtml(body));
+					macroRunnable.getHtml(macroContext));
 
-			MacroInvocation invocation = new MacroInvocation(macro, macroName, params);
+			MacroInvocation invocation = new MacroInvocation(macroName, params);
 			html = cleanupHTML(html, Collections.singletonList(invocation), false);
 		}
 		return html;
@@ -248,9 +258,11 @@ public class MarkdownProcessor {
 				newHtml = replacement.replaceAll(newHtml);
 			}
 			for (MacroInvocation macroInvocation : macroInvocations) {
-				IMacro macro = macroInvocation.getMacro();
-				if (macro.isCacheable() == cacheable) {
-					newHtml = macro.cleanupHTML(newHtml);
+				IMacro macro = macroFactory.get(macroInvocation.getMacroName());
+				IMacroDescriptor macroDescriptor = macro.getDescriptor();
+				if (macroDescriptor.isCacheable() == cacheable) {
+					IMacroRunnable macroRunnable = macro.createRunnable();
+					newHtml = macroRunnable.cleanupHTML(newHtml);
 				}
 			}
 			
@@ -263,11 +275,6 @@ public class MarkdownProcessor {
 		return html;
 	}
 	
-	public MacroInvocation getMacroInvocation(String macroName, String params, HtmlSerializerContext context) {
-		IMacro macro = macroFactory.get(macroName, params, context);
-		return new MacroInvocation(macro, macroName, params);
-	}
-
 	void setMacroFactory(MacroFactory macroFactory) {
 		this.macroFactory = macroFactory;
 	}

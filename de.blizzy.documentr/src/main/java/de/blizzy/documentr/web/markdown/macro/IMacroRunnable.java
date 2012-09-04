@@ -15,22 +15,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.impl;
+package de.blizzy.documentr.web.markdown.macro;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-public class PanelMacroTest {
-	@Test
-	public void getHtml() {
-		PanelMacro macro = new PanelMacro();
-		macro.setParameters("3"); //$NON-NLS-1$
-		assertEquals("<div class=\"span3\">body</div>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		macro = new PanelMacro();
-		macro.setParameters("3 border"); //$NON-NLS-1$
-		assertEquals("<div class=\"span3\"><div class=\"span12 panel-border\">body</div></div>", //$NON-NLS-1$
-				macro.getHtml("body")); //$NON-NLS-1$
-	}
+public interface IMacroRunnable {
+	String getHtml(IMacroContext macroContext);
+	String cleanupHTML(String html);
 }

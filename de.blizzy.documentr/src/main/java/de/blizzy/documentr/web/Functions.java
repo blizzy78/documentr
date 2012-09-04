@@ -34,6 +34,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.OpenId;
@@ -51,8 +52,8 @@ import de.blizzy.documentr.util.FileLengthFormat;
 import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.markdown.IPageRenderer;
 import de.blizzy.documentr.web.markdown.MarkdownProcessor;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 @Component
 public final class Functions {
@@ -181,21 +182,25 @@ public final class Functions {
 		return openIds;
 	}
 	
-	public static List<MacroDescriptor> getMacros() {
-		List<MacroDescriptor> descs = Lists.newArrayList(macroFactory.getDescriptors());
+	public static List<JspMacroDescriptor> getMacros() {
+		List<IMacroDescriptor> descs = Lists.newArrayList(macroFactory.getDescriptors());
 		final Locale locale = LocaleContextHolder.getLocale();
 		final Collator collator = Collator.getInstance(locale);
-		Collections.sort(descs, new Comparator<MacroDescriptor>() {
+		Collections.sort(descs, new Comparator<IMacroDescriptor>() {
 			@Override
-			public int compare(MacroDescriptor d1, MacroDescriptor d2) {
-				String titleKey1 = d1.getTitleKey();
-				String titleKey2 = d2.getTitleKey();
-				String title1 = messageSource.getMessage(titleKey1, null, locale);
-				String title2 = messageSource.getMessage(titleKey2, null, locale);
+			public int compare(IMacroDescriptor d1, IMacroDescriptor d2) {
+				String title1 = d1.getTitle(locale);
+				String title2 = d2.getTitle(locale);
 				return collator.compare(title1, title2);
 			}
 		});
-		return descs;
+		Function<IMacroDescriptor, JspMacroDescriptor> function = new Function<IMacroDescriptor, JspMacroDescriptor>() {
+			@Override
+			public JspMacroDescriptor apply(IMacroDescriptor descriptor) {
+				return new JspMacroDescriptor(descriptor, locale);
+			}
+		};
+		return Lists.transform(descs, function);
 	}
 	
 	public static int floor(double d) {

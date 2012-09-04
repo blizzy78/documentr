@@ -17,17 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
+import org.apache.commons.lang3.StringUtils;
 
-public class UnknownMacroMacro extends AbstractMacro {
-	private String macroName;
+import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-	public UnknownMacroMacro(String macroName) {
-		this.macroName = macroName;
+abstract class AbstractMarkdownMacroRunnable implements IMacroRunnable {
+	@Override
+	public final String getHtml(IMacroContext macroContext) {
+		String markdown = getMarkdown(macroContext);
+		if (StringUtils.isNotBlank(markdown)) {
+			HtmlSerializerContext context = macroContext.getHtmlSerializerContext();
+			return context.markdownToHTML(markdown);
+		}
+		return null;
 	}
 
+	abstract String getMarkdown(IMacroContext macroContext);
+	
 	@Override
-	public String getHtml(String body) {
-		return "<span class=\"unknown-macro\">!" + macroName + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
+	public final String cleanupHTML(String html) {
+		return html;
 	}
 }

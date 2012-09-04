@@ -19,8 +19,13 @@ package de.blizzy.documentr.web.markdown.macro;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
 
 public interface IMacroContext {
+	String getMacroName();
+	String getParameters();
+	String getBody();
+	HtmlSerializerContext getHtmlSerializerContext();
 	IPageStore getPageStore();
 	DocumentrPermissionEvaluator getPermissionEvaluator();
 }

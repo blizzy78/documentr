@@ -17,15 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import static org.junit.Assert.*;
+import org.apache.commons.lang3.StringEscapeUtils;
 
-import org.junit.Test;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class PanelRowMacroTest {
-	@Test
-	public void getHtml() {
-		PanelRowMacro macro = new PanelRowMacro();
-		macro.setParameters(null);
-		assertEquals("<div class=\"row-fluid\">body</div>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
+class ColorMacroRunnable implements IMacroRunnable {
+	@Override
+	public String getHtml(IMacroContext macroContext) {
+		String color = macroContext.getParameters();
+		return "<span style=\"color: " + StringEscapeUtils.escapeHtml4(color) + ";\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				macroContext.getBody() + "</span>"; //$NON-NLS-1$
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

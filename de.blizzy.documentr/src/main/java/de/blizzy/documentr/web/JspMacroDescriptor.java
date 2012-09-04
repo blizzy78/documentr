@@ -15,29 +15,32 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro.impl;
+package de.blizzy.documentr.web;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.Locale;
 
-import de.blizzy.documentr.web.markdown.macro.IMacro;
 import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-@Component
-public class PanelRowMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
-	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("panelrow", beanFactory) //$NON-NLS-1$
-			.insertText("{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+public class JspMacroDescriptor {
+	private String insertText;
+	private String title;
+	private String description;
+
+	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
+		insertText = descriptor.getInsertText();
+		title = descriptor.getTitle(locale);
+		description = descriptor.getDescription(locale);
 	}
-
-	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	
+	public String getInsertText() {
+		return insertText;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public String getDescription() {
+		return description;
 	}
 }

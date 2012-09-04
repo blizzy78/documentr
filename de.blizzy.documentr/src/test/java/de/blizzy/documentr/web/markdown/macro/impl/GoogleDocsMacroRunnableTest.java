@@ -18,54 +18,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro.impl;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class GoogleDocsMacroTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+
+public class GoogleDocsMacroRunnableTest extends AbstractDocumentrTest {
+	private GoogleDocsMacroRunnable runnable;
+	@Mock
+	private IMacroContext context;
+
+	@Before
+	public void setUp() {
+		runnable = new GoogleDocsMacroRunnable();
+	}
+
 	@Test
 	public void getHtmlForSpreadsheet() {
-		GoogleDocsMacro macro = new GoogleDocsMacro();
-		macro.setParameters("https://docs.google.com/spreadsheet/pub?key=0As6LH-BXhcPZdEFtWi1Udl9HM0Z6T3h5NmhLYzlrd1E&output=html"); //$NON-NLS-1$
+		when(context.getParameters()).thenReturn("https://docs.google.com/spreadsheet/pub?key=0As6LH-BXhcPZdEFtWi1Udl9HM0Z6T3h5NmhLYzlrd1E&output=html"); //$NON-NLS-1$
 		assertEquals("<iframe class=\"googledocs-document\" src=\"" + //$NON-NLS-1$
 				"https://docs.google.com/spreadsheet/pub?key=0As6LH-BXhcPZdEFtWi1Udl9HM0Z6T3h5NmhLYzlrd1E&output=html&widget=true" + //$NON-NLS-1$
 				"\" allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>", //$NON-NLS-1$
-				macro.getHtml(null));
+				runnable.getHtml(context));
 	}
 
 	@Test
 	public void getHtmlForTextDocument() {
-		GoogleDocsMacro macro = new GoogleDocsMacro();
-		macro.setParameters("https://docs.google.com/document/pub?id=1TjMiACP4BZsPiY3KIXHiXOw11QpLtLOfFC-G-4EQinc"); //$NON-NLS-1$
+		when(context.getParameters()).thenReturn("https://docs.google.com/document/pub?id=1TjMiACP4BZsPiY3KIXHiXOw11QpLtLOfFC-G-4EQinc"); //$NON-NLS-1$
 		assertEquals("<iframe class=\"googledocs-document\" src=\"" + //$NON-NLS-1$
 				"https://docs.google.com/document/pub?id=1TjMiACP4BZsPiY3KIXHiXOw11QpLtLOfFC-G-4EQinc&embedded=true" + //$NON-NLS-1$
 				"\" allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>", //$NON-NLS-1$
-				macro.getHtml(null));
+				runnable.getHtml(context));
 	}
 	
 	@Test
 	public void getHtmlForPresentation() {
-		GoogleDocsMacro macro = new GoogleDocsMacro();
-		macro.setParameters("https://docs.google.com/presentation/pub?id=1WzJncZtIcd9up5b_MI2oBceQ2PnTmIUSltp0RKYXqJo&start=false&loop=false&delayms=4000"); //$NON-NLS-1$
+		when(context.getParameters()).thenReturn("https://docs.google.com/presentation/pub?id=1WzJncZtIcd9up5b_MI2oBceQ2PnTmIUSltp0RKYXqJo&start=false&loop=false&delayms=4000"); //$NON-NLS-1$
 		assertEquals("<iframe class=\"googledocs-document\" src=\"" + //$NON-NLS-1$
 				"https://docs.google.com/presentation/embed?id=1WzJncZtIcd9up5b_MI2oBceQ2PnTmIUSltp0RKYXqJo&start=false&loop=false&delayms=3000" + //$NON-NLS-1$
 				"\" allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>", //$NON-NLS-1$
-				macro.getHtml(null));
+				runnable.getHtml(context));
 	}
 	
 	@Test
 	public void getHtmlForDrawing() {
-		GoogleDocsMacro macro = new GoogleDocsMacro();
-		macro.setParameters("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196"); //$NON-NLS-1$
+		when(context.getParameters()).thenReturn("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196"); //$NON-NLS-1$
 		assertEquals("<img src=\"" + //$NON-NLS-1$
 				"https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=960" + //$NON-NLS-1$
 				"\"/>", //$NON-NLS-1$
-				macro.getHtml(null));
-
-		macro = new GoogleDocsMacro();
-		macro.setParameters("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196 123"); //$NON-NLS-1$
+				runnable.getHtml(context));
+	}
+	
+	@Test
+	public void getHtmlForDrawingWithWidth() {
+		when(context.getParameters()).thenReturn("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196 123"); //$NON-NLS-1$
 		assertEquals("<img src=\"" + //$NON-NLS-1$
 				"https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=123" + //$NON-NLS-1$
 				"\"/>", //$NON-NLS-1$
-				macro.getHtml(null));
+				runnable.getHtml(context));
 	}
 }

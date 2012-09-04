@@ -17,23 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class YoutubeMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("youtube", //$NON-NLS-1$
-			YoutubeMacro.class, "{{youtube [VIDEO]/}}"); //$NON-NLS-1$
+@Component
+public class YoutubeMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("youtube", beanFactory) //$NON-NLS-1$
+			.insertText("{{youtube [VIDEO]/}}"); //$NON-NLS-1$
+	}
 
 	@Override
-	public String getHtml(String body) {
-		String videoId = getParameters().trim();
-		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getQueryParams().get("v").get(0); //$NON-NLS-1$
-		}
-		
-		return "<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/" + videoId + //$NON-NLS-1$
-				"?rel=0\" frameborder=\"0\" allowfullscreen></iframe>"; //$NON-NLS-1$
+	public IMacroRunnable createRunnable() {
+		return new YoutubeMacroRunnable();
 	}
 }

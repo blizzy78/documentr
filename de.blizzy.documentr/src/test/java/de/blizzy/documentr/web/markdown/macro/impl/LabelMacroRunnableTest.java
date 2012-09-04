@@ -17,27 +17,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
 
-@Component
-public class PanelRowMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
-	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("panelrow", beanFactory) //$NON-NLS-1$
-			.insertText("{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+
+public class LabelMacroRunnableTest extends AbstractDocumentrTest {
+	private LabelMacroRunnable runnable;
+	@Mock
+	private IMacroContext context;
+
+	@Before
+	public void setUp() {
+		runnable = new LabelMacroRunnable();
 	}
-
-	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	
+	@Test
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("info label text"); //$NON-NLS-1$
+		assertEquals("<span class=\"label label-info\">label text</span>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

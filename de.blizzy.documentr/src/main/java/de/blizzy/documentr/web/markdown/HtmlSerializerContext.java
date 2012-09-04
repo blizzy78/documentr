@@ -30,7 +30,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.util.Util;
-import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
 
 public class HtmlSerializerContext {
 	private String projectName;
@@ -119,7 +118,7 @@ public class HtmlSerializerContext {
 	}
 
 	public MacroInvocation addMacroInvocation(String macroName, String params) {
-		MacroInvocation invocation = markdownProcessor.getMacroInvocation(macroName, params, this);
+		MacroInvocation invocation = new MacroInvocation(macroName, params);
 		macroInvocations.add(invocation);
 		return invocation;
 	}

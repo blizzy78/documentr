@@ -17,21 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class LabelMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("label", //$NON-NLS-1$
-			LabelMacro.class, "{{label [TYPE] TEXT/}}"); //$NON-NLS-1$
+@Component
+public class LabelMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
 	
 	@Override
-	public String getHtml(String body) {
-		String type = StringUtils.substringBefore(getParameters(), " ").trim(); //$NON-NLS-1$
-		String text = StringUtils.substringAfter(getParameters(), " ").trim(); //$NON-NLS-1$
-		return "<span class=\"label label-" + StringEscapeUtils.escapeHtml4(type) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
-				StringEscapeUtils.escapeHtml4(text) + "</span>"; //$NON-NLS-1$
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("label", beanFactory) //$NON-NLS-1$
+			.insertText("{{label [TYPE] TEXT/}}"); //$NON-NLS-1$
+	}
+
+	@Override
+	public IMacroRunnable createRunnable() {
+		return new LabelMacroRunnable();
 	}
 }

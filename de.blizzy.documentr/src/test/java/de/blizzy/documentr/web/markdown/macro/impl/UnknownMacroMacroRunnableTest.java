@@ -18,18 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro.impl;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class AlertMacroTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+
+public class UnknownMacroMacroRunnableTest extends AbstractDocumentrTest {
+	private UnknownMacroMacroRunnable runnable;
+	@Mock
+	private IMacroContext context;
+
+	@Before
+	public void setUp() {
+		runnable = new UnknownMacroMacroRunnable();
+	}
+	
 	@Test
 	public void getHtml() {
-		AlertMacro macro = new AlertMacro();
-		macro.setParameters(null);
-		assertEquals("<div class=\"alert\">body</div>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		macro = new AlertMacro();
-		macro.setParameters("error"); //$NON-NLS-1$
-		assertEquals("<div class=\"alert alert-error\">body</div>", macro.getHtml("body")); //$NON-NLS-1$ //$NON-NLS-2$
+		when(context.getMacroName()).thenReturn("nonexistent"); //$NON-NLS-1$
+		assertEquals("<span class=\"unknown-macro\">!nonexistent!</span>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

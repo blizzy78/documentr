@@ -37,9 +37,6 @@ import org.pegdown.ast.VerbatimNode;
 
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroInvocation;
-
 public class HtmlSerializerTest {
 	private HtmlSerializerContext context;
 	private HtmlSerializer htmlSerializer;
@@ -130,8 +127,7 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void visitMacroNode() {
-		IMacro macro = mock(IMacro.class);
-		MacroInvocation invocation = new MacroInvocation(macro, "macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
+		MacroInvocation invocation = new MacroInvocation("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(context.addMacroInvocation("macro", "params")).thenReturn(invocation); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		MacroNode node = new MacroNode("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$

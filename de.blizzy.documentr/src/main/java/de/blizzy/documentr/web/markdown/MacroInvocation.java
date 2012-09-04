@@ -15,17 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.markdown.macro;
+package de.blizzy.documentr.web.markdown;
 
-public class MacroInvocation {
-	private IMacro macro;
+import org.springframework.util.Assert;
+
+class MacroInvocation {
 	private String macroName;
 	private String params;
 	private String startMarker;
 	private String endMarker;
 
-	public MacroInvocation(IMacro macro, String macroName, String params) {
-		this.macro = macro;
+	MacroInvocation(String macroName, String params) {
+		Assert.hasLength(macroName);
+		
 		this.macroName = macroName;
 		this.params = params;
 		
@@ -35,23 +37,19 @@ public class MacroInvocation {
 		endMarker = "__/" + markerLabel + "__"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public IMacro getMacro() {
-		return macro;
-	}
-
-	public String getMacroName() {
+	String getMacroName() {
 		return macroName;
 	}
 	
-	public String getParameters() {
+	String getParameters() {
 		return params;
 	}
 	
-	public String getStartMarker() {
+	String getStartMarker() {
 		return startMarker;
 	}
 
-	public String getEndMarker() {
+	String getEndMarker() {
 		return endMarker;
 	}
 }

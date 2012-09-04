@@ -17,38 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.macro.AbstractMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class TwitterMacro extends AbstractMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("twitter", //$NON-NLS-1$
-			TwitterMacro.class, "{{twitter [SEARCHTERMS]/}}"); //$NON-NLS-1$
+@Component
+public class TwitterMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("twitter", beanFactory) //$NON-NLS-1$
+			.insertText("{{twitter [SEARCHTERMS]/}}"); //$NON-NLS-1$
+	}
 
 	@Override
-	public String getHtml(String body) {
-		String searchTerms = getParameters().trim();
-		@SuppressWarnings("nls")
-		String html = "<script charset=\"UTF-8\" src=\"http://widgets.twimg.com/j/2/widget.js\"></script>\n" +
-			"<script>\n" +
-			"new TWTR.Widget({" +
-				"version: 2," +
-				"type: 'search'," +
-				"search: '" + StringEscapeUtils.escapeEcmaScript(searchTerms) + "'," +
-				"interval: 15000," +
-				"title: ''," +
-				"subject: ''," +
-				"width: 300," +
-				"height: 300," +
-				"features: {" +
-					"scrollbar: true," +
-					"loop: false," +
-					"live: true," +
-					"behavior: 'default'" +
-				"}" +
-			"}).render().start(); documentr.fixTwitterCss();\n" +
-			"</script>\n";
-		return html;
+	public IMacroRunnable createRunnable() {
+		return new TwitterMacroRunnable();
 	}
 }

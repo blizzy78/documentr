@@ -17,39 +17,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.web.markdown.Header;
-import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.web.markdown.macro.AbstractMarkdownMacro;
-import de.blizzy.documentr.web.markdown.macro.MacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacro;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-public class TableOfContentsMacro extends AbstractMarkdownMacro {
-	public static final MacroDescriptor DESCRIPTOR = new MacroDescriptor("toc", //$NON-NLS-1$
-			TableOfContentsMacro.class, "{{toc/}}"); //$NON-NLS-1$
+@Component
+public class TableOfContentsMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("toc", beanFactory) //$NON-NLS-1$
+			.insertText("{{toc/}}"); //$NON-NLS-1$
+	}
 
 	@Override
-	public String getMarkdown(String body) {
-		HtmlSerializerContext context = getHtmlSerializerContext();
-		List<Header> headers = context.getHeaders();
-		if (!headers.isEmpty()) {
-			int smallestLevel = Integer.MAX_VALUE;
-			for (Header header : headers) {
-				int level = header.getLevel() - 1;
-				if (level < smallestLevel) {
-					smallestLevel = level;
-				}
-			}
-			
-			StringBuilder buf = new StringBuilder();
-			for (Header header : headers) {
-				buf.append(StringUtils.repeat("    ", header.getLevel() - 1 - smallestLevel)) //$NON-NLS-1$
-					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return buf.toString() + "\n"; //$NON-NLS-1$
-		}
-		return null;
+	public IMacroRunnable createRunnable() {
+		return new TableOfContentsMacroRunnable();
 	}
 }

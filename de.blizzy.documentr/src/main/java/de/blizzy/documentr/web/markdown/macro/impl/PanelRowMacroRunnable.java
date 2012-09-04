@@ -17,27 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-@Component
-public class PanelRowMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
+class PanelRowMacroRunnable implements IMacroRunnable {
 	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("panelrow", beanFactory) //$NON-NLS-1$
-			.insertText("{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+	public String getHtml(IMacroContext macroContext) {
+		return "<div class=\"row-fluid\">" + macroContext.getBody() + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

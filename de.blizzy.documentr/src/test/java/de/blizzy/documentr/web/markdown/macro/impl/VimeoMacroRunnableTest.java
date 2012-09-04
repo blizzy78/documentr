@@ -18,21 +18,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.markdown.macro.impl;
 
 import static junit.framework.Assert.*;
+import static org.mockito.Mockito.*;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class VimeoMacroTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+
+public class VimeoMacroRunnableTest extends AbstractDocumentrTest {
+	private VimeoMacroRunnable runnable;
+	@Mock
+	private IMacroContext context;
+
+	@Before
+	public void setUp() {
+		runnable = new VimeoMacroRunnable();
+	}
+	
 	@Test
 	public void getHtml() {
-		VimeoMacro macro = new VimeoMacro();
-		macro.setParameters("video123"); //$NON-NLS-1$
+		when(context.getParameters()).thenReturn("video123"); //$NON-NLS-1$
 		assertEquals("<iframe src=\"http://player.vimeo.com/video/video123\" width=\"500\" " + //$NON-NLS-1$
 				"height=\"281\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen " + //$NON-NLS-1$
-				"allowFullScreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
-
-		macro.setParameters("http://vimeo.com/video123?foo=bar"); //$NON-NLS-1$
+				"allowFullScreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getHtmlWithUrl() {
+		when(context.getParameters()).thenReturn("http://vimeo.com/video123?foo=bar"); //$NON-NLS-1$
 		assertEquals("<iframe src=\"http://player.vimeo.com/video/video123\" width=\"500\" " + //$NON-NLS-1$
 				"height=\"281\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen " + //$NON-NLS-1$
-				"allowFullScreen></iframe>", macro.getHtml(null)); //$NON-NLS-1$
+				"allowFullScreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

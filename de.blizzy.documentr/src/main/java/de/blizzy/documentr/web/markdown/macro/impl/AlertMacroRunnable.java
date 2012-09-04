@@ -17,27 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-@Component
-public class PanelRowMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
+class AlertMacroRunnable implements IMacroRunnable {
 	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("panelrow", beanFactory) //$NON-NLS-1$
-			.insertText("{{panelrow}}[CONTENTS]{{/panelrow}}"); //$NON-NLS-1$
+	public String getHtml(IMacroContext macroContext) {
+		String body = StringUtils.defaultString(macroContext.getBody());
+		
+		String type = macroContext.getParameters();
+		String typeClass = StringUtils.EMPTY;
+		if (StringUtils.isNotBlank(type)) {
+			typeClass = " alert-" + StringEscapeUtils.escapeHtml4(type); //$NON-NLS-1$
+		}
+		return "<div class=\"alert" + typeClass + "\">" + body + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

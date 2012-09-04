@@ -23,14 +23,31 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.web.markdown.Header;
 import de.blizzy.documentr.web.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
 
-public class TableOfContentsMacroTest {
+public class TableOfContentsMacroRunnableTest extends AbstractDocumentrTest {
+	private TableOfContentsMacroRunnable runnable;
+	@Mock
+	private IMacroContext context;
+	@Mock
+	private HtmlSerializerContext htmlSerializerContext;
+
+	@Before
+	public void setUp() {
+		runnable = new TableOfContentsMacroRunnable();
+		
+		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
+	}
+	
 	@Test
 	public void getMarkdown() {
 		List<Header> headers = Lists.newArrayList(
@@ -38,29 +55,21 @@ public class TableOfContentsMacroTest {
 				new Header("bar", 2), //$NON-NLS-1$
 				new Header("baz", 3), //$NON-NLS-1$
 				new Header("qux", 1)); //$NON-NLS-1$
-		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
-		when(context.getHeaders()).thenReturn(headers);
-		
-		TableOfContentsMacro macro = new TableOfContentsMacro();
-		macro.setHtmlSerializerContext(context);
-		
+		when(htmlSerializerContext.getHeaders()).thenReturn(headers);
+
 		assertEquals(
 				"- [[#foo]]\n" + //$NON-NLS-1$
 				"    - [[#bar]]\n" + //$NON-NLS-1$
 				"        - [[#baz]]\n" + //$NON-NLS-1$
 				"- [[#qux]]\n\n", //$NON-NLS-1$
-				macro.getMarkdown(null));
+				runnable.getMarkdown(context));
 	}
 	
 	@Test
 	public void getMarkdownButNoHeaders() {
 		List<Header> headers = Collections.emptyList();
-		HtmlSerializerContext context = mock(HtmlSerializerContext.class);
-		when(context.getHeaders()).thenReturn(headers);
+		when(htmlSerializerContext.getHeaders()).thenReturn(headers);
 		
-		TableOfContentsMacro macro = new TableOfContentsMacro();
-		macro.setHtmlSerializerContext(context);
-		
-		assertNull(macro.getMarkdown(null));
+		assertNull(runnable.getMarkdown(context));
 	}
 }

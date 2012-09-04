@@ -17,15 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.markdown.macro.impl;
 
-import static org.junit.Assert.*;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
 
-import org.junit.Test;
-
-public class LabelMacroTest {
-	@Test
-	public void getHtml() {
-		LabelMacro macro = new LabelMacro();
-		macro.setParameters("info label text"); //$NON-NLS-1$
-		assertEquals("<span class=\"label label-info\">label text</span>", macro.getHtml(null)); //$NON-NLS-1$
+public class UnknownMacroMacroRunnable implements IMacroRunnable {
+	@Override
+	public String getHtml(IMacroContext macroContext) {
+		return "<span class=\"unknown-macro\">!" + macroContext.getMacroName() + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

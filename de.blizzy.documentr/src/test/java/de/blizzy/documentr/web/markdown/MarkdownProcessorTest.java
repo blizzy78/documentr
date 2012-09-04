@@ -25,42 +25,55 @@ import static org.mockito.Mockito.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.web.markdown.macro.IMacro;
-import de.blizzy.documentr.web.markdown.macro.factory.MacroFactory;
+import de.blizzy.documentr.web.markdown.macro.IMacroContext;
+import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.web.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
-public class MarkdownProcessorTest {
+public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
 	private static final String PARAMS = "params"; //$NON-NLS-1$
 	
+	@Mock
 	private MacroFactory macroFactory;
-	private MarkdownProcessor markdownProcessor;
+	@Mock
 	private Authentication authentication;
+	@Mock
+	@SuppressWarnings("unused")
+	private BeanFactory beanFactory;
+	@InjectMocks
+	private MarkdownProcessor markdownProcessor;
 
 	@Before
 	public void setUp() {
-		macroFactory = mock(MacroFactory.class);
-
-		markdownProcessor = new MarkdownProcessor();
-		markdownProcessor.setMacroFactory(macroFactory);
-		
-		authentication = mock(Authentication.class);
 	}
 	
 	@Test
 	@SuppressWarnings("boxing")
 	public void markdownToHTML() {
+		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
+		when(descriptor.isCacheable()).thenReturn(true);
+
+		IMacroRunnable runnable = mock(IMacroRunnable.class);
+		
 		IMacro macro = mock(IMacro.class);
-		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
-		when(macro.isCacheable()).thenReturn(true);
-		when(macro.getHtml(anyString())).thenReturn(macroHtml);
-		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
-		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
+		when(macro.getDescriptor()).thenReturn(descriptor);
+		when(macro.createRunnable()).thenReturn(runnable);
+		
+		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
+		when(runnable.getHtml(any(IMacroContext.class))).thenReturn(macroHtml);
+		String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
+		when(runnable.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String html = (String) invocation.getArguments()[0];
@@ -68,7 +81,7 @@ public class MarkdownProcessorTest {
 			}
 		});
 		
-		when(macroFactory.get(eq(MACRO), (String) isNull(), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
+		when(macroFactory.get(MACRO)).thenReturn(macro);
 		
 		String markdown = "{{:header:}}*header*{{:/header:}}**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHTML(
@@ -81,10 +94,13 @@ public class MarkdownProcessorTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void markdownToHTMLMustNotRenderNonCacheableMacros() {
-		IMacro macro = mock(IMacro.class);
-		when(macro.isCacheable()).thenReturn(false);
+		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
+		when(descriptor.isCacheable()).thenReturn(false);
 		
-		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
+		IMacro macro = mock(IMacro.class);
+		when(macro.getDescriptor()).thenReturn(descriptor);
+		
+		when(macroFactory.get(MACRO)).thenReturn(macro);
 		
 		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String result = markdownProcessor.markdownToHTML(
@@ -100,20 +116,27 @@ public class MarkdownProcessorTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void processNonCacheableMacros() {
+		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
+		when(descriptor.isCacheable()).thenReturn(false);
+
+		IMacroRunnable runnable = mock(IMacroRunnable.class);
+		
 		IMacro macro = mock(IMacro.class);
-		final String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
-		when(macro.isCacheable()).thenReturn(false);
-		when(macro.getHtml(anyString())).thenReturn(macroHtml);
-		final String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
-		when(macro.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
+		when(macro.getDescriptor()).thenReturn(descriptor);
+		when(macro.createRunnable()).thenReturn(runnable);
+
+		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
+		when(runnable.getHtml(any(IMacroContext.class))).thenReturn(macroHtml);
+		String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
+		when(runnable.cleanupHTML(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String html = (String) invocation.getArguments()[0];
-				return StringUtils.replace(html, macroHtml, cleanedMacroHtml);
+				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		
-		when(macroFactory.get(eq(MACRO), eq(PARAMS), Matchers.<HtmlSerializerContext>any())).thenReturn(macro);
+		when(macroFactory.get(MACRO)).thenReturn(macro);
 
 		String html = "<p>__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				PARAMS + "__/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__</p>"; //$NON-NLS-1$ //$NON-NLS-2$
