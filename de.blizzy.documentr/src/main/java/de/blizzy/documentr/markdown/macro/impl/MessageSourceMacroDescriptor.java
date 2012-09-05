@@ -38,7 +38,7 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	private String insertText;
 	private boolean cacheable = true;
 
-	private MessageSourceMacroDescriptor(String macroName) {
+	MessageSourceMacroDescriptor(String macroName) {
 		this.macroName = macroName;
 	}
 	
