@@ -99,6 +99,7 @@ import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.markdown.MarkdownProcessor;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageChangedEvent;
@@ -108,7 +109,6 @@ import de.blizzy.documentr.repository.BranchCreatedEvent;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.util.Util;
-import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 
 @Component
 public class PageIndex {

@@ -15,32 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.markdown.macro.impl;
 
-import java.util.Locale;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import de.blizzy.documentr.markdown.macro.IMacro;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 
-public class JspMacroDescriptor {
-	private String insertText;
-	private String title;
-	private String description;
+@Component
+public class NeighborsMacro implements IMacro {
+	@Autowired
+	private BeanFactory beanFactory;
+	
+	@Override
+	public IMacroDescriptor getDescriptor() {
+		return MessageSourceMacroDescriptor.create("neighbors", beanFactory) //$NON-NLS-1$
+			.insertText("{{neighbors/}}").cacheable(false); //$NON-NLS-1$
+	}
 
-	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
-		insertText = descriptor.getInsertText();
-		title = descriptor.getTitle(locale);
-		description = descriptor.getDescription(locale);
-	}
-	
-	public String getInsertText() {
-		return insertText;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getDescription() {
-		return description;
+	@Override
+	public IMacroRunnable createRunnable() {
+		return new NeighborsMacroRunnable();
 	}
 }

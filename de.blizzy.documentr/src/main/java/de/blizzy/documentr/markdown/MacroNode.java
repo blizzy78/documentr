@@ -15,32 +15,34 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.markdown;
 
-import java.util.Locale;
+import java.util.Collections;
+import java.util.List;
 
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import org.pegdown.ast.Node;
+import org.pegdown.ast.SuperNode;
 
-public class JspMacroDescriptor {
-	private String insertText;
-	private String title;
-	private String description;
+public class MacroNode extends SuperNode {
+	private String macroName;
+	private String params;
 
-	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
-		insertText = descriptor.getInsertText();
-		title = descriptor.getTitle(locale);
-		description = descriptor.getDescription(locale);
+	public MacroNode(String macroName, String params) {
+		this(macroName, params, Collections.<Node>emptyList());
 	}
 	
-	public String getInsertText() {
-		return insertText;
+	public MacroNode(String macroName, String params, List<Node> children) {
+		super(children);
+		
+		this.macroName = macroName;
+		this.params = params;
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getMacroName() {
+		return macroName;
 	}
 	
-	public String getDescription() {
-		return description;
+	public String getParams() {
+		return params;
 	}
 }

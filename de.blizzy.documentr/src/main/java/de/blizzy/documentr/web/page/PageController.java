@@ -59,6 +59,8 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.markdown.IPageRenderer;
+import de.blizzy.documentr.markdown.MarkdownProcessor;
 import de.blizzy.documentr.page.CommitCherryPickConflictResolve;
 import de.blizzy.documentr.page.CommitCherryPickResult;
 import de.blizzy.documentr.page.ICherryPicker;
@@ -72,8 +74,6 @@ import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
-import de.blizzy.documentr.web.markdown.IPageRenderer;
-import de.blizzy.documentr.web.markdown.MarkdownProcessor;
 import de.blizzy.documentr.web.util.ErrorController;
 
 @Controller

@@ -15,32 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.markdown;
 
-import java.util.Locale;
+import static org.junit.Assert.*;
 
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import java.util.List;
 
-public class JspMacroDescriptor {
-	private String insertText;
-	private String title;
-	private String description;
+import org.junit.Test;
+import org.pegdown.ast.HeaderNode;
+import org.pegdown.ast.Node;
 
-	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
-		insertText = descriptor.getInsertText();
-		title = descriptor.getTitle(locale);
-		description = descriptor.getDescription(locale);
-	}
-	
-	public String getInsertText() {
-		return insertText;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getDescription() {
-		return description;
+import com.google.common.collect.Lists;
+
+import de.blizzy.documentr.markdown.PageHeaderNode;
+
+public class PageHeaderNodeTest {
+	@Test
+	public void getChildren() {
+		List<Node> children = Lists.<Node>newArrayList(new HeaderNode(1));
+		PageHeaderNode node = new PageHeaderNode(children);
+		assertEquals(children, node.getChildren());
 	}
 }

@@ -48,16 +48,16 @@ import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.markdown.IPageRenderer;
+import de.blizzy.documentr.markdown.MarkdownProcessor;
+import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.markdown.macro.MacroFactory;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.web.markdown.IPageRenderer;
-import de.blizzy.documentr.web.markdown.MarkdownProcessor;
-import de.blizzy.documentr.web.markdown.macro.IMacroDescriptor;
-import de.blizzy.documentr.web.markdown.macro.MacroFactory;
 
 public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$

@@ -15,32 +15,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.markdown;
 
-import java.util.Locale;
+import static org.junit.Assert.*;
 
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import org.junit.Test;
 
-public class JspMacroDescriptor {
-	private String insertText;
-	private String title;
-	private String description;
+import de.blizzy.documentr.markdown.Header;
 
-	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
-		insertText = descriptor.getInsertText();
-		title = descriptor.getTitle(locale);
-		description = descriptor.getDescription(locale);
+public class HeaderTest {
+	@Test
+	public void getText() {
+		Header header = new Header("foo bar", 123); //$NON-NLS-1$
+		assertEquals("foo bar", header.getText()); //$NON-NLS-1$
 	}
 	
-	public String getInsertText() {
-		return insertText;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getDescription() {
-		return description;
+	@Test
+	public void getLevel() {
+		Header header = new Header("foo bar", 123); //$NON-NLS-1$
+		assertEquals(123, header.getLevel());
 	}
 }

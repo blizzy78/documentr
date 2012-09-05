@@ -15,32 +15,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web;
+package de.blizzy.documentr.markdown.macro.impl;
 
-import java.util.Locale;
+import org.apache.commons.lang3.StringEscapeUtils;
 
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 
-public class JspMacroDescriptor {
-	private String insertText;
-	private String title;
-	private String description;
-
-	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
-		insertText = descriptor.getInsertText();
-		title = descriptor.getTitle(locale);
-		description = descriptor.getDescription(locale);
+class ColorMacroRunnable implements IMacroRunnable {
+	@Override
+	public String getHtml(IMacroContext macroContext) {
+		String color = macroContext.getParameters();
+		return "<span style=\"color: " + StringEscapeUtils.escapeHtml4(color) + ";\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				macroContext.getBody() + "</span>"; //$NON-NLS-1$
 	}
-	
-	public String getInsertText() {
-		return insertText;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getDescription() {
-		return description;
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

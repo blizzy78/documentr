@@ -24,8 +24,8 @@ import org.parboiled.common.ArrayBuilder;
 import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.StringVar;
 
-import de.blizzy.documentr.web.markdown.MacroNode;
-import de.blizzy.documentr.web.markdown.PageHeaderNode;
+import de.blizzy.documentr.markdown.MacroNode;
+import de.blizzy.documentr.markdown.PageHeaderNode;
 
 public class DocumentrParser extends Parser {
 	private static final int PEGDOWN_OPTIONS = Extensions.ALL -
