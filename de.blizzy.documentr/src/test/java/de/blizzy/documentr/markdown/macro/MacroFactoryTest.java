@@ -24,31 +24,33 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.markdown.macro.IMacro;
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
-import de.blizzy.documentr.markdown.macro.MacroFactory;
 
 public class MacroFactoryTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
 	
-	private MacroFactory macroFactory;
 	@Mock
 	private IMacro macro;
 	@Mock
 	private IMacroDescriptor descriptor;
+	@Mock
+	private GroovyMacroScanner groovyMacroScanner;
+	@InjectMocks
+	private MacroFactory macroFactory;
 
 	@Before
 	public void setUp() {
 		when(descriptor.getMacroName()).thenReturn(MACRO);
-		
+
 		when(macro.getDescriptor()).thenReturn(descriptor);
 		
-		macroFactory = new MacroFactory();
+		when(groovyMacroScanner.findGroovyMacros()).thenReturn(Sets.<IMacro>newHashSet());
+
 		macroFactory.setContextMacros(Sets.newHashSet(macro));
 		macroFactory.init();
 	}

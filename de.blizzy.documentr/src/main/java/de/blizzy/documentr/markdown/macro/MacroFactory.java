@@ -23,6 +23,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,17 +35,44 @@ import com.google.common.collect.Sets;
 
 @Component
 public class MacroFactory {
+	private static final Logger log = LoggerFactory.getLogger(MacroFactory.class);
+	
 	@Autowired
 	private Collection<IMacro> contextMacros;
+	@Autowired
+	private GroovyMacroScanner groovyMacroScanner;
 	private Map<String, IMacro> macros = Maps.newHashMap();
 
 	@PostConstruct
 	public void init() {
+		registerMacrosFromClasses();
+		registerGroovyMacros();
+	}
+
+	private void registerMacrosFromClasses() {
+		log.info("registering macros from classes"); //$NON-NLS-1$
 		for (IMacro macro : contextMacros) {
-			IMacroDescriptor descriptor = macro.getDescriptor();
-			macros.put(descriptor.getMacroName(), macro);
+			registerMacro(macro);
 		}
 		contextMacros = null;
+	}
+
+	private void registerGroovyMacros() {
+		Set<IMacro> macros = groovyMacroScanner.findGroovyMacros();
+		for (IMacro macro : macros) {
+			registerMacro(macro);
+		}
+	}
+
+	private void registerMacro(IMacro macro) {
+		IMacroDescriptor descriptor = macro.getDescriptor();
+		String macroName = descriptor.getMacroName();
+		log.debug("registering macro: {}", macroName); //$NON-NLS-1$
+		if (!macros.containsKey(macroName)) {
+			macros.put(macroName, macro);
+		} else {
+			log.warn("duplicate macro: {}", macroName); //$NON-NLS-1$
+		}
 	}
 	
 	public IMacro get(String macroName) {
