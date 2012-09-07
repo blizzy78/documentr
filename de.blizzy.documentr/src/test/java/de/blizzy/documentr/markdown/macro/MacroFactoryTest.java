@@ -33,11 +33,16 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 
 public class MacroFactoryTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
+	private static final String GROOVY_MACRO = "groovyMacro"; //$NON-NLS-1$
 	
 	@Mock
 	private IMacro macro;
 	@Mock
+	private IMacro groovyMacro;
+	@Mock
 	private IMacroDescriptor descriptor;
+	@Mock
+	private IMacroDescriptor groovyDescriptor;
 	@Mock
 	private GroovyMacroScanner groovyMacroScanner;
 	@InjectMocks
@@ -47,23 +52,31 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 	public void setUp() {
 		when(descriptor.getMacroName()).thenReturn(MACRO);
 
+		when(groovyDescriptor.getMacroName()).thenReturn(GROOVY_MACRO);
+
 		when(macro.getDescriptor()).thenReturn(descriptor);
+
+		when(groovyMacro.getDescriptor()).thenReturn(groovyDescriptor);
 		
-		when(groovyMacroScanner.findGroovyMacros()).thenReturn(Sets.<IMacro>newHashSet());
+		when(groovyMacroScanner.findGroovyMacros()).thenReturn(Sets.newHashSet(groovyMacro));
 
 		macroFactory.setContextMacros(Sets.newHashSet(macro));
 		macroFactory.init();
 	}
 	
 	@Test
+	public void mustFindGroovyMacros() {
+		assertSame(groovyMacro, macroFactory.get(GROOVY_MACRO));
+	}
+	
+	@Test
 	public void get() {
-		IMacro result = macroFactory.get(MACRO);
-		assertSame(macro, result);
+		assertSame(macro, macroFactory.get(MACRO));
 	}
 	
 	@Test
 	public void getDescriptors() {
 		Set<IMacroDescriptor> descriptors = macroFactory.getDescriptors();
-		assertEquals(Sets.newHashSet(descriptor), descriptors);
+		assertEquals(Sets.newHashSet(descriptor, groovyDescriptor), descriptors);
 	}
 }

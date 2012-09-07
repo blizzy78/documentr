@@ -80,4 +80,8 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 		this.cacheable = cacheable;
 		return this;
 	}
+
+	void setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
 }

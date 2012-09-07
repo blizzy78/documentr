@@ -17,6 +17,75 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-public class MessageSourceMacroDescriptorTest {
-	// TODO: implement tests
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Locale;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.MessageSource;
+
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class MessageSourceMacroDescriptorTest extends AbstractDocumentrTest {
+	private static final String MACRO = "macro"; //$NON-NLS-1$
+	private static final Locale LOCALE = Locale.US;
+	private static final String TITLE = "title"; //$NON-NLS-1$
+	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
+	
+	@Mock
+	private MessageSource messageSource;
+	@Mock
+	private BeanFactory beanFactory;
+	private MessageSourceMacroDescriptor descriptor;
+	
+	@Before
+	public void setUp() {
+		MessageSourceMacroDescriptor desc = new MessageSourceMacroDescriptor(MACRO);
+		desc.setMessageSource(messageSource);
+		
+		when(beanFactory.getBean(MessageSourceMacroDescriptor.ID, MACRO)).thenReturn(desc);
+	
+		when(messageSource.getMessage("macro." + MACRO + ".title", null, LOCALE)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(TITLE);
+		when(messageSource.getMessage("macro." + MACRO + ".description", null, LOCALE)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(DESCRIPTION);
+		
+		descriptor = MessageSourceMacroDescriptor.create(MACRO, beanFactory);
+	}
+	
+	@Test
+	public void getMacroName() {
+		assertEquals(MACRO, descriptor.getMacroName());
+	}
+	
+	@Test
+	public void setAndGetInsertText() {
+		MessageSourceMacroDescriptor desc = descriptor.insertText("insertText"); //$NON-NLS-1$
+		assertSame(descriptor, desc);
+		assertEquals("insertText", descriptor.getInsertText()); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getTitle() {
+		assertEquals(TITLE, descriptor.getTitle(LOCALE));
+	}
+	
+	@Test
+	public void getDescription() {
+		assertEquals(DESCRIPTION, descriptor.getDescription(LOCALE));
+	}
+	
+	@Test
+	public void setAndGetCacheable() {
+		MessageSourceMacroDescriptor desc = descriptor.cacheable(true);
+		assertSame(descriptor, desc);
+		assertTrue(descriptor.isCacheable());
+
+		descriptor.cacheable(false);
+		assertFalse(descriptor.isCacheable());
+	}
 }

@@ -28,7 +28,6 @@ import java.util.concurrent.TimeoutException;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -153,6 +152,8 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		pageIndex.commit();
 		pageIndex.refresh();
+		// make sure page got indexed
+		assertEquals(1, pageIndex.getNumDocuments());
 		
 		pageIndex.deletePages(new PagesDeletedEvent(PROJECT, BRANCH, Collections.singleton(PAGE_PATH)));
 		pageIndex.commit();
@@ -161,8 +162,29 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@Ignore
-	public void getAllTags() {
-		// TODO: implement test
+	public void getAllTags() throws IOException, TimeoutException {
+		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false)) //$NON-NLS-1$
+			.thenReturn("html"); //$NON-NLS-1$
+		when(markdownProcessor.markdownToHTML("markdown2", PROJECT, "branch2", PAGE_PATH, authentication, false)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn("html2"); //$NON-NLS-1$
+
+		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$
+		page.setTags(Sets.newHashSet("tag")); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
+		Page page2 = Page.fromText("title2", "markdown2"); //$NON-NLS-1$ //$NON-NLS-2$
+		page2.setTags(Sets.newHashSet("tag2")); //$NON-NLS-1$
+		when(pageStore.getPage(PROJECT, "branch2", PAGE_PATH, true)).thenReturn(page2); //$NON-NLS-1$
+	
+		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
+			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
+
+		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
+		pageIndex.addPage(new PageChangedEvent(PROJECT, "branch2", PAGE_PATH)); //$NON-NLS-1$
+		pageIndex.commit();
+		pageIndex.refresh();
+		// make sure pages got indexed
+		assertEquals(2, pageIndex.getNumDocuments());
+		
+		assertEquals(Sets.newHashSet("tag"), pageIndex.getAllTags(authentication)); //$NON-NLS-1$
 	}
 }

@@ -17,13 +17,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import org.junit.Ignore;
+import static org.junit.Assert.*;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 public class RoleGrantedAuthorityComparatorTest {
 	@Test
-	@Ignore
 	public void compare() {
-		// TODO: implement test
+		RoleGrantedAuthority rga1 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project", GrantedAuthorityTarget.Type.PROJECT), "role1"); //$NON-NLS-1$ //$NON-NLS-2$
+		RoleGrantedAuthority rga2 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project/branch", GrantedAuthorityTarget.Type.BRANCH), "role2"); //$NON-NLS-1$ //$NON-NLS-2$
+		RoleGrantedAuthority rga3 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project/branch2", GrantedAuthorityTarget.Type.BRANCH), "role3"); //$NON-NLS-1$ //$NON-NLS-2$
+		RoleGrantedAuthority rga4 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project/branch2", GrantedAuthorityTarget.Type.BRANCH), "role4"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<RoleGrantedAuthority> expected = Lists.newArrayList(rga1, rga2, rga3, rga4);
+
+		List<RoleGrantedAuthority> rgas = Lists.newArrayList(expected);
+		
+		// make sure the list is random
+		while (rgas.equals(expected)) {
+			Collections.shuffle(rgas);
+		}
+
+		RoleGrantedAuthorityComparator comparator = new RoleGrantedAuthorityComparator();
+		Collections.sort(rgas, comparator);
+		assertEquals(expected, rgas);
 	}
 }

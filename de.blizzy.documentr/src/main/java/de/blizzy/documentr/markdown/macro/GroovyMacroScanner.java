@@ -38,7 +38,8 @@ import de.blizzy.documentr.Settings;
 
 @Component
 class GroovyMacroScanner {
-	private static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
+	static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
+	
 	private static final Logger log = LoggerFactory.getLogger(GroovyMacroScanner.class);
 	
 	@Autowired
