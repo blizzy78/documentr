@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<div class="btn-group">
 		<form id="siteSearch" class="form-search" action="<c:url value="/search/page"/>" method="GET">
 			<input type="text" name="q" class="search-query input-large" value="<c:out value="${requestScope._showSiteSearch}"/>"
-				placeholder="<spring:message code="searchTermsPlaceholder"/>"/>
+				placeholder="<spring:message code="searchTermsPlaceholder"/>" x-webkit-speech="x-webkit-speech"/>
 		</form>
 	</div>
 

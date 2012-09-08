@@ -422,4 +422,8 @@ $(function() {
 	});
 	
 	prettyPrint();
+	
+	$('#siteSearch input').bind('webkitspeechchange', function() {
+		$('#siteSearch')[0].submit();
+	});
 });
