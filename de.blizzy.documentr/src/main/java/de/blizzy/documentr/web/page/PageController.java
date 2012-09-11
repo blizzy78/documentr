@@ -33,6 +33,8 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -79,6 +81,8 @@ import de.blizzy.documentr.web.util.ErrorController;
 @Controller
 @RequestMapping("/page")
 public class PageController {
+	private static final Logger log = LoggerFactory.getLogger(PageController.class);
+	
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired
@@ -205,7 +209,11 @@ public class PageController {
 	public String savePage(@ModelAttribute @Valid PageForm form, BindingResult bindingResult,
 			Model model, Authentication authentication) throws IOException {
 		
-		if (!repoManager.listProjectBranches(form.getProjectName()).contains(form.getBranchName())) {
+		String projectName = form.getProjectName();
+		String branchName = form.getBranchName();
+		User user = userStore.getUser(authentication.getName());
+		
+		if (!repoManager.listProjectBranches(projectName).contains(branchName)) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -229,13 +237,12 @@ public class PageController {
 		
 		Page oldPage = null;
 		try {
-			oldPage = pageStore.getPage(form.getProjectName(), form.getBranchName(), path, true);
+			oldPage = pageStore.getPage(projectName, branchName, path, true);
 		} catch (PageNotFoundException e) {
 			// okay
 		}
 		if ((oldPage == null) || !page.equals(oldPage)) {
-			User user = userStore.getUser(authentication.getName());
-			MergeConflict conflict = pageStore.savePage(form.getProjectName(), form.getBranchName(), path,
+			MergeConflict conflict = pageStore.savePage(projectName, branchName, path,
 					page, Strings.emptyToNull(form.getCommit()), user);
 			if (conflict != null) {
 				form.setText(conflict.getText());
@@ -244,8 +251,25 @@ public class PageController {
 				return "/project/branch/page/edit"; //$NON-NLS-1$
 			}
 		}
+		
+		Integer start = form.getParentPageSplitRangeStart();
+		Integer end = form.getParentPageSplitRangeEnd();
+		if (StringUtils.isNotBlank(parentPagePath) && (start != null) && (end != null) &&
+			permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, Permission.EDIT_PAGE)) {
+			
+			log.info("splitting off {}-{} of {}/{}/{}", new Object[] { //$NON-NLS-1$
+					start, end, projectName, branchName, parentPagePath
+			});
 
-		return "redirect:/page/" + form.getProjectName() + "/" + form.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Page parentPage = pageStore.getPage(projectName, branchName, parentPagePath, true);
+			String text = ((PageTextData) parentPage.getData()).getText();
+			end = Integer.valueOf(Math.min(end.intValue(), text.length()));
+			text = text.substring(0, start.intValue()) + text.substring(end.intValue());
+			parentPage.setData(new PageTextData(text));
+			pageStore.savePage(projectName, branchName, parentPagePath, parentPage, null, user);
+		}
+
+		return "redirect:/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(path);
 	}
 	
@@ -584,6 +608,34 @@ public class PageController {
 		return Lists.transform(pageVersions, function);
 	}
 	
+	@RequestMapping(value="/split/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
+			"{rangeStart:[0-9]+},{rangeEnd:[0-9]+}",
+			method=RequestMethod.GET)
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
+	public String splitPage(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd,
+			Model model) throws IOException {
+
+		log.info("splitting off {}-{} of {}/{}/{}", new Object[] { //$NON-NLS-1$
+				Integer.valueOf(rangeStart), Integer.valueOf(rangeEnd),
+				projectName, branchName, path
+		});
+
+		path = Util.toRealPagePath(path);
+		Page page = pageStore.getPage(projectName, branchName, path, true);
+		String text = ((PageTextData) page.getData()).getText();
+		rangeEnd = Math.min(rangeEnd, text.length());
+		text = text.substring(rangeStart, rangeEnd).trim();
+		PageForm form = new PageForm(projectName, branchName, null, path,
+				null, text, StringUtils.EMPTY, null, ArrayUtils.EMPTY_STRING_ARRAY);
+		form.setParentPageSplitRangeStart(Integer.valueOf(rangeStart));
+		form.setParentPageSplitRangeEnd(Integer.valueOf(rangeEnd));
+		model.addAttribute("pageForm", form); //$NON-NLS-1$
+		return "/project/branch/page/edit"; //$NON-NLS-1$
+	}
+
 	void setPageStore(IPageStore pageStore) {
 		this.pageStore = pageStore;
 	}

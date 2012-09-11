@@ -1,0 +1,64 @@
+/*
+documentr - Edit, maintain, and present software documentation on the web.
+Copyright (C) 2012 Maik Schreiber
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+.page-split-cursor {
+	position: absolute;
+	z-index: 1;
+	
+	.line {
+		background-color: #08c;
+		height: 2px;
+	}
+	
+	.above,
+	.below {
+		background-color: #08c;
+		color: white;
+		display: inline-block;
+		padding: 0 5px 0 5px;
+
+		[class^="icon-"],
+		[class*=" icon-"] {
+			.icon-white;
+		}
+	}
+	
+	.above {
+		border-top-left-radius: 2px 2px;
+		border-top-right-radius: 2px 2px;
+	}
+	
+	.below {
+		border-bottom-left-radius: 2px 2px;
+		border-bottom-right-radius: 2px 2px;
+	}
+}
+
+.page-split-outside,
+.page-split-outside * {
+	/* cannot use .muted here because we need !important */
+	color: #999 !important;
+}
+
+.page-split-background {
+	position: absolute;
+	background-color: #f2f9fc;
+	z-index: -1;
+	border-left: 1px solid #08c;
+	border-right: 1px solid #08c;
+}

@@ -54,6 +54,8 @@ public class PageForm {
 	private String viewRestrictionRole;
 	private String commit;
 	private String[] tags;
+	private Integer parentPageSplitRangeStart;
+	private Integer parentPageSplitRangeEnd;
 
 	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
 			String viewRestrictionRole, String commit, String[] tags) {
@@ -111,5 +113,21 @@ public class PageForm {
 	
 	public String[] getTags() {
 		return ArrayUtils.clone(tags);
+	}
+	
+	public void setParentPageSplitRangeStart(Integer parentPageSplitRangeStart) {
+		this.parentPageSplitRangeStart = parentPageSplitRangeStart;
+	}
+	
+	public Integer getParentPageSplitRangeStart() {
+		return parentPageSplitRangeStart;
+	}
+	
+	public void setParentPageSplitRangeEnd(Integer parentPageSplitRangeEnd) {
+		this.parentPageSplitRangeEnd = parentPageSplitRangeEnd;
+	}
+	
+	public Integer getParentPageSplitRangeEnd() {
+		return parentPageSplitRangeEnd;
 	}
 }

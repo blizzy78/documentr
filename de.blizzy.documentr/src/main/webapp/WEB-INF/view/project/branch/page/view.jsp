@@ -78,6 +78,20 @@ function copyToBranchSelected() {
 
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 
+function toggleHideFloatingElements(hide) {
+	$('#pageText').children().each(function() {
+		var el = $(this);
+		var float = el.css('float');
+		if ((float === 'left') || (float === 'right')) {
+			if (hide) {
+				el.hide();
+			} else {
+				el.show();
+			}
+		}
+	});
+}
+
 function showDeleteDialog() {
 	documentr.openMessageDialog('<spring:message code="title.deletePage"/>',
 		<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/></c:set>
@@ -163,23 +177,150 @@ function showRelocateDialog() {
 	}
 }
 
-</sec:authorize>
+function startPageSplit() {
+	toggleHideFloatingElements(true);
+	$('#pageText').data({
+		pageSplitMode: 'start',
+		pageSplitStart: null,
+		pageSplitEnd: null
+	});
+	updatePageSplitRange();
+}
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
-
-function toggleHideFloatingElements(hide) {
-	$('#pageText').children().each(function() {
-		var el = $(this);
-		var float = el.css('float');
-		if ((float === 'left') || (float === 'right')) {
-			if (hide) {
-				el.hide();
+function updatePageSplitRange() {
+	var pageText = $('#pageText');
+	var startEl = pageText.data('pageSplitStart');
+	var endEl = pageText.data('pageSplitEnd');
+	var inside = false;
+	if (!documentr.isSomething(startEl) && !documentr.isSomething(endEl)) {
+		inside = true;
+	}
+	$('#pageText > *[data-text-range]').each(function() {
+		var textEl = $(this);
+		var float = textEl.css('float');
+		if ((float !== 'left') && (float !== 'right')) {
+			var el = textEl[0];
+			if (documentr.isSomething(startEl) && (el === startEl)) {
+				inside = true;
+			}
+		
+			if (inside) {
+				textEl
+					.removeClass('page-split-outside')
+					.children()
+						.removeClass('page-split-outside');
 			} else {
-				el.show();
+				textEl
+					.addClass('page-split-outside')
+					.children()
+						.addClass('page-split-outside');
+			}
+
+			if (documentr.isSomething(endEl) && (el === endEl)) {
+				inside = false;
 			}
 		}
 	});
+
+	var mode = $('#pageText').data('pageSplitMode');
+	var textEl = (mode === 'start') ? startEl : endEl;
+	var splitCursorEl = $('#splitCursor');
+	var splitCursorStartEl = $('#splitCursorStart');
+	var splitBGEl = $('#splitBG');
+	if (documentr.isSomething(textEl)) {
+		var wasHidden = $('#splitCursor:hidden').length > 0;
+	
+		textEl = $(textEl);
+		splitCursorEl.css({
+				left: textEl.offset().left,
+				top: (mode === 'start') ? (textEl.offset().top - splitCursorEl.outerHeight() - 3) : (textEl.offset().top + textEl.outerHeight() + 3),
+				width: textEl.outerWidth()
+			})
+			.show();
+
+		if (mode === 'start') {
+			splitCursorEl.find('.above').show();
+			splitCursorEl.find('.below').hide();
+			splitCursorStartEl.hide();
+			$('#splitBG').hide();
+		} else {
+			splitCursorEl.find('.above').hide();
+			splitCursorEl.find('.below').show();
+			splitCursorStartEl.show();
+			splitBGEl.css({
+				left: splitCursorStartEl.offset().left,
+				top: splitCursorStartEl.offset().top + splitCursorStartEl.outerHeight(),
+				<%-- minus 2 to account for border --%>
+				width: splitCursorStartEl.outerWidth() - 2,
+				height: splitCursorEl.offset().top - splitCursorStartEl.offset().top - splitCursorStartEl.outerHeight()
+			}).show();
+		}
+		
+		<%-- force another refresh if cursor was hidden before to set cursor top position correctly --%>
+		if (wasHidden) {
+			window.setTimeout(updatePageSplitRange, 1);
+		}
+	} else {
+		splitCursorEl.hide();
+		splitCursorStartEl.hide();
+		splitBGEl.hide();
+	}
 }
+
+function hookupSplitCursor() {
+	$('#pageText > *[data-text-range]')
+		.mouseenter(function() {
+			var mode = $('#pageText').data('pageSplitMode');
+			if ((mode === 'start') || (mode === 'end')) {
+				var textEl = $(this);
+				var float = textEl.css('float');
+				if ((float !== 'left') && (float !== 'right')) {
+					var ok = true;
+					if (mode === 'end') {
+						var els = $('#pageText > *[data-text-range]');
+						var startEl = $('#pageText').data('pageSplitStart');
+						var startIdx = els.index(startEl);
+						var endIdx = els.index(textEl[0]);
+						if (endIdx < startIdx) {
+							ok = false;
+						}
+					}
+
+					if (ok) {
+						$('#pageText').data((mode === 'start') ? 'pageSplitStart' : 'pageSplitEnd', textEl[0]);
+						updatePageSplitRange();
+					}
+				}
+			}
+		})
+		.click(function() {
+			var pageTextEl = $('#pageText');
+			var mode = pageTextEl.data('pageSplitMode');
+			if (mode === 'start') {
+				pageTextEl.data({
+					pageSplitEnd: $('#pageText').data('pageSplitStart'),
+					pageSplitMode: 'end'
+				});
+				var splitCursorEl = $('#splitCursor');
+				$('#splitCursorStart').css({
+					left: splitCursorEl.offset().left,
+					top: splitCursorEl.offset().top,
+					width: splitCursorEl.outerWidth()
+				});
+				updatePageSplitRange();
+			} else if (mode === 'end') {
+				var startEl = $(pageTextEl.data('pageSplitStart'));
+				var endEl = $(pageTextEl.data('pageSplitEnd'));
+				var start = startEl.attr('data-text-range').replace(/,.*/, '');
+				var end = endEl.attr('data-text-range').replace(/.*,/, '');
+				window.location.href = '<c:url value="/page/split/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + start + ',' + end;
+			}
+		});
+}
+
+</sec:authorize>
+
+<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 
 function saveInlineEditor() {
 	var formEl = $('#inlineEditorForm');
@@ -248,14 +389,6 @@ function startInlineEditor(textEl, range) {
 }
 
 function hookupInlineEditorToolbar() {
-	function showEl(el) {
-		el.stop(true).fadeTo(0, 1);
-	}
-	
-	function hideEl(el) {
-		el.stop(true).fadeTo(3000, 0.25);
-	}
-
 	$('#pageText > *[data-text-range]').mouseenter(function() {
 		var textEl = $(this);
 		var float = textEl.css('float');
@@ -333,6 +466,7 @@ function showChangesDialog() {
 
 $(function() {
 	hookupInlineEditorToolbar();
+	hookupSplitCursor();
 });
 
 </sec:authorize>
@@ -410,6 +544,12 @@ $(function() {
 					</dt:dropdownEntry>
 				</sec:authorize>
 				
+				<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
+					<dt:dropdownEntry divider="true">
+						<li><a href="javascript:void(startPageSplit());"><i class="icon-file"></i> <spring:message code="button.splitPage"/></a></li>
+					</dt:dropdownEntry>
+				</sec:authorize>
+
 				<c:if test="${path ne 'home'}">
 					<dt:dropdownEntry divider="true">
 						<sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
@@ -507,6 +647,10 @@ $(function() {
 </sec:authorize>
 
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
+	<div id="splitCursor" class="page-split-cursor" style="display: none;"><div class="above"><i class="icon-chevron-down"></i> <spring:message code="title.pageSplitStart"/></div><div class="line"></div><div class="below"><i class="icon-chevron-up"></i> <spring:message code="title.pageSplitEnd"/></div></div>
+	<div id="splitCursorStart" class="page-split-cursor" style="display: none;"><div class="above"><i class="icon-chevron-down"></i> <spring:message code="title.pageSplitStart"/></div><div class="line"></div></div>
+	<div id="splitBG" class="page-split-background" style="display: none;"></div>
+
 	<div class="modal" id="relocate-dialog" style="display: none;">
 		<div class="modal-header">
 			<button class="close" onclick="$('#relocate-dialog').hideModal();">×</button>

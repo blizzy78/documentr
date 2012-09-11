@@ -557,6 +557,8 @@ $(function() {
 		<c:forEach var="tag" items="${pageForm.tags}">
 			<input type="hidden" name="tags" value="<c:out value="${tag}"/>"/>
 		</c:forEach>
+		<form:hidden path="parentPageSplitRangeStart"/>
+		<form:hidden path="parentPageSplitRangeEnd"/>
 		
 		<c:set var="errorText"><form:errors path="title"/></c:set>
 		<div id="titleFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
