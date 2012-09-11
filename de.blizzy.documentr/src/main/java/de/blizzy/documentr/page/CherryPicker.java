@@ -19,6 +19,8 @@ package de.blizzy.documentr.page;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -54,6 +57,8 @@ class CherryPicker implements ICherryPicker {
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private EventBus eventBus;
+	@Autowired
+	private IPageStore pageStore;
 	
 	@Override
 	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
@@ -232,6 +237,53 @@ class CherryPicker implements ICherryPicker {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<String> getCommitsList(String projectName, String branchName, String path,
+			String version1, String version2) throws IOException {
+		
+		List<PageVersion> pageVersions = Lists.newArrayList(pageStore.listPageVersions(projectName, branchName, path));
+		boolean foundVersion1 = false;
+		boolean foundVersion2 = false;
+		for (PageVersion pageVersion : pageVersions) {
+			String commit = pageVersion.getCommitName();
+			if (!foundVersion1 && commit.equals(version1)) {
+				foundVersion1 = true;
+			}
+			if (!foundVersion2 && commit.equals(version2)) {
+				foundVersion2 = true;
+			}
+			if (foundVersion1 && foundVersion2) {
+				break;
+			}
+		}
+		if (!foundVersion1 || !foundVersion2) {
+			throw new IllegalArgumentException("one of version1 or version2 not found in version history of page"); //$NON-NLS-1$
+		}
+		
+		Collections.reverse(pageVersions);
+		boolean include = false;
+		for (Iterator<PageVersion> iter = pageVersions.iterator(); iter.hasNext();) {
+			PageVersion version = iter.next();
+			if (!include) {
+				iter.remove();
+			}
+			
+			String commit = version.getCommitName();
+			if (commit.equals(version1)) {
+				include = true;
+			} else if (commit.equals(version2)) {
+				include = false;
+			}
+		}
+		Function<PageVersion, String> function = new Function<PageVersion, String>() {
+			@Override
+			public String apply(PageVersion version) {
+				return version.getCommitName();
+			}
+		};
+		return Lists.transform(pageVersions, function);
 	}
 
 	void setEventBus(EventBus eventBus) {

@@ -19,9 +19,7 @@ package de.blizzy.documentr.web.page;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,9 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -73,7 +69,6 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PageUtil;
-import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.util.ErrorController;
@@ -511,7 +506,7 @@ public class PageController {
 			}
 		}
 		
-		List<String> commits = getCommitsToCherryPick(projectName, branchName, path, version1, version2);
+		List<String> commits = cherryPicker.getCommitsList(projectName, branchName, path, version1, version2);
 		if (commits.isEmpty()) {
 			throw new IllegalArgumentException("no commits to cherry-pick"); //$NON-NLS-1$
 		}
@@ -562,52 +557,6 @@ public class PageController {
 		return "/project/branch/page/cherryPick"; //$NON-NLS-1$
 	}
 
-	private List<String> getCommitsToCherryPick(String projectName, String branchName, String path,
-			String version1, String version2) throws IOException {
-		
-		List<PageVersion> pageVersions = Lists.newArrayList(pageStore.listPageVersions(projectName, branchName, path));
-		boolean foundVersion1 = false;
-		boolean foundVersion2 = false;
-		for (PageVersion pageVersion : pageVersions) {
-			String commit = pageVersion.getCommitName();
-			if (!foundVersion1 && commit.equals(version1)) {
-				foundVersion1 = true;
-			}
-			if (!foundVersion2 && commit.equals(version2)) {
-				foundVersion2 = true;
-			}
-			if (foundVersion1 && foundVersion2) {
-				break;
-			}
-		}
-		if (!foundVersion1 || !foundVersion2) {
-			throw new IllegalArgumentException("one of version1 or version2 not found in version history of page"); //$NON-NLS-1$
-		}
-		
-		Collections.reverse(pageVersions);
-		boolean include = false;
-		for (Iterator<PageVersion> iter = pageVersions.iterator(); iter.hasNext();) {
-			PageVersion version = iter.next();
-			if (!include) {
-				iter.remove();
-			}
-			
-			String commit = version.getCommitName();
-			if (commit.equals(version1)) {
-				include = true;
-			} else if (commit.equals(version2)) {
-				include = false;
-			}
-		}
-		Function<PageVersion, String> function = new Function<PageVersion, String>() {
-			@Override
-			public String apply(PageVersion version) {
-				return version.getCommitName();
-			}
-		};
-		return Lists.transform(pageVersions, function);
-	}
-	
 	@RequestMapping(value="/split/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +

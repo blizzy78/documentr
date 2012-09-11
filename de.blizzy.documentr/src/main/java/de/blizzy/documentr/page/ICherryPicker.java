@@ -36,4 +36,7 @@ public interface ICherryPicker {
 	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
 			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
 			User user) throws IOException;
+
+	List<String> getCommitsList(String projectName, String branchName, String path,
+			String version1, String version2) throws IOException;
 }
