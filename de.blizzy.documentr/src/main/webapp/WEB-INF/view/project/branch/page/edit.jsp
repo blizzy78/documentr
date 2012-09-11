@@ -469,7 +469,8 @@ $(function() {
 							$('#pageForm').find('#path').val(result.path);
 							if (result.exists) {
 								fieldset.addClass('warning');
-								fieldset.append($('<span id="pathExistsWarning" class="help-inline">' +
+								var controls = $('#pathControls');
+								controls.append($('<span id="pathExistsWarning" class="help-inline">' +
 									'<spring:message code="page.path.exists"/></span>'));
 							}
 							$('#pinPathButton').removeClass('disabled').removeClass('active');
@@ -571,7 +572,7 @@ $(function() {
 		<div id="pathFieldset" class="control-group">
 			<form:hidden path="path"/>
 			<form:label path="path" cssClass="control-label"><spring:message code="label.pathGeneratedAutomatically"/>:</form:label>
-			<div class="controls">
+			<div class="controls" id="pathControls">
 				<form:input path="path" cssClass="input-xlarge disabled" disabled="true"/>
 				<c:if test="${empty pageForm.path}">
 					<a id="pinPathButton" class="btn disabled" data-toggle="button" href="javascript:;" title="<spring:message code="button.pinPath"/>"><i class="icon-lock"></i></a>
