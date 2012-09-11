@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -224,5 +225,11 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 				Collections.<CommitCherryPickConflictResolve>emptySet(), true, USER);
 		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
 		assertEquals("a\nb\nc\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+
+	@Test
+	@Ignore
+	public void getCommitsList() {
+		// TODO: implement test
 	}
 }

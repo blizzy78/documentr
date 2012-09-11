@@ -475,14 +475,9 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
 				.thenReturn(true);
-		@SuppressWarnings("nls")
-		List<PageVersion> pageVersions = Lists.newArrayList(
-				new PageVersion("version5", "user", new Date()),
-				new PageVersion("version4", "user", new Date()),
-				new PageVersion("version3", "user", new Date()),
-				new PageVersion("version2", "user", new Date()),
-				new PageVersion("version1", "user", new Date()));
-		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
+
+		when(cherryPicker.getCommitsList(PROJECT, BRANCH, PAGE_PATH, "version2", "version4")) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(Lists.newArrayList("version3", "version4")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		@SuppressWarnings("nls")
 		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
@@ -510,14 +505,9 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
 				.thenReturn(true);
-		@SuppressWarnings("nls")
-		List<PageVersion> pageVersions = Lists.newArrayList(
-				new PageVersion("version5", "user", new Date()),
-				new PageVersion("version4", "user", new Date()),
-				new PageVersion("version3", "user", new Date()),
-				new PageVersion("version2", "user", new Date()),
-				new PageVersion("version1", "user", new Date()));
-		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
+
+		when(cherryPicker.getCommitsList(PROJECT, BRANCH, PAGE_PATH, "version2", "version4")) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(Lists.newArrayList("version3", "version4")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		@SuppressWarnings("nls")
 		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
@@ -549,15 +539,10 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
 				.thenReturn(true);
-		@SuppressWarnings("nls")
-		List<PageVersion> pageVersions = Lists.newArrayList(
-				new PageVersion("version5", "user", new Date()),
-				new PageVersion("version4", "user", new Date()),
-				new PageVersion("version3", "user", new Date()),
-				new PageVersion("version2", "user", new Date()),
-				new PageVersion("version1", "user", new Date()));
-		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageVersions);
 		
+		when(cherryPicker.getCommitsList(PROJECT, BRANCH, PAGE_PATH, "version2", "version4")) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(Lists.newArrayList("version3", "version4")); //$NON-NLS-1$ //$NON-NLS-2$
+
 		@SuppressWarnings("nls")
 		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet(
 				new CommitCherryPickConflictResolve("targetBranch", "version3", "resolveText"));
