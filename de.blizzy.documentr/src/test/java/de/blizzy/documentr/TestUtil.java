@@ -20,11 +20,14 @@ package de.blizzy.documentr;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -156,5 +159,9 @@ public final class TestUtil {
 		} catch (InterruptedException e) {
 			// ignore
 		}
+	}
+	
+	public static void assertClean(Repository repo) throws IOException {
+		assertTrue(Git.wrap(repo).status().call().isClean());
 	}
 }

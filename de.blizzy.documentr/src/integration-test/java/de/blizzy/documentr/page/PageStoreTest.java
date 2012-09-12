@@ -89,7 +89,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void saveAndGetPage() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		Page page = saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, "home/foo", true); //$NON-NLS-1$
 		assertEquals(page.getTitle(), result.getTitle());
@@ -99,12 +100,15 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertNull(result.getViewRestrictionRole());
 		
 		verify(eventBus).post(new PageChangedEvent(PROJECT, BRANCH_1, "home/foo")); //$NON-NLS-1$
+		
+		assertClean(repo.r());
 	}
 	
 	@Test
 	public void savePageWithViewRestrictionRole() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
 		pageStore.savePage(PROJECT, BRANCH_1, "home/foo", page, null, USER); //$NON-NLS-1$
@@ -114,12 +118,15 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(page.getContentType(), result.getContentType());
 		assertEquals(page.getViewRestrictionRole(), result.getViewRestrictionRole());
 		assertEquals("home", result.getParentPagePath()); //$NON-NLS-1$
+
+		assertClean(repo.r());
 	}
 	
 	@Test
 	public void savePageWithSameBaseCommitAndNonconflictingChanges() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String baseCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
@@ -132,12 +139,15 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		Page result = pageStore.getPage(PROJECT, BRANCH_1, PAGE, true);
 		assertNull(conflict);
 		assertEquals("a\nbbb\nc\nd\ne\nf\ng\nh\niii\nj\n", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
+
+		assertClean(repo.r());
 	}
 
 	@Test
 	public void savePageWithSameBaseCommitAndConflictingChanges() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		String baseCommit = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
@@ -151,6 +161,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertNotNull(conflict);
 		assertEquals("a\nbbb\nc\nd\ne\nf\ng\nh\ni\nj\n", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
 		assertEquals("a\n<<<<<<< OURS\nbbb\n=======\nxxx\n>>>>>>> THEIRS\nc\nd\ne\nf\ng\nh\ni\nj\n", conflict.getText()); //$NON-NLS-1$
+
+		assertClean(repo.r());
 	}
 	
 	@Test
@@ -250,7 +262,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void saveAndGetAttachment() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		saveRandomPage(BRANCH_1, "foo/bar/baz"); //$NON-NLS-1$
 		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat", attachment, USER); //$NON-NLS-1$ //$NON-NLS-2$
@@ -258,6 +271,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		Page result = pageStore.getAttachment(PROJECT, BRANCH_1, "foo/bar/baz", "test.dat"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertTrue(ArrayUtils.isEquals(attachment.getData(), result.getData()));
 		assertEquals(attachment.getContentType(), result.getContentType());
+
+		assertClean(repo.r());
 	}
 
 	@Test
@@ -323,18 +338,30 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertFalse(metaFile.exists());
 		assertFalse(subPagesDir.exists());
 		assertFalse(attachmentsDir.exists());
+
+		assertClean(repo.r());
 	}
 	
 	@Test
 	public void deleteAttachment() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		saveRandomPage(BRANCH_1, PAGE);
 		Page attachment = Page.fromData(new byte[] { 1, 2, 3 }, "application/octet-stream"); //$NON-NLS-1$
 		pageStore.saveAttachment(PROJECT, BRANCH_1, PAGE, "test.dat", attachment, USER); //$NON-NLS-1$
+		assertFalse(pageStore.listPageAttachments(PROJECT, BRANCH_1, PAGE).isEmpty());
+		File pageFile = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "attachments"), PAGE), "test.dat.page"); //$NON-NLS-1$ //$NON-NLS-2$
+		File metaFile = new File(new File(new File(RepositoryUtil.getWorkingDir(repo.r()), "attachments"), PAGE), "test.dat.meta"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(pageFile.exists());
+		assertTrue(metaFile.exists());
 		
 		pageStore.deleteAttachment(PROJECT, BRANCH_1, PAGE, "test.dat", USER); //$NON-NLS-1$
 		assertTrue(pageStore.listPageAttachments(PROJECT, BRANCH_1, PAGE).isEmpty());
+		assertFalse(pageFile.exists());
+		assertFalse(metaFile.exists());
+
+		assertClean(repo.r());
 	}
 	
 	@Test
@@ -366,7 +393,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void relocatePage() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		saveRandomPage(BRANCH_1, "home"); //$NON-NLS-1$
 		saveRandomPage(BRANCH_1, "home/foo"); //$NON-NLS-1$
 		Page page = saveRandomPage(BRANCH_1, "home/foo/bar"); //$NON-NLS-1$
@@ -389,6 +417,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 				pageStore.getPage(PROJECT, BRANCH_1, "home/baz/bar", true).getData()); //$NON-NLS-1$
 		assertEquals(attachment.getData(),
 				pageStore.getAttachment(PROJECT, BRANCH_1, "home/baz/bar", "test.txt").getData()); //$NON-NLS-1$ //$NON-NLS-2$
+
+		assertClean(repo.r());
 	}
 	
 	@Test
@@ -453,7 +483,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	@Test
 	public void restorePageVersion() throws IOException, GitAPIException {
 		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
-		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		ILockedRepository repo = globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null);
+		register(repo);
 		Page page = Page.fromText("old", "old"); //$NON-NLS-1$ //$NON-NLS-2$
 		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
 		page = Page.fromText("new", "new"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -465,6 +496,8 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals("old", ((PageTextData) result.getData()).getText()); //$NON-NLS-1$
 		versions = pageStore.listPageVersions(PROJECT, BRANCH_1, PAGE);
 		assertEquals(3, versions.size());
+
+		assertClean(repo.r());
 	}
 	
 	private void assertPageVersion(RevCommit commit, PageVersion version) {

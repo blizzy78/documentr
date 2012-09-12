@@ -609,31 +609,40 @@ class PageStore implements IPageStore {
 			}));
 			oldPagePaths.add(path);
 
+			Git git = Git.wrap(repo.r());
+
 			File file = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 			if (file.isFile()) {
-				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			file = Util.toFile(pagesDir, path + DocumentrConstants.META_SUFFIX);
 			if (file.isFile()) {
-				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.META_SUFFIX) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			file = Util.toFile(pagesDir, path);
 			if (file.isDirectory()) {
-				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			
 			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
 			file = Util.toFile(attachmentsDir, path);
 			if (file.isDirectory()) {
-				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.ATTACHMENTS_DIR_NAME + "/" + path) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			
 			if (deleted) {
-				Git git = Git.wrap(repo.r());
 				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 				git.commit()
 					.setAuthor(ident)
@@ -942,21 +951,30 @@ class PageStore implements IPageStore {
 			repo = repoManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
+			Git git = Git.wrap(repo.r());
+
 			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
 			boolean deleted = false;
 			File file = Util.toFile(attachmentsDir, pagePath + "/" + name + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.ATTACHMENTS_DIR_NAME + "/" + //$NON-NLS-1$
+						pagePath + "/" + name + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			file = Util.toFile(attachmentsDir, pagePath + "/" + name + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 			if (file.isFile()) {
 				FileUtils.forceDelete(file);
+				git.rm()
+					.addFilepattern(DocumentrConstants.ATTACHMENTS_DIR_NAME + "/" + //$NON-NLS-1$
+						pagePath + "/" + name + DocumentrConstants.META_SUFFIX) //$NON-NLS-1$
+					.call();
 				deleted = true;
 			}
 			
 			if (deleted) {
-				Git git = Git.wrap(repo.r());
 				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 				git.commit()
 					.setAuthor(ident)
