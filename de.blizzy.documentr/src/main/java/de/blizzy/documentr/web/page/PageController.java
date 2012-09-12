@@ -252,9 +252,8 @@ public class PageController {
 		if (StringUtils.isNotBlank(parentPagePath) && (start != null) && (end != null) &&
 			permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, Permission.EDIT_PAGE)) {
 			
-			log.info("splitting off {}-{} of {}/{}/{}", new Object[] { //$NON-NLS-1$
-					start, end, projectName, branchName, parentPagePath
-			});
+			log.info("splitting off {}-{} of {}/{}/{}", //$NON-NLS-1$
+					start, end, projectName, branchName, parentPagePath);
 
 			Page parentPage = pageStore.getPage(projectName, branchName, parentPagePath, true);
 			String text = ((PageTextData) parentPage.getData()).getText();
@@ -567,10 +566,9 @@ public class PageController {
 			@PathVariable String path, @PathVariable int rangeStart, @PathVariable int rangeEnd,
 			Model model) throws IOException {
 
-		log.info("splitting off {}-{} of {}/{}/{}", new Object[] { //$NON-NLS-1$
+		log.info("splitting off {}-{} of {}/{}/{}", //$NON-NLS-1$
 				Integer.valueOf(rangeStart), Integer.valueOf(rangeEnd),
-				projectName, branchName, path
-		});
+				projectName, branchName, path);
 
 		path = Util.toRealPagePath(path);
 		Page page = pageStore.getPage(projectName, branchName, path, true);

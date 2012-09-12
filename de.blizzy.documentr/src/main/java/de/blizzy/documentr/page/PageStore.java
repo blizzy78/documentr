@@ -262,9 +262,8 @@ class PageStore implements IPageStore {
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("loading page {}/{}/{}, commit: {}, loadData: {}", new Object[] { //$NON-NLS-1$
-					projectName, branchName, Util.toURLPagePath(path), commit, Boolean.valueOf(loadData)
-			});
+			log.debug("loading page {}/{}/{}, commit: {}, loadData: {}", //$NON-NLS-1$
+					projectName, branchName, Util.toURLPagePath(path), commit, Boolean.valueOf(loadData));
 		}
 
 		try {

@@ -56,9 +56,8 @@ class NeighborsMacroRunnable implements IMacroRunnable {
 			branchName = htmlSerializerContext.getBranchName();
 			
 			if (log.isInfoEnabled()) {
-				log.info("rendering neighbors for page: {}/{}/{}, user: {}", new Object[] { //$NON-NLS-1$
-						projectName, branchName, Util.toURLPagePath(path), htmlSerializerContext.getAuthentication().getName()
-				});
+				log.info("rendering neighbors for page: {}/{}/{}, user: {}", //$NON-NLS-1$
+						projectName, branchName, Util.toURLPagePath(path), htmlSerializerContext.getAuthentication().getName());
 			}
 
 			try {

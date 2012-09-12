@@ -45,7 +45,7 @@ class PageRenderer implements IPageRenderer {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} for user {}", //$NON-NLS-1$
-					new Object[] { projectName, branchName, Util.toURLPagePath(path), authentication.getName() });
+					projectName, branchName, Util.toURLPagePath(path), authentication.getName());
 		}
 		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
@@ -59,7 +59,7 @@ class PageRenderer implements IPageRenderer {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} header for user {}", //$NON-NLS-1$
-					new Object[] { projectName, branchName, Util.toURLPagePath(path), authentication.getName() });
+					projectName, branchName, Util.toURLPagePath(path), authentication.getName());
 		}
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
