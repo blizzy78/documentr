@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <center>
 
 <c:if test="${!empty errorMessage}">
-	<p class="login-error">
+	<p class="text-error">
 		<c:out value="${errorMessage}"/>
 	</p>
 </c:if>

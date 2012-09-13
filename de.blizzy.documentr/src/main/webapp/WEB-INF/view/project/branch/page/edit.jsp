@@ -547,9 +547,9 @@ $(function() {
 <p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal">
-	<c:set var="errorText"><form:errors cssClass="form-error"/></c:set>
+	<c:set var="errorText"><form:errors cssClass="text-error"/></c:set>
 	<c:if test="${mergeConflict}">
-		<p class="form-error"><spring:message code="conflictExists"/></p>
+		<p class="text-error"><spring:message code="conflictExists"/></p>
 	</c:if>
 
 	<fieldset>
