@@ -17,25 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import de.blizzy.documentr.markdown.macro.IMacro;
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.markdown.macro.ISimpleMacro;
+import de.blizzy.documentr.markdown.macro.Macro;
 
-@Component
-public class VimeoMacro implements IMacro {
-	@Autowired
-	private BeanFactory beanFactory;
-	
-	@Override
-	public IMacroDescriptor getDescriptor() {
-		return MessageSourceMacroDescriptor.create("vimeo", beanFactory) //$NON-NLS-1$
-			.insertText("{{vimeo [VIDEO]/}}"); //$NON-NLS-1$
-	}
-
+@Macro(name="vimeo", insertText="{{vimeo [VIDEO]/}}")
+public class VimeoMacro implements ISimpleMacro {
 	@Override
 	public IMacroRunnable createRunnable() {
 		return new VimeoMacroRunnable();

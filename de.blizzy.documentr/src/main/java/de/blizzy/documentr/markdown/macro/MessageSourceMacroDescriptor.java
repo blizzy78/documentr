@@ -15,20 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro.impl;
+package de.blizzy.documentr.markdown.macro;
 
 import java.util.Locale;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
-
 @Component(MessageSourceMacroDescriptor.ID)
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	static final String ID = "messageSourceMacroDescriptor"; //$NON-NLS-1$
 	

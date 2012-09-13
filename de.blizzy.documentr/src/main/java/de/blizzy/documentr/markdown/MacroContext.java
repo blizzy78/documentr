@@ -19,6 +19,7 @@ package de.blizzy.documentr.markdown;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -28,7 +29,7 @@ import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.page.IPageStore;
 
 @Component(MacroContext.ID)
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 class MacroContext implements IMacroContext {
 	static final String ID = "macroContext"; //$NON-NLS-1$
 	

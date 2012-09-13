@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro.impl;
+package de.blizzy.documentr.markdown.macro;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +29,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.MessageSource;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.MessageSourceMacroDescriptor;
 
 public class MessageSourceMacroDescriptorTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$

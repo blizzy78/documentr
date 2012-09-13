@@ -15,16 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro.impl;
+package de.blizzy.documentr.markdown.macro;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
-import de.blizzy.documentr.markdown.macro.Macro;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Macro(name="neighbors", insertText="{{neighbors/}}")
-public class NeighborsMacro implements ISimpleMacro {
-	@Override
-	public IMacroRunnable createRunnable() {
-		return new NeighborsMacroRunnable();
-	}
+import org.springframework.stereotype.Component;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Macro {
+	String name();
+	String insertText();
+	boolean cacheable() default true;
 }

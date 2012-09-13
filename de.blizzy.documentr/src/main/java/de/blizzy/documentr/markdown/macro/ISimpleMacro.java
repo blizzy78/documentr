@@ -15,16 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro.impl;
+package de.blizzy.documentr.markdown.macro;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
-import de.blizzy.documentr.markdown.macro.Macro;
-
-@Macro(name="neighbors", insertText="{{neighbors/}}")
-public class NeighborsMacro implements ISimpleMacro {
-	@Override
-	public IMacroRunnable createRunnable() {
-		return new NeighborsMacroRunnable();
-	}
+public interface ISimpleMacro {
+	IMacroRunnable createRunnable();
 }

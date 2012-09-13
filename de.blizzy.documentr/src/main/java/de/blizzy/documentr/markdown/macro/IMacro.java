@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
-public interface IMacro {
+public interface IMacro extends ISimpleMacro {
 	IMacroDescriptor getDescriptor();
-	IMacroRunnable createRunnable();
 }

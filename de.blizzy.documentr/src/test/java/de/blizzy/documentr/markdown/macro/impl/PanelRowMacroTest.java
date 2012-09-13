@@ -18,37 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown.macro.impl;
 
 import static junit.framework.Assert.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.BeanFactory;
 
-import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 
-public class PanelRowMacroTest extends AbstractDocumentrTest {
-	@Mock
-	private BeanFactory beanFactory;
-	@InjectMocks
+public class PanelRowMacroTest {
 	private PanelRowMacro macro;
 
 	@Before
 	public void setUp() {
-		when(beanFactory.getBean(MessageSourceMacroDescriptor.ID, "panelrow")) //$NON-NLS-1$
-			.thenReturn(new MessageSourceMacroDescriptor("panelrow")); //$NON-NLS-1$
+		macro = new PanelRowMacro();
 	}
-	
-	@Test
-	public void getDescriptor() {
-		IMacroDescriptor descriptor = macro.getDescriptor();
-		assertEquals("panelrow", descriptor.getMacroName()); //$NON-NLS-1$
-		assertEquals("{{panelrow}}[CONTENTS]{{/panelrow}}", descriptor.getInsertText()); //$NON-NLS-1$
-	}
-	
+
 	@Test
 	public void createRunnable() {
 		IMacroRunnable runnable = macro.createRunnable();

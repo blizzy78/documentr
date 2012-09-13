@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +45,8 @@ class GroovyMacroScanner {
 	
 	@Autowired
 	private Settings settings;
+	@Autowired
+	private BeanFactory beanFactory;
 
 	@PostConstruct
 	public void init() throws IOException {
@@ -66,18 +69,32 @@ class GroovyMacroScanner {
 		Set<IMacro> macros = Sets.newHashSet();
 		for (File file : macrosDir.listFiles(filter)) {
 			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends IMacro> clazz = classLoader.parseClass(file);
-				IMacro macro = clazz.newInstance();
-				macros.add(macro);
+				Class<?> clazz = classLoader.parseClass(file);
+				if (IMacro.class.isAssignableFrom(clazz)) {
+					IMacro macro = (IMacro) clazz.newInstance();
+					macros.add(macro);
+				} else {
+					Macro annotation = clazz.getAnnotation(Macro.class);
+					if (annotation != null) {
+						if (ISimpleMacro.class.isAssignableFrom(clazz)) {
+							ISimpleMacro simpleMacro = (ISimpleMacro) clazz.newInstance();
+							IMacro macro = new SimpleMacroMacro(simpleMacro, annotation, beanFactory);
+							macros.add(macro);
+						} else {
+							log.warn("class {} not supported: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
+						}
+					} else {
+						log.warn("class {} not supported: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
+					}
+				}
 			} catch (IOException e) {
-				log.error("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 			} catch (InstantiationException e) {
-				log.error("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 			} catch (IllegalAccessException e) {
-				log.error("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 			} catch (RuntimeException e) {
-				log.error("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 			}
 		}
 		return macros;
