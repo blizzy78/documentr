@@ -26,7 +26,6 @@ import org.mockito.Mock;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
-import de.blizzy.documentr.markdown.macro.impl.UnknownMacroMacroRunnable;
 
 public class UnknownMacroMacroRunnableTest extends AbstractDocumentrTest {
 	private UnknownMacroMacroRunnable runnable;
@@ -41,6 +40,6 @@ public class UnknownMacroMacroRunnableTest extends AbstractDocumentrTest {
 	@Test
 	public void getHtml() {
 		when(context.getMacroName()).thenReturn("nonexistent"); //$NON-NLS-1$
-		assertEquals("<span class=\"unknown-macro\">!nonexistent!</span>", runnable.getHtml(context)); //$NON-NLS-1$
+		assertEquals("<span class=\"text-error\">{{nonexistent/}}</span>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

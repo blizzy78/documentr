@@ -23,7 +23,7 @@ import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 public class UnknownMacroMacroRunnable implements IMacroRunnable {
 	@Override
 	public String getHtml(IMacroContext macroContext) {
-		return "<span class=\"unknown-macro\">!" + macroContext.getMacroName() + "!</span>"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "<span class=\"text-error\">{{" + macroContext.getMacroName() + "/}}</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Override

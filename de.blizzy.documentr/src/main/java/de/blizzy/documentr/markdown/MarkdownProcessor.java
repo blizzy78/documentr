@@ -41,6 +41,7 @@ import de.blizzy.documentr.markdown.macro.IMacro;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 import de.blizzy.documentr.markdown.macro.MacroFactory;
+import de.blizzy.documentr.markdown.macro.impl.UnknownMacroMacro;
 import de.blizzy.documentr.util.Replacement;
 
 @Component
@@ -114,6 +115,9 @@ public class MarkdownProcessor {
 		int nonCacheableMacroIdx = 1;
 		for (MacroInvocation invocation : macroInvocations) {
 			IMacro macro = macroFactory.get(invocation.getMacroName());
+			if (macro == null) {
+				macro = new UnknownMacroMacro();
+			}
 			IMacroDescriptor macroDescriptor = macro.getDescriptor();
 			String startMarker = invocation.getStartMarker();
 			String endMarker = invocation.getEndMarker();
@@ -259,10 +263,12 @@ public class MarkdownProcessor {
 			}
 			for (MacroInvocation macroInvocation : macroInvocations) {
 				IMacro macro = macroFactory.get(macroInvocation.getMacroName());
-				IMacroDescriptor macroDescriptor = macro.getDescriptor();
-				if (macroDescriptor.isCacheable() == cacheable) {
-					IMacroRunnable macroRunnable = macro.createRunnable();
-					newHtml = macroRunnable.cleanupHTML(newHtml);
+				if (macro != null) {
+					IMacroDescriptor macroDescriptor = macro.getDescriptor();
+					if (macroDescriptor.isCacheable() == cacheable) {
+						IMacroRunnable macroRunnable = macro.createRunnable();
+						newHtml = macroRunnable.cleanupHTML(newHtml);
+					}
 				}
 			}
 			
