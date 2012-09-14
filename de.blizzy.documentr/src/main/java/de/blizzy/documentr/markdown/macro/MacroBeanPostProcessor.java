@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
@@ -29,9 +29,8 @@ import org.springframework.beans.factory.support.BeanDefinitionValidationExcepti
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MacroBeanPostProcessor implements BeanPostProcessor {
-	private static final Logger log = LoggerFactory.getLogger(MacroBeanPostProcessor.class);
-	
 	@Autowired
 	private BeanFactory beanFactory;
 	

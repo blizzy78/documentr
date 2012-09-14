@@ -19,12 +19,20 @@ package de.blizzy.documentr.search;
 
 import java.util.List;
 
+import lombok.Getter;
+
 public class SearchHit {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String path;
+	@Getter
 	private String title;
+	@Getter
 	private String textHtml;
+	@Getter
 	private List<String> tags;
 
 	SearchHit(String projectName, String branchName, String path, String title, String textHtml, List<String> tags) {
@@ -34,29 +42,5 @@ public class SearchHit {
 		this.title = title;
 		this.textHtml = textHtml;
 		this.tags = tags;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getTextHtml() {
-		return textHtml;
-	}
-	
-	public List<String> getTags() {
-		return tags;
 	}
 }

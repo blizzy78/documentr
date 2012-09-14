@@ -17,6 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -34,12 +38,20 @@ class MacroContext implements IMacroContext {
 	static final String ID = "macroContext"; //$NON-NLS-1$
 	
 	@Autowired
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Getter
 	private String macroName;
+	@Getter
 	private String parameters;
+	@Getter
 	private String body;
+	@Getter
 	private HtmlSerializerContext htmlSerializerContext;
 
 	MacroContext(String macroName, String parameters, String body, HtmlSerializerContext htmlSerializerContext) {
@@ -55,43 +67,5 @@ class MacroContext implements IMacroContext {
 			HtmlSerializerContext htmlSerializerContext, BeanFactory beanFactory) {
 		
 		return (MacroContext) beanFactory.getBean(ID, macroName, parameters, body, htmlSerializerContext);
-	}
-
-	@Override
-	public String getMacroName() {
-		return macroName;
-	}
-
-	@Override
-	public String getParameters() {
-		return parameters;
-	}
-
-	@Override
-	public String getBody() {
-		return body;
-	}
-
-	@Override
-	public HtmlSerializerContext getHtmlSerializerContext() {
-		return htmlSerializerContext;
-	}
-
-	@Override
-	public IPageStore getPageStore() {
-		return pageStore;
-	}
-
-	@Override
-	public DocumentrPermissionEvaluator getPermissionEvaluator() {
-		return permissionEvaluator;
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator) {
-		this.permissionEvaluator = permissionEvaluator;
 	}
 }

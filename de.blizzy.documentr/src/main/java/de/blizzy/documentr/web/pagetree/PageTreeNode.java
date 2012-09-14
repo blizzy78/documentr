@@ -17,11 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 public class PageTreeNode extends AbstractTreeNode {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String path;
+	@Getter
 	private String title;
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
 	private boolean hasBranchPermissions;
 
 	PageTreeNode(String projectName, String branchName, String path, String title) {
@@ -31,29 +41,5 @@ public class PageTreeNode extends AbstractTreeNode {
 		this.branchName = branchName;
 		this.path = path;
 		this.title = title;
-	}
-
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	void setHasBranchPermissions(boolean hasBranchPermissions) {
-		this.hasBranchPermissions = hasBranchPermissions;
-	}
-	
-	public boolean isHasBranchPermissions() {
-		return hasBranchPermissions;
 	}
 }

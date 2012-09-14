@@ -21,6 +21,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
@@ -32,12 +35,17 @@ import com.google.common.collect.Lists;
 import de.blizzy.documentr.util.Util;
 
 public class HtmlSerializerContext {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String pagePath;
 	private MarkdownProcessor markdownProcessor;
 	private List<Header> headers = Lists.newArrayList();
+	@Getter(AccessLevel.PACKAGE)
 	private List<MacroInvocation> macroInvocations = Lists.newArrayList();
+	@Getter
 	private Authentication authentication;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
@@ -56,22 +64,6 @@ public class HtmlSerializerContext {
 		this.authentication = authentication;
 	}
 
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPagePath() {
-		return pagePath;
-	}
-	
-	public Authentication getAuthentication() {
-		return authentication;
-	}
-	
 	public String getAttachmentURI(String name) {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
@@ -121,9 +113,5 @@ public class HtmlSerializerContext {
 		MacroInvocation invocation = new MacroInvocation(macroName, params);
 		macroInvocations.add(invocation);
 		return invocation;
-	}
-	
-	List<MacroInvocation> getMacroInvocations() {
-		return macroInvocations;
 	}
 }

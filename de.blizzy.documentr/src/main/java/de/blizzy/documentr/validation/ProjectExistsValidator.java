@@ -20,6 +20,9 @@ package de.blizzy.documentr.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +31,8 @@ import de.blizzy.documentr.validation.annotation.ProjectExists;
 
 public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	
 	@Override
 	public void initialize(ProjectExists annotation) {
@@ -40,10 +44,6 @@ public class ProjectExistsValidator implements ConstraintValidator<ProjectExists
 			return true;
 		}
 
-		return repoManager.listProjects().contains(value);
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
+		return globalRepositoryManager.listProjects().contains(value);
 	}
 }

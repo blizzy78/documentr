@@ -19,28 +19,20 @@ package de.blizzy.documentr.web;
 
 import java.util.Locale;
 
+import lombok.Getter;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 
 public class JspMacroDescriptor {
+	@Getter
 	private String insertText;
+	@Getter
 	private String title;
+	@Getter
 	private String description;
 
 	JspMacroDescriptor(IMacroDescriptor descriptor, Locale locale) {
 		insertText = descriptor.getInsertText();
 		title = descriptor.getTitle(locale);
 		description = descriptor.getDescription(locale);
-	}
-	
-	public String getInsertText() {
-		return insertText;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getDescription() {
-		return description;
 	}
 }

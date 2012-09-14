@@ -29,6 +29,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.AddCommand;
@@ -50,8 +54,6 @@ import org.gitective.core.filter.commit.AndCommitFilter;
 import org.gitective.core.filter.commit.CommitFilter;
 import org.gitective.core.filter.commit.CommitLimitFilter;
 import org.gitective.core.filter.commit.CommitListFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -75,9 +77,8 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
 
 @Component
+@Slf4j
 class PageStore implements IPageStore {
-	private static final Logger log = LoggerFactory.getLogger(PageStore.class);
-	
 	private static final String PARENT_PAGE_PATH = "parentPagePath"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
@@ -88,8 +89,10 @@ class PageStore implements IPageStore {
 	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 	
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 
 	@Override
@@ -139,7 +142,7 @@ class PageStore implements IPageStore {
 
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			return savePageInternal(projectName, branchName, path, suffix, page, baseCommit, rootDir, user, repo, true);
 		} finally {
 			Closeables.closeQuietly(repo);
@@ -295,7 +298,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
@@ -393,7 +396,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
 			File pageAttachmentsDir = Util.toFile(attachmentsDir, pagePath);
@@ -430,7 +433,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 			return listPagePaths(pagesDir, true);
@@ -501,11 +504,11 @@ class PageStore implements IPageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 
-		List<String> allBranches = repoManager.listProjectBranches(projectName);
+		List<String> allBranches = globalRepositoryManager.listProjectBranches(projectName);
 		ILockedRepository centralRepo = null;
 		Set<String> branchesWithCommit = Collections.emptySet();
 		try {
-			centralRepo = repoManager.getProjectCentralRepository(projectName);
+			centralRepo = globalRepositoryManager.getProjectCentralRepository(projectName);
 			String repoPath = DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX; //$NON-NLS-1$
 			RevCommit commit = CommitUtils.getLastCommit(centralRepo.r(), branchName, repoPath);
 			if (commit != null) {
@@ -563,7 +566,7 @@ class PageStore implements IPageStore {
 
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), path);
 			List<String> paths = Lists.newArrayList(listPagePaths(pagesDir, false));
@@ -593,7 +596,7 @@ class PageStore implements IPageStore {
 		List<String> oldPagePaths;
 		boolean deleted = false;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
 			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
@@ -689,7 +692,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 
 			RevCommit metaCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 			RevCommit pageCommit = CommitUtils.getLastCommit(repo.r(), rootDir + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
@@ -752,7 +755,7 @@ class PageStore implements IPageStore {
 		List<String> deletedPagePaths;
 		List<String> newPagePaths;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
 			final String newPagePath = newParentPagePath + "/" + pageName; //$NON-NLS-1$
 
@@ -864,7 +867,7 @@ class PageStore implements IPageStore {
 		Map<String, String> result = Maps.newHashMap();
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			String filePath = DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX; //$NON-NLS-1$
 			
 			Set<String> realVersions = Sets.newHashSet();
@@ -915,7 +918,7 @@ class PageStore implements IPageStore {
 		ILockedRepository repo = null;
 		List<PageVersion> result = Lists.newArrayList();
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 
 			CommitFinder finder = new CommitFinder(repo.r());
 			TreeFilter pathFilter = PathFilterUtils.or(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
@@ -947,7 +950,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			
 			Git git = Git.wrap(repo.r());
@@ -1002,7 +1005,7 @@ class PageStore implements IPageStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, branchName);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			String text = BlobUtils.getContent(repo.r(), version, DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX); //$NON-NLS-1$
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
@@ -1032,13 +1035,5 @@ class PageStore implements IPageStore {
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
 	}
 }

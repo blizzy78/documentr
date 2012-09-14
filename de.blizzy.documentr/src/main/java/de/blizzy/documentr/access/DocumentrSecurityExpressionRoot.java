@@ -19,6 +19,9 @@ package de.blizzy.documentr.access;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -37,11 +40,17 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	public static final Permission EDIT_BRANCH = Permission.EDIT_BRANCH;
 	public static final Permission EDIT_PAGE = Permission.EDIT_PAGE;
 
+	@Getter
+	@Setter
 	public HttpServletRequest request;
 	
 	private GlobalRepositoryManager repoManager;
 	private Object target;
+	@Getter
+	@Setter
 	private Object returnObject;
+	@Getter
+	@Setter
 	private Object filterObject;
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
@@ -96,34 +105,6 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 		return target;
 	}
 
-	@Override
-	public void setReturnObject(Object returnObject) {
-		this.returnObject = returnObject;
-	}
-	
-	@Override
-	public Object getReturnObject() {
-		return returnObject;
-	}
-
-	@Override
-	public void setFilterObject(Object filterObject) {
-		this.filterObject = filterObject;
-	}
-	
-	@Override
-	public Object getFilterObject() {
-		return filterObject;
-	}
-	
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
-	}
-	
-	public HttpServletRequest getRequest() {
-		return request;
-	}
-	
 	@Override
 	public void setPermissionEvaluator(PermissionEvaluator permissionEvaluator) {
 		super.setPermissionEvaluator(permissionEvaluator);

@@ -17,20 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown;
 
+import lombok.Getter;
+
 public class Header {
+	@Getter
 	private String text;
+	@Getter
 	private int level;
 
 	public Header(String text, int level) {
 		this.text = text;
 		this.level = level;
-	}
-	
-	public String getText() {
-		return text;
-	}
-	
-	public int getLevel() {
-		return level;
 	}
 }

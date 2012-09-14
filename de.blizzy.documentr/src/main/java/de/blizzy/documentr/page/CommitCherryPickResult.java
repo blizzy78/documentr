@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import lombok.Getter;
+
 import org.springframework.util.Assert;
 
 public class CommitCherryPickResult {
@@ -24,8 +26,11 @@ public class CommitCherryPickResult {
 		OK, CONFLICT, UNKNOWN;
 	}
 	
+	@Getter
 	private PageVersion pageVersion;
+	@Getter
 	private Status status;
+	@Getter
 	private String conflictText;
 
 	public CommitCherryPickResult(PageVersion pageVersion, Status status) {
@@ -43,17 +48,5 @@ public class CommitCherryPickResult {
 		this.pageVersion = pageVersion;
 		this.conflictText = conflictText;
 		status = Status.CONFLICT;
-	}
-	
-	public PageVersion getPageVersion() {
-		return pageVersion;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-	
-	public String getConflictText() {
-		return conflictText;
 	}
 }

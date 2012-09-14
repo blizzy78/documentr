@@ -17,20 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import lombok.Getter;
+
 public class BranchCreatedEvent {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
 
 	public BranchCreatedEvent(String projectName, String branchName) {
 		this.projectName = projectName;
 		this.branchName = branchName;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
 	}
 }

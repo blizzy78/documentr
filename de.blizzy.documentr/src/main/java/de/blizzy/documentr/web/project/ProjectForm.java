@@ -19,6 +19,8 @@ package de.blizzy.documentr.web.project;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 import de.blizzy.documentr.validation.annotation.ProjectDoesNotExist;
@@ -31,13 +33,10 @@ public class ProjectForm {
 	@ValidProjectName
 	@ProjectNameNotBlacklisted
 	@ProjectDoesNotExist
+	@Getter
 	private String name;
 
 	ProjectForm(String name) {
 		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
 	}
 }

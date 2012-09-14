@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
@@ -29,7 +31,9 @@ import org.springframework.util.Assert;
  * &quot;yahoo.com&quot; is the common delegate ID for users using Yahoo's OpenID services.</p>
  */
 public class OpenId {
+	@Getter
 	private String delegateId;
+	@Getter
 	private String realId;
 
 	/**
@@ -46,16 +50,6 @@ public class OpenId {
 		this.realId = realId;
 	}
 
-	/** Returns the delegate ID. */
-	public String getDelegateId() {
-		return delegateId;
-	}
-	
-	/** Returns the real ID. */
-	public String getRealId() {
-		return realId;
-	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {

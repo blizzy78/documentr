@@ -19,26 +19,19 @@ package de.blizzy.documentr.page;
 
 import java.util.Date;
 
+import lombok.Getter;
+
 public class PageVersion {
+	@Getter
 	private String commitName;
+	@Getter
 	private String lastEditedBy;
+	@Getter
 	private Date lastEdited;
 
 	public PageVersion(String commitName, String lastEditedBy, Date lastEdited) {
 		this.commitName = commitName;
 		this.lastEditedBy = lastEditedBy;
 		this.lastEdited = lastEdited;
-	}
-	
-	public String getCommitName() {
-		return commitName;
-	}
-	
-	public String getLastEditedBy() {
-		return lastEditedBy;
-	}
-	
-	public Date getLastEdited() {
-		return lastEdited;
 	}
 }

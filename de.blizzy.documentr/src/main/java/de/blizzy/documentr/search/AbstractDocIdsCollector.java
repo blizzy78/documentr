@@ -19,12 +19,12 @@ package de.blizzy.documentr.search;
 
 import java.util.BitSet;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import org.apache.lucene.search.Collector;
 
 abstract class AbstractDocIdsCollector extends Collector {
+	@Getter(AccessLevel.PACKAGE)
 	private BitSet docIds = new BitSet();
-	
-	BitSet getDocIds() {
-		return docIds;
-	}
 }

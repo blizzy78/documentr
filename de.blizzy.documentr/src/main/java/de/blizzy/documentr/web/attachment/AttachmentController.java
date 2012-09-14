@@ -22,6 +22,9 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +57,13 @@ import de.blizzy.documentr.util.Util;
 @RequestMapping("/attachment")
 public class AttachmentController {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private ServletContext servletContext;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -171,17 +177,5 @@ public class AttachmentController {
 		pageStore.deleteAttachment(projectName, branchName, Util.toRealPagePath(pagePath), name, user);
 		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Util.toURLPagePath(pagePath);
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setServletContext(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

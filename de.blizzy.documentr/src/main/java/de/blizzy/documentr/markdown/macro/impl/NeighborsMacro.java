@@ -20,9 +20,9 @@ package de.blizzy.documentr.markdown.macro.impl;
 import java.io.IOException;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
@@ -36,9 +36,8 @@ import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.util.Util;
 
 @Macro(name="neighbors", insertText="{{neighbors/}}", cacheable=false)
+@Slf4j
 public class NeighborsMacro implements IMacroRunnable {
-	private static final Logger log = LoggerFactory.getLogger(NeighborsMacro.class);
-
 	private HtmlSerializerContext htmlSerializerContext;
 	private IPageStore pageStore;
 	private DocumentrPermissionEvaluator permissionEvaluator;

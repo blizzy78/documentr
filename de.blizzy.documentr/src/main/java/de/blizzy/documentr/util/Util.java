@@ -22,19 +22,18 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.validation.PagePathValidator;
 
 /** Generic utility methods. */
+@Slf4j
 public final class Util {
-	private static final Logger log = LoggerFactory.getLogger(Util.class);
-	
 	private Util() {}
 
 	/** Converts a page path from URL format to real format. */

@@ -17,19 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import lombok.Getter;
 import de.blizzy.documentr.util.NotFoundException;
 
 /** Thrown when no user is found that has a specific login name. */
 public class UserNotFoundException extends NotFoundException {
+	@Getter
 	private String loginName;
 
 	public UserNotFoundException(String loginName) {
 		super("user not found: " + loginName); //$NON-NLS-1$
 		
 		this.loginName = loginName;
-	}
-	
-	public String getLoginName() {
-		return loginName;
 	}
 }

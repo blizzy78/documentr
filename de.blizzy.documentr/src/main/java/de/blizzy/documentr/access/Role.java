@@ -19,9 +19,13 @@ package de.blizzy.documentr.access;
 
 import java.util.EnumSet;
 
+import lombok.Getter;
+
 /** A user role containing a set of {@link Permission}s. */
 public class Role {
+	@Getter
 	private String name;
+	@Getter
 	private EnumSet<Permission> permissions;
 
 	/**
@@ -33,15 +37,5 @@ public class Role {
 	public Role(String name, EnumSet<Permission> permissions) {
 		this.name = name;
 		this.permissions = permissions;
-	}
-
-	/** Returns the role name. */
-	public String getName() {
-		return name;
-	}
-
-	/** Returns the permissions this role contains. */
-	public EnumSet<Permission> getPermissions() {
-		return permissions;
 	}
 }

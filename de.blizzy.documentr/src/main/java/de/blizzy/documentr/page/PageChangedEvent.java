@@ -17,13 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
 public class PageChangedEvent {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String path;
 
 	public PageChangedEvent(String projectName, String branchName, String path) {
@@ -34,18 +39,6 @@ public class PageChangedEvent {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
 	}
 	
 	@Override

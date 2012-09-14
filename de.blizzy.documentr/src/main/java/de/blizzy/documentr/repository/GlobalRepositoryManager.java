@@ -26,6 +26,9 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,10 +43,13 @@ import de.blizzy.documentr.access.User;
 @Component
 public class GlobalRepositoryManager {
 	@Autowired
+	@Setter
 	private Settings settings;
 	@Autowired
-	private ProjectRepositoryManagerFactory repoManagerFactory;
+	@Setter
+	private ProjectRepositoryManagerFactory repositoryManagerFactory;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 	private File reposDir;
 	
@@ -55,43 +61,43 @@ public class GlobalRepositoryManager {
 	public ILockedRepository createProjectCentralRepository(String projectName, User user)
 			throws IOException, GitAPIException {
 		
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.createCentralRepository(user);
 	}
 
 	public ILockedRepository createProjectCentralRepository(String projectName, boolean bare, User user)
 			throws IOException, GitAPIException {
 		
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.createCentralRepository(bare, user);
 	}
 	
 	public ILockedRepository getProjectCentralRepository(String projectName) throws IOException {
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository();
 	}
 	
 	public ILockedRepository getProjectCentralRepository(String projectName, boolean bare) throws IOException {
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository(bare);
 	}
 	
 	public ILockedRepository createProjectBranchRepository(String projectName, String branchName, String startingBranch)
 			throws IOException, GitAPIException {
 		
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		ILockedRepository repo = repoManager.createBranchRepository(branchName, startingBranch);
 		eventBus.post(new BranchCreatedEvent(projectName, branchName));
 		return repo;
 	}
 	
 	public ILockedRepository getProjectBranchRepository(String projectName, String branchName) throws IOException, GitAPIException {
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getBranchRepository(branchName);
 	}
 
 	public List<String> listProjectBranches(String projectName) throws IOException {
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.listBranches();
 	}
 
@@ -124,19 +130,7 @@ public class GlobalRepositoryManager {
 	}
 	
 	public void importSampleContents(String projectName) throws IOException, GitAPIException {
-		ProjectRepositoryManager repoManager = repoManagerFactory.getManager(reposDir, projectName);
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		repoManager.importSampleContents();
-	}
-
-	public void setSettings(Settings settings) {
-		this.settings = settings;
-	}
-	
-	public void setRepositoryManagerFactory(ProjectRepositoryManagerFactory repoManagerFactory) {
-		this.repoManagerFactory = repoManagerFactory;
-	}
-
-	void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
 	}
 }

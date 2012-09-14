@@ -19,6 +19,9 @@ package de.blizzy.documentr.web.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +30,10 @@ import de.blizzy.documentr.Settings;
 @Component
 public class FacadeHostRequestWrapperFactory {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private Settings settings;
 	
 	public HttpServletRequest create(HttpServletRequest request) {
 		return new FacadeHostRequestWrapper(request, settings.getHost(), settings.getPort());
-	}
-	
-	void setSettings(Settings settings) {
-		this.settings = settings;
 	}
 }

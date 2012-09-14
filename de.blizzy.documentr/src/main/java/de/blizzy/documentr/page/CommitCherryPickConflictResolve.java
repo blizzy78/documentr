@@ -17,13 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
 public class CommitCherryPickConflictResolve {
+	@Getter
 	private String targetBranch;
+	@Getter
 	private String commit;
+	@Getter
 	private String text;
 
 	public CommitCherryPickConflictResolve(String targetBranch, String commit, String text) {
@@ -34,18 +39,6 @@ public class CommitCherryPickConflictResolve {
 		this.targetBranch = targetBranch;
 		this.commit = commit;
 		this.text = text;
-	}
-	
-	public String getTargetBranch() {
-		return targetBranch;
-	}
-	
-	public String getCommit() {
-		return commit;
-	}
-	
-	public String getText() {
-		return text;
 	}
 	
 	boolean isApplicable(String targetBranch, String commit) {

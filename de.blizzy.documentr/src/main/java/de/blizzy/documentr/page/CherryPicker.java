@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.CherryPickResult;
 import org.eclipse.jgit.api.CherryPickResult.CherryPickStatus;
@@ -54,8 +57,10 @@ import de.blizzy.documentr.util.Util;
 @Component
 class CherryPicker implements ICherryPicker {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 	@Autowired
 	private IPageStore pageStore;
@@ -107,7 +112,7 @@ class CherryPicker implements ICherryPicker {
 		boolean hadConflicts = false;
 		boolean failed = false;
 		try {
-			repo = repoManager.getProjectBranchRepository(projectName, targetBranch);
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, targetBranch);
 			
 			String tempBranchName = "_temp_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
 			Git git = Git.wrap(repo.r());
@@ -284,13 +289,5 @@ class CherryPicker implements ICherryPicker {
 			}
 		};
 		return Lists.transform(pageVersions, function);
-	}
-
-	void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
 	}
 }

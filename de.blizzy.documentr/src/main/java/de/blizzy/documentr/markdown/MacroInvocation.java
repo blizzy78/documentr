@@ -17,39 +17,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import org.springframework.util.Assert;
 
 class MacroInvocation {
+	@Getter(AccessLevel.PACKAGE)
 	private String macroName;
-	private String params;
+	@Getter(AccessLevel.PACKAGE)
+	private String parameters;
+	@Getter(AccessLevel.PACKAGE)
 	private String startMarker;
+	@Getter(AccessLevel.PACKAGE)
 	private String endMarker;
 
-	MacroInvocation(String macroName, String params) {
+	MacroInvocation(String macroName, String parameters) {
 		Assert.hasLength(macroName);
 		
 		this.macroName = macroName;
-		this.params = params;
+		this.parameters = parameters;
 		
 		long random = (long) (Math.random() * Long.MAX_VALUE);
 		String markerLabel = macroName + "_" + String.valueOf(random); //$NON-NLS-1$
 		startMarker = "__" + markerLabel + "__"; //$NON-NLS-1$ //$NON-NLS-2$
 		endMarker = "__/" + markerLabel + "__"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-	
-	String getMacroName() {
-		return macroName;
-	}
-	
-	String getParameters() {
-		return params;
-	}
-	
-	String getStartMarker() {
-		return startMarker;
-	}
-
-	String getEndMarker() {
-		return endMarker;
 	}
 }

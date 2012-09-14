@@ -19,6 +19,8 @@ package de.blizzy.documentr.web.access;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 import de.blizzy.documentr.validation.annotation.ValidLoginName;
@@ -27,13 +29,19 @@ public class UserForm {
 	@NotNull(message="{user.loginName.blank}")
 	@NotBlank(message="{user.loginName.blank}")
 	@ValidLoginName
+	@Getter
 	private String loginName;
+	@Getter
 	private String password1;
+	@Getter
 	private String password2;
 	@NotNull(message="{user.email.blank}")
 	@NotBlank(message="{user.email.blank}")
+	@Getter
 	private String email;
+	@Getter
 	private boolean disabled;
+	@Getter
 	private String authorities;
 
 	public UserForm(String loginName, String password1, String password2, String email,
@@ -45,29 +53,5 @@ public class UserForm {
 		this.email = email;
 		this.disabled = disabled;
 		this.authorities = authorities;
-	}
-	
-	public String getLoginName() {
-		return loginName;
-	}
-	
-	public String getPassword1() {
-		return password1;
-	}
-	
-	public String getPassword2() {
-		return password2;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
-	
-	public boolean isDisabled() {
-		return disabled;
-	}
-	
-	public String getAuthorities() {
-		return authorities;
 	}
 }

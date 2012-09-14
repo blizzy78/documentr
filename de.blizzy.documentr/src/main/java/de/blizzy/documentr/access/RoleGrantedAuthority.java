@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +28,9 @@ import org.springframework.util.Assert;
 public class RoleGrantedAuthority implements GrantedAuthority {
 	private static final long serialVersionUID = 4837778771482591248L;
 	
+	@Getter
 	private GrantedAuthorityTarget target;
+	@Getter
 	private String roleName;
 
 	/**
@@ -43,16 +47,6 @@ public class RoleGrantedAuthority implements GrantedAuthority {
 		this.roleName = roleName;
 	}
 
-	/** Returns the target object. */
-	public GrantedAuthorityTarget getTarget() {
-		return target;
-	}
-
-	/** Returns the name of the role being granted. */
-	public String getRoleName() {
-		return roleName;
-	}
-	
 	@Override
 	public String getAuthority() {
 		return null;

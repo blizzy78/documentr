@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.Lifecycle;
@@ -35,9 +35,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 @Component
+@Slf4j
 public class MacroFactory implements Lifecycle {
-	private static final Logger log = LoggerFactory.getLogger(MacroFactory.class);
-
 	@Autowired
 	private ListableBeanFactory beanFactory;
 	@Autowired

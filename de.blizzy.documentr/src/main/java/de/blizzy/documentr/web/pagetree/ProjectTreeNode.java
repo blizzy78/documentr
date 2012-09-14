@@ -17,16 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
+import lombok.Getter;
+
 public class ProjectTreeNode extends AbstractTreeNode {
+	@Getter
 	private String name;
 
 	ProjectTreeNode(String name) {
 		super(Type.PROJECT);
 
 		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
 	}
 }

@@ -17,13 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import javax.validation.constraints.NotNull;
+
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.eclipse.jgit.lib.Repository;
-import org.springframework.util.Assert;
 
 final class LockedRepository implements ILockedRepository {
 	private ILock lock;
 	private LockManager lockManager;
-	private Repository repo;
+	@Setter(AccessLevel.PACKAGE)
+	@NotNull
+	private Repository repository;
 
 	private LockedRepository(ILock lock, LockManager lockManager) {
 		this.lock = lock;
@@ -40,23 +46,18 @@ final class LockedRepository implements ILockedRepository {
 		return new LockedRepository(lock, lockManager);
 	}
 
-	void setRepository(Repository repo) {
-		Assert.notNull(repo);
-		this.repo = repo;
-	}
-	
 	@Override
 	public Repository r() {
-		if (repo == null) {
+		if (repository == null) {
 			throw new IllegalStateException("no repository"); //$NON-NLS-1$
 		}
-		return repo;
+		return repository;
 	}
 	
 	@Override
 	public void close() {
 		try {
-			RepositoryUtil.closeQuietly(repo);
+			RepositoryUtil.closeQuietly(repository);
 		} finally {
 			lockManager.unlock(lock);
 		}

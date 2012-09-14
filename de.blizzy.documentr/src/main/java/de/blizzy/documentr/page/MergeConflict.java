@@ -19,22 +19,18 @@ package de.blizzy.documentr.page;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+
 public class MergeConflict implements Serializable {
 	private static final long serialVersionUID = -694341729219549082L;
 	
+	@Getter
 	private String text;
+	@Getter
 	private String newBaseCommit;
 
 	MergeConflict(String text, String newBaseCommit) {
 		this.text = text;
 		this.newBaseCommit = newBaseCommit;
-	}
-	
-	public String getText() {
-		return text;
-	}
-	
-	public String getNewBaseCommit() {
-		return newBaseCommit;
 	}
 }

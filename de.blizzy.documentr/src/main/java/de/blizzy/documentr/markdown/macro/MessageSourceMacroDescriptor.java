@@ -19,6 +19,10 @@ package de.blizzy.documentr.markdown.macro;
 
 import java.util.Locale;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -32,9 +36,13 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	static final String ID = "messageSourceMacroDescriptor"; //$NON-NLS-1$
 	
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private MessageSource messageSource;
+	@Getter
 	private String macroName;
+	@Getter
 	private String insertText;
+	@Getter
 	private boolean cacheable = true;
 
 	MessageSourceMacroDescriptor(String macroName) {
@@ -43,16 +51,6 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	
 	static MessageSourceMacroDescriptor create(String macroName, BeanFactory beanFactory) {
 		return (MessageSourceMacroDescriptor) beanFactory.getBean(ID, macroName);
-	}
-	
-	@Override
-	public String getMacroName() {
-		return macroName;
-	}
-
-	@Override
-	public String getInsertText() {
-		return insertText;
 	}
 	
 	MessageSourceMacroDescriptor insertText(String insertText) {
@@ -70,17 +68,8 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 		return messageSource.getMessage("macro." + macroName + ".description", null, locale); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	@Override
-	public boolean isCacheable() {
-		return cacheable;
-	}
-	
 	MessageSourceMacroDescriptor cacheable(boolean cacheable) {
 		this.cacheable = cacheable;
 		return this;
-	}
-
-	void setMessageSource(MessageSource messageSource) {
-		this.messageSource = messageSource;
 	}
 }

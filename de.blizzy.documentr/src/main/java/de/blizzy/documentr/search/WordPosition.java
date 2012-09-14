@@ -17,26 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 class WordPosition {
+	@Getter(AccessLevel.PACKAGE)
 	private String word;
+	@Getter(AccessLevel.PACKAGE)
 	private int start;
+	@Getter(AccessLevel.PACKAGE)
 	private int end;
 
 	WordPosition(String word, int start, int end) {
 		this.word = word;
 		this.start = start;
 		this.end = end;
-	}
-	
-	String getWord() {
-		return word;
-	}
-	
-	int getStart() {
-		return start;
-	}
-	
-	int getEnd() {
-		return end;
 	}
 }

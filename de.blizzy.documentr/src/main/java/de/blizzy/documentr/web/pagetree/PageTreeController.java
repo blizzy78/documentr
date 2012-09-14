@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -46,10 +49,13 @@ import de.blizzy.documentr.util.Util;
 @RequestMapping("/pageTree")
 public class PageTreeController {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@RequestMapping(value="/application/json", method=RequestMethod.POST)
@@ -57,7 +63,7 @@ public class PageTreeController {
 	@PreAuthorize("hasAnyProjectPermission(VIEW)")
 	public List<ProjectTreeNode> getApplicationChildren(Authentication authentication) {
 		List<ProjectTreeNode> result = Lists.newArrayList();
-		List<String> projects = repoManager.listProjects();
+		List<String> projects = globalRepositoryManager.listProjects();
 		for (String project : projects) {
 			if (permissionEvaluator.hasProjectPermission(authentication, project, Permission.VIEW)) {
 				result.add(new ProjectTreeNode(project));
@@ -73,7 +79,7 @@ public class PageTreeController {
 	public List<BranchTreeNode> getProjectChildren(@PathVariable String name, Authentication authentication)
 			throws IOException {
 		
-		List<String> branches = repoManager.listProjectBranches(name);
+		List<String> branches = globalRepositoryManager.listProjectBranches(name);
 		List<BranchTreeNode> result = Lists.newArrayList();
 		for (String branch : branches) {
 			if (permissionEvaluator.hasBranchPermission(authentication, name, branch, Permission.VIEW)) {
@@ -148,17 +154,5 @@ public class PageTreeController {
 			}
 		}
 		return result;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator) {
-		this.permissionEvaluator = permissionEvaluator;
 	}
 }

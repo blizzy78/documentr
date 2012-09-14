@@ -19,6 +19,9 @@ package de.blizzy.documentr.web.page;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -36,25 +39,39 @@ public class PageForm {
 	@ValidProjectName
 	@ProjectNameNotBlacklisted
 	@ProjectExists
+	@Getter
 	private String projectName;
 	@NotNull(message="{branch.name.blank}")
 	@NotBlank(message="{branch.name.blank}")
 	@ValidBranchName
 	@BranchNameNotBlacklisted
+	@Getter
 	private String branchName;
 	@ValidPagePath
+	@Getter
 	private String path;
 	@ValidPagePath
+	@Getter
 	private String parentPagePath;
 	@NotNull(message="{page.title.blank}")
 	@NotBlank(message="{page.title.blank}")
+	@Getter
 	private String title;
+	@Getter
+	@Setter
 	private String text;
 	@RoleExists
+	@Getter
 	private String viewRestrictionRole;
+	@Getter
+	@Setter
 	private String commit;
 	private String[] tags;
+	@Getter
+	@Setter
 	private Integer parentPageSplitRangeStart;
+	@Getter
+	@Setter
 	private Integer parentPageSplitRangeEnd;
 
 	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
@@ -71,63 +88,7 @@ public class PageForm {
 		this.tags = ArrayUtils.clone(tags);
 	}
 	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
-	}
-	
-	public String getParentPagePath() {
-		return parentPagePath;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-	
-	public String getText() {
-		return text;
-	}
-	
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public String getViewRestrictionRole() {
-		return viewRestrictionRole;
-	}
-	
-	public String getCommit() {
-		return commit;
-	}
-
-	public void setCommit(String commit) {
-		this.commit = commit;
-	}
-	
 	public String[] getTags() {
 		return ArrayUtils.clone(tags);
-	}
-	
-	public void setParentPageSplitRangeStart(Integer parentPageSplitRangeStart) {
-		this.parentPageSplitRangeStart = parentPageSplitRangeStart;
-	}
-	
-	public Integer getParentPageSplitRangeStart() {
-		return parentPageSplitRangeStart;
-	}
-	
-	public void setParentPageSplitRangeEnd(Integer parentPageSplitRangeEnd) {
-		this.parentPageSplitRangeEnd = parentPageSplitRangeEnd;
-	}
-	
-	public Integer getParentPageSplitRangeEnd() {
-		return parentPageSplitRangeEnd;
 	}
 }

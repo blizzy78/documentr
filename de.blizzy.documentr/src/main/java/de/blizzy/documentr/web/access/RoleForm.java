@@ -21,6 +21,8 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 import de.blizzy.documentr.validation.annotation.ValidRoleName;
@@ -29,19 +31,13 @@ public class RoleForm {
 	@NotNull(message="{role.name.blank}")
 	@NotBlank(message="{role.name.blank}")
 	@ValidRoleName
+	@Getter
 	private String name;
+	@Getter
 	private Set<String> permissions;
 
 	public RoleForm(String name, Set<String> permissions) {
 		this.name = name;
 		this.permissions = permissions;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public Set<String> getPermissions() {
-		return permissions;
 	}
 }

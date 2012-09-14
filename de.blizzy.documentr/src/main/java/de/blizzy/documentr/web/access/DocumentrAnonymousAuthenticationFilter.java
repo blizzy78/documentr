@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -36,7 +39,8 @@ public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticat
 			String.valueOf((long) Math.random() * Long.MAX_VALUE);
 
 	@Autowired
-	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
+	@Setter(AccessLevel.PACKAGE)
+	private DocumentrAnonymousAuthenticationFactory anonymousAuthenticationFactory;
 	
 	public DocumentrAnonymousAuthenticationFilter() {
 		super(authKey);
@@ -46,15 +50,11 @@ public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticat
 	protected Authentication createAuthentication(HttpServletRequest request) {
 		try {
 			Authentication auth = super.createAuthentication(request);
-			AbstractAuthenticationToken authentication = authenticationFactory.create(authKey);
+			AbstractAuthenticationToken authentication = anonymousAuthenticationFactory.create(authKey);
 			authentication.setDetails(auth.getDetails());
 			return authentication;
 		} catch (IOException e) {
 			throw new AuthenticationServiceException(e.getMessage(), e);
 		}
-	}
-
-	void setAnonymousAuthenticationFactory(DocumentrAnonymousAuthenticationFactory authenticationFactory) {
-		this.authenticationFactory = authenticationFactory;
 	}
 }

@@ -22,6 +22,10 @@ import java.io.File;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,16 +37,20 @@ import com.google.common.base.Strings;
 @Component
 public class Settings {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private ServletContext servletContext;
-	private File dataDir;
+	@Getter
+	private File documentrDataDir;
+	@Getter
 	private String host;
+	@Getter
 	private Integer port;
 	
 	@PostConstruct
 	public void init() {
 		String dataDirParam = getInitParam("documentr.dataDir"); //$NON-NLS-1$
 		Assert.hasLength(dataDirParam);
-		dataDir = new File(dataDirParam);
+		documentrDataDir = new File(dataDirParam);
 		
 		host = Strings.emptyToNull(getInitParam("documentr.host")); //$NON-NLS-1$
 		
@@ -60,28 +68,9 @@ public class Settings {
 		return value;
 	}
 	
-	void setServletContext(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
-
-	/** Returns the directory where all application data is stored. */
-	public File getDocumentrDataDir() {
-		return dataDir;
-	}
-	
 	// used for testing
 	@SuppressWarnings("unused")
 	private void setDocumentrDataDir(File dataDir) {
-		this.dataDir = dataDir;
-	}
-
-	/** Returns an alternative host name where the application is available on. */
-	public String getHost() {
-		return host;
-	}
-
-	/** Returns an alternative port number where the application is available on. */
-	public Integer getPort() {
-		return port;
+		this.documentrDataDir = dataDir;
 	}
 }

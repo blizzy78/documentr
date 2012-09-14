@@ -17,8 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
+import lombok.Getter;
+
 public class BranchTreeNode extends AbstractTreeNode {
+	@Getter
 	private String projectName;
+	@Getter
 	private String name;
 
 	BranchTreeNode(String projectName, String name) {
@@ -26,13 +30,5 @@ public class BranchTreeNode extends AbstractTreeNode {
 		
 		this.projectName = projectName;
 		this.name = name;
-	}
-
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getName() {
-		return name;
 	}
 }

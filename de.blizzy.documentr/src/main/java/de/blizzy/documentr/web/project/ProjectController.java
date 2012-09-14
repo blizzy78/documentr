@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import javax.validation.Valid;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,8 +50,10 @@ import de.blizzy.documentr.repository.ILockedRepository;
 @RequestMapping("/project")
 public class ProjectController {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
@@ -80,7 +85,7 @@ public class ProjectController {
 		ILockedRepository repo = null;
 		try {
 			User user = userStore.getUser(authentication.getName());
-			repo = repoManager.createProjectCentralRepository(form.getName(), user);
+			repo = globalRepositoryManager.createProjectCentralRepository(form.getName(), user);
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
@@ -91,19 +96,11 @@ public class ProjectController {
 	@PreAuthorize("hasProjectPermission(#name, ADMIN)")
 	@ResponseBody
 	public void importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
-		repoManager.importSampleContents(name);
+		globalRepositoryManager.importSampleContents(name);
 	}
 
 	@ModelAttribute
 	public ProjectForm createProjectForm(@RequestParam(required=false) String name) {
 		return (name != null) ? new ProjectForm(name) : null;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

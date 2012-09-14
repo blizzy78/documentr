@@ -19,8 +19,10 @@ package de.blizzy.documentr.markdown;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -31,12 +33,13 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.util.Util;
 
 @Component
+@Slf4j
 class PageRenderer implements IPageRenderer {
-	private static final Logger log = LoggerFactory.getLogger(PageRenderer.class);
-	
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private MarkdownProcessor markdownProcessor;
 	
 	@Override
@@ -65,13 +68,5 @@ class PageRenderer implements IPageRenderer {
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
 		return markdownProcessor.headerMarkdownToHTML(markdown, projectName, branchName, path, authentication);
-	}
-	
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
-		this.markdownProcessor = markdownProcessor;
 	}
 }

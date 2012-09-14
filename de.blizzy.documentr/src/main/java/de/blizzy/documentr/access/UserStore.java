@@ -30,6 +30,9 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -68,8 +71,10 @@ public class UserStore {
 	private static final String AUTHORITIES_SUFFIX = ".authorities"; //$NON-NLS-1$
 	
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private PasswordEncoder passwordEncoder;
 	
 	@PostConstruct
@@ -80,7 +85,7 @@ public class UserStore {
 		ILockedRepository repo = null;
 		boolean created = false;
 		try {
-			repo = repoManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
+			repo = globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
 			created = true;
 		} catch (IllegalStateException e) {
 			// okay
@@ -124,7 +129,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			Map<String, Object> userMap = new HashMap<String, Object>();
 			userMap.put("loginName", user.getLoginName()); //$NON-NLS-1$
 			userMap.put("password", user.getPassword()); //$NON-NLS-1$
@@ -165,7 +170,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			String json = BlobUtils.getHeadContent(repo.r(), loginName + USER_SUFFIX);
 			if (json == null) {
 				throw new UserNotFoundException(loginName);
@@ -200,7 +205,7 @@ public class UserStore {
 	public List<String> listUsers() throws IOException {
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -235,7 +240,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			
 			Map<String, Object> roleMap = new HashMap<String, Object>();
 			roleMap.put("name", role.getName()); //$NON-NLS-1$
@@ -270,7 +275,7 @@ public class UserStore {
 	public List<String> listRoles() throws IOException {
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -303,7 +308,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			String json = BlobUtils.getHeadContent(repo.r(), roleName + ROLE_SUFFIX);
 			if (json == null) {
 				throw new RoleNotFoundException(roleName);
@@ -346,7 +351,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 
 			Map<String, Set<String>> authoritiesMap = new HashMap<String, Set<String>>();
 			for (RoleGrantedAuthority rga : authorities) {
@@ -393,7 +398,7 @@ public class UserStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			String json = BlobUtils.getHeadContent(repo.r(), loginName + AUTHORITIES_SUFFIX);
 			if (json == null) {
 				throw new UserNotFoundException(loginName);
@@ -428,7 +433,7 @@ public class UserStore {
 	public User getUserByOpenId(String openId) throws IOException {
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			FileFilter filter = new FileFilter() {
 				@Override
@@ -470,13 +475,5 @@ public class UserStore {
 			// role might have been deleted
 		}
 		return result;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-		this.passwordEncoder = passwordEncoder;
 	}
 }

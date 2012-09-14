@@ -17,12 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import lombok.Getter;
 import de.blizzy.documentr.util.NotFoundException;
 import de.blizzy.documentr.util.Util;
 
 public class PageNotFoundException extends NotFoundException {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String path;
 
 	public PageNotFoundException(String projectName, String branchName, String path) {
@@ -31,17 +35,5 @@ public class PageNotFoundException extends NotFoundException {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public String getPath() {
-		return path;
 	}
 }

@@ -19,10 +19,16 @@ package de.blizzy.documentr.page;
 
 import java.util.Date;
 
+import lombok.Getter;
+
 public class PageMetadata {
+	@Getter
 	private String lastEditedBy;
+	@Getter
 	private Date lastEdited;
+	@Getter
 	private long size;
+	@Getter
 	private String commit;
 
 	public PageMetadata(String lastEditedBy, Date lastEdited, long size, String commit) {
@@ -30,21 +36,5 @@ public class PageMetadata {
 		this.lastEdited = lastEdited;
 		this.size = size;
 		this.commit = commit;
-	}
-	
-	public String getLastEditedBy() {
-		return lastEditedBy;
-	}
-	
-	public Date getLastEdited() {
-		return lastEdited;
-	}
-	
-	public long getSize() {
-		return size;
-	}
-	
-	public String getCommit() {
-		return commit;
 	}
 }

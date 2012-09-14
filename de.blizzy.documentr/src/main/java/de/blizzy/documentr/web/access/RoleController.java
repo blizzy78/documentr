@@ -24,6 +24,9 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -48,6 +51,7 @@ import de.blizzy.documentr.access.UserStore;
 @RequestMapping("/role")
 public class RoleController {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	@RequestMapping(value="/add", method=RequestMethod.GET)
@@ -101,9 +105,5 @@ public class RoleController {
 		return (name != null) ?
 				new RoleForm(name, permissions) :
 				null;
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

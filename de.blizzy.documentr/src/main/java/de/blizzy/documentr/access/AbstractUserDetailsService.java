@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +39,8 @@ import com.google.common.collect.Sets;
  */
 abstract class AbstractUserDetailsService implements UserDetailsService {
 	@Autowired
+	@Getter(AccessLevel.PROTECTED)
+	@Setter(AccessLevel.PROTECTED)
 	private UserStore userStore;
 
 	/**
@@ -68,12 +74,4 @@ abstract class AbstractUserDetailsService implements UserDetailsService {
 
 	/** Returns the {@link User} that has the specified login name. */
 	abstract User loadUser(String loginName) throws IOException;
-	
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
-	}
-	
-	UserStore getUserStore() {
-		return userStore;
-	}
 }

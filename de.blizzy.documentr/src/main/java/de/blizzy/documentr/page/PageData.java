@@ -17,12 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class PageData {
 	private byte[] data;
+	@Getter
 	private String contentType;
 	
 	public PageData(byte[] data, String contentType) {
@@ -32,10 +35,6 @@ public class PageData {
 	
 	public byte[] getData() {
 		return ArrayUtils.clone(data);
-	}
-	
-	public String getContentType() {
-		return contentType;
 	}
 	
 	@Override

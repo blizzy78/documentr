@@ -20,11 +20,15 @@ package de.blizzy.documentr.markdown;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Getter;
+
 import org.pegdown.ast.Node;
 import org.pegdown.ast.SuperNode;
 
 public class MacroNode extends SuperNode {
+	@Getter
 	private String macroName;
+	@Getter
 	private String params;
 
 	public MacroNode(String macroName, String params) {
@@ -36,13 +40,5 @@ public class MacroNode extends SuperNode {
 		
 		this.macroName = macroName;
 		this.params = params;
-	}
-	
-	public String getMacroName() {
-		return macroName;
-	}
-	
-	public String getParams() {
-		return params;
 	}
 }

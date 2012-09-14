@@ -17,26 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.search;
 
+import lombok.Getter;
+
 public class SearchTextSuggestion {
+	@Getter
 	private String searchText;
+	@Getter
 	private String searchTextHtml;
+	@Getter
 	private int totalHits;
 
 	SearchTextSuggestion(String searchText, String searchTextHtml, int totalHits) {
 		this.searchText = searchText;
 		this.searchTextHtml = searchTextHtml;
 		this.totalHits = totalHits;
-	}
-	
-	public String getSearchText() {
-		return searchText;
-	}
-	
-	public String getSearchTextHtml() {
-		return searchTextHtml;
-	}
-	
-	public int getTotalHits() {
-		return totalHits;
 	}
 }

@@ -20,16 +20,32 @@ package de.blizzy.documentr.page;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
 public class Page {
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
 	private String parentPagePath;
+	@Getter
 	private String title;
+	@Getter
 	private String contentType;
+	@Getter
+	@Setter
+	@NotNull
 	private Set<String> tags = Collections.emptySet();
+	@Getter
 	private String viewRestrictionRole;
+	@Getter
+	@Setter
 	private PageData data;
 
 	Page(String title, String contentType, PageData data) {
@@ -52,50 +68,12 @@ public class Page {
 		return new Page(title, contentType, null);
 	}
 
-	void setParentPagePath(String parentPagePath) {
-		this.parentPagePath = parentPagePath;
-	}
-	
-	public String getParentPagePath() {
-		return parentPagePath;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public Set<String> getTags() {
-		return tags;
-	}
-	
-	public void setTags(Set<String> tags) {
-		Assert.notNull(tags);
-		
-		this.tags = tags;
-	}
-
 	public void setViewRestrictionRole(String viewRestrictionRole) {
 		if (viewRestrictionRole != null) {
 			Assert.hasLength(viewRestrictionRole);
 		}
 		
 		this.viewRestrictionRole = viewRestrictionRole;
-	}
-	
-	public String getViewRestrictionRole() {
-		return viewRestrictionRole;
-	}
-	
-	public PageData getData() {
-		return data;
-	}
-	
-	public void setData(PageData data) {
-		this.data = data;
 	}
 	
 	@Override

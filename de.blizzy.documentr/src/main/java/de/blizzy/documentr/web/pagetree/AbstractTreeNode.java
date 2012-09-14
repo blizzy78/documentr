@@ -17,18 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
+import lombok.Getter;
+
 public abstract class AbstractTreeNode {
 	public static enum Type {
 		PROJECT, BRANCH, PAGE, ATTACHMENT;
 	}
 	
+	@Getter
 	private Type type;
 
 	AbstractTreeNode(Type type) {
 		this.type = type;
-	}
-	
-	public Type getType() {
-		return type;
 	}
 }

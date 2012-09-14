@@ -23,6 +23,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +34,7 @@ import de.blizzy.documentr.validation.annotation.RoleExists;
 
 public class RoleExistsValidator implements ConstraintValidator<RoleExists, String> {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	
 	@Override
@@ -48,9 +52,5 @@ public class RoleExistsValidator implements ConstraintValidator<RoleExists, Stri
 		} catch (IOException e) {
 			throw new ValidationException(e);
 		}
-	}
-	
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

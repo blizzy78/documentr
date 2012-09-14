@@ -35,6 +35,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,8 +80,6 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.Version;
 import org.cyberneko.html.HTMLEntities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -111,6 +113,7 @@ import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.util.Util;
 
 @Component
+@Slf4j
 public class PageIndex {
 	static final String PROJECT = "project"; //$NON-NLS-1$
 	static final String BRANCH = "branch"; //$NON-NLS-1$
@@ -121,8 +124,6 @@ public class PageIndex {
 	static final String TEXT = "text"; //$NON-NLS-1$
 	static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 
-	private static final Logger log = LoggerFactory.getLogger(PageIndex.class);
-	
 	private static final String FULL_PATH = "fullPath"; //$NON-NLS-1$
 	private static final String ALL_TEXT_SUGGESTIONS = "allTextSuggestions"; //$NON-NLS-1$
 	private static final int HITS_PER_PAGE = 20;
@@ -160,6 +161,7 @@ public class PageIndex {
 	@Autowired
 	private UserStore userStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private ListeningExecutorService taskExecutor;
 	private Analyzer analyzer;
 	private Directory directory;
@@ -617,9 +619,5 @@ public class PageIndex {
 		} finally {
 			readerManager.release(reader);
 		}
-	}
-
-	void setTaskExecutor(ListeningExecutorService taskExecutor) {
-		this.taskExecutor = taskExecutor;
 	}
 }

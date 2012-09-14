@@ -19,6 +19,8 @@ package de.blizzy.documentr.access;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
@@ -67,7 +69,9 @@ public class GrantedAuthorityTarget implements Serializable {
 
 	private static final long serialVersionUID = -8582662031330649292L;
 
+	@Getter
 	private String targetId;
+	@Getter
 	private Type type;
 
 	/**
@@ -84,16 +88,6 @@ public class GrantedAuthorityTarget implements Serializable {
 
 		this.targetId = targetId;
 		this.type = type;
-	}
-	
-	/** Returns this target object's ID. */
-	public String getTargetId() {
-		return targetId;
-	}
-
-	/** Returns this target object's type. */
-	public Type getType() {
-		return type;
 	}
 	
 	@Override

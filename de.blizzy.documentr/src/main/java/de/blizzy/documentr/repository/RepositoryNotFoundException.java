@@ -17,11 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import lombok.Getter;
 import de.blizzy.documentr.util.NotFoundException;
 
 public class RepositoryNotFoundException extends NotFoundException {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private boolean central;
 
 	private RepositoryNotFoundException(String projectName, String branchName, boolean central) {
@@ -36,17 +40,5 @@ public class RepositoryNotFoundException extends NotFoundException {
 	
 	static RepositoryNotFoundException forCentralRepository(String projectName) {
 		return new RepositoryNotFoundException(projectName, null, true);
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public boolean isCentralRepository() {
-		return central;
 	}
 }

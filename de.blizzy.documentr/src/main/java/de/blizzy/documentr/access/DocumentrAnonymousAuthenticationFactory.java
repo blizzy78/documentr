@@ -21,8 +21,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -33,6 +37,7 @@ import com.google.common.collect.Sets;
 @Component
 public class DocumentrAnonymousAuthenticationFactory {
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	/** Creates an anonymous {@link Authentication} with authorities granted to the anonymous user. */
@@ -46,9 +51,5 @@ public class DocumentrAnonymousAuthenticationFactory {
 		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS")); //$NON-NLS-1$
 		
 		return new AnonymousAuthenticationToken(key, UserStore.ANONYMOUS_USER_LOGIN_NAME, authorities);
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

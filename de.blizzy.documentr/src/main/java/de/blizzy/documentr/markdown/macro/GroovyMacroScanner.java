@@ -26,9 +26,9 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,10 +38,9 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.Settings;
 
 @Component
+@Slf4j
 class GroovyMacroScanner {
 	static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
-	
-	private static final Logger log = LoggerFactory.getLogger(GroovyMacroScanner.class);
 	
 	@Autowired
 	private Settings settings;

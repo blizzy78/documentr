@@ -29,10 +29,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -75,20 +77,24 @@ import de.blizzy.documentr.web.util.ErrorController;
 
 @Controller
 @RequestMapping("/page")
+@Slf4j
 public class PageController {
-	private static final Logger log = LoggerFactory.getLogger(PageController.class);
-	
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
 	private ICherryPicker cherryPicker;
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageRenderer pageRenderer;
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;
@@ -208,7 +214,7 @@ public class PageController {
 		String branchName = form.getBranchName();
 		User user = userStore.getUser(authentication.getName());
 		
-		if (!repoManager.listProjectBranches(projectName).contains(branchName)) {
+		if (!globalRepositoryManager.listProjectBranches(projectName).contains(branchName)) {
 			bindingResult.rejectValue("branchName", "page.branch.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -581,25 +587,5 @@ public class PageController {
 		form.setParentPageSplitRangeEnd(Integer.valueOf(rangeEnd));
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setMarkdownProcessor(MarkdownProcessor markdownProcessor) {
-		this.markdownProcessor = markdownProcessor;
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
-	}
-
-	void setPageRenderer(IPageRenderer pageRenderer) {
-		this.pageRenderer = pageRenderer;
 	}
 }

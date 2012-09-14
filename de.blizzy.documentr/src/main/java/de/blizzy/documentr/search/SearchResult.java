@@ -19,35 +19,24 @@ package de.blizzy.documentr.search;
 
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 public class SearchResult {
+	@Getter
 	private List<SearchHit> hits;
+	@Getter
 	private int totalHits;
+	@Getter
 	private int hitsPerPage;
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
 	private SearchTextSuggestion suggestion;
 
 	public SearchResult(List<SearchHit> hits, int totalHits, int hitsPerPage) {
 		this.hits = hits;
 		this.totalHits = totalHits;
 		this.hitsPerPage = hitsPerPage;
-	}
-	
-	public List<SearchHit> getHits() {
-		return hits;
-	}
-	
-	public int getTotalHits() {
-		return totalHits;
-	}
-	
-	public int getHitsPerPage() {
-		return hitsPerPage;
-	}
-
-	void setSuggestion(SearchTextSuggestion suggestion) {
-		this.suggestion = suggestion;
-	}
-	
-	public SearchTextSuggestion getSuggestion() {
-		return suggestion;
 	}
 }

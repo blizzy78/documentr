@@ -22,6 +22,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +53,13 @@ import de.blizzy.documentr.repository.ILockedRepository;
 @RequestMapping("/branch")
 public class BranchController {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	@Setter(AccessLevel.PACKAGE)
+	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
@@ -69,7 +75,7 @@ public class BranchController {
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 		
-		List<String> branches = repoManager.listProjectBranches(form.getProjectName());
+		List<String> branches = globalRepositoryManager.listProjectBranches(form.getProjectName());
 		boolean firstBranch = branches.isEmpty();
 		if (branches.contains(form.getName())) {
 			bindingResult.rejectValue("name", "branch.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -81,7 +87,7 @@ public class BranchController {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = repoManager.createProjectBranchRepository(form.getProjectName(), form.getName(), form.getStartingBranch());
+			repo = globalRepositoryManager.createProjectBranchRepository(form.getProjectName(), form.getName(), form.getStartingBranch());
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
@@ -104,17 +110,5 @@ public class BranchController {
 			@RequestParam(required=false) String startingBranch) {
 		
 		return (name != null) ? new BranchForm(projectName, name, startingBranch) : null;
-	}
-
-	void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
-		this.repoManager = repoManager;
-	}
-
-	void setPageStore(IPageStore pageStore) {
-		this.pageStore = pageStore;
-	}
-
-	void setUserStore(UserStore userStore) {
-		this.userStore = userStore;
 	}
 }

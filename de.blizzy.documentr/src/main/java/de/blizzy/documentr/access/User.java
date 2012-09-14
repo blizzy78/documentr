@@ -20,14 +20,21 @@ package de.blizzy.documentr.access;
 import java.util.Iterator;
 import java.util.Set;
 
+import lombok.Getter;
+
 import com.google.common.collect.Sets;
 
 /** Represents a user. */
 public class User {
+	@Getter
 	private String loginName;
+	@Getter
 	private String password;
+	@Getter
 	private String email;
+	@Getter
 	private boolean disabled;
+	@Getter
 	private Set<OpenId> openIds = Sets.newHashSet();
 
 	/**
@@ -46,34 +53,9 @@ public class User {
 		this.disabled = disabled;
 	}
 
-	/** Returns the user's login name. */
-	public String getLoginName() {
-		return loginName;
-	}
-
-	/** Returns the user's encoded password. */
-	public String getPassword() {
-		return password;
-	}
-	
-	/** Returns the user's E-Mail address. */
-	public String getEmail() {
-		return email;
-	}
-
-	/** Returns whether the user's account is disabled, thus preventing login. */
-	public boolean isDisabled() {
-		return disabled;
-	}
-	
 	/** Adds an OpenID to this user. */
 	public void addOpenId(OpenId openId) {
 		openIds.add(openId);
-	}
-
-	/** Returns all OpenIDs associated with this user. */
-	public Set<OpenId> getOpenIds() {
-		return openIds;
 	}
 
 	/** Removes an OpenID from this user. Lookup is done using the OpenID's delegate ID. */

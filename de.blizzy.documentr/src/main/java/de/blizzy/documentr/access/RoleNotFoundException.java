@@ -17,19 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import lombok.Getter;
 import de.blizzy.documentr.util.NotFoundException;
 
 /** Thrown when no role is found that has a specific name. */
 public class RoleNotFoundException extends NotFoundException {
+	@Getter
 	private String roleName;
 
 	RoleNotFoundException(String roleName) {
 		super("role not found: " + roleName); //$NON-NLS-1$
 		
 		this.roleName = roleName;
-	}
-	
-	public String getRoleName() {
-		return roleName;
 	}
 }

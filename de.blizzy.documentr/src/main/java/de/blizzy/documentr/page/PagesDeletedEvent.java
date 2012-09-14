@@ -19,11 +19,16 @@ package de.blizzy.documentr.page;
 
 import java.util.Set;
 
+import lombok.Getter;
+
 import org.springframework.util.Assert;
 
 public class PagesDeletedEvent {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private Set<String> paths;
 
 	public PagesDeletedEvent(String projectName, String branchName, Set<String> paths) {
@@ -34,17 +39,5 @@ public class PagesDeletedEvent {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.paths = paths;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-	
-	public Set<String> getPaths() {
-		return paths;
 	}
 }

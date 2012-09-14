@@ -17,10 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.pagetree;
 
+import lombok.Getter;
+
 public class AttachmentTreeNode extends AbstractTreeNode {
+	@Getter
 	private String projectName;
+	@Getter
 	private String branchName;
+	@Getter
 	private String pagePath;
+	@Getter
 	private String name;
 
 	AttachmentTreeNode(String projectName, String branchName, String pagePath, String name) {
@@ -30,21 +36,5 @@ public class AttachmentTreeNode extends AbstractTreeNode {
 		this.branchName = branchName;
 		this.pagePath = pagePath;
 		this.name = name;
-	}
-
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public String getBranchName() {
-		return branchName;
-	}
-
-	public String getPagePath() {
-		return pagePath;
-	}
-	
-	public String getName() {
-		return name;
 	}
 }
