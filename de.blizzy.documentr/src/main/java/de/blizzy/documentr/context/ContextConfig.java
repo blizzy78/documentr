@@ -32,7 +32,6 @@ import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.MessageSource;
@@ -69,7 +68,6 @@ import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
-import de.blizzy.documentr.markdown.macro.MacroBeanPostProcessor;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 
 /** Spring application context configuration. */
@@ -183,11 +181,6 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 		ExecutorService executorService = Executors.newScheduledThreadPool(
 				DocumentrConstants.TASK_EXECUTOR_THREADS, threadFactory);
 		return MoreExecutors.listeningDecorator(executorService);
-	}
-	
-	@Bean
-	public MacroBeanPostProcessor macroBeanPostProcessor(BeanFactory beanFactory) {
-		return new MacroBeanPostProcessor(beanFactory);
 	}
 
 	@Override

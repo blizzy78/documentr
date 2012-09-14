@@ -23,17 +23,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionValidationException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MacroBeanPostProcessor implements BeanPostProcessor {
 	private static final Logger log = LoggerFactory.getLogger(MacroBeanPostProcessor.class);
 	
+	@Autowired
 	private BeanFactory beanFactory;
-	
-	public MacroBeanPostProcessor(BeanFactory beanFactory) {
-		this.beanFactory = beanFactory;
-	}
 	
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
