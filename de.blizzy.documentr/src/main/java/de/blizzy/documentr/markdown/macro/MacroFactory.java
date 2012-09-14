@@ -20,12 +20,13 @@ package de.blizzy.documentr.markdown.macro;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.Lifecycle;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -34,27 +35,52 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 @Component
-public class MacroFactory {
+public class MacroFactory implements Lifecycle {
 	private static final Logger log = LoggerFactory.getLogger(MacroFactory.class);
-	
+
 	@Autowired
-	private Collection<IMacro> contextMacros;
+	private ListableBeanFactory beanFactory;
 	@Autowired
 	private GroovyMacroScanner groovyMacroScanner;
 	private Map<String, IMacro> macros = Maps.newHashMap();
+	private AtomicBoolean running = new AtomicBoolean();
 
-	@PostConstruct
-	public void init() {
+	// cannot use @PostConstruct here because it is possible that not all beans in the context
+	// have already been constructed, thus causing us to not pick up some macros
+	@Override
+	public void start() {
 		registerMacrosFromClasses();
 		registerGroovyMacros();
+		running.set(true);
+	}
+
+	@Override
+	public void stop() {
+		running.set(false);
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running.get();
+	}
+	
+	private void waitForRunning() {
+		while (!running.get()) {
+			log.trace("wait for running"); //$NON-NLS-1$
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
 	}
 
 	private void registerMacrosFromClasses() {
 		log.info("registering macros from classes"); //$NON-NLS-1$
-		for (IMacro macro : contextMacros) {
+		Collection<IMacro> macros = beanFactory.getBeansOfType(IMacro.class).values();
+		for (IMacro macro : macros) {
 			registerMacro(macro);
 		}
-		contextMacros = null;
 	}
 
 	private void registerGroovyMacros() {
@@ -76,10 +102,12 @@ public class MacroFactory {
 	}
 	
 	public IMacro get(String macroName) {
+		waitForRunning();
 		return macros.get(macroName);
 	}
 	
 	public Set<IMacroDescriptor> getDescriptors() {
+		waitForRunning();
 		Function<IMacro, IMacroDescriptor> function = new Function<IMacro, IMacroDescriptor>() {
 			@Override
 			public IMacroDescriptor apply(IMacro macro) {
@@ -87,9 +115,5 @@ public class MacroFactory {
 			}
 		};
 		return Sets.newHashSet(Collections2.transform(macros.values(), function));
-	}
-
-	void setContextMacros(Collection<IMacro> contextMacros) {
-		this.contextMacros = contextMacros;
 	}
 }

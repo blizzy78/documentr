@@ -20,13 +20,16 @@ package de.blizzy.documentr.markdown.macro;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ListableBeanFactory;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
@@ -45,6 +48,8 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 	private IMacroDescriptor groovyDescriptor;
 	@Mock
 	private GroovyMacroScanner groovyMacroScanner;
+	@Mock
+	private ListableBeanFactory beanFactory;
 	@InjectMocks
 	private MacroFactory macroFactory;
 
@@ -60,8 +65,11 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 		
 		when(groovyMacroScanner.findGroovyMacros()).thenReturn(Sets.newHashSet(groovyMacro));
 
-		macroFactory.setContextMacros(Sets.newHashSet(macro));
-		macroFactory.init();
+		Map<String, IMacro> macros = Maps.newHashMap();
+		macros.put(MACRO, macro);
+		when(beanFactory.getBeansOfType(IMacro.class)).thenReturn(macros);
+
+		macroFactory.start();
 	}
 	
 	@Test

@@ -68,5 +68,8 @@ public class WebappInitializer implements WebApplicationInitializer {
 		FilterRegistration.Dynamic securityFilterConfig =
 				context.addFilter("springSecurityFilterChain", securityFilter); //$NON-NLS-1$
 		securityFilterConfig.addMappingForUrlPatterns(null, true, "/*");  //$NON-NLS-1$
+		
+		appContext.refresh();
+		appContext.start();
 	}
 }
