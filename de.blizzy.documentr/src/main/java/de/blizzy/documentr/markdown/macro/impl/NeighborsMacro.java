@@ -21,7 +21,7 @@ import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
-@Macro(name="neighbors", insertText="{{neighbors/}}")
+@Macro(name="neighbors", insertText="{{neighbors/}}", cacheable=false)
 public class NeighborsMacro implements ISimpleMacro {
 	@Override
 	public IMacroRunnable createRunnable() {
