@@ -17,24 +17,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.LabelMacro;
 
-public class LabelMacroTest {
-	private LabelMacro macro;
+public class LabelMacroTest extends AbstractDocumentrTest {
+	private LabelMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new LabelMacro();
+		runnable = new LabelMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof LabelMacroRunnable);
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("info label text"); //$NON-NLS-1$
+		assertEquals("<span class=\"label label-info\">label text</span>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

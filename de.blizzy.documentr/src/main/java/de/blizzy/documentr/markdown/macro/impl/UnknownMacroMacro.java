@@ -23,7 +23,7 @@ import de.blizzy.documentr.markdown.macro.IMacro;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 
-//cannot be a @Component because it must not be picked up by MacroFactory's Collection<IMacro>
+// cannot be a @Component because it must not be picked up by MacroFactory
 public class UnknownMacroMacro implements IMacro {
 	@Override
 	public IMacroDescriptor getDescriptor() {

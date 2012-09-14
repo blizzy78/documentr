@@ -17,14 +17,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="vimeo", insertText="{{vimeo [VIDEO]/}}")
-public class VimeoMacro implements ISimpleMacro {
+public class VimeoMacro implements IMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new VimeoMacroRunnable();
+	public String getHtml(IMacroContext macroContext) {
+		String videoId = macroContext.getParameters().trim();
+		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);
+		}
+		
+		return "<iframe src=\"http://player.vimeo.com/video/" + videoId + "\" " + //$NON-NLS-1$ //$NON-NLS-2$
+				"width=\"500\" height=\"281\" frameborder=\"0\" " + //$NON-NLS-1$
+				"webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"; //$NON-NLS-1$
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

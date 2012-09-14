@@ -17,14 +17,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="twitter", insertText="{{twitter [SEARCHTERMS]/}}")
-public class TwitterMacro implements ISimpleMacro {
+public class TwitterMacro implements IMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new TwitterMacroRunnable();
+	public String getHtml(IMacroContext macroContext) {
+		String searchTerms = macroContext.getParameters().trim();
+		@SuppressWarnings("nls")
+		String html = "<script charset=\"UTF-8\" src=\"http://widgets.twimg.com/j/2/widget.js\"></script>\n" +
+			"<script>\n" +
+			"new TWTR.Widget({" +
+				"version: 2," +
+				"type: 'search'," +
+				"search: '" + StringEscapeUtils.escapeEcmaScript(searchTerms) + "'," +
+				"interval: 15000," +
+				"title: ''," +
+				"subject: ''," +
+				"width: 300," +
+				"height: 300," +
+				"features: {" +
+					"scrollbar: true," +
+					"loop: false," +
+					"live: true," +
+					"behavior: 'default'" +
+				"}" +
+			"}).render().start(); documentr.fixTwitterCss();\n" +
+			"</script>\n";
+		return html;
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

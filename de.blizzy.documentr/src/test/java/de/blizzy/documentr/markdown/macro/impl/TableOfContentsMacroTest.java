@@ -17,24 +17,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import com.google.common.collect.Lists;
 
-public class TableOfContentsMacroTest {
-	private TableOfContentsMacro macro;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.Header;
+import de.blizzy.documentr.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.TableOfContentsMacro;
+
+public class TableOfContentsMacroTest extends AbstractDocumentrTest {
+	private TableOfContentsMacro runnable;
+	@Mock
+	private IMacroContext context;
+	@Mock
+	private HtmlSerializerContext htmlSerializerContext;
 
 	@Before
 	public void setUp() {
-		macro = new TableOfContentsMacro();
+		runnable = new TableOfContentsMacro();
+		
+		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof TableOfContentsMacroRunnable);
+	public void getMarkdown() {
+		List<Header> headers = Lists.newArrayList(
+				new Header("foo", 1), //$NON-NLS-1$
+				new Header("bar", 2), //$NON-NLS-1$
+				new Header("baz", 3), //$NON-NLS-1$
+				new Header("qux", 1)); //$NON-NLS-1$
+		when(htmlSerializerContext.getHeaders()).thenReturn(headers);
+
+		assertEquals(
+				"- [[#foo]]\n" + //$NON-NLS-1$
+				"    - [[#bar]]\n" + //$NON-NLS-1$
+				"        - [[#baz]]\n" + //$NON-NLS-1$
+				"- [[#qux]]\n\n", //$NON-NLS-1$
+				runnable.getMarkdown(context));
+	}
+	
+	@Test
+	public void getMarkdownButNoHeaders() {
+		List<Header> headers = Collections.emptyList();
+		when(htmlSerializerContext.getHeaders()).thenReturn(headers);
+		
+		assertNull(runnable.getMarkdown(context));
 	}
 }

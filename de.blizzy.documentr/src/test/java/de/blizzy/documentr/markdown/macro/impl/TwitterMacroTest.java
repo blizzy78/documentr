@@ -17,24 +17,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 
-public class TwitterMacroTest {
-	private TwitterMacro macro;
-
+public class TwitterMacroTest extends AbstractDocumentrTest {
+	@Mock
+	private IMacroContext context;
+	private TwitterMacro runnable;
+	
 	@Before
 	public void setUp() {
-		macro = new TwitterMacro();
+		runnable = new TwitterMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof TwitterMacroRunnable);
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("\"searchParams\""); //$NON-NLS-1$
+
+		String html = runnable.getHtml(context);
+		@SuppressWarnings("nls")
+		String expectedHtml = "<script charset=\"UTF-8\" src=\"http://widgets.twimg.com/j/2/widget.js\"></script>\n" +
+			"<script>\n" +
+			"new TWTR.Widget({" +
+				"version: 2," +
+				"type: 'search'," +
+				"search: '" + StringEscapeUtils.escapeEcmaScript("\"searchParams\"") + "'," +
+				"interval: 15000," +
+				"title: ''," +
+				"subject: ''," +
+				"width: 300," +
+				"height: 300," +
+				"features: {" +
+					"scrollbar: true," +
+					"loop: false," +
+					"live: true," +
+					"behavior: 'default'" +
+				"}" +
+			"}).render().start(); documentr.fixTwitterCss();\n" +
+			"</script>\n";
+		assertEquals(expectedHtml, html);
 	}
 }

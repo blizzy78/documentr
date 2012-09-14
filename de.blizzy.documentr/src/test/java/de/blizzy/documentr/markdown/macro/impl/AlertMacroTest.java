@@ -17,24 +17,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.AlertMacro;
 
-public class AlertMacroTest {
-	private AlertMacro macro;
+public class AlertMacroTest extends AbstractDocumentrTest {
+	private AlertMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new AlertMacro();
+		runnable = new AlertMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof AlertMacroRunnable);
+	public void getHtml() {
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<div class=\"alert\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getHtmlWithErrorType() {
+		when(context.getParameters()).thenReturn("error"); //$NON-NLS-1$
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<div class=\"alert alert-error\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

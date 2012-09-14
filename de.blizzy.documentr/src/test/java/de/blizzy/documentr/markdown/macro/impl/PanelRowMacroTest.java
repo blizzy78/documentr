@@ -17,24 +17,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.PanelRowMacro;
 
-public class PanelRowMacroTest {
-	private PanelRowMacro macro;
+public class PanelRowMacroTest extends AbstractDocumentrTest {
+	private PanelRowMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new PanelRowMacro();
+		runnable = new PanelRowMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof PanelRowMacroRunnable);
+	public void getHtml() {
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<div class=\"row-fluid\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

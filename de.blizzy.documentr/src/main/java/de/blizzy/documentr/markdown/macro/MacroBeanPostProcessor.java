@@ -49,8 +49,16 @@ public class MacroBeanPostProcessor implements BeanPostProcessor {
 						Macro.class.getSimpleName() + " annotation for bean: " + beanName); //$NON-NLS-1$
 			}
 			
-			if ((bean instanceof ISimpleMacro) && !(bean instanceof IMacro)) {
-				return createMacro((ISimpleMacro) bean, annotation);
+			if (!(bean instanceof IMacro)) {
+				if (bean instanceof ISimpleMacro) {
+					return createMacro((ISimpleMacro) bean, annotation);
+				} else if (bean instanceof IMacroRunnable) {
+					@SuppressWarnings("unchecked")
+					Class<? extends IMacroRunnable> clazz = (Class<? extends IMacroRunnable>) bean.getClass();
+					return createMacro(clazz, annotation);
+				} else {
+					throw new BeanNotOfRequiredTypeException(beanName, ISimpleMacro.class, bean.getClass());
+				}
 			} else {
 				throw new BeanNotOfRequiredTypeException(beanName, ISimpleMacro.class, bean.getClass());
 			}
@@ -62,5 +70,10 @@ public class MacroBeanPostProcessor implements BeanPostProcessor {
 	private IMacro createMacro(ISimpleMacro bean, Macro annotation) {
 		log.info("creating macro from simple macro: {}", annotation.name()); //$NON-NLS-1$
 		return new SimpleMacroMacro(bean, annotation, beanFactory);
+	}
+	
+	private IMacro createMacro(Class<? extends IMacroRunnable> clazz, Macro annotation) {
+		log.info("creating macro from macro runnable: {}", annotation.name()); //$NON-NLS-1$
+		return new MacroRunnableMacro(clazz, annotation, beanFactory);
 	}
 }

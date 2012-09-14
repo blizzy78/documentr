@@ -21,19 +21,19 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.util.Assert;
 
 // cannot be a @Component because it must not be picked up by MacroFactory
-class SimpleMacroMacro implements IMacro {
-	private ISimpleMacro simpleMacro;
+class MacroRunnableMacro implements IMacro {
+	private Class<? extends IMacroRunnable> clazz;
 	private Macro annotation;
 	private BeanFactory beanFactory;
 
-	SimpleMacroMacro(ISimpleMacro simpleMacro, Macro annotation, BeanFactory beanFactory) {
-		Assert.notNull(simpleMacro);
+	MacroRunnableMacro(Class<? extends IMacroRunnable> clazz, Macro annotation, BeanFactory beanFactory) {
+		Assert.notNull(clazz);
 		Assert.notNull(annotation);
 		Assert.hasLength(annotation.name());
 		Assert.hasLength(annotation.insertText());
 		Assert.notNull(beanFactory);
-		
-		this.simpleMacro = simpleMacro;
+
+		this.clazz = clazz;
 		this.annotation = annotation;
 		this.beanFactory = beanFactory;
 	}
@@ -47,6 +47,12 @@ class SimpleMacroMacro implements IMacro {
 
 	@Override
 	public IMacroRunnable createRunnable() {
-		return simpleMacro.createRunnable();
+		try {
+			return clazz.newInstance();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

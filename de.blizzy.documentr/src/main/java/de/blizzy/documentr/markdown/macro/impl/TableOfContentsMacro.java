@@ -17,14 +17,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import de.blizzy.documentr.markdown.Header;
+import de.blizzy.documentr.markdown.HtmlSerializerContext;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="toc", insertText="{{toc/}}")
-public class TableOfContentsMacro implements ISimpleMacro {
+public class TableOfContentsMacro extends AbstractMarkdownMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new TableOfContentsMacroRunnable();
+	String getMarkdown(IMacroContext macroContext) {
+		HtmlSerializerContext context = macroContext.getHtmlSerializerContext();
+		List<Header> headers = context.getHeaders();
+		if (!headers.isEmpty()) {
+			int smallestLevel = Integer.MAX_VALUE;
+			for (Header header : headers) {
+				int level = header.getLevel() - 1;
+				if (level < smallestLevel) {
+					smallestLevel = level;
+				}
+			}
+			
+			StringBuilder buf = new StringBuilder();
+			for (Header header : headers) {
+				buf.append(StringUtils.repeat("    ", header.getLevel() - 1 - smallestLevel)) //$NON-NLS-1$
+					.append("- [[#").append(header.getText()).append("]]\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			return buf.toString() + "\n"; //$NON-NLS-1$
+		}
+		return null;
 	}
 }

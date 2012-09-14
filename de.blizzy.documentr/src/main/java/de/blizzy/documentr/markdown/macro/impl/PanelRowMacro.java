@@ -17,14 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="panelrow", insertText="{{panelrow}}[CONTENTS]{{/panelrow}}")
-public class PanelRowMacro implements ISimpleMacro {
+public class PanelRowMacro implements IMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new PanelRowMacroRunnable();
+	public String getHtml(IMacroContext macroContext) {
+		return "<div class=\"row-fluid\">" + macroContext.getBody() + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

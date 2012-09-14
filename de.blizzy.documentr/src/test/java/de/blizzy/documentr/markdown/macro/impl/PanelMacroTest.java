@@ -17,24 +17,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.PanelMacro;
 
-public class PanelMacroTest {
-	private PanelMacro macro;
+public class PanelMacroTest extends AbstractDocumentrTest {
+	private PanelMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new PanelMacro();
+		runnable = new PanelMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof PanelMacroRunnable);
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("3"); //$NON-NLS-1$
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<div class=\"span3\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getHtmlWithBorder() {
+		when(context.getParameters()).thenReturn("3 border"); //$NON-NLS-1$
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<div class=\"span3\"><div class=\"span12 panel-border\">body</div></div>", //$NON-NLS-1$
+				runnable.getHtml(context));
 	}
 }

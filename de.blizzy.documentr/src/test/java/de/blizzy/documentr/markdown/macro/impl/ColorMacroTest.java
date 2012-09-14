@@ -17,24 +17,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.ColorMacro;
 
-public class ColorMacroTest {
-	private ColorMacro macro;
+public class ColorMacroTest extends AbstractDocumentrTest {
+	private ColorMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new ColorMacro();
+		runnable = new ColorMacro();
 	}
 
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof ColorMacroRunnable);
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("#880000"); //$NON-NLS-1$
+		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
+		assertEquals("<span style=\"color: #880000;\">body</span>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

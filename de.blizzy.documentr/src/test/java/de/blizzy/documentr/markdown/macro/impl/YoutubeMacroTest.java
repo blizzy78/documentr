@@ -18,23 +18,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown.macro.impl;
 
 import static junit.framework.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.impl.YoutubeMacro;
 
-public class YoutubeMacroTest {
-	private YoutubeMacro macro;
+public class YoutubeMacroTest extends AbstractDocumentrTest {
+	private YoutubeMacro runnable;
+	@Mock
+	private IMacroContext context;
 
 	@Before
 	public void setUp() {
-		macro = new YoutubeMacro();
+		runnable = new YoutubeMacro();
 	}
-
+	
 	@Test
-	public void createRunnable() {
-		IMacroRunnable runnable = macro.createRunnable();
-		assertTrue(runnable instanceof YoutubeMacroRunnable);
+	public void getHtml() {
+		when(context.getParameters()).thenReturn("video123"); //$NON-NLS-1$
+		assertEquals("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/video123?" + //$NON-NLS-1$
+				"rel=0\" frameborder=\"0\" allowfullscreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void getHtmlWithUrl() {
+		when(context.getParameters()).thenReturn("http://www.youtube.com/watch?v=video123&feature=g-vrec"); //$NON-NLS-1$
+		assertEquals("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/video123?" + //$NON-NLS-1$
+				"rel=0\" frameborder=\"0\" allowfullscreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
 }

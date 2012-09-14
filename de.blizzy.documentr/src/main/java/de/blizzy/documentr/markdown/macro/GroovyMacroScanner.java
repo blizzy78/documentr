@@ -80,6 +80,11 @@ class GroovyMacroScanner {
 							ISimpleMacro simpleMacro = (ISimpleMacro) clazz.newInstance();
 							IMacro macro = new SimpleMacroMacro(simpleMacro, annotation, beanFactory);
 							macros.add(macro);
+						} else if (IMacroRunnable.class.isAssignableFrom(clazz)) {
+							@SuppressWarnings("unchecked")
+							Class<? extends IMacroRunnable> c = (Class<? extends IMacroRunnable>) clazz;
+							IMacro macro = new MacroRunnableMacro(c, annotation, beanFactory);
+							macros.add(macro);
 						} else {
 							log.warn("class {} not supported: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
 						}

@@ -17,14 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="label", insertText="{{label [TYPE] TEXT/}}")
-public class LabelMacro implements ISimpleMacro {
+public class LabelMacro implements IMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new LabelMacroRunnable();
+	public String getHtml(IMacroContext macroContext) {
+		String params = macroContext.getParameters();
+		String type = StringUtils.substringBefore(params, " ").trim(); //$NON-NLS-1$
+		String text = StringUtils.substringAfter(params, " ").trim(); //$NON-NLS-1$
+		return "<span class=\"label label-" + StringEscapeUtils.escapeHtml4(type) + "\">" + //$NON-NLS-1$ //$NON-NLS-2$
+				StringEscapeUtils.escapeHtml4(text) + "</span>"; //$NON-NLS-1$
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }

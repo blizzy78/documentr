@@ -17,14 +17,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
+import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.ISimpleMacro;
 import de.blizzy.documentr.markdown.macro.Macro;
 
 @Macro(name="youtube", insertText="{{youtube [VIDEO]/}}")
-public class YoutubeMacro implements ISimpleMacro {
+public class YoutubeMacro implements IMacroRunnable {
 	@Override
-	public IMacroRunnable createRunnable() {
-		return new YoutubeMacroRunnable();
+	public String getHtml(IMacroContext macroContext) {
+		String videoId = macroContext.getParameters().trim();
+		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getQueryParams().get("v").get(0); //$NON-NLS-1$
+		}
+		
+		return "<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/" + videoId + //$NON-NLS-1$
+				"?rel=0\" frameborder=\"0\" allowfullscreen></iframe>"; //$NON-NLS-1$
+	}
+
+	@Override
+	public String cleanupHTML(String html) {
+		return html;
 	}
 }
