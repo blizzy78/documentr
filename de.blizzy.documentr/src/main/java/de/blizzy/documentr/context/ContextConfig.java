@@ -66,6 +66,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
+import de.blizzy.documentr.access.BCryptPasswordEncoder;
+import de.blizzy.documentr.access.MultiPasswordEncoder;
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
 import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
@@ -105,7 +107,9 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new Sha512PasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_ITERATIONS);
+		return new MultiPasswordEncoder(
+				new BCryptPasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_BCRYPT_ITERATIONS),
+				new Sha512PasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_SHA512_ITERATIONS));
 	}
 
 	@Bean(destroyMethod="shutdown")

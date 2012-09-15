@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
-public class Sha512PasswordEncoderTest {
+public class BCryptPasswordEncoderTest {
 	public static final String PASSWORD = "secret"; //$NON-NLS-1$
 	
 	private SecureRandom ignoredRandom;
@@ -38,17 +38,17 @@ public class Sha512PasswordEncoderTest {
 	
 	@Test
 	public void encodeAndCheckPassword() {
-		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
+		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
 
 	@Test
 	public void isPasswordValidMustUseIterationsFromEncodedPassword() {
-		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
+		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
 		
-		passwordEncoder = new Sha512PasswordEncoder(2);
+		passwordEncoder = new BCryptPasswordEncoder(5);
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
 

@@ -25,31 +25,37 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
-public class Sha512PasswordEncoderTest {
-	public static final String PASSWORD = "secret"; //$NON-NLS-1$
+public class MultiPasswordEncoderTest {
+	private static final String PASSWORD = "secret"; //$NON-NLS-1$
 	
 	private SecureRandom ignoredRandom;
+	private PasswordEncoder defaultEncoder;
+	private PasswordEncoder otherEncoder;
+	private MultiPasswordEncoder multiEncoder;
 	
 	@Before
 	public void setUp() {
 		ignoredRandom = new SecureRandom();
 		ignoredRandom.setSeed(System.currentTimeMillis());
+
+		defaultEncoder = new BCryptPasswordEncoder(4);
+		otherEncoder = new Sha512PasswordEncoder(1);
+		multiEncoder = new MultiPasswordEncoder(defaultEncoder, otherEncoder);
 	}
 	
 	@Test
-	public void encodeAndCheckPassword() {
-		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
-		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
-		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
+	public void encodePasswordMustUseDefaultEncoder() {
+		String encPass = multiEncoder.encodePassword(PASSWORD, salt());
+		assertTrue(defaultEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
-
+	
 	@Test
-	public void isPasswordValidMustUseIterationsFromEncodedPassword() {
-		PasswordEncoder passwordEncoder = new Sha512PasswordEncoder(1);
-		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
-		
-		passwordEncoder = new Sha512PasswordEncoder(2);
-		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
+	public void isPasswordValidMustCheckAllEncoders() {
+		String encPass = defaultEncoder.encodePassword(PASSWORD, salt());
+		assertTrue(multiEncoder.isPasswordValid(encPass, PASSWORD, salt()));
+
+		encPass = otherEncoder.encodePassword(PASSWORD, salt());
+		assertTrue(multiEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
 
 	private Long salt() {

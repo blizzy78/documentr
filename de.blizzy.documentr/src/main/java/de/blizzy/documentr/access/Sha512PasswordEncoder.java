@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -30,6 +31,8 @@ import org.springframework.util.Assert;
  * number of <a href="http://en.wikipedia.org/wiki/Key_stretching">iterations</a>.
  */
 public class Sha512PasswordEncoder implements PasswordEncoder {
+	private static final Pattern PATTERN = Pattern.compile("^.+?\\{.+?\\}\\{[0-9]+?\\}$"); //$NON-NLS-1$
+	
 	private int iterations;
 	private SecureRandom random = new SecureRandom();
 
@@ -70,6 +73,10 @@ public class Sha512PasswordEncoder implements PasswordEncoder {
 	 */
 	@Override
 	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
+		if (!PATTERN.matcher(encPass).matches()) {
+			throw new IllegalArgumentException("password does not seem to have been encoded with this encoder"); //$NON-NLS-1$
+		}
+		
 		int saltStartPos = StringUtils.indexOf(encPass, "{") + 1; //$NON-NLS-1$
 		int saltEndPos = StringUtils.indexOf(encPass, "}", saltStartPos); //$NON-NLS-1$
 		String newSalt = encPass.substring(saltStartPos, saltEndPos);
