@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
-import java.security.SecureRandom;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -28,11 +26,9 @@ import com.google.common.base.Stopwatch;
 @Slf4j
 public class BCryptPasswordEncoder implements PasswordEncoder {
 	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder;
-	private SecureRandom random = new SecureRandom();
 
 	public BCryptPasswordEncoder(int strength) {
-		random.setSeed(System.currentTimeMillis());
-		encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(strength, random);
+		encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(strength);
 	}
 
 	@Override
