@@ -1,0 +1,97 @@
+<%--
+documentr - Edit, maintain, and present software documentation on the web.
+Copyright (C) 2012 Maik Schreiber
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+--%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
+<%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
+
+<sec:authorize access="hasApplicationPermission(ADMIN)">
+
+<dt:breadcrumbs>
+	<li class="active"><spring:message code="title.systemSettings"/></li>
+</dt:breadcrumbs>
+
+<dt:pageTitle><spring:message code="title.systemSettings"/></dt:pageTitle>
+
+<dt:page>
+
+<div class="page-header"><h1><spring:message code="title.systemSettings"/></h1></div>
+
+<p>
+<c:set var="action"><c:url value="/system/save"/></c:set>
+<form:form commandName="systemSettingsForm" action="${action}" method="POST" cssClass="well form-horizontal">
+	<fieldset>
+		<legend><spring:message code="title.sendingMail"/></legend>
+	
+		<c:set var="errorText"><form:errors path="mailHostName"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="mailHostName" cssClass="control-label"><spring:message code="label.hostName"/>:</form:label>
+			<form:input path="mailHostName" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<c:set var="errorText"><form:errors path="mailHostPort"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="mailHostPort" cssClass="control-label"><spring:message code="label.portNumber"/>:</form:label>
+			<form:input path="mailHostPort" cssClass="input-mini"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<c:set var="errorText"><form:errors path="mailSenderEmail"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="mailSenderEmail" cssClass="control-label"><spring:message code="label.senderEmail"/>:</form:label>
+			<form:input path="mailSenderEmail" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<c:set var="errorText"><form:errors path="mailSenderName"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="mailSenderName" cssClass="control-label"><spring:message code="label.senderName"/>:</form:label>
+			<form:input path="mailSenderName" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<c:set var="errorText"><form:errors path="mailSubjectPrefix"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="mailSubjectPrefix" cssClass="control-label"><spring:message code="label.subjectPrefix"/>:</form:label>
+			<form:input path="mailSubjectPrefix" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend><spring:message code="title.security"/></legend>
+	
+		<c:set var="errorText"><form:errors path="bcryptRounds"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="bcryptRounds" cssClass="control-label"><spring:message code="label.bcryptRounds"/>:</form:label>
+			<form:input path="bcryptRounds" cssClass="input-mini"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			<span class="help-block"><spring:message code="bcryptRoundsHelp"/></span>
+		</div>
+	</fieldset>
+
+	<div class="form-actions">
+		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</form:form>
+</p>
+
+</dt:page>
+
+</sec:authorize>

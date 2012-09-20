@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			<sec:authorize access="hasApplicationPermission(ADMIN)">
 				<li><a href="<c:url value="/users"/>"><i class="icon-user"></i> <spring:message code="button.users"/></a></li>
+				<li><a href="<c:url value="/system/edit"/>"><i class="icon-cog"></i> <spring:message code="button.systemSettings"/></a></li>
 			</sec:authorize>
 		</ul>
 	</div>

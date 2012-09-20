@@ -18,16 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.security.SecureRandom;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
-public class BCryptPasswordEncoderTest {
+import com.google.common.eventbus.EventBus;
+
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.system.SystemSettingsStore;
+
+public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 	public static final String PASSWORD = "secret"; //$NON-NLS-1$
 	
+	@Mock
+	private SystemSettingsStore systemSettingsStore;
+	@Mock
+	@SuppressWarnings("unused")
+	private EventBus eventBus;
+	@InjectMocks
+	private BCryptPasswordEncoder passwordEncoder;
 	private SecureRandom ignoredRandom;
 	
 	@Before
@@ -38,17 +52,21 @@ public class BCryptPasswordEncoderTest {
 	
 	@Test
 	public void encodeAndCheckPassword() {
-		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
+		passwordEncoder.init();
+		
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
 
 	@Test
 	public void isPasswordValidMustUseIterationsFromEncodedPassword() {
-		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
+		passwordEncoder.init();
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
 		
-		passwordEncoder = new BCryptPasswordEncoder(5);
+		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
+		passwordEncoder.init();
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
 

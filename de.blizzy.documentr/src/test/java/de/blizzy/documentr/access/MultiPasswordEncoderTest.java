@@ -18,19 +18,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.security.SecureRandom;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
-public class MultiPasswordEncoderTest {
+import com.google.common.eventbus.EventBus;
+
+import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.system.SystemSettingsStore;
+
+public class MultiPasswordEncoderTest extends AbstractDocumentrTest {
 	private static final String PASSWORD = "secret"; //$NON-NLS-1$
 	
+	@Mock
+	private SystemSettingsStore systemSettingsStore;
+	@Mock
+	@SuppressWarnings("unused")
+	private EventBus eventBus;
+	@InjectMocks
+	private BCryptPasswordEncoder defaultEncoder;
 	private SecureRandom ignoredRandom;
-	private PasswordEncoder defaultEncoder;
-	private PasswordEncoder otherEncoder;
+	private Sha512PasswordEncoder otherEncoder;
 	private MultiPasswordEncoder multiEncoder;
 	
 	@Before
@@ -38,7 +51,8 @@ public class MultiPasswordEncoderTest {
 		ignoredRandom = new SecureRandom();
 		ignoredRandom.setSeed(System.currentTimeMillis());
 
-		defaultEncoder = new BCryptPasswordEncoder(4);
+		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
+		defaultEncoder.init();
 		otherEncoder = new Sha512PasswordEncoder(1);
 		multiEncoder = new MultiPasswordEncoder(defaultEncoder, otherEncoder);
 	}

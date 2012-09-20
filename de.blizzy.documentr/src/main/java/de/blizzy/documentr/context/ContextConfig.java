@@ -106,9 +106,9 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	}
 	
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	public PasswordEncoder passwordEncoder(BCryptPasswordEncoder bcryptEncoder) {
 		return new MultiPasswordEncoder(
-				new BCryptPasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_BCRYPT_ITERATIONS),
+				bcryptEncoder,
 				new Sha512PasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_SHA512_ITERATIONS));
 	}
 

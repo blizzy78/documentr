@@ -17,18 +17,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import javax.annotation.PostConstruct;
+
+import lombok.AccessLevel;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
+import de.blizzy.documentr.system.SystemSettingsChangedEvent;
+import de.blizzy.documentr.system.SystemSettingsStore;
+
+@Component
 @Slf4j
 public class BCryptPasswordEncoder implements PasswordEncoder {
+	@Autowired
+	@Setter(AccessLevel.PACKAGE)
+	private SystemSettingsStore systemSettingsStore;
+	@Autowired
+	@Setter(AccessLevel.PACKAGE)
+	private EventBus eventBus;
 	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder;
 
-	public BCryptPasswordEncoder(int strength) {
-		encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(strength);
+	@PostConstruct
+	public void init() {
+		encoder = createEncoder();
+		
+		eventBus.register(this);
+	}
+
+	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder createEncoder() {
+		int rounds = Integer.parseInt(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS));
+		log.debug("constructing bcrypt encoder using {} rounds", Integer.valueOf(rounds)); //$NON-NLS-1$
+		return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(rounds);
 	}
 
 	@Override
@@ -53,5 +80,10 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 			log.trace("time taken to verify password: {} ms", Long.valueOf(stopwatch.elapsedMillis())); //$NON-NLS-1$
 		}
 		return valid;
+	}
+	
+	@Subscribe
+	public void systemSettingsChanged(@SuppressWarnings("unused") SystemSettingsChangedEvent event) {
+		encoder = createEncoder();
 	}
 }
