@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.gitective.core.BlobUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.Lifecycle;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
@@ -46,12 +47,13 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.RepositoryNotFoundException;
 import de.blizzy.documentr.repository.RepositoryUtil;
 
 /** Manages storage of system settings. */
 @Component
 @Slf4j
-public class SystemSettingsStore {
+public class SystemSettingsStore implements Lifecycle {
 	public static final String MAIL_HOST_NAME = "mail.host.name"; //$NON-NLS-1$
 	public static final String MAIL_HOST_PORT = "mail.host.port"; //$NON-NLS-1$
 	public static final String MAIL_SENDER_EMAIL = "mail.sender.email"; //$NON-NLS-1$
@@ -69,48 +71,60 @@ public class SystemSettingsStore {
 	@Autowired
 	private EventBus eventBus;
 	private Map<String, String> settings;
+	private boolean running;
 	
 	@PostConstruct
-	public void init() throws IOException, GitAPIException {
-		User adminUser = userStore.getUser("admin"); //$NON-NLS-1$
-		ILockedRepository repo = null;
-		boolean created = false;
+	public void init() throws IOException {
+		settings = loadSettings();
+		setDefaultSettings();
+	}
+	
+	@Override
+	public void start() {
+		running = true;
+		
 		try {
-			repo = globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
-			created = true;
+			User adminUser = userStore.getUser("admin"); //$NON-NLS-1$
+			ILockedRepository repo = globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
+			Closeables.closeQuietly(repo);
+
+			// repository has just been created, store settings for the first time
+			Map<String, String> settingsToStore;
+			synchronized (settings) {
+				settingsToStore = Maps.newHashMap(settings);
+			}
+			storeSettings(settingsToStore, adminUser);
 		} catch (IllegalStateException e) {
 			// okay
-		} finally {
-			Closeables.closeQuietly(repo);
-		}
-
-		if (created) {
-			settings = Maps.newHashMap();
-		} else {
-			settings = loadSettings();
-		}
-
-		if (setDefaultSettings()) {
-			log.debug("set new default settings, storing system settings"); //$NON-NLS-1$
-			storeSettings(settings, adminUser);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (GitAPIException e) {
+			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public void stop() {
+		running = false;
+	}
 
-	private boolean setDefaultSettings() {
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+	
+	private void setDefaultSettings() {
 		Map<String, String> defaultSettings = Maps.newHashMap();
 		defaultSettings.put(MAIL_HOST_PORT, "25"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_SENDER_NAME, "documentr"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_SUBJECT_PREFIX, "[documentr]"); //$NON-NLS-1$
 		defaultSettings.put(BCRYPT_ROUNDS, "12"); //$NON-NLS-1$
 		
-		boolean modified = false;
 		for (Map.Entry<String, String> entry : defaultSettings.entrySet()) {
 			if (!settings.containsKey(entry.getKey())) {
 				settings.put(entry.getKey(), entry.getValue());
-				modified = true;
 			}
 		}
-		return modified;
 	}
 
 	public Map<String, String> getSettings() {
@@ -140,7 +154,7 @@ public class SystemSettingsStore {
 		
 		ILockedRepository repo = null;
 		try {
-			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			repo = getOrCreateRepository(currentUser);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File file = new File(workingDir, SETTINGS_FILE_NAME);
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
@@ -163,18 +177,29 @@ public class SystemSettingsStore {
 		}
 	}
 
+	private ILockedRepository getOrCreateRepository(User user) throws IOException, GitAPIException {
+		try {
+			return globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+		} catch (RepositoryNotFoundException e) {
+			return globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, user);
+		}
+	}
+	
 	private Map<String, String> loadSettings() throws IOException {
 		log.info("loading system settings"); //$NON-NLS-1$
 
 		ILockedRepository repo = null;
+		Map<String, String> settingsMap = Maps.newHashMap();
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			String json = BlobUtils.getHeadContent(repo.r(), SETTINGS_FILE_NAME);
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Map<String, String> settingsMap = gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
-			return settingsMap;
+			settingsMap = gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
+		} catch (RepositoryNotFoundException e) {
+			// okay
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
+		return settingsMap;
 	}
 }
