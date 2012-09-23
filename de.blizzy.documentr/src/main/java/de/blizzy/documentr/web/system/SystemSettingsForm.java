@@ -31,6 +31,8 @@ public class SystemSettingsForm {
 	@NotBlank
 	private String documentrHost;
 	@Getter
+	private String siteNotice;
+	@Getter
 	private String mailHostName;
 	@Getter
 	@Min(1)
@@ -51,10 +53,12 @@ public class SystemSettingsForm {
 	@Max(31)
 	private int bcryptRounds;
 
-	public SystemSettingsForm(String documentrHost, String mailHostName, int mailHostPort, String mailSenderEmail,
-			String mailSenderName, String mailSubjectPrefix, String mailDefaultLanguage, int bcryptRounds) {
+	public SystemSettingsForm(String documentrHost, String siteNotice, String mailHostName, int mailHostPort,
+			String mailSenderEmail, String mailSenderName, String mailSubjectPrefix, String mailDefaultLanguage,
+			int bcryptRounds) {
 
 		this.documentrHost = documentrHost;
+		this.siteNotice = siteNotice;
 		this.mailHostName = mailHostName;
 		this.mailHostPort = mailHostPort;
 		this.mailSenderEmail = mailSenderEmail;

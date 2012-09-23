@@ -54,6 +54,7 @@ public class SystemController {
 		Map<String, String> settings = systemSettingsStore.getSettings();
 		SystemSettingsForm form = new SystemSettingsForm(
 				settings.get(SystemSettingsStore.DOCUMENTR_HOST),
+				settings.get(SystemSettingsStore.SITE_NOTICE),
 				settings.get(SystemSettingsStore.MAIL_HOST_NAME),
 				Integer.parseInt(settings.get(SystemSettingsStore.MAIL_HOST_PORT)),
 				settings.get(SystemSettingsStore.MAIL_SENDER_EMAIL),
@@ -80,6 +81,7 @@ public class SystemController {
 		documentrHost = StringUtils.removeEnd(documentrHost, "/"); //$NON-NLS-1$
 		
 		settings.put(SystemSettingsStore.DOCUMENTR_HOST, documentrHost);
+		settings.put(SystemSettingsStore.SITE_NOTICE, form.getSiteNotice());
 		settings.put(SystemSettingsStore.MAIL_HOST_NAME, form.getMailHostName());
 		settings.put(SystemSettingsStore.MAIL_HOST_PORT, String.valueOf(form.getMailHostPort()));
 		settings.put(SystemSettingsStore.MAIL_SENDER_EMAIL, form.getMailSenderEmail());
@@ -94,6 +96,7 @@ public class SystemController {
 	@ModelAttribute
 	public SystemSettingsForm createSystemSettingsForm(
 			@RequestParam(required=false) String documentrHost,
+			@RequestParam(required=false) String siteNotice,
 			@RequestParam(required=false) String mailHostName,
 			@RequestParam(required=false) Integer mailHostPort,
 			@RequestParam(required=false) String mailSenderEmail,
@@ -104,6 +107,7 @@ public class SystemController {
 		
 		return new SystemSettingsForm(
 				Strings.emptyToNull(documentrHost),
+				Strings.emptyToNull(siteNotice),
 				Strings.emptyToNull(mailHostName),
 				(mailHostPort != null) ? mailHostPort.intValue() : Integer.MIN_VALUE,
 				Strings.emptyToNull(mailSenderEmail),

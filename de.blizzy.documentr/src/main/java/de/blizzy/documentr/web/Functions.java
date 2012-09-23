@@ -27,6 +27,7 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -54,6 +55,7 @@ import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.subscription.SubscriptionStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.util.FileLengthFormat;
 import de.blizzy.documentr.util.Util;
 
@@ -67,6 +69,7 @@ public final class Functions {
 	private static MessageSource messageSource;
 	private static MacroFactory macroFactory;
 	private static SubscriptionStore subscriptionStore;
+	private static SystemSettingsStore systemSettingsStore;
 	
 	@Autowired
 	private GlobalRepositoryManager wiredRepoManager;
@@ -84,6 +87,8 @@ public final class Functions {
 	private MacroFactory wiredMacroFactory;
 	@Autowired
 	private SubscriptionStore wiredSubscriptionStore;
+	@Autowired
+	private SystemSettingsStore wiredSystemSettingsStore;
 	
 	@PostConstruct
 	public void init() {
@@ -95,6 +100,7 @@ public final class Functions {
 		messageSource = wiredMessageSource;
 		macroFactory = wiredMacroFactory;
 		subscriptionStore = wiredSubscriptionStore;
+		systemSettingsStore = wiredSystemSettingsStore;
 	}
 
 	public static List<String> listProjects() {
@@ -236,6 +242,10 @@ public final class Functions {
 		String loginName = SecurityContextHolder.getContext().getAuthentication().getName();
 		User user = userStore.getUser(loginName);
 		return subscriptionStore.isSubscribed(projectName, branchName, path, user);
+	}
+	
+	public static String getSystemSetting(String key) {
+		return StringUtils.defaultString(systemSettingsStore.getSetting(key));
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

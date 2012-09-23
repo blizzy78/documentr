@@ -56,6 +56,7 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 @Slf4j
 public class SystemSettingsStore implements Lifecycle {
 	public static final String DOCUMENTR_HOST = "documentrHost"; //$NON-NLS-1$
+	public static final String SITE_NOTICE = "siteNotice"; //$NON-NLS-1$
 	public static final String MAIL_HOST_NAME = "mail.host.name"; //$NON-NLS-1$
 	public static final String MAIL_HOST_PORT = "mail.host.port"; //$NON-NLS-1$
 	public static final String MAIL_SENDER_EMAIL = "mail.sender.email"; //$NON-NLS-1$

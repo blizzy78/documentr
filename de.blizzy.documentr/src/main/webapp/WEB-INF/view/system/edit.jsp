@@ -48,6 +48,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 			<span class="help-block"><spring:message code="documentrHostHelp"/></span>
 		</div>
+		<c:set var="errorText"><form:errors path="siteNotice"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="siteNotice" cssClass="control-label"><spring:message code="label.siteNotice"/>:</form:label>
+			<form:input path="siteNotice" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			<span class="help-block"><spring:message code="siteNoticeHelp"/></span>
+		</div>
 	</fieldset>
 	
 	<fieldset>

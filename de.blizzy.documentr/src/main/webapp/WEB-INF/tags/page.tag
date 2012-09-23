@@ -17,12 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 
 <jsp:include page="/WEB-INF/view/pageHeader.jsp"/>
 
 <c:if test="${!empty requestScope._breadcrumbs}"><c:out value="${requestScope._breadcrumbs}" escapeXml="false"/></c:if>
 
-<c:set var="pageContents"><jsp:doBody/></c:set>
+<c:set var="siteNotice" value="${d:getSystemSetting('siteNotice')}"/>
+
+<c:set var="pageContents"><%--
+--%><c:if test="${!empty siteNotice}"><div class="alert alert-error alert-block"><h4><spring:message code="title.siteNotice"/></h4><c:out value="${siteNotice}"/></div></c:if><%--
+--%><jsp:doBody/><%--
+--%></c:set>
+
 <c:if test="${!empty pageContents}">
 	<div class="container">
 		<c:out value="${pageContents}" escapeXml="false"/>
