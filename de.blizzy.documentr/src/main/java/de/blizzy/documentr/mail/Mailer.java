@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PostConstruct;
@@ -46,6 +47,7 @@ import com.google.common.eventbus.Subscribe;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageChangedEvent;
+import de.blizzy.documentr.subscription.SubscriptionStore;
 import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.util.Util;
 
@@ -62,6 +64,8 @@ public class Mailer {
 	private IPageStore pageStore;
 	@Autowired
 	private MessageSource messageSource;
+	@Autowired
+	private SubscriptionStore subscriptionStore;
 	
 	@PostConstruct
 	public void init() {
@@ -82,8 +86,6 @@ public class Mailer {
 					sendNotifications(projectName, branchName, path);
 				} catch (IOException e) {
 					log.error("error sending notifications", e); //$NON-NLS-1$
-				} catch (MessagingException e) {
-					log.error("error sending notifications", e); //$NON-NLS-1$
 				} catch (RuntimeException e) {
 					log.error("error sending notifications", e); //$NON-NLS-1$
 				}
@@ -93,7 +95,7 @@ public class Mailer {
 	}
 
 	private void sendNotifications(String projectName, String branchName, String path)
-			throws MessagingException, IOException {
+			throws IOException {
 
 		Map<String, String> settings = systemSettingsStore.getSettings();
 		String host = settings.get(SystemSettingsStore.MAIL_HOST_NAME);
@@ -104,36 +106,47 @@ public class Mailer {
 		String languageCode = settings.get(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE);
 		Locale locale = new Locale(languageCode);
 		if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(senderEmail)) {
-			Page page = pageStore.getPage(projectName, branchName, path, false);
-			String title = page.getTitle();
-			String subject = messageSource.getMessage("mail.pageChanged.subject", //$NON-NLS-1$
-					new Object[] { title }, locale);
-			if (StringUtils.isNotBlank(subjectPrefix)) {
-				subject = subjectPrefix.trim() + " " + subject; //$NON-NLS-1$
+			Set<String> subscriberEmails = subscriptionStore.getSubscriberEmails(projectName, branchName, path);
+			if (!subscriberEmails.isEmpty()) {
+				Page page = pageStore.getPage(projectName, branchName, path, false);
+				String title = page.getTitle();
+				String subject = messageSource.getMessage("mail.pageChanged.subject", //$NON-NLS-1$
+						new Object[] { title }, locale);
+				if (StringUtils.isNotBlank(subjectPrefix)) {
+					subject = subjectPrefix.trim() + " " + subject; //$NON-NLS-1$
+				}
+				String pageUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						Util.toURLPagePath(path));
+				String changesUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						Util.toURLPagePath(path) + "#changes"); //$NON-NLS-1$
+				String text = messageSource.getMessage("mail.pageChanged.text", //$NON-NLS-1$
+						new Object[] { title, pageUrl, changesUrl }, locale);
+	
+				JavaMailSender sender = createSender(host, port);
+				sendMail(subject, text, senderEmail, senderName, subscriberEmails, sender);
+			} else {
+				log.info("no subscribers, not sending mail"); //$NON-NLS-1$
 			}
-			String pageUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					Util.toURLPagePath(path));
-			String changesUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					Util.toURLPagePath(path) + "#changes"); //$NON-NLS-1$
-			String text = messageSource.getMessage("mail.pageChanged.text", //$NON-NLS-1$
-					new Object[] { title, pageUrl, changesUrl }, locale);
-
-			JavaMailSender sender = createSender(host, port);
-			sendMail(subject, text, senderEmail, senderName, sender);
 		} else {
 			log.info("settings incomplete, not sending mail"); //$NON-NLS-1$
 		}
 	}
 
-	private void sendMail(String subject, String text, String senderEmail,
-			String senderName, JavaMailSender sender) throws MessagingException {
-		
-		MimeMessage msg = sender.createMimeMessage();
-		msg.setFrom(createAddress(senderEmail, senderName));
-		msg.setRecipient(RecipientType.TO, createAddress("blizzy@blizzy.de", "Maik")); //$NON-NLS-1$ //$NON-NLS-2$
-		msg.setSubject(subject, Charsets.UTF_8.name());
-		msg.setText(text, Charsets.UTF_8.name());
-		sender.send(msg);
+	private void sendMail(String subject, String text, String senderEmail, String senderName,
+			Set<String> subscriberEmails, JavaMailSender sender) {
+
+		for (String subscriberEmail : subscriberEmails) {
+			try {
+				MimeMessage msg = sender.createMimeMessage();
+				msg.setFrom(createAddress(senderEmail, senderName));
+				msg.setRecipient(RecipientType.TO, createAddress(subscriberEmail, null));
+				msg.setSubject(subject, Charsets.UTF_8.name());
+				msg.setText(text, Charsets.UTF_8.name());
+				sender.send(msg);
+			} catch (MessagingException e) {
+				log.error("error while sending mail", e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	private JavaMailSender createSender(String host, int port) {
