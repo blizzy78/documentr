@@ -19,10 +19,17 @@ package de.blizzy.documentr.web.system;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class SystemSettingsForm {
+	@Getter
+	@NotNull
+	@NotBlank
+	private String documentrHost;
 	@Getter
 	private String mailHostName;
 	@Getter
@@ -36,18 +43,24 @@ public class SystemSettingsForm {
 	@Getter
 	private String mailSubjectPrefix;
 	@Getter
+	@NotNull
+	@NotBlank
+	private String mailDefaultLanguage;
+	@Getter
 	@Min(4)
 	@Max(31)
 	private int bcryptRounds;
 
-	public SystemSettingsForm(String mailHostName, int mailHostPort, String mailSenderEmail,
-			String mailSenderName, String mailSubjectPrefix, int bcryptRounds) {
+	public SystemSettingsForm(String documentrHost, String mailHostName, int mailHostPort, String mailSenderEmail,
+			String mailSenderName, String mailSubjectPrefix, String mailDefaultLanguage, int bcryptRounds) {
 
+		this.documentrHost = documentrHost;
 		this.mailHostName = mailHostName;
 		this.mailHostPort = mailHostPort;
 		this.mailSenderEmail = mailSenderEmail;
 		this.mailSenderName = mailSenderName;
 		this.mailSubjectPrefix = mailSubjectPrefix;
+		this.mailDefaultLanguage = mailDefaultLanguage;
 		this.bcryptRounds = bcryptRounds;
 	}
 }

@@ -40,11 +40,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.google.common.base.Charsets;
 
-import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.OpenIdNotFoundException;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.web.util.FacadeHostRequestWrapper;
 import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
@@ -54,9 +54,9 @@ public class AccountOpenIdController {
 	@Autowired
 	private UserStore userStore;
 	@Autowired
-	private Settings settings;
-	@Autowired
 	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
+	@Autowired
+	private SystemSettingsStore systemSettingsStore;
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
@@ -68,18 +68,20 @@ public class AccountOpenIdController {
 			session.removeAttribute("openIdConsumer"); //$NON-NLS-1$
 			session.removeAttribute("openId"); //$NON-NLS-1$
 
+			String contextPath = request.getContextPath();
+			String documentrHost = systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST);
 			OpenIDConsumer consumer = new OpenID4JavaConsumer();
 			String returnToUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/accountOpenId/saveFinish") //$NON-NLS-1$
 					.build()
 					.encode(Charsets.UTF_8.name())
 					.toUriString();
-			returnToUrl = FacadeHostRequestWrapper.buildFacadeUrl(returnToUrl, settings.getHost(), settings.getPort());
+			returnToUrl = FacadeHostRequestWrapper.buildFacadeUrl(returnToUrl, contextPath, documentrHost);
 			String realm = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/").build() //$NON-NLS-1$
 					.encode(Charsets.UTF_8.name())
 					.toUriString();
-			realm = FacadeHostRequestWrapper.buildFacadeUrl(realm, settings.getHost(), settings.getPort());
+			realm = FacadeHostRequestWrapper.buildFacadeUrl(realm, contextPath, documentrHost);
 			String url = consumer.beginConsumption(request, openId, returnToUrl, realm);
 			session.setAttribute("openIdConsumer", consumer); //$NON-NLS-1$
 			session.setAttribute("openId", openId); //$NON-NLS-1$

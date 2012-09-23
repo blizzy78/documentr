@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Strings;
-
 /** Holds information about settings for the application. */
 @Component
 public class Settings {
@@ -41,23 +39,12 @@ public class Settings {
 	private ServletContext servletContext;
 	@Getter
 	private File documentrDataDir;
-	@Getter
-	private String host;
-	@Getter
-	private Integer port;
 	
 	@PostConstruct
 	public void init() {
 		String dataDirParam = getInitParam("documentr.dataDir"); //$NON-NLS-1$
 		Assert.hasLength(dataDirParam);
 		documentrDataDir = new File(dataDirParam);
-		
-		host = Strings.emptyToNull(getInitParam("documentr.host")); //$NON-NLS-1$
-		
-		String port = getInitParam("documentr.port"); //$NON-NLS-1$
-		if (StringUtils.isNotBlank(port)) {
-			this.port = Integer.valueOf(port);
-		}
 	}
 
 	private String getInitParam(String param) {

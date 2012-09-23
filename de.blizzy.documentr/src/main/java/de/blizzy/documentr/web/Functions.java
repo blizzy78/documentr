@@ -39,6 +39,7 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.RoleGrantedAuthority;
+import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.markdown.IPageRenderer;
@@ -52,6 +53,7 @@ import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.subscription.SubscriptionStore;
 import de.blizzy.documentr.util.FileLengthFormat;
 import de.blizzy.documentr.util.Util;
 
@@ -64,6 +66,7 @@ public final class Functions {
 	private static MarkdownProcessor markdownProcessor;
 	private static MessageSource messageSource;
 	private static MacroFactory macroFactory;
+	private static SubscriptionStore subscriptionStore;
 	
 	@Autowired
 	private GlobalRepositoryManager wiredRepoManager;
@@ -79,6 +82,8 @@ public final class Functions {
 	private MessageSource wiredMessageSource;
 	@Autowired
 	private MacroFactory wiredMacroFactory;
+	@Autowired
+	private SubscriptionStore wiredSubscriptionStore;
 	
 	@PostConstruct
 	public void init() {
@@ -89,6 +94,7 @@ public final class Functions {
 		markdownProcessor = wiredMarkdownProcessor;
 		messageSource = wiredMessageSource;
 		macroFactory = wiredMacroFactory;
+		subscriptionStore = wiredSubscriptionStore;
 	}
 
 	public static List<String> listProjects() {
@@ -224,6 +230,12 @@ public final class Functions {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static boolean isSubscribed(String projectName, String branchName, String path) throws IOException {
+		String loginName = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = userStore.getUser(loginName);
+		return subscriptionStore.isSubscribed(projectName, branchName, path, user);
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {

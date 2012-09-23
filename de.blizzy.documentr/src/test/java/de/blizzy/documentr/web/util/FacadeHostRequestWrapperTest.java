@@ -22,31 +22,41 @@ import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.web.util.FacadeHostRequestWrapper;
 
 public class FacadeHostRequestWrapperTest extends AbstractDocumentrTest {
-	private static final String URI = "/foo/bar.html?baz=qux&quux=quuux"; //$NON-NLS-1$
-	private static final String FACADE_HOST = "test.example.org"; //$NON-NLS-1$
-	private static final int FACADE_PORT = 9090;
-	
 	@Mock
 	private HttpServletRequest request;
 	
-	@Before
-	public void setUp() {
-		when(request.getRequestURL()).thenReturn(new StringBuffer("http://www.example.com:8080" + URI)); //$NON-NLS-1$
+	@Test
+	public void getRequestURL() {
+		when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:38080/documentr/page")); //$NON-NLS-1$
+		when(request.getContextPath()).thenReturn("/documentr"); //$NON-NLS-1$
+		FacadeHostRequestWrapper requestWrapper = new FacadeHostRequestWrapper(
+				request, "https://documentr.org:1234/docs"); //$NON-NLS-1$
+		assertEquals("https://documentr.org:1234/docs/page", requestWrapper.getRequestURL().toString()); //$NON-NLS-1$
 	}
 	
 	@Test
-	public void getRequestURL() {
-		FacadeHostRequestWrapper requestWrapper = new FacadeHostRequestWrapper(
-				request, FACADE_HOST, Integer.valueOf(FACADE_PORT));
-		assertEquals("http://" + FACADE_HOST + ":" + String.valueOf(FACADE_PORT) + URI, //$NON-NLS-1$ //$NON-NLS-2$
-			requestWrapper.getRequestURL().toString());
+	@SuppressWarnings("nls")
+	public void buildFacadeUrl() {
+		assertEquals("https://documentr.org/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/documentr/page", "/documentr", "https://documentr.org"));
+		assertEquals("https://documentr.org:1234/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/documentr/page", "/documentr", "https://documentr.org:1234"));
+		assertEquals("https://documentr.org:1234/docs/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/documentr/page", "/documentr", "https://documentr.org:1234/docs"));
+		assertEquals("https://documentr.org/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/page", StringUtils.EMPTY, "https://documentr.org"));
+		assertEquals("https://documentr.org:1234/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/page", StringUtils.EMPTY, "https://documentr.org:1234"));
+		assertEquals("https://documentr.org:1234/docs/page", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080/page", StringUtils.EMPTY, "https://documentr.org:1234/docs"));
+		assertEquals("https://documentr.org:1234/docs", FacadeHostRequestWrapper.buildFacadeUrl(
+				"http://localhost:38080", StringUtils.EMPTY, "https://documentr.org:1234/docs"));
 	}
 }

@@ -20,6 +20,7 @@ package de.blizzy.documentr.system;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -54,11 +55,13 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 @Component
 @Slf4j
 public class SystemSettingsStore implements Lifecycle {
+	public static final String DOCUMENTR_HOST = "documentrHost"; //$NON-NLS-1$
 	public static final String MAIL_HOST_NAME = "mail.host.name"; //$NON-NLS-1$
 	public static final String MAIL_HOST_PORT = "mail.host.port"; //$NON-NLS-1$
 	public static final String MAIL_SENDER_EMAIL = "mail.sender.email"; //$NON-NLS-1$
 	public static final String MAIL_SENDER_NAME = "mail.sender.name"; //$NON-NLS-1$
 	public static final String MAIL_SUBJECT_PREFIX = "mail.subject.prefix"; //$NON-NLS-1$
+	public static final String MAIL_DEFAULT_LANGUAGE = "mail.defaultLanguage"; //$NON-NLS-1$
 	public static final String BCRYPT_ROUNDS = "bcrypt.rounds"; //$NON-NLS-1$
 	
 	private static final String REPOSITORY_NAME = "_system"; //$NON-NLS-1$
@@ -115,9 +118,11 @@ public class SystemSettingsStore implements Lifecycle {
 	
 	private void setDefaultSettings() {
 		Map<String, String> defaultSettings = Maps.newHashMap();
+		defaultSettings.put(DOCUMENTR_HOST, "http://localhost:8080"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_HOST_PORT, "25"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_SENDER_NAME, "documentr"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_SUBJECT_PREFIX, "[documentr]"); //$NON-NLS-1$
+		defaultSettings.put(MAIL_DEFAULT_LANGUAGE, Locale.ENGLISH.getLanguage());
 		defaultSettings.put(BCRYPT_ROUNDS, "12"); //$NON-NLS-1$
 		
 		for (Map.Entry<String, String> entry : defaultSettings.entrySet()) {

@@ -738,7 +738,7 @@ class PageStore implements IPageStore {
 	}
 	
 	@Override
-	public void relocatePage(String projectName, String branchName, final String path, String newParentPagePath,
+	public void relocatePage(final String projectName, final String branchName, final String path, String newParentPagePath,
 			User user) throws IOException {
 		
 		Assert.hasLength(projectName);
@@ -754,6 +754,7 @@ class PageStore implements IPageStore {
 		List<String> oldPagePaths;
 		List<String> deletedPagePaths;
 		List<String> newPagePaths;
+		List<PagePathChangedEvent> pagePathChangedEvents;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
@@ -837,6 +838,14 @@ class PageStore implements IPageStore {
 				}
 			});
 
+			pagePathChangedEvents = Lists.transform(oldPagePaths, new Function<String, PagePathChangedEvent>() {
+				@Override
+				public PagePathChangedEvent apply(String oldPath) {
+					String newPath = newPagePath + StringUtils.removeStart(oldPath, path);
+					return new PagePathChangedEvent(projectName, branchName, oldPath, newPath);
+				}
+			});
+
 			PageUtil.updateProjectEditTime(projectName);
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -850,6 +859,10 @@ class PageStore implements IPageStore {
 		
 		for (String newPath : newPagePaths) {
 			eventBus.post(new PageChangedEvent(projectName, branchName, newPath));
+		}
+		
+		for (PagePathChangedEvent event : pagePathChangedEvents) {
+			eventBus.post(event);
 		}
 	}
 	

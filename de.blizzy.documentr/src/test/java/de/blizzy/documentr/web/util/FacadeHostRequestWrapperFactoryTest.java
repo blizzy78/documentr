@@ -28,25 +28,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
+import de.blizzy.documentr.system.SystemSettingsStore;
 
 public class FacadeHostRequestWrapperFactoryTest extends AbstractDocumentrTest {
 	private static final String URI = "/foo/bar.html?baz=qux&quux=quuux"; //$NON-NLS-1$
-	private static final String FACADE_HOST = "test.example.org"; //$NON-NLS-1$
-	private static final int FACADE_PORT = 9090;
+	private static final String DOCUMENTR_HOST = "https://documentr.org:1234"; //$NON-NLS-1$
 
 	@InjectMocks
 	private FacadeHostRequestWrapperFactory factory;
 	@Mock
-	private Settings settings;
+	private SystemSettingsStore systemSettingsStore;
 	@Mock
 	private HttpServletRequest request;
 	
 	@Before
 	public void setUp() {
-		when(settings.getHost()).thenReturn(FACADE_HOST);
-		when(settings.getPort()).thenReturn(Integer.valueOf(FACADE_PORT));
+		when(systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST)).thenReturn(DOCUMENTR_HOST);
 
 		when(request.getRequestURL()).thenReturn(new StringBuffer("http://www.example.com:8080" + URI)); //$NON-NLS-1$
 	}
@@ -54,7 +51,6 @@ public class FacadeHostRequestWrapperFactoryTest extends AbstractDocumentrTest {
 	@Test
 	public void create() {
 		HttpServletRequest requestWrapper = factory.create(request);
-		assertEquals("http://" + FACADE_HOST + ":" + String.valueOf(FACADE_PORT) + URI, //$NON-NLS-1$ //$NON-NLS-2$
-			requestWrapper.getRequestURL().toString());
+		assertEquals(DOCUMENTR_HOST + URI, requestWrapper.getRequestURL().toString());
 	}
 }

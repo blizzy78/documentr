@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,11 +53,13 @@ public class SystemController {
 	public String editSettings(Model model) {
 		Map<String, String> settings = systemSettingsStore.getSettings();
 		SystemSettingsForm form = new SystemSettingsForm(
+				settings.get(SystemSettingsStore.DOCUMENTR_HOST),
 				settings.get(SystemSettingsStore.MAIL_HOST_NAME),
 				Integer.parseInt(settings.get(SystemSettingsStore.MAIL_HOST_PORT)),
 				settings.get(SystemSettingsStore.MAIL_SENDER_EMAIL),
 				settings.get(SystemSettingsStore.MAIL_SENDER_NAME),
 				settings.get(SystemSettingsStore.MAIL_SUBJECT_PREFIX),
+				settings.get(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE),
 				Integer.parseInt(settings.get(SystemSettingsStore.BCRYPT_ROUNDS)));
 		model.addAttribute("systemSettingsForm", form); //$NON-NLS-1$
 		return "/system/edit"; //$NON-NLS-1$
@@ -72,11 +75,17 @@ public class SystemController {
 		}
 		
 		Map<String, String> settings = Maps.newHashMap();
+		String documentrHost = form.getDocumentrHost();
+		// remove trailing slash
+		documentrHost = StringUtils.removeEnd(documentrHost, "/"); //$NON-NLS-1$
+		
+		settings.put(SystemSettingsStore.DOCUMENTR_HOST, documentrHost);
 		settings.put(SystemSettingsStore.MAIL_HOST_NAME, form.getMailHostName());
 		settings.put(SystemSettingsStore.MAIL_HOST_PORT, String.valueOf(form.getMailHostPort()));
 		settings.put(SystemSettingsStore.MAIL_SENDER_EMAIL, form.getMailSenderEmail());
 		settings.put(SystemSettingsStore.MAIL_SENDER_NAME, form.getMailSenderName());
 		settings.put(SystemSettingsStore.MAIL_SUBJECT_PREFIX, form.getMailSubjectPrefix());
+		settings.put(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE, form.getMailDefaultLanguage());
 		settings.put(SystemSettingsStore.BCRYPT_ROUNDS, String.valueOf(form.getBcryptRounds()));
 		systemSettingsStore.saveSettings(settings, userStore.getUser(authentication.getName()));
 		return "redirect:/system/edit"; //$NON-NLS-1$
@@ -84,19 +93,23 @@ public class SystemController {
 
 	@ModelAttribute
 	public SystemSettingsForm createSystemSettingsForm(
+			@RequestParam(required=false) String documentrHost,
 			@RequestParam(required=false) String mailHostName,
 			@RequestParam(required=false) Integer mailHostPort,
 			@RequestParam(required=false) String mailSenderEmail,
 			@RequestParam(required=false) String mailSenderName,
 			@RequestParam(required=false) String mailSubjectPrefix,
+			@RequestParam(required=false) String mailDefaultLanguage,
 			@RequestParam(required=false) Integer bcryptRounds) {
 		
 		return new SystemSettingsForm(
+				Strings.emptyToNull(documentrHost),
 				Strings.emptyToNull(mailHostName),
 				(mailHostPort != null) ? mailHostPort.intValue() : Integer.MIN_VALUE,
 				Strings.emptyToNull(mailSenderEmail),
 				Strings.emptyToNull(mailSenderName),
 				Strings.emptyToNull(mailSubjectPrefix),
+				Strings.emptyToNull(mailDefaultLanguage),
 				(bcryptRounds != null) ? bcryptRounds.intValue() : Integer.MIN_VALUE);
 	}
 }

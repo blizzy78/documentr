@@ -17,59 +17,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.util;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.base.Charsets;
-
 public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
-	private static final Integer DEFAULT_HTTP_PORT = Integer.valueOf(80);
-	
-	private String facadeHost;
-	private Integer facadePort;
+	private String documentrHost;
 
-	FacadeHostRequestWrapper(HttpServletRequest request, String facadeHost, Integer facadePort) {
+	FacadeHostRequestWrapper(HttpServletRequest request, String documentrHost) {
 		super(request);
-
-		this.facadeHost = facadeHost;
-		this.facadePort = facadePort;
+		this.documentrHost = documentrHost;
 	}
 	
 	@Override
 	public StringBuffer getRequestURL() {
 		StringBuffer urlBuf = super.getRequestURL();
 		String url = urlBuf.toString();
-		String facadeUrl = buildFacadeUrl(url, facadeHost, facadePort);
+		String contextPath = getContextPath();
+		String facadeUrl = buildFacadeUrl(url, contextPath, documentrHost);
 		if (!facadeUrl.equals(url)) {
 			return new StringBuffer(facadeUrl);
 		} else {
 			return urlBuf;
 		}
 	}
-	
-	public static String buildFacadeUrl(String url, String facadeHost, Integer facadePort) {
-		if (facadePort == null) {
-			facadePort = DEFAULT_HTTP_PORT;
-		}
 
-		if (StringUtils.isNotBlank(facadeHost) && (facadePort != null)) {
-			try {
-				return UriComponentsBuilder.fromHttpUrl(url)
-					.host(facadeHost)
-					.port(facadePort.intValue())
-					.build()
-					.encode(Charsets.UTF_8.name())
-					.toUriString();
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			return url;
+	public static String buildFacadeUrl(String url, String contextPath, String documentrHost) {
+		contextPath = StringUtils.defaultIfBlank(contextPath, StringUtils.EMPTY);
+		if (contextPath.equals("/")) { //$NON-NLS-1$
+			contextPath = StringUtils.EMPTY;
 		}
+		
+		String newUrl;
+		if (StringUtils.isNotBlank(contextPath)) {
+			int pos = url.indexOf(contextPath);
+			newUrl = documentrHost + url.substring(pos + contextPath.length());
+		} else {
+			String path = StringUtils.defaultIfBlank(
+					UriComponentsBuilder.fromHttpUrl(url).build().getPath(), StringUtils.EMPTY);
+			if (StringUtils.isNotBlank(path)) {
+				int pos = StringUtils.lastIndexOf(url, path);
+				newUrl = documentrHost + url.substring(pos);
+			} else {
+				newUrl = documentrHost;
+			}
+		}
+		return newUrl;
 	}
 }

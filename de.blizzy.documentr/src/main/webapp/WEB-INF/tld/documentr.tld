@@ -170,4 +170,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>boolean pageExists(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
+
+	<function>
+		<name>isSubscribed</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>boolean isSubscribed(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
 </taglib>

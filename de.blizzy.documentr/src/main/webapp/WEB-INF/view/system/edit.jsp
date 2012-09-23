@@ -39,6 +39,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="action"><c:url value="/system/save"/></c:set>
 <form:form commandName="systemSettingsForm" action="${action}" method="POST" cssClass="well form-horizontal">
 	<fieldset>
+		<legend><spring:message code="title.general"/></legend>
+	
+		<c:set var="errorText"><form:errors path="documentrHost"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="documentrHost" cssClass="control-label"><spring:message code="label.documentrHost"/>:</form:label>
+			<form:input path="documentrHost" cssClass="input-xlarge"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			<span class="help-block"><spring:message code="documentrHostHelp"/></span>
+		</div>
+	</fieldset>
+	
+	<fieldset>
 		<legend><spring:message code="title.sendingMail"/></legend>
 	
 		<c:set var="errorText"><form:errors path="mailHostName"/></c:set>
@@ -70,6 +82,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<form:label path="mailSubjectPrefix" cssClass="control-label"><spring:message code="label.subjectPrefix"/>:</form:label>
 			<form:input path="mailSubjectPrefix" cssClass="input-xlarge"/>
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+		</div>
+		<div class="control-group">
+			<form:label path="mailDefaultLanguage" cssClass="control-label"><spring:message code="label.defaultLanguage"/>:</form:label>
+			<form:select path="mailDefaultLanguage">
+				<form:option value="de">de - <spring:message code="language.de"/></form:option>
+				<form:option value="en">en - <spring:message code="language.en"/></form:option>
+			</form:select>
 		</div>
 	</fieldset>
 

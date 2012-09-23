@@ -15,22 +15,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.util;
+package de.blizzy.documentr.page;
 
-import javax.servlet.http.HttpServletRequest;
+import lombok.Getter;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+public class PagePathChangedEvent {
+	@Getter
+	private String projectName;
+	@Getter
+	private String branchName;
+	@Getter
+	private String oldPagePath;
+	@Getter
+	private String newPagePath;
 
-import de.blizzy.documentr.system.SystemSettingsStore;
-
-@Component
-public class FacadeHostRequestWrapperFactory {
-	@Autowired
-	private SystemSettingsStore systemSettingsStore;
-	
-	public HttpServletRequest create(HttpServletRequest request) {
-		String documentrHost = systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST);
-		return new FacadeHostRequestWrapper(request, documentrHost);
+	PagePathChangedEvent(String projectName, String branchName, String oldPagePath, String newPagePath) {
+		this.projectName = projectName;
+		this.branchName = branchName;
+		this.oldPagePath = oldPagePath;
+		this.newPagePath = newPagePath;
 	}
 }

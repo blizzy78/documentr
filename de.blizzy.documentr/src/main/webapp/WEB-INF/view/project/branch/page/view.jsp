@@ -460,16 +460,52 @@ function showChangesDialog() {
 	});
 }
 
-</sec:authorize>
+function subscribe() {
+	$.ajax({
+		url: '<c:url value="/subscription/subscribe/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		type: 'GET',
+		success: function() {
+			documentr.openMessageDialog('<spring:message code="title.subscribe"/>',
+				'<spring:message code="subscribedSuccessfully"/>', [
+					{
+						text: '<spring:message code="button.close"/>',
+						cancel: true
+					}
+				]);
+		}
+	});
+}
 
-<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
+function unsubscribe() {
+	$.ajax({
+		url: '<c:url value="/subscription/unsubscribe/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		type: 'GET',
+		success: function() {
+			documentr.openMessageDialog('<spring:message code="title.unsubscribe"/>',
+				'<spring:message code="unsubscribedSuccessfully"/>', [
+					{
+						text: '<spring:message code="button.close"/>',
+						cancel: true
+					}
+				]);
+		}
+	});
+}
+
+</sec:authorize>
 
 $(function() {
-	hookupInlineEditorToolbar();
-	hookupSplitCursor();
+	<sec:authorize access="isAuthenticated()">
+		if (window.location.hash === '#changes') {
+			showChangesDialog();
+		}
+	</sec:authorize>
+	
+	<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
+		hookupInlineEditorToolbar();
+		hookupSplitCursor();
+	</sec:authorize>
 });
-
-</sec:authorize>
 
 </dt:headerJS>
 
@@ -517,13 +553,18 @@ $(function() {
 		<div class="btn-group">
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i> <spring:message code="button.tools"/> <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
-					<dt:dropdownEntry>
+				<dt:dropdownEntry divider="true">
+					<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
+						<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
+						<li><a href="javascript:void(startPageSplit());"><i class="icon-file"></i> <spring:message code="button.splitPage"/></a></li>
+					</sec:authorize>
+				</dt:dropdownEntry>
+
+				<dt:dropdownEntry divider="true">
+					<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 						<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
-					</dt:dropdownEntry>
-				</sec:authorize>
-				<sec:authorize access="isAuthenticated()">
-					<dt:dropdownEntry>
+					</sec:authorize>
+					<sec:authorize access="isAuthenticated()">
 						<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
 						<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>
 								<c:choose>
@@ -531,40 +572,40 @@ $(function() {
 									<c:otherwise><spring:message code="button.attachments"/></c:otherwise>
 								</c:choose>
 							</a></li>
-					</dt:dropdownEntry>
-				</sec:authorize>
-				<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
-					<dt:dropdownEntry divider="true">
-						<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
-					</dt:dropdownEntry>
-				</sec:authorize>
-				<sec:authorize access="isAuthenticated()">
-					<dt:dropdownEntry divider="true">
-						<li><a href="<c:url value="/page/changes/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-book"></i> <spring:message code="button.changes"/></a></li>
-					</dt:dropdownEntry>
-				</sec:authorize>
-				
-				<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
-					<dt:dropdownEntry divider="true">
-						<li><a href="javascript:void(startPageSplit());"><i class="icon-file"></i> <spring:message code="button.splitPage"/></a></li>
-					</dt:dropdownEntry>
-				</sec:authorize>
+					</sec:authorize>
+				</dt:dropdownEntry>
 
-				<c:if test="${path ne 'home'}">
-					<dt:dropdownEntry divider="true">
+				<dt:dropdownEntry divider="true">
+					<sec:authorize access="isAuthenticated()">
+						<li><a href="<c:url value="/page/changes/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-book"></i> <spring:message code="button.changes"/></a></li>
+						<c:choose>
+							<c:when test="${!d:isSubscribed(projectName, branchName, path)}">
+								<li><a href="javascript:void(subscribe());"><i class="icon-envelope"></i> <spring:message code="button.subscribe"/></a>
+							</c:when>
+							<c:otherwise>
+								<li><a href="javascript:void(unsubscribe());"><i class="icon-envelope"></i> <spring:message code="button.unsubscribe"/></a>
+							</c:otherwise>
+						</c:choose>
+					</sec:authorize>
+				</dt:dropdownEntry>
+
+				<dt:dropdownEntry divider="true">
+					<c:if test="${path ne 'home'}">
 						<sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
 							<c:if test="${fn:length(branches) ge 2}">
 								<%-- doesn't work correctly for "home" page --%>
 								<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
 							</c:if>
 						</sec:authorize>
-						<li><a href="javascript:void(showRelocateDialog());"><i class="icon-arrow-right"></i> <spring:message code="button.relocate"/>...</a></li>
+						<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
+							<li><a href="javascript:void(showRelocateDialog());"><i class="icon-arrow-right"></i> <spring:message code="button.relocate"/>...</a></li>
+						</sec:authorize>
 						<%-- "home" page must not be deleted --%>
 						<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 							<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
 						</sec:authorize>
-					</dt:dropdownEntry>
-				</c:if>
+					</c:if>
+				</dt:dropdownEntry>
 			</ul>
 		</div>
 	</div>

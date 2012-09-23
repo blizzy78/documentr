@@ -20,8 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ attribute name="divider" required="false" rtexprvalue="true" %>
 
-<c:if test="${divider and requestScope._dropdownNeedDivider}">
+<c:set var="body"><jsp:doBody/></c:set>
+<c:set var="body" value="${fn:trim(body)}"/>
+
+<c:if test="${divider and requestScope._dropdownNeedDivider and !empty body}">
 	<li class="divider"></li>
 </c:if>
-<jsp:doBody/>
-<c:set var="_dropdownNeedDivider" scope="request" value="${true}"/>
+<c:if test="${!empty body}">
+	<c:out value="${body}" escapeXml="false"/>
+	<c:set var="_dropdownNeedDivider" scope="request" value="${true}"/>
+</c:if>
