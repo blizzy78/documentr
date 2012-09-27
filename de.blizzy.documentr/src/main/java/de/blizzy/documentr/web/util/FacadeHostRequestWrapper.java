@@ -55,8 +55,14 @@ public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
 			int pos = url.indexOf(contextPath);
 			newUrl = documentrHost + url.substring(pos + contextPath.length());
 		} else {
+			UriComponentsBuilder builder;
+			try {
+				builder = UriComponentsBuilder.fromHttpUrl(url);
+			} catch (IllegalArgumentException e) {
+				builder = UriComponentsBuilder.fromUriString(url);
+			}
 			String path = StringUtils.defaultIfBlank(
-					UriComponentsBuilder.fromHttpUrl(url).build().getPath(), StringUtils.EMPTY);
+					builder.build().getPath(), StringUtils.EMPTY);
 			if (StringUtils.isNotBlank(path)) {
 				int pos = StringUtils.lastIndexOf(url, path);
 				newUrl = documentrHost + url.substring(pos);
