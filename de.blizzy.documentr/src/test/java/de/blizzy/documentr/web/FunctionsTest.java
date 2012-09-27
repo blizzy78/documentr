@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +38,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -63,6 +67,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
+	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	private static final Locale LOCALE = Locale.US;
 	
 	@Mock
@@ -83,6 +88,8 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private SecurityContext securityContext;
 	@Mock
 	private MacroFactory macroFactory;
+	@Mock
+	private HttpServletRequest request;
 
 	@Before
 	public void setUp() {
@@ -99,6 +106,9 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		LocaleContextHolder.setLocale(LOCALE);
+		
+		ServletRequestAttributes requestAttrs = new ServletRequestAttributes(request);
+		RequestContextHolder.setRequestAttributes(requestAttrs);
 	}
 
 	@After
@@ -112,6 +122,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		Functions.setMacroFactory(null);
 		SecurityContextHolder.clearContext();
 		LocaleContextHolder.resetLocaleContext();
+		RequestContextHolder.resetRequestAttributes();
 	}
 	
 	@Test
@@ -158,17 +169,20 @@ public class FunctionsTest extends AbstractDocumentrTest {
 
 	@Test
 	public void getPageHTML() throws IOException {
-		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE, authentication)).thenReturn("html"); //$NON-NLS-1$
-		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE, authentication)) //$NON-NLS-1$
-			.thenReturn("htmlWithMacros"); //$NON-NLS-1$
+		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE, //$NON-NLS-1$
+				authentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
+		when(request.getContextPath()).thenReturn(CONTEXT);
 		assertEquals("htmlWithMacros", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void getPageHeaderHTML() throws IOException {
-		when(pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, authentication)).thenReturn("headerHtml"); //$NON-NLS-1$
-		when(markdownProcessor.processNonCacheableMacros("headerHtml", PROJECT, BRANCH, PAGE, authentication)) //$NON-NLS-1$
-			.thenReturn("headerHtmlWithMacros"); //$NON-NLS-1$
+		when(pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, authentication, CONTEXT))
+			.thenReturn("headerHtml"); //$NON-NLS-1$
+		when(markdownProcessor.processNonCacheableMacros("headerHtml", PROJECT, BRANCH, PAGE, //$NON-NLS-1$
+				authentication, CONTEXT)).thenReturn("headerHtmlWithMacros"); //$NON-NLS-1$
+		when(request.getContextPath()).thenReturn(CONTEXT);
 		assertEquals("headerHtmlWithMacros", Functions.getPageHeaderHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	

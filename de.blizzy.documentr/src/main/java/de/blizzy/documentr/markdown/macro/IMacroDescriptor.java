@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown.macro;
 
 import java.util.Locale;
+import java.util.Set;
 
 public interface IMacroDescriptor {
 	String getMacroName();
@@ -25,4 +26,5 @@ public interface IMacroDescriptor {
 	String getTitle(Locale locale);
 	String getDescription(Locale locale);
 	boolean isCacheable();
+	Set<MacroSetting> getSettings();
 }

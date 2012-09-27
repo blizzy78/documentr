@@ -268,7 +268,7 @@ public class PageIndex {
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
-		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false);
+		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false, null);
 		text = removeHtmlTags(text);
 		text = replaceHtmlEntities(text);
 

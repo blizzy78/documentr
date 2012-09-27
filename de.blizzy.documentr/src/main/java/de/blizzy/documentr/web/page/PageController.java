@@ -322,11 +322,15 @@ public class PageController {
 	@ResponseBody
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
-			@RequestParam String markdown, @RequestParam(required=false) String pagePath, Authentication authentication) {
+			@RequestParam String markdown, @RequestParam(required=false) String pagePath, Authentication authentication,
+			HttpServletRequest request) {
 
+		String contextPath = request.getContextPath();
 		Map<String, String> result = new HashMap<String, String>();
-		String html = markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication);
-		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, pagePath, authentication);
+		String html = markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication,
+				contextPath);
+		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, pagePath, authentication,
+				contextPath);
 		result.put("html", html); //$NON-NLS-1$
 		return result;
 	}
@@ -438,7 +442,7 @@ public class PageController {
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
 	public Map<String, Object> savePageRange(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String markdown, @RequestParam String range,
-			@RequestParam String commit, Authentication authentication, HttpSession session) throws IOException {
+			@RequestParam String commit, Authentication authentication, HttpServletRequest request) throws IOException {
 		
 		path = Util.toRealPagePath(path);
 		
@@ -463,15 +467,17 @@ public class PageController {
 		Map<String, Object> result = Maps.newHashMap();
 		if (conflict != null) {
 			result.put("conflict", Boolean.TRUE); //$NON-NLS-1$
+			HttpSession session = request.getSession();
 			session.setAttribute("conflict", conflict); //$NON-NLS-1$
 			session.setAttribute("conflict.projectName", projectName); //$NON-NLS-1$
 			session.setAttribute("conflict.branchName", branchName); //$NON-NLS-1$
 			session.setAttribute("conflict.path", path); //$NON-NLS-1$
 		} else {
 			String newCommit = pageStore.getPageMetadata(projectName, branchName, path).getCommit();
-
-			String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
-			html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+			String contextPath = request.getContextPath();
+			String html = pageRenderer.getHtml(projectName, branchName, path, authentication, contextPath);
+			html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication,
+					contextPath);
 			result.put("html", html); //$NON-NLS-1$
 			result.put("commit", newCommit); //$NON-NLS-1$
 		}

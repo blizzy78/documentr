@@ -17,7 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,6 +31,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component(MessageSourceMacroDescriptor.ID)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -44,8 +47,13 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	private String insertText;
 	@Getter
 	private boolean cacheable = true;
+	@Getter
+	private Set<MacroSetting> settings = Collections.emptySet();
 
 	MessageSourceMacroDescriptor(String macroName) {
+		Assert.hasLength(macroName);
+		Assert.isTrue(macroName.indexOf('.') < 0, "macro name contains dots: " + macroName); //$NON-NLS-1$
+		
 		this.macroName = macroName;
 	}
 	
@@ -70,6 +78,11 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	
 	MessageSourceMacroDescriptor cacheable(boolean cacheable) {
 		this.cacheable = cacheable;
+		return this;
+	}
+	
+	MessageSourceMacroDescriptor settings(Set<MacroSetting> settings) {
+		this.settings = Collections.unmodifiableSet(settings);
 		return this;
 	}
 }

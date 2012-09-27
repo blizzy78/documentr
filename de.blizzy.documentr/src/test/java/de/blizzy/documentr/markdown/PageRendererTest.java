@@ -29,8 +29,6 @@ import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.markdown.MarkdownProcessor;
-import de.blizzy.documentr.markdown.PageRenderer;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 
@@ -40,6 +38,7 @@ public class PageRendererTest extends AbstractDocumentrTest {
 	private static final String PAGE_PATH = "page"; //$NON-NLS-1$
 	private static final String MARKDOWN = "md"; //$NON-NLS-1$
 	private static final String HTML = "html"; //$NON-NLS-1$
+	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	private static final Page PAGE = Page.fromText("title", MARKDOWN); //$NON-NLS-1$
 
 	@Mock
@@ -58,19 +57,19 @@ public class PageRendererTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getHtml() throws IOException {
-		when(markdownProcessor.markdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication))
+		when(markdownProcessor.markdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
 			.thenReturn(HTML); 
 		
-		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication);
+		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
 		assertEquals(HTML, result);
 	}
 
 	@Test
 	public void getHeaderHtml() throws IOException {
-		when(markdownProcessor.headerMarkdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication))
+		when(markdownProcessor.headerMarkdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
 			.thenReturn(HTML);
 		
-		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication);
+		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
 		assertEquals(HTML, result);
 	}
 }

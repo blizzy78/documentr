@@ -17,8 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
+import java.util.Collections;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.util.Assert;
+
+import com.google.common.collect.Sets;
 
 // cannot be a @Component because it must not be picked up by MacroFactory
 class MacroRunnableMacro implements IMacro {
@@ -40,9 +44,11 @@ class MacroRunnableMacro implements IMacro {
 
 	@Override
 	public IMacroDescriptor getDescriptor() {
+		MacroSetting[] settings = annotation.settings();
 		return MessageSourceMacroDescriptor.create(annotation.name(), beanFactory)
 				.insertText(annotation.insertText())
-				.cacheable(annotation.cacheable());
+				.cacheable(annotation.cacheable())
+				.settings(settings != null ? Sets.newHashSet(settings) : Collections.<MacroSetting>emptySet());
 	}
 
 	@Override

@@ -28,35 +28,40 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.markdown.Header;
-import de.blizzy.documentr.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.markdown.MacroInvocation;
-import de.blizzy.documentr.markdown.MarkdownProcessor;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.util.Util;
 
-public class HtmlSerializerContextTest {
+public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = DocumentrConstants.HOME_PAGE_NAME + "/foo"; //$NON-NLS-1$
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
-	
+
+	@Mock
 	private MarkdownProcessor markdownProcessor;
+	@Mock
 	private Authentication authentication;
-	private HtmlSerializerContext htmlSerializerContext;
+	@Mock
 	private HttpServletRequest request;
+	@Mock
+	private IPageStore pageStore;
+	@Mock
+	private SystemSettingsStore systemSettingsStore;
+	private HtmlSerializerContext htmlSerializerContext;
 
 	@Before
 	public void setUp() {
-		markdownProcessor = mock(MarkdownProcessor.class);
-		authentication = mock(Authentication.class);
-		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, authentication);
+		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, authentication,
+				pageStore, systemSettingsStore, CONTEXT);
 		
-		request = mock(HttpServletRequest.class);
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
 		when(request.getScheme()).thenReturn("http"); //$NON-NLS-1$
 		when(request.getContextPath()).thenReturn(CONTEXT);
@@ -109,7 +114,7 @@ public class HtmlSerializerContextTest {
 	
 	@Test
 	public void markdownToHTML() {
-		when(markdownProcessor.markdownToHTML("md", PROJECT, BRANCH, PAGE, authentication)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(markdownProcessor.markdownToHTML("md", PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("html", htmlSerializerContext.markdownToHTML("md")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

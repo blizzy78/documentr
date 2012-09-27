@@ -17,11 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro.impl;
 
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
 import de.blizzy.documentr.markdown.macro.IMacro;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.markdown.macro.MacroSetting;
 
 // cannot be a @Component because it must not be picked up by MacroFactory
 public class UnknownMacroMacro implements IMacro {
@@ -55,6 +58,11 @@ public class UnknownMacroMacro implements IMacro {
 			@Override
 			public boolean isCacheable() {
 				return true;
+			}
+			
+			@Override
+			public Set<MacroSetting> getSettings() {
+				return Collections.emptySet();
 			}
 		};
 	}

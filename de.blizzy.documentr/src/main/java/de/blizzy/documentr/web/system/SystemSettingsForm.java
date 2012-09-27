@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.system;
 
+import java.util.SortedMap;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -52,10 +54,14 @@ public class SystemSettingsForm {
 	@Min(4)
 	@Max(31)
 	private int bcryptRounds;
+	// macroName -> [key -> value]
+	@Getter
+	@NotNull
+	private SortedMap<String, SortedMap<String, String>> macroSettings;
 
 	public SystemSettingsForm(String documentrHost, String siteNotice, String mailHostName, int mailHostPort,
 			String mailSenderEmail, String mailSenderName, String mailSubjectPrefix, String mailDefaultLanguage,
-			int bcryptRounds) {
+			int bcryptRounds, SortedMap<String, SortedMap<String, String>> macroSettings) {
 
 		this.documentrHost = documentrHost;
 		this.siteNotice = siteNotice;
@@ -66,5 +72,6 @@ public class SystemSettingsForm {
 		this.mailSubjectPrefix = mailSubjectPrefix;
 		this.mailDefaultLanguage = mailDefaultLanguage;
 		this.bcryptRounds = bcryptRounds;
+		this.macroSettings = macroSettings;
 	}
 }

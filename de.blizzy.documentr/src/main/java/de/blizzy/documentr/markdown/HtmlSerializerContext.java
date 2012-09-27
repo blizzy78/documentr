@@ -32,7 +32,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.util.Util;
+import de.blizzy.documentr.web.util.FacadeHostRequestWrapper;
 
 public class HtmlSerializerContext {
 	@Getter
@@ -47,21 +50,32 @@ public class HtmlSerializerContext {
 	private List<MacroInvocation> macroInvocations = Lists.newArrayList();
 	@Getter
 	private Authentication authentication;
+	@Getter
+	private SystemSettingsStore systemSettingsStore;
+	@Getter
+	private IPageStore pageStore;
+	private String contextPath;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
-			MarkdownProcessor markdownProcessor, Authentication authentication) {
+			MarkdownProcessor markdownProcessor, Authentication authentication, IPageStore pageStore,
+			SystemSettingsStore systemSettingsStore, String contextPath) {
 		
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		// pagePath can be null for new pages
 		Assert.notNull(markdownProcessor);
 		Assert.notNull(authentication);
+		Assert.notNull(pageStore);
+		Assert.notNull(systemSettingsStore);
 		
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;
 		this.markdownProcessor = markdownProcessor;
 		this.authentication = authentication;
+		this.pageStore = pageStore;
+		this.systemSettingsStore = systemSettingsStore;
+		this.contextPath = contextPath;
 	}
 
 	public String getAttachmentURI(String name) {
@@ -97,8 +111,13 @@ public class HtmlSerializerContext {
 		}
 	}
 
+	public String getURL(String uri) {
+		String documentrHost = systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST);
+		return FacadeHostRequestWrapper.buildFacadeUrl(uri, contextPath, documentrHost);
+	}
+	
 	public String markdownToHTML(String markdown) {
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication, contextPath);
 	}
 
 	void addHeader(String text, int level) {

@@ -15,19 +15,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown;
+package de.blizzy.documentr.markdown.macro;
 
-import java.io.IOException;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.Authentication;
-
-public interface IPageRenderer {
-	@Cacheable(value="page_html", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHtml(String projectName, String branchName, String path, Authentication authentication,
-			String contextPath) throws IOException;
-
-	@Cacheable(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication,
-			String contextPath) throws IOException;
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface MacroSetting {
+	String value();
 }

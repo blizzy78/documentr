@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -134,14 +137,20 @@ public final class Functions {
 	
 	public static String getPageHTML(String projectName, String branchName, String path) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String html = pageRenderer.getHtml(projectName, branchName, path, authentication);
-		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String contextPath = request.getContextPath();
+		String html = pageRenderer.getHtml(projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication,
+				contextPath);
 	}
 
 	public static String getPageHeaderHTML(String projectName, String branchName, String path) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String html = pageRenderer.getHeaderHtml(projectName, branchName, path, authentication);
-		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String contextPath = request.getContextPath();
+		String html = pageRenderer.getHeaderHtml(projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication,
+				contextPath);
 	}
 	
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)

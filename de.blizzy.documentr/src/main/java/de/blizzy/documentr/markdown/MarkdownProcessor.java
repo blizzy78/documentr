@@ -45,6 +45,8 @@ import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 import de.blizzy.documentr.markdown.macro.MacroFactory;
 import de.blizzy.documentr.markdown.macro.impl.UnknownMacroMacro;
+import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.util.Replacement;
 
 @Component
@@ -77,27 +79,31 @@ public class MarkdownProcessor {
 	private MacroFactory macroFactory;
 	@Autowired
 	private BeanFactory beanFactory;
+	@Autowired
+	private IPageStore pageStore;
+	@Autowired
+	private SystemSettingsStore systemSettingsStore;
 
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
-			Authentication authentication) {
+			Authentication authentication, String contextPath) {
 		
-		return markdownToHTML(markdown, projectName, branchName, path, authentication, true);
+		return markdownToHTML(markdown, projectName, branchName, path, authentication, true, contextPath);
 	}
 	
 	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
-			Authentication authentication, boolean nonCacheableMacros) {
+			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		removeHeader(rootNode);
-		return markdownToHTML(rootNode, projectName, branchName, path, authentication, nonCacheableMacros);
+		return markdownToHTML(rootNode, projectName, branchName, path, authentication, nonCacheableMacros, contextPath);
 	}
 	
 	public String headerMarkdownToHTML(String markdown, String projectName, String branchName, String path,
-			Authentication authentication) {
+			Authentication authentication, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		extractHeader(rootNode);
-		return markdownToHTML(rootNode, projectName, branchName, path, authentication, true);
+		return markdownToHTML(rootNode, projectName, branchName, path, authentication, true, contextPath);
 	}
 
 	private RootNode parse(String markdown) {
@@ -109,9 +115,10 @@ public class MarkdownProcessor {
 	}
 	
 	private String markdownToHTML(RootNode rootNode, String projectName, String branchName, String path,
-			Authentication authentication, boolean nonCacheableMacros) {
+			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
 		
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
+				pageStore, systemSettingsStore, contextPath);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
 		
@@ -210,9 +217,10 @@ public class MarkdownProcessor {
 	}
 
 	public String processNonCacheableMacros(String html, String projectName, String branchName, String path,
-			Authentication authentication) {
+			Authentication authentication, String contextPath) {
 		
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication);
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
+				pageStore, systemSettingsStore, contextPath);
 		String startMarkerPrefix = "__" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
 		String endMarkerPrefix = "__/" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
 		String bodyMarker = "__" + NON_CACHEABLE_MACRO_BODY_MARKER + "__"; //$NON-NLS-1$ //$NON-NLS-2$

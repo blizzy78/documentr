@@ -33,4 +33,5 @@ public @interface Macro {
 	String name();
 	String insertText();
 	boolean cacheable() default true;
+	MacroSetting[] settings() default {};
 }

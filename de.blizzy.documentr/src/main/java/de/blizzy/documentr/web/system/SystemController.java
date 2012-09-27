@@ -19,6 +19,8 @@ package de.blizzy.documentr.web.system;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 import javax.validation.Valid;
 
@@ -33,25 +35,35 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.WebRequest;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
+import de.blizzy.documentr.markdown.macro.MacroFactory;
+import de.blizzy.documentr.markdown.macro.MacroSetting;
 import de.blizzy.documentr.system.SystemSettingsStore;
 
 @Controller
 @RequestMapping("/system")
 public class SystemController {
+	private static final String MACRO_KEY_PREFIX = "macro."; //$NON-NLS-1$
+	
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Autowired
 	private UserStore userStore;
+	@Autowired
+	private MacroFactory macroFactory;
 	
 	@RequestMapping(value="/edit", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String editSettings(Model model) {
 		Map<String, String> settings = systemSettingsStore.getSettings();
+		SortedMap<String, SortedMap<String, String>> allMacroSettings = getMacroSettingsFromSystemSettings();
 		SystemSettingsForm form = new SystemSettingsForm(
 				settings.get(SystemSettingsStore.DOCUMENTR_HOST),
 				settings.get(SystemSettingsStore.SITE_NOTICE),
@@ -61,9 +73,29 @@ public class SystemController {
 				settings.get(SystemSettingsStore.MAIL_SENDER_NAME),
 				settings.get(SystemSettingsStore.MAIL_SUBJECT_PREFIX),
 				settings.get(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE),
-				Integer.parseInt(settings.get(SystemSettingsStore.BCRYPT_ROUNDS)));
+				Integer.parseInt(settings.get(SystemSettingsStore.BCRYPT_ROUNDS)),
+				allMacroSettings);
 		model.addAttribute("systemSettingsForm", form); //$NON-NLS-1$
 		return "/system/edit"; //$NON-NLS-1$
+	}
+
+	private SortedMap<String, SortedMap<String, String>> getMacroSettingsFromSystemSettings() {
+		Set<IMacroDescriptor> descriptors = macroFactory.getDescriptors();
+		SortedMap<String, SortedMap<String, String>> allMacroSettings = Maps.newTreeMap();
+		for (IMacroDescriptor descriptor : descriptors) {
+			Set<MacroSetting> settingDescriptors = descriptor.getSettings();
+			if (!settingDescriptors.isEmpty()) {
+				SortedMap<String, String> macroSettings = Maps.newTreeMap();
+				String macroName = descriptor.getMacroName();
+				for (MacroSetting settingDescriptor : settingDescriptors) {
+					String key = settingDescriptor.value();
+					String value = StringUtils.defaultString(systemSettingsStore.getMacroSetting(macroName, key));
+					macroSettings.put(key, value);
+				}
+				allMacroSettings.put(macroName, macroSettings);
+			}
+		}
+		return allMacroSettings;
 	}
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
@@ -74,6 +106,8 @@ public class SystemController {
 		if (bindingResult.hasErrors()) {
 			return "/system/edit"; //$NON-NLS-1$
 		}
+
+		User user = userStore.getUser(authentication.getName());
 		
 		Map<String, String> settings = Maps.newHashMap();
 		String documentrHost = form.getDocumentrHost();
@@ -89,7 +123,12 @@ public class SystemController {
 		settings.put(SystemSettingsStore.MAIL_SUBJECT_PREFIX, form.getMailSubjectPrefix());
 		settings.put(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE, form.getMailDefaultLanguage());
 		settings.put(SystemSettingsStore.BCRYPT_ROUNDS, String.valueOf(form.getBcryptRounds()));
-		systemSettingsStore.saveSettings(settings, userStore.getUser(authentication.getName()));
+		systemSettingsStore.saveSettings(settings, user);
+		
+		for (Map.Entry<String, SortedMap<String, String>> entry : form.getMacroSettings().entrySet()) {
+			systemSettingsStore.setMacroSetting(entry.getKey(), entry.getValue(), user);
+		}
+		
 		return "redirect:/system/edit"; //$NON-NLS-1$
 	}
 
@@ -103,8 +142,10 @@ public class SystemController {
 			@RequestParam(required=false) String mailSenderName,
 			@RequestParam(required=false) String mailSubjectPrefix,
 			@RequestParam(required=false) String mailDefaultLanguage,
-			@RequestParam(required=false) Integer bcryptRounds) {
+			@RequestParam(required=false) Integer bcryptRounds,
+			WebRequest webRequest) {
 		
+		SortedMap<String, SortedMap<String, String>> allMacroSettings = getMacroSettingsFromRequest(webRequest);
 		return new SystemSettingsForm(
 				Strings.emptyToNull(documentrHost),
 				Strings.emptyToNull(siteNotice),
@@ -114,6 +155,31 @@ public class SystemController {
 				Strings.emptyToNull(mailSenderName),
 				Strings.emptyToNull(mailSubjectPrefix),
 				Strings.emptyToNull(mailDefaultLanguage),
-				(bcryptRounds != null) ? bcryptRounds.intValue() : Integer.MIN_VALUE);
+				(bcryptRounds != null) ? bcryptRounds.intValue() : Integer.MIN_VALUE,
+				allMacroSettings);
+	}
+
+	private SortedMap<String, SortedMap<String, String>> getMacroSettingsFromRequest(WebRequest webRequest) {
+		Map<String, String[]> params = webRequest.getParameterMap();
+		SortedMap<String, SortedMap<String, String>> allMacroSettings = Maps.newTreeMap();
+		for (Map.Entry<String, String[]> entry : params.entrySet()) {
+			String key = entry.getKey();
+			if (key.startsWith(MACRO_KEY_PREFIX)) {
+				String[] values = entry.getValue();
+				if (values.length == 0) {
+					values = new String[] { StringUtils.EMPTY };
+				}
+				key = key.substring(MACRO_KEY_PREFIX.length());
+				String macroName = StringUtils.substringBefore(key, "."); //$NON-NLS-1$
+				key = StringUtils.substringAfter(key, "."); //$NON-NLS-1$
+				SortedMap<String, String> macroSettings = allMacroSettings.get(macroName);
+				if (macroSettings == null) {
+					macroSettings = Maps.newTreeMap();
+					allMacroSettings.put(macroName, macroSettings);
+				}
+				macroSettings.put(key, values[0]);
+			}
+		}
+		return allMacroSettings;
 	}
 }

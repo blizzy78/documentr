@@ -67,6 +67,7 @@ public class SystemSettingsStore implements Lifecycle {
 	
 	private static final String REPOSITORY_NAME = "_system"; //$NON-NLS-1$
 	private static final String SETTINGS_FILE_NAME = "settings"; //$NON-NLS-1$
+	private static final String MACRO_KEY_PREFIX = "macro."; //$NON-NLS-1$
 
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
@@ -207,5 +208,17 @@ public class SystemSettingsStore implements Lifecycle {
 			Closeables.closeQuietly(repo);
 		}
 		return settingsMap;
+	}
+
+	public void setMacroSetting(String macroName, Map<String, String> newSettings, User currentUser) throws IOException {
+		Map<String, String> settings = Maps.newHashMap();
+		for (Map.Entry<String, String> entry : newSettings.entrySet()) {
+			settings.put(MACRO_KEY_PREFIX + macroName + "." + entry.getKey(), entry.getValue()); //$NON-NLS-1$
+		}
+		saveSettings(settings, currentUser);
+	}
+
+	public String getMacroSetting(String macroName, String key) {
+		return getSetting(MACRO_KEY_PREFIX + macroName + "." + key); //$NON-NLS-1$
 	}
 }

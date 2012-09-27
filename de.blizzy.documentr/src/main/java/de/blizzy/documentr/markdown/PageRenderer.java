@@ -43,8 +43,8 @@ class PageRenderer implements IPageRenderer {
 	private MarkdownProcessor markdownProcessor;
 	
 	@Override
-	public String getHtml(String projectName, String branchName, String path, Authentication authentication)
-			throws IOException {
+	public String getHtml(String projectName, String branchName, String path, Authentication authentication,
+			String contextPath) throws IOException {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} for user {}", //$NON-NLS-1$
@@ -53,12 +53,12 @@ class PageRenderer implements IPageRenderer {
 		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path, authentication);
+		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path, authentication, contextPath);
 	}
 
 	@Override
-	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication)
-			throws IOException {
+	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication,
+			String contextPath) throws IOException {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} header for user {}", //$NON-NLS-1$
@@ -67,6 +67,6 @@ class PageRenderer implements IPageRenderer {
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.headerMarkdownToHTML(markdown, projectName, branchName, path, authentication);
+		return markdownProcessor.headerMarkdownToHTML(markdown, projectName, branchName, path, authentication, contextPath);
 	}
 }
