@@ -31,13 +31,14 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import lombok.AccessLevel;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
@@ -53,12 +54,13 @@ import de.blizzy.documentr.util.Util;
 
 @Component
 @Slf4j
-public class Mailer {
+public class SubscriptionMailer {
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Autowired
 	private EventBus eventBus;
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private ExecutorService taskExecutor;
 	@Autowired
 	private IPageStore pageStore;
@@ -66,6 +68,8 @@ public class Mailer {
 	private MessageSource messageSource;
 	@Autowired
 	private SubscriptionStore subscriptionStore;
+	@Autowired
+	private MailSenderFactory mailSenderFactory;
 	
 	@PostConstruct
 	public void init() {
@@ -96,36 +100,38 @@ public class Mailer {
 
 	private void sendNotifications(String projectName, String branchName, String path)
 			throws IOException {
-
+		
 		Map<String, String> settings = systemSettingsStore.getSettings();
-		String host = settings.get(SystemSettingsStore.MAIL_HOST_NAME);
-		int port = Integer.parseInt(settings.get(SystemSettingsStore.MAIL_HOST_PORT));
 		String senderEmail = settings.get(SystemSettingsStore.MAIL_SENDER_EMAIL);
 		String senderName = settings.get(SystemSettingsStore.MAIL_SENDER_NAME);
 		String subjectPrefix = settings.get(SystemSettingsStore.MAIL_SUBJECT_PREFIX);
 		String languageCode = settings.get(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE);
 		Locale locale = new Locale(languageCode);
-		if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(senderEmail)) {
-			Set<String> subscriberEmails = subscriptionStore.getSubscriberEmails(projectName, branchName, path);
-			if (!subscriberEmails.isEmpty()) {
-				Page page = pageStore.getPage(projectName, branchName, path, false);
-				String title = page.getTitle();
-				String subject = messageSource.getMessage("mail.pageChanged.subject", //$NON-NLS-1$
-						new Object[] { title }, locale);
-				if (StringUtils.isNotBlank(subjectPrefix)) {
-					subject = subjectPrefix.trim() + " " + subject; //$NON-NLS-1$
+		if (StringUtils.isNotBlank(senderEmail)) {
+			JavaMailSender sender = mailSenderFactory.createSender();
+			if (sender != null) {
+				Set<String> subscriberEmails = subscriptionStore.getSubscriberEmails(projectName, branchName, path);
+				if (!subscriberEmails.isEmpty()) {
+					Page page = pageStore.getPage(projectName, branchName, path, false);
+					String title = page.getTitle();
+					String subject = messageSource.getMessage("mail.pageChanged.subject", //$NON-NLS-1$
+							new Object[] { title }, locale);
+					if (StringUtils.isNotBlank(subjectPrefix)) {
+						subject = subjectPrefix.trim() + " " + subject; //$NON-NLS-1$
+					}
+					String pageUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							Util.toURLPagePath(path));
+					String changesUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							Util.toURLPagePath(path) + "#changes"); //$NON-NLS-1$
+					String text = messageSource.getMessage("mail.pageChanged.text", //$NON-NLS-1$
+							new Object[] { title, pageUrl, changesUrl }, locale);
+		
+					sendMail(subject, text, senderEmail, senderName, subscriberEmails, sender);
+				} else {
+					log.info("no subscribers, not sending mail"); //$NON-NLS-1$
 				}
-				String pageUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						Util.toURLPagePath(path));
-				String changesUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						Util.toURLPagePath(path) + "#changes"); //$NON-NLS-1$
-				String text = messageSource.getMessage("mail.pageChanged.text", //$NON-NLS-1$
-						new Object[] { title, pageUrl, changesUrl }, locale);
-	
-				JavaMailSender sender = createSender(host, port);
-				sendMail(subject, text, senderEmail, senderName, subscriberEmails, sender);
 			} else {
-				log.info("no subscribers, not sending mail"); //$NON-NLS-1$
+				log.info("settings incomplete, not sending mail"); //$NON-NLS-1$
 			}
 		} else {
 			log.info("settings incomplete, not sending mail"); //$NON-NLS-1$
@@ -149,13 +155,6 @@ public class Mailer {
 		}
 	}
 
-	private JavaMailSender createSender(String host, int port) {
-		JavaMailSenderImpl sender = new JavaMailSenderImpl();
-		sender.setHost(host);
-		sender.setPort(port);
-		return sender;
-	}
-	
 	private Address createAddress(String email, String name) {
 		try {
 			return new InternetAddress(email, name, Charsets.UTF_8.name());
