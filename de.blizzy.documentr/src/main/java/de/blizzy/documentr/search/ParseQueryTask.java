@@ -37,6 +37,7 @@ class ParseQueryTask implements Callable<Query> {
 	@Override
 	public Query call() throws ParseException {
 		QueryParser parser = new QueryParser(Version.LUCENE_40, PageIndex.ALL_TEXT, analyzer);
+		parser.setAllowLeadingWildcard(true);
 		return parser.parse(searchText);
 	}
 }
