@@ -76,48 +76,60 @@ class GroovyMacroScanner {
 				return file.isFile() && file.getName().endsWith(".groovy"); //$NON-NLS-1$
 			}
 		};
+
+		GroovyClassLoader classLoader = getGroovyClassLoader();
+		Set<IMacro> macros = Sets.newHashSet();
+		for (File file : macrosDir.listFiles(filter)) {
+			IMacro macro = getMacro(file, classLoader);
+			if (macro != null) {
+				macros.add(macro);
+			}
+		}
+		return macros;
+	}
+
+	private GroovyClassLoader getGroovyClassLoader() {
 		ImportCustomizer importCustomizer = new ImportCustomizer();
 		importCustomizer.addStarImports(DEFAULT_IMPORTS);
 		CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 		compilerConfiguration.addCompilationCustomizers(importCustomizer);
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		GroovyClassLoader classLoader = new GroovyClassLoader(contextClassLoader, compilerConfiguration);
-		Set<IMacro> macros = Sets.newHashSet();
-		for (File file : macrosDir.listFiles(filter)) {
-			try {
-				Class<?> clazz = classLoader.parseClass(file);
-				if (IMacro.class.isAssignableFrom(clazz)) {
-					IMacro macro = (IMacro) clazz.newInstance();
-					macros.add(macro);
-				} else {
-					Macro annotation = clazz.getAnnotation(Macro.class);
-					if (annotation != null) {
-						if (ISimpleMacro.class.isAssignableFrom(clazz)) {
-							ISimpleMacro simpleMacro = (ISimpleMacro) clazz.newInstance();
-							IMacro macro = new SimpleMacroMacro(simpleMacro, annotation, beanFactory);
-							macros.add(macro);
-						} else if (IMacroRunnable.class.isAssignableFrom(clazz)) {
-							@SuppressWarnings("unchecked")
-							Class<? extends IMacroRunnable> c = (Class<? extends IMacroRunnable>) clazz;
-							IMacro macro = new MacroRunnableMacro(c, annotation, beanFactory);
-							macros.add(macro);
-						} else {
-							log.warn("class {} not supported: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
-						}
+		return classLoader;
+	}
+
+	private IMacro getMacro(File file, GroovyClassLoader classLoader) {
+		IMacro macro = null;
+		try {
+			Class<?> clazz = classLoader.parseClass(file);
+			if (IMacro.class.isAssignableFrom(clazz)) {
+				macro = (IMacro) clazz.newInstance();
+			} else {
+				Macro annotation = clazz.getAnnotation(Macro.class);
+				if (annotation != null) {
+					if (ISimpleMacro.class.isAssignableFrom(clazz)) {
+						ISimpleMacro simpleMacro = (ISimpleMacro) clazz.newInstance();
+						macro = new SimpleMacroMacro(simpleMacro, annotation, beanFactory);
+					} else if (IMacroRunnable.class.isAssignableFrom(clazz)) {
+						@SuppressWarnings("unchecked")
+						Class<? extends IMacroRunnable> c = (Class<? extends IMacroRunnable>) clazz;
+						macro = new MacroRunnableMacro(c, annotation, beanFactory);
 					} else {
 						log.warn("class {} not supported: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
 					}
+				} else {
+					log.warn("class {} not supported, no @Macro annotation found: {}", clazz.getName(), file.getName()); //$NON-NLS-1$
 				}
-			} catch (IOException e) {
-				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
-			} catch (InstantiationException e) {
-				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
-			} catch (IllegalAccessException e) {
-				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
-			} catch (RuntimeException e) {
-				log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 			}
+		} catch (IOException e) {
+			log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+		} catch (InstantiationException e) {
+			log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+		} catch (IllegalAccessException e) {
+			log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
+		} catch (RuntimeException e) {
+			log.warn("error loading Groovy macro: " + file.getName(), e); //$NON-NLS-1$
 		}
-		return macros;
+		return macro;
 	}
 }
