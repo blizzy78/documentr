@@ -25,10 +25,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -68,12 +70,20 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	
 	@Override
 	public String getTitle(Locale locale) {
-		return messageSource.getMessage("macro." + macroName + ".title", null, locale); //$NON-NLS-1$ //$NON-NLS-2$
+		try {
+			return messageSource.getMessage("macro." + macroName + ".title", null, locale); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (NoSuchMessageException e) {
+			return macroName;
+		}
 	}
 
 	@Override
 	public String getDescription(Locale locale) {
-		return messageSource.getMessage("macro." + macroName + ".description", null, locale); //$NON-NLS-1$ //$NON-NLS-2$
+		try {
+			return messageSource.getMessage("macro." + macroName + ".description", null, locale); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (NoSuchMessageException e) {
+			return StringUtils.EMPTY;
+		}
 	}
 	
 	MessageSourceMacroDescriptor cacheable(boolean cacheable) {

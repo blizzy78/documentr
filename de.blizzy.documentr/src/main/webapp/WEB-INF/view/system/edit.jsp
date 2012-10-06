@@ -114,12 +114,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<c:forEach var="macroSettings" items="${systemSettingsForm.macroSettings}">
 		<c:set var="macroName" value="${macroSettings.key}"/>
 		<fieldset>
-			<c:set var="macroTitle"><spring:message code="macro.${macroName}.title"/></c:set>
+			<c:set var="macroTitle"><spring:message code="macro.${macroName}.title" text="${macroName}"/></c:set>
 			<legend><spring:message code="title.macroX" arguments="${macroTitle}" argumentSeparator="__DUMMY__"/></legend>
 			
 			<c:forEach var="setting" items="${macroSettings.value}">
 				<div class="control-group">
-					<label for="<c:out value="macro.${macroName}.${setting.key}"/>" class="control-label"><spring:message code="macro.${macroName}.setting.${setting.key}"/>:</label>
+					<label for="<c:out value="macro.${macroName}.${setting.key}"/>" class="control-label"><spring:message code="macro.${macroName}.setting.${setting.key}" text="${setting.key}"/>:</label>
 					<input name="<c:out value="macro.${macroName}.${setting.key}"/>" id="<c:out value="macro.${macroName}.${setting.key}"/>" type="text" class="input-xlarge" value="<c:out value="${setting.value}"/>"/>
 				</div>
 			</c:forEach>
