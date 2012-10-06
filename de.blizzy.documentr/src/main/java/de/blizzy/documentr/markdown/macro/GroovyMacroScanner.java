@@ -29,6 +29,8 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,6 +42,16 @@ import de.blizzy.documentr.Settings;
 @Component
 @Slf4j
 class GroovyMacroScanner {
+	@SuppressWarnings("nls")
+	private static final String[] DEFAULT_IMPORTS = new String[] {
+			"de.blizzy.documentr.access",
+			"de.blizzy.documentr.markdown",
+			"de.blizzy.documentr.markdown.macro",
+			"de.blizzy.documentr.page",
+			"de.blizzy.documentr.system",
+			"org.apache.commons.lang3"
+	};
+
 	static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
 	
 	@Autowired
@@ -64,7 +76,12 @@ class GroovyMacroScanner {
 				return file.isFile() && file.getName().endsWith(".groovy"); //$NON-NLS-1$
 			}
 		};
-		GroovyClassLoader classLoader = new GroovyClassLoader();
+		ImportCustomizer importCustomizer = new ImportCustomizer();
+		importCustomizer.addStarImports(DEFAULT_IMPORTS);
+		CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+		compilerConfiguration.addCompilationCustomizers(importCustomizer);
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		GroovyClassLoader classLoader = new GroovyClassLoader(contextClassLoader, compilerConfiguration);
 		Set<IMacro> macros = Sets.newHashSet();
 		for (File file : macrosDir.listFiles(filter)) {
 			try {
