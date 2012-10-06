@@ -82,9 +82,6 @@ public final class DocumentrConstants {
 	/** Suffix of a metadata file in a repository. */
 	public static final String META_SUFFIX = ".meta"; //$NON-NLS-1$
 
-	/** Number of iterations the SHA-512 password encoder must perform. */
-	public static final int PASSWORD_ENCODER_SHA512_ITERATIONS = 100000;
-
 	/** Number of iterations the bcrypt password encoder must perform. */
 	public static final int PASSWORD_ENCODER_BCRYPT_ITERATIONS = 12;
 

@@ -34,7 +34,7 @@ import com.google.common.eventbus.Subscribe;
 import de.blizzy.documentr.system.SystemSettingsChangedEvent;
 import de.blizzy.documentr.system.SystemSettingsStore;
 
-@Component
+@Component("passwordEncoder")
 @Slf4j
 public class BCryptPasswordEncoder implements PasswordEncoder {
 	@Autowired

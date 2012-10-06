@@ -45,7 +45,6 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.openid.OpenIDAuthenticationProvider;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -66,10 +65,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.access.BCryptPasswordEncoder;
-import de.blizzy.documentr.access.MultiPasswordEncoder;
 import de.blizzy.documentr.access.OpenIdUserDetailsService;
-import de.blizzy.documentr.access.Sha512PasswordEncoder;
 import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 
 /** Spring application context configuration. */
@@ -105,13 +101,6 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 		return new CommonsMultipartResolver();
 	}
 	
-	@Bean
-	public PasswordEncoder passwordEncoder(BCryptPasswordEncoder bcryptEncoder) {
-		return new MultiPasswordEncoder(
-				bcryptEncoder,
-				new Sha512PasswordEncoder(DocumentrConstants.PASSWORD_ENCODER_SHA512_ITERATIONS));
-	}
-
 	@Bean(destroyMethod="shutdown")
 	@SuppressWarnings("deprecation")
 	public net.sf.ehcache.CacheManager ehCacheManager(Settings settings) throws IOException {
