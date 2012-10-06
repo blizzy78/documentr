@@ -53,6 +53,6 @@ public class TwitterMacro implements IMacroRunnable {
 
 	@Override
 	public String cleanupHTML(String html) {
-		return html;
+		return null;
 	}
 }

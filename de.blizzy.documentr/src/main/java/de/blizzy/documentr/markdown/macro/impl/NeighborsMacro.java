@@ -164,6 +164,6 @@ public class NeighborsMacro implements IMacroRunnable {
 	
 	@Override
 	public String cleanupHTML(String html) {
-		return html;
+		return null;
 	}
 }

@@ -38,6 +38,6 @@ abstract class AbstractMarkdownMacroRunnable implements IMacroRunnable {
 	
 	@Override
 	public final String cleanupHTML(String html) {
-		return html;
+		return null;
 	}
 }

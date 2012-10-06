@@ -279,7 +279,7 @@ public class MarkdownProcessor {
 					IMacroDescriptor macroDescriptor = macro.getDescriptor();
 					if (macroDescriptor.isCacheable() == cacheable) {
 						IMacroRunnable macroRunnable = macro.createRunnable();
-						newHtml = macroRunnable.cleanupHTML(newHtml);
+						newHtml = StringUtils.defaultString(macroRunnable.cleanupHTML(newHtml), newHtml);
 					}
 				}
 			}
