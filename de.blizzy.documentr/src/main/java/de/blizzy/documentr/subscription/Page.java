@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.subscription;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+@EqualsAndHashCode
 class Page {
 	@Getter(AccessLevel.PACKAGE)
 	private String projectName;
@@ -35,29 +34,5 @@ class Page {
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
-			return true;
-		} else if ((o != null) && o.getClass().equals(getClass())) {
-			Page other = (Page) o;
-			return new EqualsBuilder()
-				.append(projectName, other.projectName)
-				.append(branchName, other.branchName)
-				.append(path, other.path)
-				.isEquals();
-		}
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(projectName)
-			.append(branchName)
-			.append(path)
-			.toHashCode();
 	}
 }
