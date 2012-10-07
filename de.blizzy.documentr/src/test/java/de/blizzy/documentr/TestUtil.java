@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -163,5 +164,15 @@ public final class TestUtil {
 	
 	public static void assertClean(Repository repo) throws IOException {
 		assertTrue(Git.wrap(repo).status().call().isClean());
+	}
+	
+	public static void assertRE(String expectedRegExp, String actual) {
+		@SuppressWarnings("nls")
+		String msg = "text does not match regular expression:\n" +
+				"regular expression:\n" +
+				expectedRegExp + "\n" +
+				"text:\n" +
+				actual;
+		assertTrue(msg, Pattern.compile(expectedRegExp, Pattern.DOTALL).matcher(actual).matches());
 	}
 }

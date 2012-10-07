@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
@@ -59,6 +61,7 @@ public class SubscriptionStore {
 	private static final String SUBSCRIPTIONS_SUFFIX = ".subscriptions"; //$NON-NLS-1$
 	
 	@Autowired
+	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private UserStore userStore;
@@ -67,7 +70,8 @@ public class SubscriptionStore {
 		ILockedRepository repo = null;
 		try {
 			repo = getOrCreateRepository(user);
-			String json = BlobUtils.getHeadContent(repo.r(), user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
+			String loginName = user.getLoginName();
+			String json = BlobUtils.getHeadContent(repo.r(), loginName + SUBSCRIPTIONS_SUFFIX);
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Set<Page> pages = Sets.newHashSet();
 			if (StringUtils.isNotBlank(json)) {
@@ -79,18 +83,18 @@ public class SubscriptionStore {
 			if (pages.add(page)) {
 				json = gson.toJson(pages);
 				File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-				File file = new File(workingDir, user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
+				File file = new File(workingDir, loginName + SUBSCRIPTIONS_SUFFIX);
 				FileUtils.writeStringToFile(file, json, Charsets.UTF_8);
 				
 				Git git = Git.wrap(repo.r());
 				git.add()
-					.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
+					.addFilepattern(loginName + SUBSCRIPTIONS_SUFFIX)
 					.call();
-				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+				PersonIdent ident = new PersonIdent(loginName, user.getEmail());
 				git.commit()
 					.setAuthor(ident)
 					.setCommitter(ident)
-					.setMessage(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
+					.setMessage(loginName + SUBSCRIPTIONS_SUFFIX)
 					.call();
 			}
 		} catch (GitAPIException e) {
