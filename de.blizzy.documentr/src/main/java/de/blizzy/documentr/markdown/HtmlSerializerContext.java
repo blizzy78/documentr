@@ -78,13 +78,13 @@ public class HtmlSerializerContext {
 		this.contextPath = contextPath;
 	}
 
-	public String getAttachmentURI(String name) {
+	public String getAttachmentUri(String name) {
 		if (StringUtils.isNotBlank(pagePath)) {
 			try {
 				String pattern = "/attachment/{projectName}/{branchName}/{pagePath}/{name}"; //$NON-NLS-1$
 				String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
 						.path(pattern).build()
-						.expand(projectName, branchName, Util.toURLPagePath(pagePath), name)
+						.expand(projectName, branchName, Util.toUrlPagePath(pagePath), name)
 						.encode(Charsets.UTF_8.name()).toUriString()
 						.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 				return uri;
@@ -97,12 +97,12 @@ public class HtmlSerializerContext {
 		return "#"; //$NON-NLS-1$
 	}
 	
-	public String getPageURI(String path) {
+	public String getPageUri(String path) {
 		try {
 			String pattern = "/page/{projectName}/{branchName}/{pagePath}"; //$NON-NLS-1$
 			String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path(pattern).build()
-					.expand(projectName, branchName, Util.toURLPagePath(path))
+					.expand(projectName, branchName, Util.toUrlPagePath(path))
 					.encode(Charsets.UTF_8.name()).toUriString()
 					.replaceFirst("^http(?:s)?://[^/]+(/.*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 			return uri;
@@ -111,13 +111,13 @@ public class HtmlSerializerContext {
 		}
 	}
 
-	public String getURL(String uri) {
+	public String getUrl(String uri) {
 		String documentrHost = systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST);
 		return FacadeHostRequestWrapper.buildFacadeUrl(uri, contextPath, documentrHost);
 	}
 	
-	public String markdownToHTML(String markdown) {
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication, contextPath);
+	public String markdownToHtml(String markdown) {
+		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, pagePath, authentication, contextPath);
 	}
 
 	void addHeader(String text, int level) {

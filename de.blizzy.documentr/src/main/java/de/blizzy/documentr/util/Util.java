@@ -42,7 +42,7 @@ public final class Util {
 	}
 
 	/** Converts a page path from real format to URL format. */
-	public static String toURLPagePath(String pagePath) {
+	public static String toUrlPagePath(String pagePath) {
 		return (pagePath != null) ? pagePath.replace('/', ',') : null;
 	}
 
@@ -52,7 +52,7 @@ public final class Util {
 	 * &quot;<code>my-funny-valentine</code>&quot;. This method is useful to convert
 	 * page titles to page path components.
 	 */
-	public static String simplifyForURL(String text) {
+	public static String simplifyForUrl(String text) {
 		PagePathValidator validator = new PagePathValidator();
 		StringBuilder buf = new StringBuilder();
 		int len = text.length();

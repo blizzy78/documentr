@@ -168,22 +168,22 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	public void getPageHTML() throws IOException {
+	public void getPageHtml() throws IOException {
 		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE, //$NON-NLS-1$
 				authentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		when(request.getContextPath()).thenReturn(CONTEXT);
-		assertEquals("htmlWithMacros", Functions.getPageHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
+		assertEquals("htmlWithMacros", Functions.getPageHtml(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test
-	public void getPageHeaderHTML() throws IOException {
+	public void getPageHeaderHtml() throws IOException {
 		when(pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, authentication, CONTEXT))
 			.thenReturn("headerHtml"); //$NON-NLS-1$
 		when(markdownProcessor.processNonCacheableMacros("headerHtml", PROJECT, BRANCH, PAGE, //$NON-NLS-1$
 				authentication, CONTEXT)).thenReturn("headerHtmlWithMacros"); //$NON-NLS-1$
 		when(request.getContextPath()).thenReturn(CONTEXT);
-		assertEquals("headerHtmlWithMacros", Functions.getPageHeaderHTML(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
+		assertEquals("headerHtmlWithMacros", Functions.getPageHeaderHtml(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
 	
 	@Test

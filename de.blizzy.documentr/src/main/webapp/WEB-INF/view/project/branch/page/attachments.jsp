@@ -36,7 +36,7 @@ function showDeleteDialog(name) {
 		{
 			text: '<spring:message code="button.delete"/>',
 			type: 'danger',
-			href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/"/>' + name
+			href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/"/>' + name
 		},
 		{
 			text: '<spring:message code="button.cancel"/>',
@@ -49,7 +49,7 @@ function showDeleteDialog(name) {
 
 </dt:headerJS>
 
-<c:set var="pagePathUrl" value="${d:toURLPagePath(pagePath)}"/>
+<c:set var="pagePathUrl" value="${d:toUrlPagePath(pagePath)}"/>
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
@@ -57,7 +57,7 @@ function showDeleteDialog(name) {
 	<c:set var="hierarchy" value="${d:getPagePathHierarchy(projectName, branchName, pagePath)}"/>
 	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 		<c:if test="${!status.first}">
-			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
+			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
 		</c:if>
 	</c:forEach>
 	<li class="active"><spring:message code="title.attachments"/></li>
@@ -85,12 +85,12 @@ function showDeleteDialog(name) {
 				<c:forEach var="attachment" items="${attachments}">
 					<c:set var="metadata" value="${d:getAttachmentMetadata(projectName, branchName, pagePath, attachment)}"/>
 					<tr>
-						<td><a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/${attachment}"/>"><c:out value="${attachment}"/></a></td>
+						<td><a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/${attachment}"/>"><c:out value="${attachment}"/></a></td>
 						<td><c:out value="${d:formatSize(metadata.size)}"/></td>
 						<td><c:out value="${metadata.lastEditedBy}"/></td>
 						<td><fmt:formatDate value="${metadata.lastEdited}" type="both" dateStyle="MEDIUM" timeStyle="SHORT"/></td>
 						<td>
-							<a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}/${attachment}"><c:param name="download" value="true"/></c:url>" class="btn btn-mini" rel="nofollow"><spring:message code="button.download"/></a>
+							<a href="<c:url value="/attachment/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/${attachment}"><c:param name="download" value="true"/></c:url>" class="btn btn-mini" rel="nofollow"><spring:message code="button.download"/></a>
 							<sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 								<a href="javascript:void(showDeleteDialog('${attachment}'));" class="btn btn-mini"><spring:message code="button.delete"/>...</a>
 							</sec:authorize>
@@ -107,7 +107,7 @@ function showDeleteDialog(name) {
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 	<p>
-	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
+	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
 	</p>
 </sec:authorize>
 

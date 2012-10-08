@@ -85,7 +85,7 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 
 	@Before
 	public void setUp() throws IOException {
-		when(htmlSerializerContext.getPageURI(anyString())).then(new Answer<String>() {
+		when(htmlSerializerContext.getPageUri(anyString())).then(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				return "/" + invocation.getArguments()[0]; //$NON-NLS-1$

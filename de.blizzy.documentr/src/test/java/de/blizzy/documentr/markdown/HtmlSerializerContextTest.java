@@ -96,26 +96,26 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void getAttachmentURI() {
-		String uri = htmlSerializerContext.getAttachmentURI("test.png"); //$NON-NLS-1$
+	public void getAttachmentUri() {
+		String uri = htmlSerializerContext.getAttachmentUri("test.png"); //$NON-NLS-1$
 		assertEquals(CONTEXT + "/attachment/" + PROJECT + "/" + BRANCH + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Util.toURLPagePath(PAGE) + "/test.png", //$NON-NLS-1$
+				Util.toUrlPagePath(PAGE) + "/test.png", //$NON-NLS-1$
 				uri);
 	}
 
 	@Test
-	public void getPageURI() {
+	public void getPageUri() {
 		String page = "foo/bar/baz"; //$NON-NLS-1$
-		String uri = htmlSerializerContext.getPageURI(page);
+		String uri = htmlSerializerContext.getPageUri(page);
 		assertEquals(CONTEXT + "/page/" + PROJECT + "/" + BRANCH + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Util.toURLPagePath(page),
+				Util.toUrlPagePath(page),
 				uri);
 	}
 	
 	@Test
-	public void markdownToHTML() {
-		when(markdownProcessor.markdownToHTML("md", PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("html", htmlSerializerContext.markdownToHTML("md")); //$NON-NLS-1$ //$NON-NLS-2$
+	public void markdownToHtml() {
+		when(markdownProcessor.markdownToHtml("md", PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("html", htmlSerializerContext.markdownToHtml("md")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test

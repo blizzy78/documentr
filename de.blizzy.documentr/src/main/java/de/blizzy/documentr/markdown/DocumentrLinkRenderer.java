@@ -57,7 +57,7 @@ class DocumentrLinkRenderer extends LinkRenderer {
 		boolean noFollow = false;
 		if (text.startsWith("#")) { //$NON-NLS-1$
 			text = text.substring(1).trim();
-			uri = "#" + Util.simplifyForURL(text); //$NON-NLS-1$
+			uri = "#" + Util.simplifyForUrl(text); //$NON-NLS-1$
 		} else {
 			uri = StringUtils.substringBefore(text, " ").trim(); //$NON-NLS-1$
 			text = StringUtils.substringAfter(text, " "); //$NON-NLS-1$
@@ -69,7 +69,7 @@ class DocumentrLinkRenderer extends LinkRenderer {
 					text = uri.substring(1);
 				}
 
-				uri = context.getAttachmentURI(uri.substring(1));
+				uri = context.getAttachmentUri(uri.substring(1));
 			} else {
 				if (StringUtils.isBlank(text)) {
 					text = uri;
@@ -100,12 +100,12 @@ class DocumentrLinkRenderer extends LinkRenderer {
 		if (node.url.startsWith("#")) { //$NON-NLS-1$
 			List<Node> children = node.getChildren();
 			Node child = !children.isEmpty() ? children.get(0) : null;
-			String url = "#" + Util.simplifyForURL(node.url.substring(1)); //$NON-NLS-1$
+			String url = "#" + Util.simplifyForUrl(node.url.substring(1)); //$NON-NLS-1$
 			node = new ExpLinkNode(node.title, url, child);
 		} else if (node.url.startsWith(":")) { //$NON-NLS-1$
 			List<Node> children = node.getChildren();
 			Node child = !children.isEmpty() ? children.get(0) : null;
-			String url = context.getPageURI(node.url.substring(1));
+			String url = context.getPageUri(node.url.substring(1));
 			node = new ExpLinkNode(node.title, url, child);
 		}
 		return super.render(node, text);

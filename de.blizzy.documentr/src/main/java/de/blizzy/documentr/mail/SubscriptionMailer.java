@@ -85,7 +85,7 @@ public class SubscriptionMailer {
 			@Override
 			public void run() {
 				log.info("page changed, sending notifications: {}/{}/{}", //$NON-NLS-1$
-						projectName, branchName, Util.toURLPagePath(path));
+						projectName, branchName, Util.toUrlPagePath(path));
 				try {
 					sendNotifications(projectName, branchName, path);
 				} catch (IOException e) {
@@ -120,9 +120,9 @@ public class SubscriptionMailer {
 						subject = subjectPrefix.trim() + " " + subject; //$NON-NLS-1$
 					}
 					String pageUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							Util.toURLPagePath(path));
+							Util.toUrlPagePath(path));
 					String changesUrl = createUrl(settings, "/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							Util.toURLPagePath(path) + "#changes"); //$NON-NLS-1$
+							Util.toUrlPagePath(path) + "#changes"); //$NON-NLS-1$
 					String text = messageSource.getMessage("mail.pageChanged.text", //$NON-NLS-1$
 							new Object[] { title, pageUrl, changesUrl }, locale);
 		

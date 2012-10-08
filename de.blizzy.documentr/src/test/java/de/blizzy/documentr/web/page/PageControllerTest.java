@@ -306,8 +306,8 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
-		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
-		String pathUrl = Util.toURLPagePath(path);
+		String path = PARENT_PAGE + "/" + Util.simplifyForUrl(title); //$NON-NLS-1$
+		String pathUrl = Util.toUrlPagePath(path);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + pathUrl, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
@@ -347,7 +347,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	@Test
 	public void generateName() throws IOException {
 		String title = "simple as 1, 2, 3"; //$NON-NLS-1$
-		String path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
+		String path = PARENT_PAGE + "/" + Util.simplifyForUrl(title); //$NON-NLS-1$
 		when(pageStore.getPage(eq(PROJECT), eq(BRANCH), eq(path), anyBoolean()))
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, path));
 		Map<String, Object> result = pageController.generateName(PROJECT, BRANCH, PARENT_PAGE, title);
@@ -355,7 +355,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		assertEquals(Boolean.FALSE, result.get("exists")); //$NON-NLS-1$
 
 		title = "title"; //$NON-NLS-1$
-		path = PARENT_PAGE + "/" + Util.simplifyForURL(title); //$NON-NLS-1$
+		path = PARENT_PAGE + "/" + Util.simplifyForUrl(title); //$NON-NLS-1$
 		Page page = Page.fromText(title, "text"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, path, false)).thenReturn(page);
 		result = pageController.generateName(PROJECT, BRANCH, PARENT_PAGE, title);
@@ -364,15 +364,15 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void markdownToHTML() {
-		when(markdownProcessor.markdownToHTML("markdown", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
+	public void markdownToHtml() {
+		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
 				authenticatedAuthentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
 				authenticatedAuthentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
 		
 		when(request.getContextPath()).thenReturn(CONTEXT);
 		
-		Map<String, String> result = pageController.markdownToHTML(
+		Map<String, String> result = pageController.markdownToHtml(
 				PROJECT, BRANCH, "markdown", PAGE_PATH, authenticatedAuthentication, request); //$NON-NLS-1$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}

@@ -42,7 +42,7 @@ public class AbstractMarkdownMacroRunnableTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getHtml() {
-		when(htmlSerializerContext.markdownToHTML("markdown")).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(htmlSerializerContext.markdownToHtml("markdown")).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		AbstractMarkdownMacroRunnable runnable = new AbstractMarkdownMacroRunnable() {
 			@Override

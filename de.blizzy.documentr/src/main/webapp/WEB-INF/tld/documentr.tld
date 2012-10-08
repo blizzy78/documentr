@@ -64,21 +64,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</function>
 
 	<function>
-		<name>toURLPagePath</name>
+		<name>toUrlPagePath</name>
 		<function-class>de.blizzy.documentr.util.Util</function-class>
-		<function-signature>java.lang.String toURLPagePath(java.lang.String)</function-signature>
+		<function-signature>java.lang.String toUrlPagePath(java.lang.String)</function-signature>
 	</function>
 
 	<function>
-		<name>getPageHTML</name>
+		<name>getPageHtml</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>java.lang.String getPageHTML(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String getPageHtml(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>
-		<name>getPageHeaderHTML</name>
+		<name>getPageHeaderHtml</name>
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
-		<function-signature>java.lang.String getPageHeaderHTML(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String getPageHeaderHtml(java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 	<function>

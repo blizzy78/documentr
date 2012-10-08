@@ -44,7 +44,7 @@ function togglePreview() {
 	if (previewEl.length === 0) {
 		var textEl = $('#pageForm').find('#text');
 		$.ajax({
-			url: '<c:url value="/page/markdownToHTML/${pageForm.projectName}/${pageForm.branchName}/json"/>',
+			url: '<c:url value="/page/markdownToHtml/${pageForm.projectName}/${pageForm.branchName}/json"/>',
 			type: 'POST',
 			dataType: 'json',
 			data: {
@@ -459,7 +459,7 @@ $(function() {
 				var value = el.val();
 				if (value.length > 0) {
 					$.ajax({
-						url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}/json"/>',
+						url: '<c:url value="/page/generateName/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}/json"/>',
 						type: 'POST',
 						dataType: 'json',
 						data: {
@@ -532,7 +532,7 @@ $(function() {
 	<c:set var="hierarchy" value="${d:getPagePathHierarchy(pageForm.projectName, pageForm.branchName, hierarchyPagePath)}"/>
 	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 		<c:if test="${!status.first}">
-			<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(pageForm.projectName, pageForm.branchName, entry)}"/></a> <span class="divider">/</span></li>
+			<li><a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(entry)}"/>"><c:out value="${d:getPageTitle(pageForm.projectName, pageForm.branchName, entry)}"/></a> <span class="divider">/</span></li>
 		</c:if>
 	</c:forEach>
 	<li class="active"><spring:message code="title.editPage"/></li>
@@ -639,7 +639,7 @@ $(function() {
 		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-			<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toURLPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
+			<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</fieldset>
 </form:form>

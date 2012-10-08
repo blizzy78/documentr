@@ -115,7 +115,7 @@ function preview() {
 	<c:set var="hierarchy" value="${d:getPagePathHierarchy(projectName, branchName, path)}"/>
 	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 		<c:if test="${!status.first}">
-			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
+			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
 		</c:if>
 	</c:forEach>
 	<li class="active"><spring:message code="title.copyChangesToOtherBranches"/></li>
@@ -127,7 +127,7 @@ function preview() {
 
 <div class="page-header"><h1><spring:message code="title.copyChangesToOtherBranches" htmlEscape="false"/></h1></div>
 
-<form id="cherryPickForm" action="<c:url value="/page/cherryPick/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST">
+<form id="cherryPickForm" action="<c:url value="/page/cherryPick/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" method="POST">
 	<input type="hidden" name="version1" value="${version1}"/>
 	<input type="hidden" name="version2" value="${version2}"/>
 	<c:forEach var="entry" items="${cherryPickResults}">
@@ -174,7 +174,7 @@ function preview() {
 		<a href="javascript:void(preview());" class="btn ${cssPreviewPrimary}"><spring:message code="button.preview"/></a>
 		<c:if test="${!hadConflicts}"><c:set var="cssFinishPrimary" value="btn-primary"/></c:if>
 		<a id="finishButton" href="javascript:void(run());" class="btn ${cssFinishPrimary}"><spring:message code="button.finish"/></a>
-		<a href="<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><spring:message code="button.cancel"/></a>
+		<a href="<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</p>
 </form>
 

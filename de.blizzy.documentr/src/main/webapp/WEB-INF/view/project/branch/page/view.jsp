@@ -53,7 +53,7 @@ function copyToBranchSelected() {
 	var el = $('#copyToBranchForm').find('select');
 	var branch = el.val();
 	$.ajax({
-		url: '<c:url value="/page/generateName/${projectName}/"/>' + branch + '/<c:out value="${d:toURLPagePath(parentPagePath)}"/>/json',
+		url: '<c:url value="/page/generateName/${projectName}/"/>' + branch + '/<c:out value="${d:toUrlPagePath(parentPagePath)}"/>/json',
 		type: 'POST',
 		dataType: 'json',
 		data: {
@@ -99,7 +99,7 @@ function showDeleteDialog() {
 		{
 			text: '<spring:message code="button.delete"/>',
 			type: 'danger',
-			href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
+			href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
 		},
 		{
 			text: '<spring:message code="button.cancel"/>',
@@ -128,7 +128,7 @@ function showRelocateDialog() {
 					branches: false
 				},
 				checkBranchPermissions: 'EDIT_PAGE',
-				filterPage: '<c:out value="${projectName}/${branchName}/${d:toURLPagePath(path)}"/>'
+				filterPage: '<c:out value="${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
 			})
 			.bind('select_node.jstree', function(event, data) {
 				var node = data.rslt.obj;
@@ -313,7 +313,7 @@ function hookupSplitCursor() {
 				var endEl = $(pageTextEl.data('pageSplitEnd'));
 				var start = startEl.attr('data-text-range').replace(/,.*/, '');
 				var end = endEl.attr('data-text-range').replace(/.*,/, '');
-				window.location.href = '<c:url value="/page/split/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + start + ',' + end;
+				window.location.href = '<c:url value="/page/split/${projectName}/${branchName}/${d:toUrlPagePath(path)}/"/>' + start + ',' + end;
 			}
 		});
 }
@@ -331,7 +331,7 @@ function saveInlineEditor() {
 	$(textEl).show();
 	$('#inlineEditorToolbar').hide();
 	$.ajax({
-		url: '<c:url value="/page/saveRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		url: '<c:url value="/page/saveRange/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'POST',
 		dataType: 'json',
 		data: {
@@ -341,7 +341,7 @@ function saveInlineEditor() {
 		},
 		success: function(result) {
 			if (documentr.isSomething(result.conflict) && result.conflict) {
-				window.location.href = '<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>';
+				window.location.href = '<c:url value="/page/edit/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>';
 			} else {
 				$('#pageText').html(result.html);
 				currentCommit = result.commit;
@@ -370,7 +370,7 @@ function startInlineEditor(textEl, range) {
 	cancelInlineEditor();
 
 	$.ajax({
-		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toURLPagePath(path)}/"/>' + range + '/' + currentCommit + '/json',
+		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toUrlPagePath(path)}/"/>' + range + '/' + currentCommit + '/json',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -423,14 +423,14 @@ function hookupInlineEditorToolbar() {
 function restoreOldVersion() {
 	var previousCommit = $('#changes-dialog').data('previousCommit');
 	$.ajax({
-		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'POST',
 		dataType: 'json',
 		data: {
 			version: previousCommit
 		},
 		success: function(result) {
-			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>?_=' + new Date().getTime();
+			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>?_=' + new Date().getTime();
 		}
 	});
 }
@@ -441,7 +441,7 @@ function restoreOldVersion() {
 
 function showChangesDialog() {
 	$.ajax({
-		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions=latest,previous"/>',
+		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest,previous"/>',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -462,7 +462,7 @@ function showChangesDialog() {
 
 function subscribe() {
 	$.ajax({
-		url: '<c:url value="/subscription/subscribe/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		url: '<c:url value="/subscription/subscribe/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'GET',
 		success: function() {
 			documentr.openMessageDialog('<spring:message code="title.subscribe"/>',
@@ -478,7 +478,7 @@ function subscribe() {
 
 function unsubscribe() {
 	$.ajax({
-		url: '<c:url value="/subscription/unsubscribe/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		url: '<c:url value="/subscription/unsubscribe/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'GET',
 		success: function() {
 			documentr.openMessageDialog('<spring:message code="title.unsubscribe"/>',
@@ -519,7 +519,7 @@ $(function() {
 			<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 				<c:if test="${!status.first}">
 					<c:choose>
-						<c:when test="${!status.last}"><li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li></c:when>
+						<c:when test="${!status.last}"><li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li></c:when>
 						<c:otherwise><li class="active"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></li></c:otherwise>
 					</c:choose>
 				</c:if>
@@ -534,7 +534,7 @@ $(function() {
 <dt:page>
 
 <c:set var="branches" value="${d:listProjectBranches(projectName)}"/>
-<c:set var="pageHeader"><c:out value="${d:getPageHeaderHTML(projectName, branchName, path)}" escapeXml="false"/></c:set>
+<c:set var="pageHeader"><c:out value="${d:getPageHeaderHtml(projectName, branchName, path)}" escapeXml="false"/></c:set>
 
 <sec:authorize access="isAuthenticated() or
 	hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE) or
@@ -546,7 +546,7 @@ $(function() {
 	<div class="btn-toolbar ${cssNoMargin} pull-right page-toolbar">
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			<div class="btn-group">
-				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
+				<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.edit"/></a>
 			</div>
 		</sec:authorize>
 
@@ -555,18 +555,18 @@ $(function() {
 			<ul class="dropdown-menu">
 				<dt:dropdownEntry divider="true">
 					<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
-						<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
+						<li><a href="<c:url value="/page/create/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>"><i class="icon-file"></i> <spring:message code="button.addChildPage"/></a></li>
 						<li><a href="javascript:void(startPageSplit());"><i class="icon-file"></i> <spring:message code="button.splitPage"/></a></li>
 					</sec:authorize>
 				</dt:dropdownEntry>
 
 				<dt:dropdownEntry divider="true">
 					<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
-						<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
+						<li><a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>"><i class="icon-download-alt"></i> <spring:message code="button.addAttachment"/></a></li>
 					</sec:authorize>
 					<sec:authorize access="isAuthenticated()">
 						<c:set var="attachments" value="${d:listPageAttachments(projectName, branchName, path)}"/>
-						<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-list"></i>
+						<li><a href="<c:url value="/attachment/list/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>"><i class="icon-list"></i>
 								<c:choose>
 									<c:when test="${!empty attachments}"><spring:message code="button.attachmentsX" arguments="${fn:length(attachments)}"/></c:when>
 									<c:otherwise><spring:message code="button.attachments"/></c:otherwise>
@@ -577,7 +577,7 @@ $(function() {
 
 				<dt:dropdownEntry divider="true">
 					<sec:authorize access="isAuthenticated()">
-						<li><a href="<c:url value="/page/changes/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>"><i class="icon-book"></i> <spring:message code="button.changes"/></a></li>
+						<li><a href="<c:url value="/page/changes/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>"><i class="icon-book"></i> <spring:message code="button.changes"/></a></li>
 						<c:choose>
 							<c:when test="${!d:isSubscribed(projectName, branchName, path)}">
 								<li><a href="javascript:void(subscribe());"><i class="icon-envelope"></i> <spring:message code="button.subscribe"/></a>
@@ -635,11 +635,11 @@ $(function() {
 		--%></div>
 </div>
 
-<span id="pageText"><c:out value="${d:getPageHTML(projectName, branchName, path)}" escapeXml="false"/></span>
+<span id="pageText"><c:out value="${d:getPageHtml(projectName, branchName, path)}" escapeXml="false"/></span>
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 	<p class="spacer">
-	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
+	<a href="<c:url value="/page/edit/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" class="btn"><i class="icon-edit"></i> <spring:message code="button.editPage"/></a>
 	</p>
 
 	<div id="inlineEditorToolbar" class="btn-toolbar btn-toolbar-icons btn-toolbar-floating" style="display: none; position: absolute;">
@@ -660,7 +660,7 @@ $(function() {
 			<h3><spring:message code="title.copyPageToBranch"/></h3>
 		</div>
 		<div class="modal-body">
-			<form id="copyToBranchForm" action="<c:url value="/page/copyToBranch/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+			<form id="copyToBranchForm" action="<c:url value="/page/copyToBranch/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" method="POST" class="form-horizontal">
 				<fieldset class="control-group">
 					<label class="control-label"><spring:message code="label.copyToBranch"/>:</label>
 					<select name="targetBranchName" onchange="copyToBranchSelected();">
@@ -698,7 +698,7 @@ $(function() {
 			<h3><spring:message code="title.relocatePage"/></h3>
 		</div>
 		<div class="modal-body">
-			<form id="relocateForm" action="<c:url value="/page/relocate/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+			<form id="relocateForm" action="<c:url value="/page/relocate/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" method="POST" class="form-horizontal">
 				<fieldset>
 					<input type="hidden" name="newParentPagePath" value=""/>
 	

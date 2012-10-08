@@ -19,5 +19,5 @@ package de.blizzy.documentr.markdown.macro;
 
 public interface IMacroRunnable {
 	String getHtml(IMacroContext macroContext);
-	String cleanupHTML(String html);
+	String cleanupHtml(String html);
 }

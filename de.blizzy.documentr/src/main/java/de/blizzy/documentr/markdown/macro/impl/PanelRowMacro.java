@@ -29,7 +29,7 @@ public class PanelRowMacro implements IMacroRunnable {
 	}
 
 	@Override
-	public String cleanupHTML(String html) {
+	public String cleanupHtml(String html) {
 		return null;
 	}
 }

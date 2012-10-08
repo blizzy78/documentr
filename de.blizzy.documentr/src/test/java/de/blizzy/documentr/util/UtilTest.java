@@ -41,16 +41,16 @@ public class UtilTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	public void toURLPagePath() {
-		assertEquals("x,y,z", Util.toURLPagePath("x/y/z")); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("x,y,z", Util.toURLPagePath("x,y,z")); //$NON-NLS-1$ //$NON-NLS-2$
-		assertNull(Util.toURLPagePath(null));
+	public void toUrlPagePath() {
+		assertEquals("x,y,z", Util.toUrlPagePath("x/y/z")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("x,y,z", Util.toUrlPagePath("x,y,z")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNull(Util.toUrlPagePath(null));
 	}
 	
 	@Test
-	public void simplifyForURL() {
+	public void simplifyForUrl() {
 		assertEquals("changes-for-1-0-x-code-name-wheatley-xl", //$NON-NLS-1$
-				Util.simplifyForURL("Changes For 1.0.x: Code Name \"Wheatley\" (XL)")); //$NON-NLS-1$
+				Util.simplifyForUrl("Changes For 1.0.x: Code Name \"Wheatley\" (XL)")); //$NON-NLS-1$
 	}
 
 	@Test

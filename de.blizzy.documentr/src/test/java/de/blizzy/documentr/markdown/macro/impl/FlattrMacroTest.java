@@ -74,8 +74,8 @@ public class FlattrMacroTest extends AbstractDocumentrTest {
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(PAGE);
-		when(htmlSerializerContext.getPageURI(PAGE)).thenReturn(PAGE_URI);
-		when(htmlSerializerContext.getURL(PAGE_URI)).thenReturn(PAGE_URL);
+		when(htmlSerializerContext.getPageUri(PAGE)).thenReturn(PAGE_URI);
+		when(htmlSerializerContext.getUrl(PAGE_URI)).thenReturn(PAGE_URL);
 		
 		when(systemSettingsStore.getMacroSetting("flattr", "userId")).thenReturn(FLATTR_USER_ID); //$NON-NLS-1$ //$NON-NLS-2$
 		

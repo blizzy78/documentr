@@ -196,7 +196,7 @@ public class SubscriptionStore {
 					emails.add(user.getEmail());
 				}
 			}
-			log.debug("emails subscribed to {}/{}/{}: {}", projectName, branchName, Util.toURLPagePath(path), emails); //$NON-NLS-1$
+			log.debug("emails subscribed to {}/{}/{}: {}", projectName, branchName, Util.toUrlPagePath(path), emails); //$NON-NLS-1$
 			return emails;
 		} finally {
 			Closeables.closeQuietly(repo);

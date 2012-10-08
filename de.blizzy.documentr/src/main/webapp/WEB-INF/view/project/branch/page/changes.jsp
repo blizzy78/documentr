@@ -64,7 +64,7 @@ function showChangesDialog() {
 	var version2 = $('#versions input:radio:checked[name="version2"]').val();
 
 	$.ajax({
-		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toURLPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
+		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -81,14 +81,14 @@ function showChangesDialog() {
 function restoreOldVersion() {
 	var previousCommit = $('#changes-dialog').data('previousCommit');
 	$.ajax({
-		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toURLPagePath(path)}/json"/>',
+		url: '<c:url value="/page/restoreVersion/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'POST',
 		dataType: 'json',
 		data: {
 			version: previousCommit
 		},
 		success: function(result) {
-			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>';
+			window.location.href = '<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>';
 		}
 	});
 }
@@ -123,7 +123,7 @@ $(function() {
 
 </c:if>
 
-<c:set var="pagePathUrl" value="${d:toURLPagePath(pagePath)}"/>
+<c:set var="pagePathUrl" value="${d:toUrlPagePath(pagePath)}"/>
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
@@ -131,7 +131,7 @@ $(function() {
 	<c:set var="hierarchy" value="${d:getPagePathHierarchy(projectName, branchName, path)}"/>
 	<c:forEach var="entry" items="${hierarchy}" varStatus="status">
 		<c:if test="${!status.first}">
-			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toURLPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
+			<li><a href="<c:url value="/page/${projectName}/${branchName}/${d:toUrlPagePath(entry)}"/>"><c:out value="${d:getPageTitle(projectName, branchName, entry)}"/></a> <span class="divider">/</span></li>
 		</c:if>
 	</c:forEach>
 	<li class="active"><spring:message code="title.changes"/></li>
@@ -212,7 +212,7 @@ $(function() {
 			<spring:message code="selectBranchesToCopyChangesInto"/>
 			</p>
 		
-			<form id="cherryPickForm" action="<c:url value="/page/cherryPick/${projectName}/${branchName}/${d:toURLPagePath(path)}"/>" method="POST" class="form-horizontal">
+			<form id="cherryPickForm" action="<c:url value="/page/cherryPick/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>" method="POST" class="form-horizontal">
 				<fieldset>
 					<input type="hidden" name="version1" value=""/>
 					<input type="hidden" name="version2" value=""/>

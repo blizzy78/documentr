@@ -94,7 +94,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		if (thumbnail) {
 			printer.print("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" ") //$NON-NLS-1$
 				.print("rel=\"lightbox[images]\" href=\"") //$NON-NLS-1$
-				.print(context.getAttachmentURI(url)).print("\""); //$NON-NLS-1$
+				.print(context.getAttachmentUri(url)).print("\""); //$NON-NLS-1$
 			
 			if (StringUtils.isNotBlank(title)) {
 				printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -102,7 +102,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			printer.print(">"); //$NON-NLS-1$
 		}
 		
-		printer.print("<img src=\"").print(context.getAttachmentURI(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.print("<img src=\"").print(context.getAttachmentUri(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		if (StringUtils.isNotBlank(altText)) {
 			printer.print(" alt=\"").printEncoded(altText).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -125,7 +125,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		if (!children.isEmpty()) {
 			String text = printChildrenToString(node);
 			if (StringUtils.isNotBlank(text)) {
-				String anchor = Util.simplifyForURL(text);
+				String anchor = Util.simplifyForUrl(text);
 				printer.print("<a name=\"").print(anchor).print("\"></a>"); //$NON-NLS-1$ //$NON-NLS-2$
 				context.addHeader(text, node.getLevel());
 			}

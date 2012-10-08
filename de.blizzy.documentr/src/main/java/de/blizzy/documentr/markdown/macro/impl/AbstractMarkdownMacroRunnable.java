@@ -29,7 +29,7 @@ abstract class AbstractMarkdownMacroRunnable implements IMacroRunnable {
 		String markdown = getMarkdown(macroContext);
 		if (StringUtils.isNotBlank(markdown)) {
 			HtmlSerializerContext context = macroContext.getHtmlSerializerContext();
-			return context.markdownToHTML(markdown);
+			return context.markdownToHtml(markdown);
 		}
 		return null;
 	}
@@ -37,7 +37,7 @@ abstract class AbstractMarkdownMacroRunnable implements IMacroRunnable {
 	abstract String getMarkdown(IMacroContext macroContext);
 	
 	@Override
-	public final String cleanupHTML(String html) {
+	public final String cleanupHtml(String html) {
 		return null;
 	}
 }

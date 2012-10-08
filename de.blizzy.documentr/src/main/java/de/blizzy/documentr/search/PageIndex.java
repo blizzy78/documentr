@@ -262,13 +262,13 @@ public class PageIndex {
 	}
 
 	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
-		String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+		String fullPath = projectName + "/" + branchName + "/" + Util.toUrlPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("indexing page {}", fullPath); //$NON-NLS-1$
 		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
-		text = markdownProcessor.markdownToHTML(text, projectName, branchName, path, authentication, false, null);
+		text = markdownProcessor.markdownToHtml(text, projectName, branchName, path, authentication, false, null);
 		text = removeHtmlTags(text);
 		text = replaceHtmlEntities(text);
 
@@ -355,7 +355,7 @@ public class PageIndex {
 		boolean dirty = false;
 		try {
 			for (String path : paths) {
-				String fullPath = projectName + "/" + branchName + "/" + Util.toURLPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
+				String fullPath = projectName + "/" + branchName + "/" + Util.toUrlPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
 				log.info("deleting page {}", fullPath); //$NON-NLS-1$
 				writer.deleteDocuments(new Term(FULL_PATH, fullPath));
 				dirty = true;

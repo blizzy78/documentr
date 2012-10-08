@@ -84,26 +84,26 @@ public class MarkdownProcessor {
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 
-	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
+	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, String contextPath) {
 		
-		return markdownToHTML(markdown, projectName, branchName, path, authentication, true, contextPath);
+		return markdownToHtml(markdown, projectName, branchName, path, authentication, true, contextPath);
 	}
 	
-	public String markdownToHTML(String markdown, String projectName, String branchName, String path,
+	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		removeHeader(rootNode);
-		return markdownToHTML(rootNode, projectName, branchName, path, authentication, nonCacheableMacros, contextPath);
+		return markdownToHtml(rootNode, projectName, branchName, path, authentication, nonCacheableMacros, contextPath);
 	}
 	
-	public String headerMarkdownToHTML(String markdown, String projectName, String branchName, String path,
+	public String headerMarkdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		extractHeader(rootNode);
-		return markdownToHTML(rootNode, projectName, branchName, path, authentication, true, contextPath);
+		return markdownToHtml(rootNode, projectName, branchName, path, authentication, true, contextPath);
 	}
 
 	private RootNode parse(String markdown) {
@@ -114,7 +114,7 @@ public class MarkdownProcessor {
 		return rootNode;
 	}
 	
-	private String markdownToHTML(RootNode rootNode, String projectName, String branchName, String path,
+	private String markdownToHtml(RootNode rootNode, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
 		
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
@@ -153,7 +153,7 @@ public class MarkdownProcessor {
 				html = StringUtils.replace(html, startMarker + body + endMarker, StringUtils.EMPTY);
 			}
 		}
-		html = cleanupHTML(html, macroInvocations, true);
+		html = cleanupHtml(html, macroInvocations, true);
 		return html;
 	}
 	
@@ -262,12 +262,12 @@ public class MarkdownProcessor {
 					macroRunnable.getHtml(macroContext));
 
 			MacroInvocation invocation = new MacroInvocation(macroName, params);
-			html = cleanupHTML(html, Collections.singletonList(invocation), false);
+			html = cleanupHtml(html, Collections.singletonList(invocation), false);
 		}
 		return html;
 	}
 
-	private String cleanupHTML(String html, List<MacroInvocation> macroInvocations, boolean cacheable) {
+	private String cleanupHtml(String html, List<MacroInvocation> macroInvocations, boolean cacheable) {
 		for (;;) {
 			String newHtml = html;
 			for (Replacement replacement : CLEANUP) {
@@ -279,7 +279,7 @@ public class MarkdownProcessor {
 					IMacroDescriptor macroDescriptor = macro.getDescriptor();
 					if (macroDescriptor.isCacheable() == cacheable) {
 						IMacroRunnable macroRunnable = macro.createRunnable();
-						newHtml = StringUtils.defaultString(macroRunnable.cleanupHTML(newHtml), newHtml);
+						newHtml = StringUtils.defaultString(macroRunnable.cleanupHtml(newHtml), newHtml);
 					}
 				}
 			}

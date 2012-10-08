@@ -58,7 +58,7 @@ public class NeighborsMacro implements IMacroRunnable {
 			
 			if (log.isInfoEnabled()) {
 				log.info("rendering neighbors for page: {}/{}/{}, user: {}", //$NON-NLS-1$
-						projectName, branchName, Util.toURLPagePath(path), htmlSerializerContext.getAuthentication().getName());
+						projectName, branchName, Util.toUrlPagePath(path), htmlSerializerContext.getAuthentication().getName());
 			}
 
 			try {
@@ -82,7 +82,7 @@ public class NeighborsMacro implements IMacroRunnable {
 			if (hasViewPermission(page.getParentPagePath())) {
 				StringBuilder parentBuf = new StringBuilder();
 				Page parentPage = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false);
-				String uri = htmlSerializerContext.getPageURI(page.getParentPagePath());
+				String uri = htmlSerializerContext.getPageUri(page.getParentPagePath());
 				parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(parentPage.getTitle())
 					.append("</a>") //$NON-NLS-1$
@@ -123,7 +123,7 @@ public class NeighborsMacro implements IMacroRunnable {
 	}
 
 	private CharSequence printActiveLinkListItem(String path, String title) throws IOException {
-		String uri = htmlSerializerContext.getPageURI(path);
+		String uri = htmlSerializerContext.getPageUri(path);
 		StringBuilder buf = new StringBuilder();
 		buf.append("<li class=\"active\"><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 			.append(title)
@@ -136,7 +136,7 @@ public class NeighborsMacro implements IMacroRunnable {
 	private CharSequence printRegularLinkListItem(String path, String title) {
 		StringBuilder buf = new StringBuilder();
 		if (hasViewPermission(path)) {
-			String uri = htmlSerializerContext.getPageURI(path);
+			String uri = htmlSerializerContext.getPageUri(path);
 			buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 				.append(title)
 				.append("</a></li>"); //$NON-NLS-1$
@@ -163,7 +163,7 @@ public class NeighborsMacro implements IMacroRunnable {
 	}
 	
 	@Override
-	public String cleanupHTML(String html) {
+	public String cleanupHtml(String html) {
 		return null;
 	}
 }

@@ -57,7 +57,7 @@ public class PageRendererTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getHtml() throws IOException {
-		when(markdownProcessor.markdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
+		when(markdownProcessor.markdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
 			.thenReturn(HTML); 
 		
 		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
@@ -66,7 +66,7 @@ public class PageRendererTest extends AbstractDocumentrTest {
 
 	@Test
 	public void getHeaderHtml() throws IOException {
-		when(markdownProcessor.headerMarkdownToHTML(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
+		when(markdownProcessor.headerMarkdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
 			.thenReturn(HTML);
 		
 		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);

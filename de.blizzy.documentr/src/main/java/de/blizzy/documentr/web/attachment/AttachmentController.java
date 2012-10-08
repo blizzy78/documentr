@@ -161,7 +161,7 @@ public class AttachmentController {
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);
 		
 		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(pagePath);
+			Util.toUrlPagePath(pagePath);
 	}
 
 	@RequestMapping(value="/delete/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -176,6 +176,6 @@ public class AttachmentController {
 		User user = userStore.getUser(authentication.getName());
 		pageStore.deleteAttachment(projectName, branchName, Util.toRealPagePath(pagePath), name, user);
 		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(pagePath);
+			Util.toUrlPagePath(pagePath);
 	}
 }

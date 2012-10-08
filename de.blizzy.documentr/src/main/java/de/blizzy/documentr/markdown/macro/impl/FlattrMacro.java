@@ -49,8 +49,8 @@ public class FlattrMacro implements IMacroRunnable {
 				String projectName = htmlSerializerContext.getProjectName();
 				String branchName = htmlSerializerContext.getBranchName();
 				String path = htmlSerializerContext.getPagePath();
-				String pageURI = htmlSerializerContext.getPageURI(path);
-				String pageURL = htmlSerializerContext.getURL(pageURI);
+				String pageUri = htmlSerializerContext.getPageUri(path);
+				String pageUrl = htmlSerializerContext.getUrl(pageUri);
 				IPageStore pageStore = htmlSerializerContext.getPageStore();
 				Page page = pageStore.getPage(projectName, branchName, path, false);
 				String title = page.getTitle();
@@ -58,7 +58,7 @@ public class FlattrMacro implements IMacroRunnable {
 				// http://developers.flattr.net/auto-submit/
 				UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://flattr.com/submit/auto") //$NON-NLS-1$
 					.queryParam("user_id", userId) //$NON-NLS-1$
-					.queryParam("url", pageURL) //$NON-NLS-1$
+					.queryParam("url", pageUrl) //$NON-NLS-1$
 					.queryParam("title", title) //$NON-NLS-1$
 					.queryParam("category", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (StringUtils.isNotBlank(tags)) {
@@ -77,7 +77,7 @@ public class FlattrMacro implements IMacroRunnable {
 	}
 
 	@Override
-	public String cleanupHTML(String html) {
+	public String cleanupHtml(String html) {
 		return null;
 	}
 }

@@ -82,17 +82,17 @@ public class GoogleDocsMacro implements IMacroRunnable {
 	}
 
 	private String buildIframe(UriComponents components) {
-		String url = toURL(components);
+		String url = toUrl(components);
 		return "<iframe class=\"googledocs-document\" src=\"" + url + "\" " + //$NON-NLS-1$ //$NON-NLS-2$
 				"allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>"; //$NON-NLS-1$
 	}
 
 	private String buildImg(UriComponents components) {
-		String url = toURL(components);
+		String url = toUrl(components);
 		return "<img src=\"" + url + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private String toURL(UriComponents components) {
+	private String toUrl(UriComponents components) {
 		try {
 			return components.encode(Charsets.UTF_8.name()).toUriString();
 		} catch (UnsupportedEncodingException e) {
@@ -101,7 +101,7 @@ public class GoogleDocsMacro implements IMacroRunnable {
 	}
 
 	@Override
-	public String cleanupHTML(String html) {
+	public String cleanupHtml(String html) {
 		return null;
 	}
 }

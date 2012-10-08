@@ -135,7 +135,7 @@ public final class Functions {
 		return userStore.listUsers();
 	}
 	
-	public static String getPageHTML(String projectName, String branchName, String path) throws IOException {
+	public static String getPageHtml(String projectName, String branchName, String path) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		String contextPath = request.getContextPath();
@@ -144,7 +144,7 @@ public final class Functions {
 				contextPath);
 	}
 
-	public static String getPageHeaderHTML(String projectName, String branchName, String path) throws IOException {
+	public static String getPageHeaderHtml(String projectName, String branchName, String path) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		String contextPath = request.getContextPath();

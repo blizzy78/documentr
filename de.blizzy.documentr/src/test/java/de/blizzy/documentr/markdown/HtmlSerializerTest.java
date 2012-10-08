@@ -71,7 +71,7 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void printImageTag() {
-		when(context.getAttachmentURI("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png")), null, new TextNode(StringUtils.EMPTY)); //$NON-NLS-1$
@@ -85,7 +85,7 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void printImageTagWithAltText() {
-		when(context.getAttachmentURI("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png")), null, new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -99,7 +99,7 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void printImageTagAsThumbnail() {
-		when(context.getAttachmentURI("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png | thumbnail")), null, new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -114,7 +114,7 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void printImageTagWithTitle() {
-		when(context.getAttachmentURI("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		ExpImageNode node = new ExpImageNode("title", "url", new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String html = htmlSerializer.toHtml(root(node));

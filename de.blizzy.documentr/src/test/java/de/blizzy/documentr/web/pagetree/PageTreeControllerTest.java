@@ -132,7 +132,7 @@ public class PageTreeControllerTest {
 			@Override
 			public String apply(PageTreeNode node) {
 				return node.getProjectName() + "/" + node.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
-						Util.toURLPagePath(node.getPath()) + "/" + node.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
+						Util.toUrlPagePath(node.getPath()) + "/" + node.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
 						node.isHasBranchPermissions();
 			}
 		};
@@ -167,7 +167,7 @@ public class PageTreeControllerTest {
 			public String apply(AbstractTreeNode node) {
 				PageTreeNode n = (PageTreeNode) node;
 				return n.getProjectName() + "/" + n.getBranchName() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
-						Util.toURLPagePath(n.getPath()) + "/" + n.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
+						Util.toUrlPagePath(n.getPath()) + "/" + n.getTitle() + "/" + //$NON-NLS-1$ //$NON-NLS-2$
 						n.isHasBranchPermissions();
 			}
 		};

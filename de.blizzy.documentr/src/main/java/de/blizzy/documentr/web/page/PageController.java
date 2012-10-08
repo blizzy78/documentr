@@ -230,7 +230,7 @@ public class PageController {
 		Page page = Page.fromText(form.getTitle(), form.getText());
 		String path = form.getPath();
 		if (StringUtils.isBlank(path)) {
-			path = parentPagePath + "/" + Util.simplifyForURL(form.getTitle()); //$NON-NLS-1$
+			path = parentPagePath + "/" + Util.simplifyForUrl(form.getTitle()); //$NON-NLS-1$
 		}
 		page.setTags(Sets.newHashSet(form.getTags()));
 		page.setViewRestrictionRole(StringUtils.isNotBlank(form.getViewRestrictionRole()) ?
@@ -270,7 +270,7 @@ public class PageController {
 		}
 
 		return "redirect:/page/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toURLPagePath(path);
+			Util.toUrlPagePath(path);
 	}
 	
 	@ModelAttribute
@@ -300,7 +300,7 @@ public class PageController {
 	public Map<String, Object> generateName(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String parentPagePath, @RequestParam String title) throws IOException {
 
-		String name = Util.simplifyForURL(title);
+		String name = Util.simplifyForUrl(title);
 		String path = Util.toRealPagePath(parentPagePath) + "/" + name; //$NON-NLS-1$
 		boolean pageExists = false;
 		try {
@@ -316,18 +316,18 @@ public class PageController {
 		return result;
 	}
 
-	@RequestMapping(value="/markdownToHTML/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+	@RequestMapping(value="/markdownToHtml/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	@PreAuthorize("isAuthenticated()")
-	public Map<String, String> markdownToHTML(@PathVariable String projectName, @PathVariable String branchName,
+	public Map<String, String> markdownToHtml(@PathVariable String projectName, @PathVariable String branchName,
 			@RequestParam String markdown, @RequestParam(required=false) String pagePath, Authentication authentication,
 			HttpServletRequest request) {
 
 		String contextPath = request.getContextPath();
 		Map<String, String> result = new HashMap<String, String>();
-		String html = markdownProcessor.markdownToHTML(markdown, projectName, branchName, pagePath, authentication,
+		String html = markdownProcessor.markdownToHtml(markdown, projectName, branchName, pagePath, authentication,
 				contextPath);
 		html = markdownProcessor.processNonCacheableMacros(html, projectName, branchName, pagePath, authentication,
 				contextPath);
@@ -350,7 +350,7 @@ public class PageController {
 		User user = userStore.getUser(authentication.getName());
 		pageStore.savePage(projectName, targetBranchName, path, page, null, user);
 		return "redirect:/page/edit/" + projectName + "/" + targetBranchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Util.toURLPagePath(path);
+				Util.toUrlPagePath(path);
 	}
 
 	@RequestMapping(value="/delete/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -384,7 +384,7 @@ public class PageController {
 		pageStore.relocatePage(projectName, branchName, path, newParentPagePath, user);
 		String pageName = path.contains("/") ? StringUtils.substringAfterLast(path, "/") : path; //$NON-NLS-1$ //$NON-NLS-2$
 		return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
-				"/" + Util.toURLPagePath(newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
+				"/" + Util.toUrlPagePath(newParentPagePath + "/" + pageName); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@RequestMapping(value="/markdown/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -557,7 +557,7 @@ public class PageController {
 			
 			if (allOk) {
 				return "redirect:/page/" + projectName + "/" + branchName + //$NON-NLS-1$ //$NON-NLS-2$
-						"/" + Util.toURLPagePath(path); //$NON-NLS-1$
+						"/" + Util.toUrlPagePath(path); //$NON-NLS-1$
 			}
 		}
 		

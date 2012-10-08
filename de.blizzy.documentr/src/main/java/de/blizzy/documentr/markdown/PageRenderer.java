@@ -48,12 +48,12 @@ class PageRenderer implements IPageRenderer {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} for user {}", //$NON-NLS-1$
-					projectName, branchName, Util.toURLPagePath(path), authentication.getName());
+					projectName, branchName, Util.toUrlPagePath(path), authentication.getName());
 		}
 		
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.markdownToHTML(markdown, projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, path, authentication, contextPath);
 	}
 
 	@Override
@@ -62,11 +62,11 @@ class PageRenderer implements IPageRenderer {
 
 		if (log.isInfoEnabled()) {
 			log.info("rendering page {}/{}/{} header for user {}", //$NON-NLS-1$
-					projectName, branchName, Util.toURLPagePath(path), authentication.getName());
+					projectName, branchName, Util.toUrlPagePath(path), authentication.getName());
 		}
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.headerMarkdownToHTML(markdown, projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.headerMarkdownToHtml(markdown, projectName, branchName, path, authentication, contextPath);
 	}
 }
