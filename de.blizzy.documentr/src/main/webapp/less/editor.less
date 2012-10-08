@@ -15,25 +15,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro.impl;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+.editor-wrapper {
+	height: 450px;
+	position: relative;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
 
-import de.blizzy.documentr.markdown.macro.IMacroContext;
-import de.blizzy.documentr.markdown.macro.IMacroRunnable;
-import de.blizzy.documentr.markdown.macro.Macro;
-
-@Macro(name="color", insertText="{{color COLOR}}[TEXT]{{/color}}")
-public class ColorMacro implements IMacroRunnable {
-	@Override
-	public String getHtml(IMacroContext macroContext) {
-		String color = macroContext.getParameters();
-		return "<span style=\"color: " + StringEscapeUtils.escapeHtml4(color) + ";\">" + //$NON-NLS-1$ //$NON-NLS-2$
-				macroContext.getBody() + "</span>"; //$NON-NLS-1$
-	}
-
-	@Override
-	public String cleanupHtml(String html) {
-		return null;
+#editor {
+	left: 0px;
+	top: 0px;
+	bottom: 1px;
+	right: 1px;
+	background: white;
+	font-family: "Bitstream Vera Sans Mono", Menlo, Monaco, Consolas, "Courier New", "Lucida Console", monospace;
+	font-size: 12px;
+	
+	.ace_marker-layer {
+		.ace_active_line {
+			background: #e8f2fe;
+		}
 	}
 }

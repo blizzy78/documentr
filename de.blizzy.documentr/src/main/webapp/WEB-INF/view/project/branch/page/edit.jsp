@@ -42,14 +42,15 @@ var allTagsLoaded = false;
 function togglePreview() {
 	var previewEl = $('#preview');
 	if (previewEl.length === 0) {
-		var textEl = $('#pageForm').find('#text');
+		var el = $('.editor-wrapper');
+		var text = $('#editor').data('editor').getValue();
 		$.ajax({
 			url: '<c:url value="/page/markdownToHtml/${pageForm.projectName}/${pageForm.branchName}/json"/>',
 			type: 'POST',
 			dataType: 'json',
 			data: {
 				pagePath: '<c:out value="${hierarchyPagePath}"/>',
-				markdown: textEl.val()
+				markdown: text
 			},
 			success: function(result) {
 				$('#textEditorToolbar a').each(function() {
@@ -62,10 +63,10 @@ function togglePreview() {
 				$(document.body).append(previewEl);
 				prettyPrint();
 				previewEl
-					.css('left', textEl.offset().left)
-					.css('top', textEl.offset().top)
-					.css('width', textEl.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
-					.css('height', textEl.outerHeight() - (previewEl.outerHeight() - previewEl.height()))
+					.css('left', el.offset().left)
+					.css('top', el.offset().top)
+					.css('width', el.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
+					.css('height', el.outerHeight() - (previewEl.outerHeight() - previewEl.height()))
 					.slideToggle('fast');
 			}
 		});
@@ -81,47 +82,63 @@ function togglePreview() {
 }
 
 function toggleStyleBold() {
-	var textEl = $('#text');
-	var start = textEl[0].selectionStart;
-	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	var isBold = (start >= 2) && (end <= (text.length - 2)) &&
-		(text.substring(start - 2, start) === '**') &&
-		(text.substring(end, end + 2) === '**');
-	if (!isBold) {
-		text = text.substring(0, start) + '**' + text.substring(start, end) + '**' + text.substring(end);
-		start = start + 2;
-		end = end + 2;
+	var editor = $('#editor').data('editor');
+	var origRange = editor.getSelectionRange();
+	var lenBefore = editor.session.getTextRange(origRange).length;
+	editor.selection.shiftSelection(!editor.selection.isBackwards() ? -2 : 2);
+	if (!editor.selection.isBackwards()) {
+		for (var i = 1; i <= 4; i++) {
+			editor.selection.selectRight();
+		}
 	} else {
-		text = text.substring(0, start - 2) + text.substring(start, end) + text.substring(end + 2);
-		start = start - 2;
-		end = end - 2;
+		for (var i = 1; i <= 4; i++) {
+			editor.selection.selectLeft();
+		}
 	}
-	textEl.val(text);
-	textEl[0].setSelectionRange(start, end);
-	textEl.focus();
+	var text = editor.session.getTextRange(editor.getSelectionRange());
+	var lenAfter = text.length;
+	if ((lenAfter - lenBefore) === 4) {
+		var isBold = (text.substring(0, 2) === '**') && (text.substring(text.length - 2, text.length) === '**');
+		var origText = editor.session.getTextRange(origRange);
+		if (!isBold) {
+			editor.session.replace(origRange, '**' + origText + '**');
+		} else {
+			editor.session.replace(editor.getSelectionRange(), origText);
+		}
+		editor.selection.setSelectionRange(origRange);
+		editor.selection.shiftSelection(!isBold ? 2 : -2);
+		editor.focus();
+	}
 }
 
 function toggleStyleItalic() {
-	var textEl = $('#text');
-	var start = textEl[0].selectionStart;
-	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	var isItalic = (start >= 1) && (end <= (text.length - 1)) &&
-		(text.substring(start - 1, start) === '*') &&
-		(text.substring(end, end + 1) === '*');
-	if (!isItalic) {
-		text = text.substring(0, start) + '*' + text.substring(start, end) + '*' + text.substring(end);
-		start++;
-		end++;
+	var editor = $('#editor').data('editor');
+	var origRange = editor.getSelectionRange();
+	var lenBefore = editor.session.getTextRange(origRange).length;
+	editor.selection.shiftSelection(!editor.selection.isBackwards() ? -1 : 1);
+	if (!editor.selection.isBackwards()) {
+		for (var i = 1; i <= 2; i++) {
+			editor.selection.selectRight();
+		}
 	} else {
-		text = text.substring(0, start - 1) + text.substring(start, end) + text.substring(end + 1);
-		start--;
-		end--;
+		for (var i = 1; i <= 2; i++) {
+			editor.selection.selectLeft();
+		}
 	}
-	textEl.val(text);
-	textEl[0].setSelectionRange(start, end);
-	textEl.focus();
+	var text = editor.session.getTextRange(editor.getSelectionRange());
+	var lenAfter = text.length;
+	if ((lenAfter - lenBefore) === 2) {
+		var isItalic = (text.substring(0, 1) === '*') && (text.substring(text.length - 1, text.length) === '*');
+		var origText = editor.session.getTextRange(origRange);
+		if (!isItalic) {
+			editor.session.replace(origRange, '*' + origText + '*');
+		} else {
+			editor.session.replace(editor.getSelectionRange(), origText);
+		}
+		editor.selection.setSelectionRange(origRange);
+		editor.selection.shiftSelection(!isItalic ? 1 : -1);
+		editor.focus();
+	}
 }
 
 function insertMacro(insertText) {
@@ -130,21 +147,32 @@ function insertMacro(insertText) {
 	}
 	var selectionStart = insertText.indexOf('[');
 	var selectionEnd = insertText.indexOf(']') - 1;
-	insertText = insertText.replace(/\[/, '').replace(/\]/, '');
-	var textEl = $('#text');
-	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	text = text.substring(0, end) + insertText + text.substring(end);
-	textEl.val(text);
-	textEl[0].setSelectionRange(end + selectionStart, end + selectionEnd);
-	textEl.focus();
+	insertText = insertText.replace(/\[/g, '').replace(/\]/g, '');
+	var len = insertText.length;
+	var editor = $('#editor').data('editor');
+	var range = editor.getSelectionRange();
+	var selectedText = editor.session.getTextRange(range);
+	if (selectedText === '') {
+		selectedText = insertText.substring(selectionStart, selectionEnd);
+	}
+	var newText = insertText.substring(0, selectionStart) + selectedText + insertText.substring(selectionEnd);
+	editor.session.replace(editor.getSelectionRange(), newText);
+	editor.selection.setSelectionRange(range);
+	editor.selection.shiftSelection(selectionStart);
+	if (editor.selection.isEmpty()) {
+		for (var i = 0; i < selectedText.length; i++) {
+			editor.selection.selectRight();
+		}
+	}
+	editor.focus();
 }
 
 function toggleFullscreen() {
 	$('#titleFieldset, #pathFieldset, #textLabel, #tagsFieldset, #viewRestrictionRoleFieldset').toggle();
-	var textEl = $('#text');
-	var rows = textEl.attr('rows');
-	textEl.attr('rows', (rows == 30) ? '20' : '30');
+	var editorWrapperEl = $('.editor-wrapper');
+	var height = editorWrapperEl.outerHeight();
+	editorWrapperEl.css('height', height < 500 ? '575px' : '450px');
+	$('#editor').data('editor').resize();
 }
 
 function showMarkdownHelp() {
@@ -169,11 +197,8 @@ function updateInsertLinkButton() {
 }
 
 function openInsertLinkDialog() {
-	var textEl = $('#text');
-	var start = textEl[0].selectionStart;
-	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	var linkText = text.substring(start, end);
+	var editor = $('#editor').data('editor');
+	var linkText = editor.session.getTextRange(editor.getSelectionRange());
 	$('#insert-attachment-link-text, #insert-page-link-text, #insert-static-page-link-text, #insert-link-dialog input[name="externalLinkText"]')
 		.val(linkText);
 	$('#insert-link-dialog input[name="externalLinkUrl"]').val('');
@@ -295,16 +320,17 @@ function insertLink() {
 		link = url;
 	}
 
-	var textEl = $('#text');
-	var start = textEl[0].selectionStart;
-	var end = textEl[0].selectionEnd;
-	var text = textEl.val();
-	text = text.substring(0, start) + '[[' + link + ' ' + linkText + ']]' + text.substring(end);
-	start = start + link.length + 3;
-	end = start + linkText.length;
-	textEl.val(text);
-	textEl[0].setSelectionRange(start, end);
-	textEl.focus();
+	var text = '[[' + link + ' ' + linkText + ']]';
+	var editor = $('#editor').data('editor');
+	editor.session.replace(editor.getSelectionRange(), text);
+	editor.selection.clearSelection();
+	for (var i = 0; i < (text.length - link.length - 3); i++) {
+		editor.selection.moveCursorLeft();
+	}
+	for (var i = 0; i < linkText.length; i++) {
+		editor.selection.selectRight();
+	}
+	editor.focus();
 }
 
 function updateInsertImageButton() {
@@ -359,15 +385,18 @@ function insertImage() {
 	if (thumbnail) {
 		linkedImage = linkedImage + ' | thumb';
 	}
-	var textEl = $('#text');
-	var start = textEl[0].selectionStart;
-	var text = textEl.val();
-	text = text.substring(0, start) + '![' + altText + '](' + linkedImage + ')' + text.substring(start);
-	start = start + 2;
-	var end = start + altText.length;
-	textEl.val(text);
-	textEl[0].setSelectionRange(start, end);
-	textEl.focus();
+
+	var text = '![' + altText + '](' + linkedImage + ')';
+	var editor = $('#editor').data('editor');
+	editor.selection.clearSelection();
+	editor.insert(text);
+	for (var i = 0; i < (text.length - 2); i++) {
+		editor.selection.moveCursorLeft();
+	}
+	for (var i = 0; i < altText.length; i++) {
+		editor.selection.selectRight();
+	}
+	editor.focus();
 }
 
 function addTag(tag) {
@@ -443,6 +472,12 @@ function hookTags() {
 			deleteTag(e.data.tag);
 		});
 	});
+}
+
+function prepareForm() {
+	var text = $('#editor').data('editor').getValue();
+	$('#pageForm input[name="text"]').val(text);
+	return true;
 }
 
 $(function() {
@@ -521,6 +556,18 @@ $(function() {
 		});
 	
 	hookTags();
+	
+	var editor = ace.edit('editor');
+	$('#editor').data('editor', editor);
+	editor.setTheme('ace/theme/chrome');
+	editor.session.setMode('ace/mode/markdown');
+	editor.setDisplayIndentGuides(true);
+	editor.renderer.setShowGutter(false);
+	editor.session.setUseWrapMode(true);
+	editor.session.setWrapLimitRange(null, null);
+	editor.renderer.setShowPrintMargin(false);
+	editor.session.setUseSoftTabs(false);
+	editor.setHighlightSelectedWord(false);
 });
 
 </dt:headerJS>
@@ -546,7 +593,7 @@ $(function() {
 
 <p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
-<form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal">
+<form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="prepareForm()">
 	<c:set var="errorText"><form:errors cssClass="text-error"/></c:set>
 	<c:if test="${mergeConflict}">
 		<p class="text-error"><spring:message code="conflictExists"/></p>
@@ -560,6 +607,7 @@ $(function() {
 		</c:forEach>
 		<form:hidden path="parentPageSplitRangeStart"/>
 		<form:hidden path="parentPageSplitRangeEnd"/>
+		<input type="hidden" name="text"/>
 		
 		<c:set var="errorText"><form:errors path="title"/></c:set>
 		<div id="titleFieldset" class="control-group <c:if test="${!empty errorText}">error</c:if>">
@@ -612,7 +660,9 @@ $(function() {
 						<a href="javascript:showMarkdownHelp();" class="btn" title="<spring:message code="button.showFormattingHelp"/>"><i class="icon-question-sign"></i></a>
 					</div>
 				</div>
-				<form:textarea id="text" path="text" cssClass="span11 code" rows="20"/>
+				<div class="editor-wrapper">
+					<!--__NOTRIM__--><div id="editor"><c:out value="${pageForm.text}"/></div><!--__/NOTRIM__-->
+				</div>
 			</div>
 		</div>
 		<div id="tagsFieldset" class="control-group">
