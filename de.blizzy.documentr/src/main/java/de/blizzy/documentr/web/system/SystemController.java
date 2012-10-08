@@ -100,7 +100,7 @@ public class SystemController {
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
-	public String saveSystemSettings(@ModelAttribute @Valid SystemSettingsForm form, BindingResult bindingResult,
+	public String saveSettings(@ModelAttribute @Valid SystemSettingsForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
 
 		if (bindingResult.hasErrors()) {
