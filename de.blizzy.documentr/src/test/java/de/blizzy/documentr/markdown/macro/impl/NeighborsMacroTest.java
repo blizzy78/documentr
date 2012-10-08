@@ -43,7 +43,6 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
-import de.blizzy.documentr.markdown.macro.impl.NeighborsMacro;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.TestPageUtil;
@@ -143,7 +142,7 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")
 		String html =
-				"<ul class=\"well well-small nav nav-list pull-right\">" +
+				"<ul class=\"well well-small nav nav-list neighbors pull-right\">" +
 					"<li>" +
 						"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "\">" + DocumentrConstants.HOME_PAGE_NAME + "</a>" +
 						"<ul class=\"nav nav-list\">" +

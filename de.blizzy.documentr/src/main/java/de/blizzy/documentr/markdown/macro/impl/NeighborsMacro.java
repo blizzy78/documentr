@@ -63,7 +63,7 @@ public class NeighborsMacro implements IMacroRunnable {
 
 			try {
 				StringBuilder buf = new StringBuilder();
-				buf.append("<ul class=\"well well-small nav nav-list pull-right\">") //$NON-NLS-1$
+				buf.append("<ul class=\"well well-small nav nav-list neighbors pull-right\">") //$NON-NLS-1$
 					.append(printParent(printLinkListItem(path), path))
 					.append("</ul>"); //$NON-NLS-1$
 				return buf.toString();
