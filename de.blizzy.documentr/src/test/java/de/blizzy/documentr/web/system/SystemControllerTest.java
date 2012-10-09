@@ -58,6 +58,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 	private static final String MAIL_SUBJECT_PREFIX = "mailSubjectPrefix"; //$NON-NLS-1$
 	private static final String MAIL_DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
 	private static final int BCRYPT_ROUNDS = 234;
+	private static final String PAGE_FOOTER_HTML = "pageFooterHtml"; //$NON-NLS-1$
 	
 	@Mock
 	private SystemSettingsStore systemSettingsStore;
@@ -101,6 +102,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		settings.put(SystemSettingsStore.MAIL_SUBJECT_PREFIX, MAIL_SUBJECT_PREFIX); 
 		settings.put(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE, MAIL_DEFAULT_LANGUAGE);
 		settings.put(SystemSettingsStore.BCRYPT_ROUNDS, "234"); //$NON-NLS-1$
+		settings.put(SystemSettingsStore.PAGE_FOOTER_HTML, PAGE_FOOTER_HTML);
 		when(systemSettingsStore.getSettings()).thenReturn(settings);
 		
 		Model model = mock(Model.class);
@@ -119,6 +121,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		assertEquals(MAIL_SUBJECT_PREFIX, form.getMailSubjectPrefix()); 
 		assertEquals(MAIL_DEFAULT_LANGUAGE, form.getMailDefaultLanguage());
 		assertEquals(234, form.getBcryptRounds());
+		assertEquals(PAGE_FOOTER_HTML, form.getPageFooterHtml());
 		assertEquals("macroValue1", form.getMacroSettings().get("macro1").get("key1")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("macroValue2", form.getMacroSettings().get("macro2").get("key2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
@@ -141,7 +144,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		macroSettings.put("key2", "macroValue2"); //$NON-NLS-1$ //$NON-NLS-2$
 		allMacroSettings.put("macro2", macroSettings); //$NON-NLS-1$
 		SystemSettingsForm form = new SystemSettingsForm(DOCUMENTR_HOST, SITE_NOTICE, MAIL_HOST_NAME, 123, MAIL_SENDER_EMAIL,
-				MAIL_SENDER_NAME, MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, 234, allMacroSettings);
+				MAIL_SENDER_NAME, MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, 234, PAGE_FOOTER_HTML, allMacroSettings);
 		
 		String view = systemController.saveSettings(form, bindingResult, authentication);
 		assertEquals("/system/edit", removeViewPrefix(view)); //$NON-NLS-1$
@@ -157,6 +160,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		settings.put(SystemSettingsStore.MAIL_SUBJECT_PREFIX, MAIL_SUBJECT_PREFIX); 
 		settings.put(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE, MAIL_DEFAULT_LANGUAGE);
 		settings.put(SystemSettingsStore.BCRYPT_ROUNDS, "234"); //$NON-NLS-1$
+		settings.put(SystemSettingsStore.PAGE_FOOTER_HTML, PAGE_FOOTER_HTML);
 		verify(systemSettingsStore).saveSettings(settings, user);
 		
 		macroSettings = Maps.newTreeMap();
@@ -178,7 +182,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 
 		SystemSettingsForm form = systemController.createSystemSettingsForm(DOCUMENTR_HOST,
 				SITE_NOTICE, MAIL_HOST_NAME, Integer.valueOf(123), MAIL_SENDER_EMAIL, MAIL_SENDER_NAME,
-				MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, Integer.valueOf(234), request);
+				MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, Integer.valueOf(234), PAGE_FOOTER_HTML, request);
 		assertEquals(DOCUMENTR_HOST, form.getDocumentrHost()); 
 		assertEquals(SITE_NOTICE, form.getSiteNotice()); 
 		assertEquals(MAIL_HOST_NAME, form.getMailHostName()); 
@@ -188,6 +192,7 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		assertEquals(MAIL_SUBJECT_PREFIX, form.getMailSubjectPrefix()); 
 		assertEquals(MAIL_DEFAULT_LANGUAGE, form.getMailDefaultLanguage());
 		assertEquals(BCRYPT_ROUNDS, form.getBcryptRounds());
+		assertEquals(PAGE_FOOTER_HTML, form.getPageFooterHtml());
 		assertEquals("macroValue1", form.getMacroSettings().get("macro1").get("key1")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("macroValue2", form.getMacroSettings().get("macro2").get("key2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

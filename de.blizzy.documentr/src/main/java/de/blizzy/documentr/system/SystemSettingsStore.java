@@ -64,6 +64,7 @@ public class SystemSettingsStore implements Lifecycle {
 	public static final String MAIL_SUBJECT_PREFIX = "mail.subject.prefix"; //$NON-NLS-1$
 	public static final String MAIL_DEFAULT_LANGUAGE = "mail.defaultLanguage"; //$NON-NLS-1$
 	public static final String BCRYPT_ROUNDS = "bcrypt.rounds"; //$NON-NLS-1$
+	public static final String PAGE_FOOTER_HTML = "page.footerHtml"; //$NON-NLS-1$
 	
 	private static final String REPOSITORY_NAME = "_system"; //$NON-NLS-1$
 	private static final String SETTINGS_FILE_NAME = "settings"; //$NON-NLS-1$

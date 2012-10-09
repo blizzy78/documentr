@@ -74,6 +74,7 @@ public class SystemController {
 				settings.get(SystemSettingsStore.MAIL_SUBJECT_PREFIX),
 				settings.get(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE),
 				Integer.parseInt(settings.get(SystemSettingsStore.BCRYPT_ROUNDS)),
+				settings.get(SystemSettingsStore.PAGE_FOOTER_HTML),
 				allMacroSettings);
 		model.addAttribute("systemSettingsForm", form); //$NON-NLS-1$
 		return "/system/edit"; //$NON-NLS-1$
@@ -123,6 +124,7 @@ public class SystemController {
 		settings.put(SystemSettingsStore.MAIL_SUBJECT_PREFIX, form.getMailSubjectPrefix());
 		settings.put(SystemSettingsStore.MAIL_DEFAULT_LANGUAGE, form.getMailDefaultLanguage());
 		settings.put(SystemSettingsStore.BCRYPT_ROUNDS, String.valueOf(form.getBcryptRounds()));
+		settings.put(SystemSettingsStore.PAGE_FOOTER_HTML, form.getPageFooterHtml());
 		systemSettingsStore.saveSettings(settings, user);
 		
 		for (Map.Entry<String, SortedMap<String, String>> entry : form.getMacroSettings().entrySet()) {
@@ -143,6 +145,7 @@ public class SystemController {
 			@RequestParam(required=false) String mailSubjectPrefix,
 			@RequestParam(required=false) String mailDefaultLanguage,
 			@RequestParam(required=false) Integer bcryptRounds,
+			@RequestParam(required=false) String pageFooterHtml,
 			WebRequest webRequest) {
 		
 		SortedMap<String, SortedMap<String, String>> allMacroSettings = getMacroSettingsFromRequest(webRequest);
@@ -156,6 +159,7 @@ public class SystemController {
 				Strings.emptyToNull(mailSubjectPrefix),
 				Strings.emptyToNull(mailDefaultLanguage),
 				(bcryptRounds != null) ? bcryptRounds.intValue() : Integer.MIN_VALUE,
+				Strings.emptyToNull(pageFooterHtml),
 				allMacroSettings);
 	}
 

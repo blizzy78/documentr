@@ -51,9 +51,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<c:set var="errorText"><form:errors path="siteNotice"/></c:set>
 		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="siteNotice" cssClass="control-label"><spring:message code="label.siteNotice"/>:</form:label>
-			<form:input path="siteNotice" cssClass="input-xlarge"/>
+			<form:input path="siteNotice" cssClass="input-xxlarge"/>
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 			<span class="help-block"><spring:message code="siteNoticeHelp"/></span>
+		</div>
+		<c:set var="errorText"><form:errors path="pageFooterHtml"/></c:set>
+		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
+			<form:label path="pageFooterHtml" cssClass="control-label"><spring:message code="label.pageFooterHtml"/>:</form:label>
+			<form:textarea path="pageFooterHtml" cssClass="input-xxlarge" rows="6"/>
+			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
+			<span class="help-block"><spring:message code="pageFooterHtmlHelp"/></span>
 		</div>
 	</fieldset>
 	
