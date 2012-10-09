@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-collapse.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-transition.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/google-code-prettify-20110601/prettify.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/ace-1.0.0/ace.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <body id="#top" class="markdown-help">
@@ -72,8 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><strong>Fett</strong></td>
-									<td><code>**Fett**</code></td>
+									<td width="50%"><strong>Fett</strong></td>
+									<td width="50%"><code>**Fett**</code></td>
 								</tr>
 								<tr>
 									<td><em>Kursiv</em></td>
@@ -106,8 +106,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><strong>Bold</strong></td>
-									<td><code>**Bold**</code></td>
+									<td width="50%"><strong>Bold</strong></td>
+									<td width="50%"><code>**Bold**</code></td>
 								</tr>
 								<tr>
 									<td><em>Italic</em></td>
@@ -156,8 +156,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><a href="http://www.example.com">http://www.example.com</a></td>
-									<td><code>http://www.example.com</code><em class="alternative">oder</em><code>[[http://www.example.com]]</code></td>
+									<td width="50%"><a href="http://www.example.com">http://www.example.com</a></td>
+									<td width="50%"><code>http://www.example.com</code><em class="alternative">oder</em><code>[[http://www.example.com]]</code></td>
 								</tr>
 								<tr>
 									<td><a href="http://www.example.com">Gehe zu www.example.com</a></td>
@@ -190,8 +190,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><a href="http://www.example.com">http://www.example.com</a></td>
-									<td><code>http://www.example.com</code><em class="alternative">or</em><code>[[http://www.example.com]]</code></td>
+									<td width="50%"><a href="http://www.example.com">http://www.example.com</a></td>
+									<td width="50%"><code>http://www.example.com</code><em class="alternative">or</em><code>[[http://www.example.com]]</code></td>
 								</tr>
 								<tr>
 									<td><a href="http://www.example.com">Go to www.example.com</a></td>
@@ -302,12 +302,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><code>Quellcode im Fließtext</code></td>
-									<td><code>`Quellcode im Fließtext`</code></td>
+									<td width="50%"><code>Quellcode im Fließtext</code></td>
+									<td width="50%"><code>`Quellcode im Fließtext`</code></td>
 								</tr>
 								<tr>
-									<td><pre class="pre-scrollable prettyprint linenums"><code>Zeile 1<br/>Zeile 2<br/>Zeile 3</code></pre>
+									<td><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view">Zeile 1
+Zeile 2
+Zeile 3</div><!--__/NOTRIM-->
+</div></td>
 									<td><pre><code>    Zeile 1<br/>    Zeile 2<br/>    Zeile 3</code></pre><em class="alternative">oder</em><pre><code>~~~<br/>Zeile 1<br/>Zeile 2<br/>Zeile 3<br/>~~~</code></pre></td>
+								</tr>
+								<tr>
+									<td><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view" data-type="html">&lt;!-- Quellcode mit
+Hervorhebung --&gt;
+&lt;p class=&quot;header&quot;&gt;
+Hallo
+&lt;p&gt;</div><!--__/NOTRIM-->
+</div></td>
+									<td><pre><code>~~~html<br/>&lt;!-- Quellcode mit<br/>Hervorhebung --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
 							</tbody>
 						</table>
@@ -316,12 +330,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-documentr table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><code>Source code within running text</code></td>
-									<td><code>`Source code within running text`</code></td>
+									<td width="50%"><code>Source code within running text</code></td>
+									<td width="50%"><code>`Source code within running text`</code></td>
 								</tr>
 								<tr>
-									<td><pre class="pre-scrollable prettyprint linenums"><code>Line 1<br/>Line 2<br/>Line 3</code></pre>
+									<td><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view">Line 1
+Line 2
+Line 3</div><!--__/NOTRIM-->
+</div></td>
 									<td><pre><code>    Line 1<br/>    Line 2<br/>    Line 3</code></pre><em class="alternative">or</em><pre><code>~~~<br/>Line 1<br/>Line 2<br/>Line 3<br/>~~~</code></pre></td>
+								</tr>
+								<tr>
+									<td><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view" data-type="html">&lt;!-- Source code
+with highlighting --&gt;
+&lt;p class=&quot;header&quot;&gt;
+Hello
+&lt;p&gt;</div><!--__/NOTRIM-->
+</div></td>
+									<td><pre><code>~~~html<br/>&lt;!-- Source code<br/>with highlighting --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
 							</tbody>
 						</table>
@@ -352,8 +380,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><ul><li>Liste 1</li><li>Liste 2<ul><li>Liste 2.1</ul></li><li>Liste 3</li></ul></td>
-									<td><pre><code>- Liste 1<br/>- Liste 2<br/>    - Liste 2.1<br/>- Liste 3</code></pre><em class="alternative">oder</em><pre><code>* Liste 1<br/>* Liste 2<br/>    * Liste 2.1<br/>* Liste 3</code></pre></td>
+									<td width="50%"><ul><li>Liste 1</li><li>Liste 2<ul><li>Liste 2.1</ul></li><li>Liste 3</li></ul></td>
+									<td width="50%"><pre><code>- Liste 1<br/>- Liste 2<br/>    - Liste 2.1<br/>- Liste 3</code></pre><em class="alternative">oder</em><pre><code>* Liste 1<br/>* Liste 2<br/>    * Liste 2.1<br/>* Liste 3</code></pre></td>
 								</tr>
 								<tr>
 									<td><ol><li>Liste 1</li><li>Liste 2<ol><li>Liste 2.1</ol></li><li>Liste 3</li></ol></td>
@@ -374,8 +402,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						<table class="table table-bordered table-condensed">
 							<tbody>
 								<tr>
-									<td><ul><li>List 1</li><li>List 2<ul><li>List 2.1</ul></li><li>List 3</li></ul></td>
-									<td><pre><code>- List 1<br/>- List 2<br/>    - List 2.1<br/>- List 3</code></pre><em class="alternative">or</em><pre><code>* List 1<br/>* List 2<br/>    * List 2.1<br/>* List 3</code></pre></td>
+									<td width="50%"><ul><li>List 1</li><li>List 2<ul><li>List 2.1</ul></li><li>List 3</li></ul></td>
+									<td width="50%"><pre><code>- List 1<br/>- List 2<br/>    - List 2.1<br/>- List 3</code></pre><em class="alternative">or</em><pre><code>* List 1<br/>* List 2<br/>    * List 2.1<br/>* List 3</code></pre></td>
 								</tr>
 								<tr>
 									<td><ol><li>List 1</li><li>List 2<ol><li>List 2.1</ol></li><li>List 3</li></ol></td>
@@ -407,8 +435,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<table class="table table-bordered table-condensed">
 					<tbody>
 						<tr>
-							<td><table class="table table-bordered table-condensed table-striped"><thead><tr><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>7</td><td>8</td><td>9</td></tr></tbody></table></td>
-							<td><pre><code>A | B | C<br/>--|---|--<br/>1 | 2 | 3<br/>4 | 5 | 6<br/>7 | 8 | 9</code></pre></td>
+							<td width="50%"><table class="table table-bordered table-condensed table-striped"><thead><tr><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>7</td><td>8</td><td>9</td></tr></tbody></table></td>
+							<td width="50%"><pre><code>A | B | C<br/>--|---|--<br/>1 | 2 | 3<br/>4 | 5 | 6<br/>7 | 8 | 9</code></pre></td>
 						</tr>
 					</tbody>
 				</table>
@@ -430,8 +458,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<table class="table table-bordered table-condensed">
 					<tbody>
 						<tr>
-							<td><blockquote>Believe you can and you're halfway there.</blockquote></td>
-							<td><pre><code>&gt; Believe you can and<br/>&gt; you're halfway there.</code></pre></td>
+							<td width="50%"><blockquote>Believe you can and you're halfway there.</blockquote></td>
+							<td width="50%"><pre><code>&gt; Believe you can and<br/>&gt; you're halfway there.</code></pre></td>
 						</tr>
 						<tr>
 							<td><hr/></td>

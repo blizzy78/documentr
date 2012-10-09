@@ -61,7 +61,7 @@ function togglePreview() {
 				previewEl = $('<div id="preview" class="preview"></div>');
 				previewEl.html(result.html);
 				$(document.body).append(previewEl);
-				prettyPrint();
+				documentr.setupCodeViews();
 				previewEl
 					.css('left', el.offset().left)
 					.css('top', el.offset().top)
@@ -177,7 +177,7 @@ function toggleFullscreen() {
 
 function showMarkdownHelp() {
 	window.open('<c:url value="/help/markdown"/>', 'documentrMarkdownHelp',
-		'width=700, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
+		'width=800, height=600, dependent=yes, location=no, menubar=no, resizable=yes, scrollbars=yes, status=no, toolbar=no');
 }
 
 function updateInsertLinkButton() {

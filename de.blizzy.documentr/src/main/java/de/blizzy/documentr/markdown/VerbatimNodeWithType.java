@@ -15,17 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+package de.blizzy.documentr.markdown;
 
-@import "bootstrap-2.1.1/bootstrap.less";
-@import "bootstrap-2.1.1/responsive.less";
+import lombok.Getter;
 
-@import "styles.less";
+import org.pegdown.ast.VerbatimNode;
 
-@import "breadcrumbs.less";
-@import "changes.less";
-@import "editor.less";
-@import "markdown-help.less";
-@import "page-split.less";
-@import "tags.less";
+public class VerbatimNodeWithType extends VerbatimNode {
+	@Getter
+	private String type;
 
-@import "macros/macros.less";
+	public VerbatimNodeWithType(String text, String type) {
+		super(text);
+
+		this.type = type;
+	}
+}

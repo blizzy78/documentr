@@ -369,6 +369,14 @@ var documentr = {};
 		$('.twtr-widget').removeAttr('id');
 	};
 	
+	documentr.setupCodeViews = function() {
+		$('.code-view-wrapper .code-view').each(function() {
+			if (!$(this).hasClass('ace_editor')) {
+				$(this).setupCodeView();
+			}
+		});
+	};
+	
 	
 	$.fn.extend({
 		showModal: function(options) {
@@ -383,10 +391,12 @@ var documentr = {};
 				.css('margin-top', '0')
 				.css('left', Math.floor((win.width() - this.width()) / 2) + 'px')
 				.css('top', Math.floor((win.height() - this.height()) / 2) + 'px');
+			return this;
 		},
 		
 		hideModal: function() {
 			this.modal('hide');
+			return this;
 		},
 		
 		setPreventClick: function(preventClick) {
@@ -412,6 +422,29 @@ var documentr = {};
 			}
 			this.setPreventClick(disabled);
 			return this;
+		},
+		
+		setupCodeView: function() {
+			var editor = ace.edit(this[0]);
+			editor.setTheme('ace/theme/chrome');
+			var type = $(this).attr('data-type');
+			if (documentr.isSomething(type)) {
+				editor.session.setMode('ace/mode/' + type);
+			}
+			editor.setReadOnly(true);
+			editor.setDisplayIndentGuides(true);
+			editor.renderer.setShowGutter(true);
+			editor.session.setUseWrapMode(false);
+			editor.renderer.setShowPrintMargin(false);
+			editor.session.setUseSoftTabs(false);
+			editor.setHighlightSelectedWord(false);
+			editor.setHighlightActiveLine(false);
+			editor.renderer.hideCursor();
+			var lines = editor.session.getDocument().getLength();
+			lines = Math.min(lines, 20);
+			this.parent().css('height', (lines * 20) + 'px');
+			editor.resize();
+			return this;
 		}
 	});
 })();
@@ -420,9 +453,9 @@ $(function() {
 	$.ajaxSetup({
 		cache: false
 	});
-	
-	prettyPrint();
-	
+
+	documentr.setupCodeViews();
+
 	$('#siteSearch input').bind('webkitspeechchange', function() {
 		$('#siteSearch')[0].submit();
 	});

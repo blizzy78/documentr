@@ -16,25 +16,42 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-.editor-wrapper {
+.editor-wrapper,
+.code-view-wrapper {
 	height: 450px;
 	position: relative;
 	border: 1px solid #ccc;
 	border-radius: 4px;
+	// http://stackoverflow.com/a/712418
+	overflow: auto;
 }
 
-#editor {
+.code-view-wrapper {
+	height: 340px;
+	margin-bottom: 10px;
+}
+
+#editor,
+.code-view {
 	left: 0px;
 	top: 0px;
-	bottom: 1px;
-	right: 1px;
+	bottom: 0px;
+	right: 0px;
 	background: white;
-	font-family: "Bitstream Vera Sans Mono", Menlo, Monaco, Consolas, "Courier New", "Lucida Console", monospace;
-	font-size: 12px;
-	
+	font-family: "Bitstream Vera Sans Mono", Menlo, Monaco, Consolas, "Courier New", "Lucida Console", monospace !important;
+	font-size: 12px !important;
+
 	.ace_marker-layer {
 		.ace_active_line {
-			background: #e8f2fe;
+			background: #e8f2fe !important;
+		}
+	}
+}
+
+.code-view {
+	.ace_cursor-layer {
+		.ace_cursor {
+			border: 0 !important;
 		}
 	}
 }

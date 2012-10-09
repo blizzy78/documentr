@@ -51,16 +51,19 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	
 	@Override
 	public void visit(VerbatimNode node) {
-		printer.println().print("<pre class=\"pre-scrollable prettyprint linenums\" data-text-range=\"") //$NON-NLS-1$
+		printer.print("<div class=\"code-view-wrapper\">").println() //$NON-NLS-1$
+			.print("<!--__NOTRIM__--><div class=\"code-view\" data-text-range=\"") //$NON-NLS-1$
 			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
-			.print("\"><code>"); //$NON-NLS-1$
-		String text = node.getText();
-		while (text.charAt(0) == '\n') {
-			printer.print("<br/>"); //$NON-NLS-1$
-			text = text.substring(1);
+			.print("\""); //$NON-NLS-1$
+		if (node instanceof VerbatimNodeWithType) {
+			String type = ((VerbatimNodeWithType) node).getType();
+			if (StringUtils.isNotBlank(type)) {
+				printer.print(" data-type=\"").printEncoded(type).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
-		printer.printEncoded(text);
-		printer.print("</code></pre>"); //$NON-NLS-1$
+		printer.print(">") //$NON-NLS-1$
+			.printEncoded(node.getText().replaceFirst("[\\r\\n]*$", StringUtils.EMPTY)); //$NON-NLS-1$
+		printer.print("</div><!--__/NOTRIM__-->").println().print("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Override

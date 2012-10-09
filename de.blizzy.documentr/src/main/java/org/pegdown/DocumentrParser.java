@@ -23,9 +23,11 @@ import org.parboiled.annotations.Cached;
 import org.parboiled.common.ArrayBuilder;
 import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.StringVar;
+import org.parboiled.support.Var;
 
 import de.blizzy.documentr.markdown.MacroNode;
 import de.blizzy.documentr.markdown.PageHeaderNode;
+import de.blizzy.documentr.markdown.VerbatimNodeWithType;
 
 public class DocumentrParser extends Parser {
 	private static final int PEGDOWN_OPTIONS = Extensions.ALL -
@@ -183,4 +185,40 @@ public class DocumentrParser extends Parser {
 						inner.append(match())),
 				ZeroOrMore(BlankLine()));
 	}
+
+    // adapted from https://github.com/sirthias/pegdown/pull/60
+    @Override
+	@SuppressWarnings("boxing")
+	public Rule FencedCodeBlock() {
+        StringBuilderVar text = new StringBuilderVar();
+        Var<Integer> markerLength = new Var<Integer>();
+        StringBuilderVar codeType = new StringBuilderVar();
+        return NodeSequence(
+                CodeFenceWithType(markerLength, codeType),
+                TestNot(CodeFence(markerLength)), // prevent empty matches
+                ZeroOrMore(BlankLine(), text.append('\n')),
+                OneOrMore(TestNot(Newline(), CodeFence(markerLength)), ANY, text.append(matchedChar())),
+                Newline(),
+                push(new VerbatimNodeWithType(text.appended('\n').getString(), codeType.getString())),
+                CodeFence(markerLength)
+        );
+    }
+    
+	@Cached
+	@SuppressWarnings("boxing")
+    public Rule CodeFenceWithType(Var<Integer> markerLength, StringBuilderVar codeType) {
+        return Sequence(
+                FirstOf(NOrMore('~', 3), NOrMore('`', 3)),
+                (markerLength.isSet() && matchLength() == markerLength.get()) ||
+                        (markerLength.isNotSet() && markerLength.set(matchLength())),
+                Sp(),
+                ZeroOrMore(TestNot(Newline()), ANY, codeType.append(matchedChar())), // GFM code type identifier
+                Newline()
+        );
+    }
+    
+    @Override
+    public Rule CodeFence(Var<Integer> markerLength) {
+    	return CodeFenceWithType(markerLength, new StringBuilderVar());
+    }
 }

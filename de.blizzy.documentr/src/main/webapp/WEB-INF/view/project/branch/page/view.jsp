@@ -346,7 +346,7 @@ function saveInlineEditor() {
 				$('#pageText').html(result.html);
 				currentCommit = result.commit;
 				toggleHideFloatingElements(false);
-				prettyPrint();
+				documentr.setupCodeViews();
 				$('#inlineEditorToolbar').hide();
 				hookupInlineEditorToolbar();
 			}
