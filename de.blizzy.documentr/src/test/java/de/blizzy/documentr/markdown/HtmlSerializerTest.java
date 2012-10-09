@@ -37,11 +37,6 @@ import org.pegdown.ast.VerbatimNode;
 
 import com.google.common.collect.Lists;
 
-import de.blizzy.documentr.markdown.HtmlSerializer;
-import de.blizzy.documentr.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.markdown.MacroInvocation;
-import de.blizzy.documentr.markdown.MacroNode;
-
 public class HtmlSerializerTest {
 	private HtmlSerializerContext context;
 	private HtmlSerializer htmlSerializer;
@@ -54,10 +49,10 @@ public class HtmlSerializerTest {
 	
 	@Test
 	public void visitVerbatimNode() {
-		String text = "x\ny\nz\n"; //$NON-NLS-1$
+		String text = "x\ny\nz"; //$NON-NLS-1$
 		VerbatimNode node = new VerbatimNode(text);
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<pre class=\"pre-scrollable prettyprint linenums\"><code>" + text + "</code></pre>", //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("<div class=\"code-view-wrapper\">\n<!--__NOTRIM__--><div class=\"code-view\">" + text + "</div><!--__/NOTRIM__-->\n</div>", //$NON-NLS-1$ //$NON-NLS-2$
 				removeTextRange(html));
 	}
 	
