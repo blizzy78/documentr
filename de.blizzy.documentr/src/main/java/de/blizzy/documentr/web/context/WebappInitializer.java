@@ -33,6 +33,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import de.blizzy.documentr.context.ContextConfig;
+import de.blizzy.documentr.context.EventBusBeanFactoryPostProcessor;
 import de.blizzy.documentr.web.filter.RequestEncodingFilter;
 import de.blizzy.documentr.web.filter.TrimFilter;
 
@@ -41,10 +42,25 @@ public class WebappInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext context) {
 		log.info("initializing documentr web application"); //$NON-NLS-1$
+		WebApplicationContext appContext = setupApplicationContext(context);
+		setupServletContext(context, appContext);
+		log.info("web application initialization complete"); //$NON-NLS-1$
+	}
+
+	private WebApplicationContext setupApplicationContext(ServletContext context) {
+		log.debug("initializing Spring application context"); //$NON-NLS-1$
 		
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
 		appContext.setServletContext(context);
 		appContext.setConfigLocation(ContextConfig.class.getName());
+		appContext.addBeanFactoryPostProcessor(new EventBusBeanFactoryPostProcessor());
+		appContext.refresh();
+		appContext.start();
+		return appContext;
+	}
+
+	private void setupServletContext(ServletContext context, WebApplicationContext appContext) {
+		log.debug("initializing servlet context"); //$NON-NLS-1$
 		
 		context.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, appContext);
 
@@ -67,8 +83,5 @@ public class WebappInitializer implements WebApplicationInitializer {
 		FilterRegistration.Dynamic securityFilterConfig =
 				context.addFilter("springSecurityFilterChain", securityFilter); //$NON-NLS-1$
 		securityFilterConfig.addMappingForUrlPatterns(null, true, "/*");  //$NON-NLS-1$
-		
-		appContext.refresh();
-		appContext.start();
 	}
 }

@@ -89,7 +89,6 @@ import org.springframework.util.Assert;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.Futures;
@@ -153,8 +152,6 @@ public class PageIndex {
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
 	@Autowired
-	private EventBus eventBus;
-	@Autowired
 	private IPageStore pageStore;
 	@Autowired
 	private GlobalRepositoryManager repoManager;
@@ -191,8 +188,6 @@ public class PageIndex {
 		readerManager = new ReaderManager(directory);
 		searcherManager = new SearcherManager(directory, null);
 		
-		eventBus.register(this);
-		
 		log.info("checking if index is empty"); //$NON-NLS-1$
 		if (getNumDocuments() == 0) {
 			reindexEverything();
@@ -201,8 +196,6 @@ public class PageIndex {
 	
 	@PreDestroy
 	public void destroy() {
-		eventBus.unregister(this);
-		
 		Closeables.closeQuietly(searcherManager);
 		Closeables.closeQuietly(readerManager);
 		Closeables.closeQuietly(writer);

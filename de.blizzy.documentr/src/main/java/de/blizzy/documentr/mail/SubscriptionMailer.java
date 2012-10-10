@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PostConstruct;
 import javax.mail.Address;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -42,7 +41,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import de.blizzy.documentr.page.IPageStore;
@@ -58,8 +56,6 @@ public class SubscriptionMailer {
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Autowired
-	private EventBus eventBus;
-	@Autowired
 	@Setter(AccessLevel.PACKAGE)
 	private ExecutorService taskExecutor;
 	@Autowired
@@ -70,11 +66,6 @@ public class SubscriptionMailer {
 	private SubscriptionStore subscriptionStore;
 	@Autowired
 	private MailSenderFactory mailSenderFactory;
-	
-	@PostConstruct
-	public void init() {
-		eventBus.register(this);
-	}
 	
 	@Subscribe
 	public void pageChanged(PageChangedEvent event) {

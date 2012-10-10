@@ -28,7 +28,6 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import de.blizzy.documentr.system.SystemSettingsChangedEvent;
@@ -40,16 +39,11 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 	@Autowired
 	@Setter(AccessLevel.PACKAGE)
 	private SystemSettingsStore systemSettingsStore;
-	@Autowired
-	@Setter(AccessLevel.PACKAGE)
-	private EventBus eventBus;
 	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder;
 
 	@PostConstruct
 	public void init() {
 		encoder = createEncoder();
-		
-		eventBus.register(this);
 	}
 
 	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder createEncoder() {
