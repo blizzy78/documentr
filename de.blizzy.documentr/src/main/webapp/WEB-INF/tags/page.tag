@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%></c:set>
 
 <c:if test="${!empty pageContents}">
-	<div class="container">
+	<div class="container container-main">
 		<c:out value="${pageContents}" escapeXml="false"/>
 		<c:set var="footer" value="${d:getSystemSetting('page.footerHtml')}"/>
 		<c:if test="${!empty footer}"><c:out value="${footer}" escapeXml="false"/></c:if>

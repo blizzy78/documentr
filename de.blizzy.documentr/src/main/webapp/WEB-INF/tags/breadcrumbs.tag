@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="_showSiteSearch" value="${showSiteSearch}" scope="request"/>
 <c:set var="_breadcrumbs" scope="request">
 	<nav>
-		<div class="breadcrumb">
+		<div class="breadcrumb navbar-fixed-top">
 			<div class="container">
 				<ul class="clearfix">
 					<jsp:doBody/>
