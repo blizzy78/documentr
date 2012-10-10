@@ -39,9 +39,9 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.IMacroSettings;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.system.SystemSettingsStore;
 
 public class FlattrMacroTest extends AbstractDocumentrTest {
 	private static final String FLATTR_USER_ID = "flattrUserId"; //$NON-NLS-1$
@@ -59,25 +59,24 @@ public class FlattrMacroTest extends AbstractDocumentrTest {
 	@Mock
 	private HtmlSerializerContext htmlSerializerContext;
 	@Mock
-	private SystemSettingsStore systemSettingsStore;
-	@Mock
 	private IPageStore pageStore;
+	@Mock
+	private IMacroSettings macroSettings;
 	@InjectMocks
 	private FlattrMacro macro;
 
 	@Before
 	public void setUp() throws IOException {
-		when(htmlSerializerContext.getSystemSettingsStore()).thenReturn(systemSettingsStore);
 		when(htmlSerializerContext.getPageStore()).thenReturn(pageStore);
 		when(macroContext.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
+		when(macroContext.getSettings()).thenReturn(macroSettings);
+		when(macroSettings.getSetting("userId")).thenReturn(FLATTR_USER_ID); //$NON-NLS-1$
 		
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(PAGE);
 		when(htmlSerializerContext.getPageUri(PAGE)).thenReturn(PAGE_URI);
 		when(htmlSerializerContext.getUrl(PAGE_URI)).thenReturn(PAGE_URL);
-		
-		when(systemSettingsStore.getMacroSetting("flattr", "userId")).thenReturn(FLATTR_USER_ID); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Page page = Page.fromText(PAGE_TITLE, "text"); //$NON-NLS-1$
 		page.setTags(Sets.newHashSet(TAG_1, TAG_2));

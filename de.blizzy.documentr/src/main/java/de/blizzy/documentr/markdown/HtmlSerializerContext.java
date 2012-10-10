@@ -50,7 +50,6 @@ public class HtmlSerializerContext {
 	private List<MacroInvocation> macroInvocations = Lists.newArrayList();
 	@Getter
 	private Authentication authentication;
-	@Getter
 	private SystemSettingsStore systemSettingsStore;
 	@Getter
 	private IPageStore pageStore;

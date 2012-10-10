@@ -30,11 +30,11 @@ import com.google.common.base.Charsets;
 import de.blizzy.documentr.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
+import de.blizzy.documentr.markdown.macro.IMacroSettings;
 import de.blizzy.documentr.markdown.macro.Macro;
 import de.blizzy.documentr.markdown.macro.MacroSetting;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.system.SystemSettingsStore;
 
 @Macro(name="flattr", insertText="{{flattr/}}", cacheable=false, settings=@MacroSetting("userId"))
 @Slf4j
@@ -43,8 +43,8 @@ public class FlattrMacro implements IMacroRunnable {
 	public String getHtml(IMacroContext macroContext) {
 		try {
 			HtmlSerializerContext htmlSerializerContext = macroContext.getHtmlSerializerContext();
-			SystemSettingsStore systemSettingsStore = htmlSerializerContext.getSystemSettingsStore();
-			String userId = systemSettingsStore.getMacroSetting("flattr", "userId"); //$NON-NLS-1$ //$NON-NLS-2$
+			IMacroSettings settings = macroContext.getSettings();
+			String userId = settings.getSetting("userId"); //$NON-NLS-1$ 
 			if (StringUtils.isNotBlank(userId)) {
 				String projectName = htmlSerializerContext.getProjectName();
 				String branchName = htmlSerializerContext.getBranchName();

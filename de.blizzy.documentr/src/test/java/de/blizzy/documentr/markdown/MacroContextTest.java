@@ -27,11 +27,12 @@ import org.springframework.beans.factory.BeanFactory;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.markdown.HtmlSerializerContext;
-import de.blizzy.documentr.markdown.MacroContext;
 import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 
 public class MacroContextTest extends AbstractDocumentrTest {
+	private static final String MACRO = "macro"; //$NON-NLS-1$
+	
 	@Mock
 	private BeanFactory beanFactory;
 	@Mock
@@ -40,47 +41,26 @@ public class MacroContextTest extends AbstractDocumentrTest {
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	@Mock
 	private HtmlSerializerContext htmlSerializerContext;
+	@Mock
+	private SystemSettingsStore systemSettingsStore;
 	private MacroContext context;
 
 	@Before
 	public void setUp() {
-		MacroContext ctx = new MacroContext("macro", "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$
 		ctx.setPageStore(pageStore);
 		ctx.setPermissionEvaluator(permissionEvaluator);
+		ctx.setSystemSettingsStore(systemSettingsStore);
 		
-		when(beanFactory.getBean(MacroContext.ID, "macro", "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(ctx);
 		
-		context = MacroContext.create("macro", "params", "body", htmlSerializerContext, beanFactory); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		context = MacroContext.create(MACRO, "params", "body", htmlSerializerContext, beanFactory); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Test
-	public void getMacroName() {
-		assertSame("macro", context.getMacroName()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void getParameters() {
-		assertSame("params", context.getParameters()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void getBody() {
-		assertSame("body", context.getBody()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void getHtmlSerializerContext() {
-		assertSame(htmlSerializerContext, context.getHtmlSerializerContext());
-	}
-	
-	@Test
-	public void getPageStore() {
-		assertSame(pageStore, context.getPageStore());
-	}
-
-	@Test
-	public void getPermissionEvaluator() {
-		assertSame(permissionEvaluator, context.getPermissionEvaluator());
+	public void getSettings() {
+		when(systemSettingsStore.getMacroSetting(MACRO, "key")).thenReturn("value"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("value", context.getSettings().getSetting("key")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

@@ -30,7 +30,9 @@ import org.springframework.util.Assert;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
+import de.blizzy.documentr.markdown.macro.IMacroSettings;
 import de.blizzy.documentr.page.IPageStore;
+import de.blizzy.documentr.system.SystemSettingsStore;
 
 @Component(MacroContext.ID)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -53,6 +55,9 @@ class MacroContext implements IMacroContext {
 	private String body;
 	@Getter
 	private HtmlSerializerContext htmlSerializerContext;
+	@Autowired
+	@Setter(AccessLevel.PACKAGE)
+	private SystemSettingsStore systemSettingsStore;
 
 	MacroContext(String macroName, String parameters, String body, HtmlSerializerContext htmlSerializerContext) {
 		Assert.hasLength(macroName);
@@ -61,6 +66,16 @@ class MacroContext implements IMacroContext {
 		this.parameters = parameters;
 		this.body = body;
 		this.htmlSerializerContext = htmlSerializerContext;
+	}
+	
+	@Override
+	public IMacroSettings getSettings() {
+		return new IMacroSettings() {
+			@Override
+			public String getSetting(String key) {
+				return systemSettingsStore.getMacroSetting(macroName, key);
+			}
+		};
 	}
 	
 	static MacroContext create(String macroName, String parameters, String body,
