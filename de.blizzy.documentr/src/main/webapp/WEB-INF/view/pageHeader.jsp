@@ -36,13 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-button.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-collapse.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-dropdown.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-modal.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-tab.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-transition.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1/bootstrap-typeahead.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-2.1.1.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/lightbox-2.51.js.jsp"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/diff_match_patch-20120106.js"/>"></script>
