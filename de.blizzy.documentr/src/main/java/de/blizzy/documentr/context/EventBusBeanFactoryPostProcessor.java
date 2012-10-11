@@ -17,13 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.context;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 public class EventBusBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		EventBusBeanPostProcessor eventBusBeanPostProcessor = new EventBusBeanPostProcessor(beanFactory);
 		beanFactory.addBeanPostProcessor(eventBusBeanPostProcessor);
 	}
