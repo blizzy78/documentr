@@ -34,6 +34,8 @@ import de.blizzy.documentr.validation.PagePathValidator;
 /** Generic utility methods. */
 @Slf4j
 public final class Util {
+	private static final String CHARS_TO_DASH = " .,:;/()[]<>"; //$NON-NLS-1$
+	
 	private Util() {}
 
 	/** Converts a page path from URL format to real format. */
@@ -58,27 +60,13 @@ public final class Util {
 		int len = text.length();
 		for (int i = 0; i < len; i++) {
 			char c = text.charAt(i);
-			switch (c) {
-				case ' ':
-				case '.':
-				case ',':
-				case '/':
-				case ':':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '<':
-				case '>':
-					buf.append("-"); //$NON-NLS-1$
-					break;
-				
-				default:
-					buf.append(c);
-					if (!validator.isValid(buf.toString(), null)) {
-						buf.deleteCharAt(buf.length() - 1);
-					}
-					break;
+			if (StringUtils.contains(CHARS_TO_DASH, c)) {
+				buf.append("-"); //$NON-NLS-1$
+			} else {
+				buf.append(c);
+				if (!validator.isValid(buf.toString(), null)) {
+					buf.deleteCharAt(buf.length() - 1);
+				}
 			}
 		}
 
