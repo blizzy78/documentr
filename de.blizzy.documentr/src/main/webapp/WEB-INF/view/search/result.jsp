@@ -22,6 +22,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
+<c:if test="${searchResult.totalHits gt searchResult.hitsPerPage}">
+	<c:set var="excess" value="${searchResult.totalHits mod searchResult.hitsPerPage}"/>
+	<c:set var="numPages" value="${d:floor((searchResult.totalHits - excess) / searchResult.hitsPerPage)}"/>
+	<c:if test="${excess gt 0}"><c:set var="numPages" value="${numPages + 1}"/></c:if>
+	<c:set var="firstPage" value="${page - 2}"/>
+	<c:if test="${firstPage lt 1}"><c:set var="firstPage" value="1"/></c:if>
+	<c:set var="lastPage" value="${firstPage + 4}"/>
+	<c:if test="${lastPage gt numPages}">
+		<c:set var="lastPage" value="${numPages}"/>
+		<c:set var="firstPage" value="${lastPage - 4}"/>
+		<c:if test="${firstPage lt 1}"><c:set var="firstPage" value="1"/></c:if>
+	</c:if>
+	
+	<dt:headerHTML>
+		<c:if test="${page gt 1}">
+			<link rel="prev" href="<c:url value="/search/page"><c:param name="q" value="${searchText}"/><c:param name="p" value="${page - 1}"/></c:url>"/>
+		</c:if>
+		<c:if test="${page lt numPages}">
+			<link rel="next" href="<c:url value="/search/page"><c:param name="q" value="${searchText}"/><c:param name="p" value="${page + 1}"/></c:url>"/>
+		</c:if>
+	</dt:headerHTML>
+</c:if>
+
 <dt:breadcrumbs showSiteSearch="${searchText}">
 	<li class="active"><spring:message code="title.searchResults"/></li>
 </dt:breadcrumbs>
@@ -66,6 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<c:set var="firstPage" value="${lastPage - 4}"/>
 				<c:if test="${firstPage lt 1}"><c:set var="firstPage" value="1"/></c:if>
 			</c:if>
+			
 			<p class="spacer">
 				<div class="btn-toolbar">
 					<div class="btn-group">

@@ -49,6 +49,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</c:forTokens> 
 </c:if>
 
+<c:out value="${requestScope._headerHTML}" escapeXml="false"/>
+
 <script type="text/javascript">
 
 <sec:authorize access="isAuthenticated()">
