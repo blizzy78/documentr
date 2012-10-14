@@ -62,6 +62,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 			<span class="help-block"><spring:message code="pageFooterHtmlHelp"/></span>
 		</div>
+		<div class="control-group">
+			<form:label path="updateCheckInterval" cssClass="control-label"><spring:message code="label.checkForUpdates"/>:</form:label>
+			<form:select path="updateCheckInterval">
+				<form:option value="never"><spring:message code="never"/></form:option>
+				<form:option value="daily"><spring:message code="daily"/></form:option>
+				<form:option value="weekly"><spring:message code="weekly"/></form:option>
+			</form:select>
+		</div>
 	</fieldset>
 	
 	<fieldset>

@@ -56,6 +56,10 @@ public class SystemSettingsForm {
 	private int bcryptRounds;
 	@Getter
 	private String pageFooterHtml;
+	@Getter
+	@NotNull
+	@NotBlank
+	private String updateCheckInterval;
 	// macroName -> [key -> value]
 	@Getter
 	@NotNull
@@ -63,7 +67,8 @@ public class SystemSettingsForm {
 
 	public SystemSettingsForm(String documentrHost, String siteNotice, String mailHostName, int mailHostPort,
 			String mailSenderEmail, String mailSenderName, String mailSubjectPrefix, String mailDefaultLanguage,
-			int bcryptRounds, String pageFooterHtml, SortedMap<String, SortedMap<String, String>> macroSettings) {
+			int bcryptRounds, String pageFooterHtml, String updateCheckInterval,
+			SortedMap<String, SortedMap<String, String>> macroSettings) {
 
 		this.documentrHost = documentrHost;
 		this.siteNotice = siteNotice;
@@ -75,6 +80,7 @@ public class SystemSettingsForm {
 		this.mailDefaultLanguage = mailDefaultLanguage;
 		this.bcryptRounds = bcryptRounds;
 		this.pageFooterHtml = pageFooterHtml;
+		this.updateCheckInterval = updateCheckInterval;
 		this.macroSettings = macroSettings;
 	}
 }

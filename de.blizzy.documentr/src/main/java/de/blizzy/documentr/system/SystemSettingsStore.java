@@ -65,6 +65,11 @@ public class SystemSettingsStore implements Lifecycle {
 	public static final String MAIL_DEFAULT_LANGUAGE = "mail.defaultLanguage"; //$NON-NLS-1$
 	public static final String BCRYPT_ROUNDS = "bcrypt.rounds"; //$NON-NLS-1$
 	public static final String PAGE_FOOTER_HTML = "page.footerHtml"; //$NON-NLS-1$
+	public static final String UPDATE_CHECK_INTERVAL = "updateCheck.interval"; //$NON-NLS-1$
+
+	public static final String UPDATE_CHECK_INTERVAL_NEVER = "never"; //$NON-NLS-1$
+	public static final String UPDATE_CHECK_INTERVAL_DAILY = "daily"; //$NON-NLS-1$
+	public static final String UPDATE_CHECK_INTERVAL_WEEKLY = "weekly"; //$NON-NLS-1$
 	
 	private static final String REPOSITORY_NAME = "_system"; //$NON-NLS-1$
 	private static final String SETTINGS_FILE_NAME = "settings"; //$NON-NLS-1$
@@ -127,6 +132,7 @@ public class SystemSettingsStore implements Lifecycle {
 		defaultSettings.put(MAIL_SUBJECT_PREFIX, "[documentr]"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_DEFAULT_LANGUAGE, Locale.ENGLISH.getLanguage());
 		defaultSettings.put(BCRYPT_ROUNDS, "12"); //$NON-NLS-1$
+		defaultSettings.put(UPDATE_CHECK_INTERVAL, UPDATE_CHECK_INTERVAL_WEEKLY); 
 		
 		for (Map.Entry<String, String> entry : defaultSettings.entrySet()) {
 			if (!settings.containsKey(entry.getKey())) {

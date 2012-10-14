@@ -16,7 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 
 <footer class="footer">
 	<p class="pull-right">
@@ -27,4 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	Powered by <a href="http://documentr.org">documentr</a> &ndash;
 	Copyright (C) 2012 Maik Schreiber
 	</p>
+	
+	<sec:authorize access="isAuthenticated()">
+		<c:set var="version" value="${d:getLatestVersionForUpdate()}"/>
+		<c:if test="${!empty version}">
+			<div class="alert"><spring:message code="updateAvailableToVersionX" arguments="${version}"/></div>
+		</c:if>
+	</sec:authorize>
 </footer>

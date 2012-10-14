@@ -182,4 +182,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.lang.String getSystemSetting(java.lang.String)</function-signature>
 	</function>
+
+	<function>
+		<name>getLatestVersionForUpdate</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.lang.String getLatestVersionForUpdate()</function-signature>
+	</function>
 </taglib>

@@ -59,6 +59,7 @@ import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.subscription.SubscriptionStore;
 import de.blizzy.documentr.system.SystemSettingsStore;
+import de.blizzy.documentr.system.UpdateChecker;
 import de.blizzy.documentr.util.FileLengthFormat;
 import de.blizzy.documentr.util.Util;
 
@@ -73,6 +74,7 @@ public final class Functions {
 	private static MacroFactory macroFactory;
 	private static SubscriptionStore subscriptionStore;
 	private static SystemSettingsStore systemSettingsStore;
+	private static UpdateChecker updateChecker;
 	
 	@Autowired
 	private GlobalRepositoryManager wiredRepoManager;
@@ -92,6 +94,8 @@ public final class Functions {
 	private SubscriptionStore wiredSubscriptionStore;
 	@Autowired
 	private SystemSettingsStore wiredSystemSettingsStore;
+	@Autowired
+	private UpdateChecker wiredUpdateChecker;
 	
 	@PostConstruct
 	public void init() {
@@ -104,6 +108,7 @@ public final class Functions {
 		macroFactory = wiredMacroFactory;
 		subscriptionStore = wiredSubscriptionStore;
 		systemSettingsStore = wiredSystemSettingsStore;
+		updateChecker = wiredUpdateChecker;
 	}
 
 	public static List<String> listProjects() {
@@ -255,6 +260,10 @@ public final class Functions {
 	
 	public static String getSystemSetting(String key) {
 		return StringUtils.defaultString(systemSettingsStore.getSetting(key));
+	}
+	
+	public static String getLatestVersionForUpdate() {
+		return updateChecker.isUpdateAvailable() ? updateChecker.getLatestVersion() : null;
 	}
 	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
