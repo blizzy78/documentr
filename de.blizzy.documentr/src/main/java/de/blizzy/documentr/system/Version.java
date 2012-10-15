@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.util.Assert;
 
 @EqualsAndHashCode
@@ -49,17 +50,11 @@ class Version implements Comparable<Version> {
 
 	@Override
 	public int compareTo(Version v) {
-		int result = Integer.valueOf(major).compareTo(Integer.valueOf(v.major));
-		if (result != 0) {
-			return result;
-		}
-
-		result = Integer.valueOf(minor).compareTo(Integer.valueOf(v.minor));
-		if (result != 0) {
-			return result;
-		}
-
-		return Integer.valueOf(maintenance).compareTo(Integer.valueOf(v.maintenance));
+		return new CompareToBuilder()
+			.append(major, v.major)
+			.append(minor, v.minor)
+			.append(maintenance, v.maintenance)
+			.toComparison();
 	}
 	
 	@Override
