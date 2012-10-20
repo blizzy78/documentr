@@ -69,6 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<form:option value="daily"><spring:message code="daily"/></form:option>
 				<form:option value="weekly"><spring:message code="weekly"/></form:option>
 			</form:select>
+			<span class="help-block"><spring:message code="checkForUpdatesHelp"/></span>
 		</div>
 	</fieldset>
 	
