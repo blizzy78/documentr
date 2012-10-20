@@ -37,8 +37,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.inject.internal.Maps;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.page.IPageStore;

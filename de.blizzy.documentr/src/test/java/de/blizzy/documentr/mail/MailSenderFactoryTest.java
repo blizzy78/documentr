@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import com.google.inject.internal.Maps;
+import com.google.common.collect.Maps;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.system.SystemSettingsStore;
