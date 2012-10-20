@@ -102,7 +102,7 @@ public class PageController {
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
-			method=RequestMethod.GET)
+			method={ RequestMethod.GET, RequestMethod.HEAD })
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, VIEW)")
 	public String getPage(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, Model model, HttpServletRequest request, HttpServletResponse response)

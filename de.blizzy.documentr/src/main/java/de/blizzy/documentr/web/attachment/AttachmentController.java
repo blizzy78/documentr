@@ -84,7 +84,7 @@ public class AttachmentController {
 	@RequestMapping(value="/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/" +
-			"{name:.*}", method=RequestMethod.GET)
+			"{name:.*}", method={ RequestMethod.GET, RequestMethod.HEAD })
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, VIEW)")
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name, @RequestParam(required=false) boolean download,
