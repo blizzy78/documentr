@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
@@ -89,10 +87,8 @@ class PageStore implements IPageStore {
 	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
 	
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 
 	@Override

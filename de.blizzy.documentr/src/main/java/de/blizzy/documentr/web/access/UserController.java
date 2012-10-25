@@ -22,9 +22,6 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,10 +52,8 @@ import de.blizzy.documentr.access.UserStore;
 @RequestMapping("/user")
 public class UserController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private PasswordEncoder passwordEncoder;
 
 	@RequestMapping(value="/add", method=RequestMethod.GET)

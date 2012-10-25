@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -80,21 +78,16 @@ import de.blizzy.documentr.web.util.ErrorController;
 @Slf4j
 public class PageController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
 	private ICherryPicker cherryPicker;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private MarkdownProcessor markdownProcessor;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageRenderer pageRenderer;
 	@Autowired
 	private DocumentrPermissionEvaluator permissionEvaluator;

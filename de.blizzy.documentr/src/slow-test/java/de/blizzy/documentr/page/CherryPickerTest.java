@@ -32,7 +32,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -40,12 +42,10 @@ import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
-import de.blizzy.documentr.repository.TestGlobalRepositoryManagerUtil;
 
 public class CherryPickerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -56,31 +56,36 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 
 	@Mock
 	private EventBus eventBus;
+	@Mock
+	private Settings settings;
+	@Mock
+	@SuppressWarnings("unused")
+	private LockManager lockManager;
 	private GlobalRepositoryManager globalRepoManager;
 	private PageStore pageStore;
 	private CherryPicker cherryPicker;
+	@InjectMocks
+	private ProjectRepositoryManagerFactory repoManagerFactory;
 	
 	@Before
 	public void setUp() {
 		File dataDir = createTempDir();
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
+		
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
-		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		repoManagerFactory.setLockManager(mock(LockManager.class));
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
-		TestGlobalRepositoryManagerUtil.setEventBus(globalRepoManager, eventBus);
+		Whitebox.setInternalState(globalRepoManager, settings); 
+		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
+		Whitebox.setInternalState(globalRepoManager, eventBus); 
 		globalRepoManager.init();
 
 		pageStore = new PageStore();
-		pageStore.setGlobalRepositoryManager(globalRepoManager);
-		pageStore.setEventBus(eventBus);
+		Whitebox.setInternalState(pageStore, globalRepoManager); 
+		Whitebox.setInternalState(pageStore, eventBus); 
 
 		cherryPicker = new CherryPicker();
-		cherryPicker.setEventBus(eventBus);
-		cherryPicker.setGlobalRepositoryManager(globalRepoManager);
+		Whitebox.setInternalState(cherryPicker, globalRepoManager); 
+		Whitebox.setInternalState(cherryPicker, eventBus); 
 	}
 
 	@Test

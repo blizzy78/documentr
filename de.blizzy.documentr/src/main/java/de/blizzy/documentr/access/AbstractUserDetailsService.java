@@ -23,7 +23,6 @@ import java.util.Set;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,8 +38,7 @@ import com.google.common.collect.Sets;
  */
 abstract class AbstractUserDetailsService implements UserDetailsService {
 	@Autowired
-	@Getter(AccessLevel.PROTECTED)
-	@Setter(AccessLevel.PROTECTED)
+	@Getter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	/**

@@ -111,6 +111,10 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	private Model model;
 	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private PageMetadata pageMetadata;
+	@Mock
+	private WebRequest webRequest;
 	@InjectMocks
 	private PageController pageController;
 
@@ -445,9 +449,8 @@ public class PageControllerTest extends AbstractDocumentrTest {
 
 		when(request.getContextPath()).thenReturn(CONTEXT);
 
-		PageMetadata metadata = mock(PageMetadata.class);
-		when(metadata.getCommit()).thenReturn("newCommit"); //$NON-NLS-1$
-		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(metadata);
+		when(pageMetadata.getCommit()).thenReturn("newCommit"); //$NON-NLS-1$
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageMetadata);
 		
 		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
 				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, request); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -497,8 +500,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
 
-		WebRequest webRequest = mock(WebRequest.class);
-		
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -526,8 +527,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
-		
-		WebRequest webRequest = mock(WebRequest.class);
 		
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
@@ -564,7 +563,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 				Sets.newHashSet("targetBranch"), resolves, false, USER)) //$NON-NLS-1$
 				.thenReturn(results);
 		
-		WebRequest webRequest = mock(WebRequest.class);
 		Map<String, String[]> params = Maps.newHashMap();
 		params.put("resolveText_targetBranch/version3", new String[] { "resolveText" }); //$NON-NLS-1$ //$NON-NLS-2$
 		when(webRequest.getParameterMap()).thenReturn(params);

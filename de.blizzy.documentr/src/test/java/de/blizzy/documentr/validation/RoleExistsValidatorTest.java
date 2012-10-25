@@ -24,21 +24,25 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.Role;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.validation.RoleExistsValidator;
 
-public class RoleExistsValidatorTest {
+public class RoleExistsValidatorTest extends AbstractDocumentrTest {
+	@Mock
+	private Role role;
+	@Mock
+	private UserStore userStore;
+	@InjectMocks
+	private RoleExistsValidator validator;
+	
 	@Test
 	public void isValid() throws IOException {
-		UserStore userStore = mock(UserStore.class);
-		Role role = mock(Role.class);
 		when(userStore.getRole("role")).thenReturn(role); //$NON-NLS-1$
 
-		RoleExistsValidator validator = new RoleExistsValidator();
-		validator.setUserStore(userStore);
-		
 		assertTrue(validator.isValid(null, null));
 		assertTrue(validator.isValid(StringUtils.EMPTY, null));
 		assertTrue(validator.isValid("role", null)); //$NON-NLS-1$

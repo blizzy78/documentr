@@ -30,6 +30,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
 
@@ -39,12 +40,14 @@ public class PageUtilTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 
+	@Mock
+	private PageStore pageStore;
+	
 	@Test
 	public void getPagePathHierarchy() throws IOException {
 		Page page1 = createRandomPage(null);
 		Page page2 = createRandomPage("page1"); //$NON-NLS-1$
 		Page page3 = createRandomPage("page1/page2"); //$NON-NLS-1$
-		PageStore pageStore = mock(PageStore.class);
 		when(pageStore.getPage(PROJECT, BRANCH, "page1", false)).thenReturn(page1); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2", false)).thenReturn(page2); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2/page3", false)).thenReturn(page3); //$NON-NLS-1$

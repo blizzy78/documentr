@@ -23,27 +23,23 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.util.Collections;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
-public class DocumentrAnonymousAuthenticationFactoryTest {
+public class DocumentrAnonymousAuthenticationFactoryTest extends AbstractDocumentrTest {
+	@Mock
 	private UserStore userStore;
+	@InjectMocks
 	private DocumentrAnonymousAuthenticationFactory factory;
 
-	@Before
-	public void setUp() {
-		userStore = mock(UserStore.class);
-		
-		factory = new DocumentrAnonymousAuthenticationFactory();
-		factory.setUserStore(userStore);
-	}
-	
 	@Test
 	public void create() throws IOException {
 		RoleGrantedAuthority applicationReaderRoleAuthority =

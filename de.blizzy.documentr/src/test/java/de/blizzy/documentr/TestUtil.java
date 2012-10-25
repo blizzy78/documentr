@@ -21,8 +21,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -132,22 +130,6 @@ public final class TestUtil {
 		SecurityContextImpl context = new SecurityContextImpl();
 		context.setAuthentication(authentication);
 		return context;
-	}
-	
-	public static <T> Object invokeMethod(Class<T> targetClass, T target, String methodName,
-			Class<?>[] argTypes, Object[] args) {
-		
-		try {
-			Method method = targetClass.getDeclaredMethod(methodName, argTypes);
-			method.setAccessible(true);
-			return method.invoke(target, args);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	public static String removeTextRange(String html) {

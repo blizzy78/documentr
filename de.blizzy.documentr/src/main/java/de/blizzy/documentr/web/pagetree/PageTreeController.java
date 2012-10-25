@@ -22,9 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -49,13 +46,10 @@ import de.blizzy.documentr.util.Util;
 @RequestMapping("/pageTree")
 public class PageTreeController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
 	@RequestMapping(value="/application/json", method=RequestMethod.POST)

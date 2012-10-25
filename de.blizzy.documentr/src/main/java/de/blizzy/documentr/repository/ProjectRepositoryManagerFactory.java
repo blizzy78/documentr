@@ -19,8 +19,6 @@ package de.blizzy.documentr.repository;
 
 import java.io.File;
 
-import lombok.Setter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -30,7 +28,6 @@ import com.google.common.eventbus.EventBus;
 @Component
 public class ProjectRepositoryManagerFactory {
 	@Autowired
-	@Setter
 	private LockManager lockManager;
 	@Autowired
 	private EventBus eventBus;

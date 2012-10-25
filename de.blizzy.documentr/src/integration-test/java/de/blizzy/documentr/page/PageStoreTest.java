@@ -37,6 +37,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
@@ -44,14 +47,12 @@ import com.google.common.eventbus.EventBus;
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 import de.blizzy.documentr.repository.RepositoryUtil;
-import de.blizzy.documentr.repository.TestGlobalRepositoryManagerUtil;
 
 public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -60,30 +61,34 @@ public class PageStoreTest extends AbstractDocumentrTest {
 	private static final String BRANCH_3 = "branch_3"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	
-	private GlobalRepositoryManager globalRepoManager;
+
+	@Mock
+	private Settings settings;
+	@Mock
 	private EventBus eventBus;
+	@Mock
+	@SuppressWarnings("unused")
+	private LockManager lockManager;
+	private GlobalRepositoryManager globalRepoManager;
 	private PageStore pageStore;
+	@InjectMocks
+	private ProjectRepositoryManagerFactory repoManagerFactory;
 
 	@Before
 	public void setUp() {
 		File dataDir = createTempDir();
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
-
-		eventBus = mock(EventBus.class);
+		
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
-		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		repoManagerFactory.setLockManager(mock(LockManager.class));
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
-		TestGlobalRepositoryManagerUtil.setEventBus(globalRepoManager, eventBus);
+		Whitebox.setInternalState(globalRepoManager, settings); 
+		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
+		Whitebox.setInternalState(globalRepoManager, eventBus); 
 		globalRepoManager.init();
 
 		pageStore = new PageStore();
-		pageStore.setGlobalRepositoryManager(globalRepoManager);
-		pageStore.setEventBus(eventBus);
+		Whitebox.setInternalState(pageStore, globalRepoManager); 
+		Whitebox.setInternalState(pageStore, eventBus); 
 	}
 	
 	@Test

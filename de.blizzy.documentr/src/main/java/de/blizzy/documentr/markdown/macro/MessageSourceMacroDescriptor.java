@@ -21,9 +21,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanFactory;
@@ -41,7 +39,6 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	static final String ID = "messageSourceMacroDescriptor"; //$NON-NLS-1$
 	
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private MessageSource messageSource;
 	@Getter
 	private String macroName;

@@ -30,8 +30,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +54,6 @@ public class SubscriptionMailer {
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private ExecutorService taskExecutor;
 	@Autowired
 	private IPageStore pageStore;

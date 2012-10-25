@@ -21,9 +21,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Parboiled;
 import org.pegdown.DocumentrParser;
@@ -75,7 +72,6 @@ public class MarkdownProcessor {
 	);
 	
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private MacroFactory macroFactory;
 	@Autowired
 	private BeanFactory beanFactory;

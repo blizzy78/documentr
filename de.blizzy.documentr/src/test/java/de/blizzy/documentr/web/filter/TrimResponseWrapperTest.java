@@ -29,14 +29,19 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Closeables;
 
-public class TrimResponseWrapperTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class TrimResponseWrapperTest extends AbstractDocumentrTest {
+	@Mock
+	private HttpServletResponse response;
+	
 	@Test
 	public void setContentLengthMustBeIgnored() {
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 		wrapper.setContentLength(123);
@@ -45,7 +50,6 @@ public class TrimResponseWrapperTest {
 	
 	@Test
 	public void getOutputStreamAndGetData() throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 
@@ -64,7 +68,6 @@ public class TrimResponseWrapperTest {
 
 	@Test
 	public void getOutputStreamAndGetDataButGetStreamFirst() throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 
 		byte[] data = "hello \u20AC".getBytes(Charsets.UTF_8); //$NON-NLS-1$
@@ -83,7 +86,6 @@ public class TrimResponseWrapperTest {
 
 	@Test
 	public void getWriterAndGetData() throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getCharacterEncoding()).thenReturn(Charsets.UTF_8.name());
 		
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);

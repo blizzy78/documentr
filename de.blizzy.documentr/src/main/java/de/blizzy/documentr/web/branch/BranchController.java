@@ -22,9 +22,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,13 +50,10 @@ import de.blizzy.documentr.repository.ILockedRepository;
 @RequestMapping("/branch")
 public class BranchController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)

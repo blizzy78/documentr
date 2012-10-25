@@ -22,20 +22,23 @@ import static org.mockito.Mockito.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
-import de.blizzy.documentr.validation.ProjectDoesNotExistValidator;
 
-public class ProjectDoesNotExistValidatorTest {
+public class ProjectDoesNotExistValidatorTest extends AbstractDocumentrTest {
+	@Mock
+	private GlobalRepositoryManager repoManager;
+	@InjectMocks
+	private ProjectDoesNotExistValidator validator;
+	
 	@Test
 	public void isValid() {
-		GlobalRepositoryManager repoManager = mock(GlobalRepositoryManager.class);
 		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project")); //$NON-NLS-1$
-		
-		ProjectDoesNotExistValidator validator = new ProjectDoesNotExistValidator();
-		validator.setGlobalRepositoryManager(repoManager);
 		
 		assertTrue(validator.isValid(null, null));
 		assertTrue(validator.isValid(StringUtils.EMPTY, null));

@@ -22,9 +22,7 @@ import java.io.File;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,6 @@ import org.springframework.util.Assert;
 @Component
 public class Settings {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private ServletContext servletContext;
 	@Getter
 	private File documentrDataDir;
@@ -53,11 +50,5 @@ public class Settings {
 			value = System.getProperty(param);
 		}
 		return value;
-	}
-	
-	// used for testing
-	@SuppressWarnings("unused")
-	private void setDocumentrDataDir(File dataDir) {
-		this.documentrDataDir = dataDir;
 	}
 }

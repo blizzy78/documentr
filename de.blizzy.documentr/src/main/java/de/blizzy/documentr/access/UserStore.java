@@ -30,9 +30,6 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -71,10 +68,8 @@ public class UserStore {
 	private static final String AUTHORITIES_SUFFIX = ".authorities"; //$NON-NLS-1$
 	
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private PasswordEncoder passwordEncoder;
 	
 	@PostConstruct

@@ -25,11 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.ui.Model;
 
-import de.blizzy.documentr.web.util.ErrorController;
+import de.blizzy.documentr.AbstractDocumentrTest;
 
-public class ErrorControllerTest {
+public class ErrorControllerTest extends AbstractDocumentrTest {
+	@Mock
+	private Model model;
 	private ErrorController errorController;
 
 	@Before
@@ -39,7 +42,6 @@ public class ErrorControllerTest {
 	
 	@Test
 	public void sendError() {
-		Model model = mock(Model.class);
 		String view = errorController.sendError(HttpServletResponse.SC_FORBIDDEN, "key", model); //$NON-NLS-1$
 		assertEquals("/sendError", view); //$NON-NLS-1$
 		

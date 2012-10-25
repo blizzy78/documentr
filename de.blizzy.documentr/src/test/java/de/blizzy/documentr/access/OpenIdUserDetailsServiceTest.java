@@ -22,24 +22,22 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
-public class OpenIdUserDetailsServiceTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class OpenIdUserDetailsServiceTest extends AbstractDocumentrTest {
+	@Mock
 	private UserStore userStore;
+	@Mock
+	private User user;
+	@InjectMocks
 	private OpenIdUserDetailsService userDetailsService;
 
-	@Before
-	public void setUp() {
-		userStore = mock(UserStore.class);
-		
-		userDetailsService = new OpenIdUserDetailsService();
-		userDetailsService.setUserStore(userStore);
-	}
-	
 	@Test
 	public void loadUser() throws IOException {
-		User user = mock(User.class);
 		when(userStore.getUserByOpenId("openId")).thenReturn(user); //$NON-NLS-1$
 		
 		User result = userDetailsService.loadUser("openId"); //$NON-NLS-1$

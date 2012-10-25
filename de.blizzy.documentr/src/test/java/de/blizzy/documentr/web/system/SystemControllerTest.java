@@ -67,6 +67,24 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 	private UserStore userStore;
 	@Mock
 	private MacroFactory macroFactory;
+	@Mock
+	private IMacroDescriptor macroDescriptor1;
+	@Mock
+	private IMacroDescriptor macroDescriptor2;
+	@Mock
+	private MacroSetting setting1;
+	@Mock
+	private MacroSetting setting2;
+	@Mock
+	private Model model;
+	@Mock
+	private User user;
+	@Mock
+	private Authentication authentication;
+	@Mock
+	private BindingResult bindingResult;
+	@Mock
+	private WebRequest webRequest;
 	@InjectMocks
 	private SystemController systemController;
 	
@@ -76,15 +94,11 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void editSettings() {
-		IMacroDescriptor macroDescriptor1 = mock(IMacroDescriptor.class);
 		when(macroDescriptor1.getMacroName()).thenReturn("macro1"); //$NON-NLS-1$
-		MacroSetting setting1 = mock(MacroSetting.class);
 		when(setting1.value()).thenReturn("key1"); //$NON-NLS-1$
 		when(macroDescriptor1.getSettings()).thenReturn(Sets.newHashSet(setting1));
 		
-		IMacroDescriptor macroDescriptor2 = mock(IMacroDescriptor.class);
 		when(macroDescriptor2.getMacroName()).thenReturn("macro2"); //$NON-NLS-1$
-		MacroSetting setting2 = mock(MacroSetting.class);
 		when(setting2.value()).thenReturn("key2"); //$NON-NLS-1$
 		when(macroDescriptor2.getSettings()).thenReturn(Sets.newHashSet(setting2));
 
@@ -107,7 +121,6 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		settings.put(SystemSettingsStore.UPDATE_CHECK_INTERVAL, UPDATE_CHECK_INTERVAL);
 		when(systemSettingsStore.getSettings()).thenReturn(settings);
 		
-		Model model = mock(Model.class);
 		String view = systemController.editSettings(model);
 		assertEquals("/system/edit", view); //$NON-NLS-1$
 		
@@ -131,14 +144,10 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveSettings() throws IOException {
-		Authentication authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
 		
-		User user = mock(User.class);
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 		
-		BindingResult bindingResult = mock(BindingResult.class);
-
 		SortedMap<String, SortedMap<String, String>> allMacroSettings = Maps.newTreeMap();
 		SortedMap<String, String> macroSettings = Maps.newTreeMap();
 		macroSettings.put("key1", "macroValue1"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -178,17 +187,15 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void createSystemSettingsForm() {
-		WebRequest request = mock(WebRequest.class);
-		
 		Map<String, String[]> params = Maps.newHashMap();
 		params.put("macro.macro1.key1", new String[] { "macroValue1" }); //$NON-NLS-1$ //$NON-NLS-2$
 		params.put("macro.macro2.key2", new String[] { "macroValue2" }); //$NON-NLS-1$ //$NON-NLS-2$
-		when(request.getParameterMap()).thenReturn(params);
+		when(webRequest.getParameterMap()).thenReturn(params);
 
 		SystemSettingsForm form = systemController.createSystemSettingsForm(DOCUMENTR_HOST,
 				SITE_NOTICE, MAIL_HOST_NAME, Integer.valueOf(123), MAIL_SENDER_EMAIL, MAIL_SENDER_NAME,
 				MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, Integer.valueOf(234), PAGE_FOOTER_HTML,
-				UPDATE_CHECK_INTERVAL, request);
+				UPDATE_CHECK_INTERVAL, webRequest);
 		assertEquals(DOCUMENTR_HOST, form.getDocumentrHost()); 
 		assertEquals(SITE_NOTICE, form.getSiteNotice()); 
 		assertEquals(MAIL_HOST_NAME, form.getMailHostName()); 

@@ -18,21 +18,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.page;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class CommitCherryPickResultTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class CommitCherryPickResultTest extends AbstractDocumentrTest {
+	@Mock
+	private PageVersion pageVersion;
+	
 	@Test
 	public void getPageVersion() {
-		PageVersion pageVersion = mock(PageVersion.class);
 		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN);
 		assertEquals(pageVersion, result.getPageVersion());
 	}
 
 	@Test
 	public void getStatus() {
-		PageVersion pageVersion = mock(PageVersion.class);
 		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN);
 		assertSame(CommitCherryPickResult.Status.UNKNOWN, result.getStatus());
 
@@ -42,7 +45,6 @@ public class CommitCherryPickResultTest {
 
 	@Test
 	public void getConflictText() {
-		PageVersion pageVersion = mock(PageVersion.class);
 		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN);
 		assertNull(result.getConflictText());
 

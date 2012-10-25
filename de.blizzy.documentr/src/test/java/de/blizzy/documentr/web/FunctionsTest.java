@@ -90,6 +90,12 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private MacroFactory macroFactory;
 	@Mock
 	private HttpServletRequest request;
+	@Mock
+	private IMacroDescriptor descriptor1;
+	@Mock
+	private IMacroDescriptor descriptor2;
+	@Mock
+	private PageMetadata pageMetadata;
 
 	@Before
 	public void setUp() {
@@ -285,12 +291,10 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getMacros() {
-		IMacroDescriptor descriptor1 = mock(IMacroDescriptor.class);
 		when(descriptor1.getTitle(LOCALE)).thenReturn("title1"); //$NON-NLS-1$
 		when(descriptor1.getDescription(LOCALE)).thenReturn("description1"); //$NON-NLS-1$
 		when(descriptor1.getInsertText()).thenReturn("insertText1"); //$NON-NLS-1$
 
-		IMacroDescriptor descriptor2 = mock(IMacroDescriptor.class);
 		when(descriptor2.getTitle(LOCALE)).thenReturn("title2"); //$NON-NLS-1$
 		when(descriptor2.getDescription(LOCALE)).thenReturn("description2"); //$NON-NLS-1$
 		when(descriptor2.getInsertText()).thenReturn("insertText2"); //$NON-NLS-1$
@@ -321,7 +325,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void pageExists() throws IOException {
-		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(mock(PageMetadata.class));
+		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(pageMetadata);
 		assertTrue(Functions.pageExists(PROJECT, BRANCH, PAGE));
 		
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenThrow(PageNotFoundException.class);

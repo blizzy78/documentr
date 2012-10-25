@@ -26,18 +26,22 @@ import java.util.GregorianCalendar;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class AuthenticationUtilTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class AuthenticationUtilTest extends AbstractDocumentrTest {
+	@Mock
+	private HttpSession session;
+	
 	@Test
 	public void setAuthenticationCreationTime() {
-		HttpSession session = mock(HttpSession.class);
 		AuthenticationUtil.setAuthenticationCreationTime(session, 123);
 		verify(session).setAttribute("authenticationCreationTime", Long.valueOf(123)); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void getAuthenticationCreationTime() {
-		HttpSession session = mock(HttpSession.class);
 		Calendar c = new GregorianCalendar(2012, Calendar.JUNE, 17);
 		c.set(Calendar.MILLISECOND, 123);
 		long time = c.getTimeInMillis();

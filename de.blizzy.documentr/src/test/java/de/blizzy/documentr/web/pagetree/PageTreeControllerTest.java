@@ -26,14 +26,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
@@ -41,29 +43,18 @@ import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
-public class PageTreeControllerTest {
+public class PageTreeControllerTest extends AbstractDocumentrTest {
+	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
 	private IPageStore pageStore;
-	private PageTreeController pageTreeController;
-	private Authentication authentication;
+	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private Authentication authentication;
+	@InjectMocks
+	private PageTreeController pageTreeController;
 
-	@Before
-	public void setUp() {
-		repoManager = mock(GlobalRepositoryManager.class);
-		
-		pageStore = mock(IPageStore.class);
-		
-		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
-		
-		pageTreeController = new PageTreeController();
-		pageTreeController.setGlobalRepositoryManager(repoManager);
-		pageTreeController.setPermissionEvaluator(permissionEvaluator);
-		pageTreeController.setPageStore(pageStore);
-		
-		authentication = mock(Authentication.class);
-	}
-	
 	@Test
 	@SuppressWarnings("boxing")
 	public void getApplicationChildren() {

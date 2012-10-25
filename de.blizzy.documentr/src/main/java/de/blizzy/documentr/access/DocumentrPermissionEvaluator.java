@@ -22,9 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
@@ -60,10 +57,8 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 @Component
 public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	@Autowired
 	private GlobalRepositoryManager repoManager;

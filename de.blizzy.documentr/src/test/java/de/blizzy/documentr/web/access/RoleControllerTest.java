@@ -28,6 +28,8 @@ import java.util.EnumSet;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -35,34 +37,34 @@ import org.springframework.validation.BindingResult;
 
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrMatchers;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.Role;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 
-public class RoleControllerTest {
+public class RoleControllerTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+	@Mock
 	private UserStore userStore;
-	private RoleController roleController;
+	@Mock
 	private Authentication authentication;
+	@Mock
+	private Model model;
+	@InjectMocks
+	private RoleController roleController;
 
 	@Before
 	public void setUp() throws IOException {
-		userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		roleController = new RoleController();
-		roleController.setUserStore(userStore);
-
-		authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
 	public void addRole() {
-		Model model = mock(Model.class);
 		String view = roleController.addRole(model);
 		assertEquals("/user/role/edit", view); //$NON-NLS-1$
 		
@@ -74,7 +76,6 @@ public class RoleControllerTest {
 		when(userStore.getRole("role")).thenReturn( //$NON-NLS-1$
 			new Role("role", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE))); //$NON-NLS-1$
 		
-		Model model = mock(Model.class);
 		String view = roleController.editRole("role", model); //$NON-NLS-1$
 		assertEquals("/user/role/edit", view); //$NON-NLS-1$
 		

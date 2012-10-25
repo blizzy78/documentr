@@ -28,22 +28,28 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 
 import com.google.common.base.Charsets;
 
-public class RequestEncodingFilterTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class RequestEncodingFilterTest extends AbstractDocumentrTest {
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private HttpServletResponse response;
+	@Mock
+	private FilterChain filterChain;
+	
 	@Test
 	public void foo() throws IOException, ServletException {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		FilterChain chain = mock(FilterChain.class);
-		
 		RequestEncodingFilter filter = new RequestEncodingFilter();
-		filter.doFilter(request, response, chain);
+		filter.doFilter(request, response, filterChain);
 
-		InOrder inOrder = inOrder(request, response, chain);
+		InOrder inOrder = inOrder(request, response, filterChain);
 		inOrder.verify(request).setCharacterEncoding(Charsets.UTF_8.name());
 		inOrder.verify(response).setCharacterEncoding(Charsets.UTF_8.name());
-		inOrder.verify(chain).doFilter(request, response);
+		inOrder.verify(filterChain).doFilter(request, response);
 	}
 }

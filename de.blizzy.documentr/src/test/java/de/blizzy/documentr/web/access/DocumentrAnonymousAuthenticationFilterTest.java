@@ -26,24 +26,28 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrAnonymousAuthenticationFactory;
 
-public class DocumentrAnonymousAuthenticationFilterTest {
+public class DocumentrAnonymousAuthenticationFilterTest extends AbstractDocumentrTest {
+	@Mock
+	private AnonymousAuthenticationToken authentication;
+	@Mock
+	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
+	@Mock
+	private HttpServletRequest request;
+	@InjectMocks
+	private DocumentrAnonymousAuthenticationFilter filter;
+	
 	@Test
 	public void createAuthentication() throws IOException {
-		AnonymousAuthenticationToken authentication = mock(AnonymousAuthenticationToken.class);
-		
-		DocumentrAnonymousAuthenticationFactory authenticationFactory = mock(DocumentrAnonymousAuthenticationFactory.class);
 		when(authenticationFactory.create(anyString())).thenReturn(authentication);
 		
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		
-		DocumentrAnonymousAuthenticationFilter filter = new DocumentrAnonymousAuthenticationFilter();
-		filter.setAnonymousAuthenticationFactory(authenticationFactory);
-
 		Authentication result = filter.createAuthentication(request);
 		assertSame(authentication, result);
 	}

@@ -53,12 +53,6 @@ public final class PageUtil {
 		projectEditTimes.put(projectName, Long.valueOf(System.currentTimeMillis()));
 	}
 
-	// used for testing
-	@SuppressWarnings("unused")
-	private static void clearProjectEditTimes() {
-		projectEditTimes.clear();
-	}
-	
 	public static long getProjectEditTime(String projectName) {
 		Long time = projectEditTimes.get(projectName);
 		return (time != null) ? time.longValue() : -1;

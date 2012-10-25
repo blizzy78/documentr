@@ -22,14 +22,18 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
-public class EventBusBeanFactoryPostProcessorTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class EventBusBeanFactoryPostProcessorTest extends AbstractDocumentrTest {
+	@Mock
+	private ConfigurableListableBeanFactory beanFactory;
+	
 	@Test
 	public void postProcessBeanFactory() {
-		ConfigurableListableBeanFactory beanFactory = mock(ConfigurableListableBeanFactory.class);
-
 		EventBusBeanFactoryPostProcessor beanFactoryPostProcessor = new EventBusBeanFactoryPostProcessor();
 		beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
 		

@@ -25,11 +25,11 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.MessageSource;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.markdown.macro.MessageSourceMacroDescriptor;
 
 public class MessageSourceMacroDescriptorTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class MessageSourceMacroDescriptorTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() {
 		MessageSourceMacroDescriptor desc = new MessageSourceMacroDescriptor(MACRO);
-		desc.setMessageSource(messageSource);
+		Whitebox.setInternalState(desc, messageSource);
 		
 		when(beanFactory.getBean(MessageSourceMacroDescriptor.ID, MACRO)).thenReturn(desc);
 	

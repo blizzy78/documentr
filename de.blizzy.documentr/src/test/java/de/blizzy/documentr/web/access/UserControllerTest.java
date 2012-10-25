@@ -29,6 +29,10 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
@@ -36,37 +40,38 @@ import org.springframework.validation.BeanPropertyBindingResult;
 
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.OpenId;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserNotFoundException;
 import de.blizzy.documentr.access.UserStore;
 
-public class UserControllerTest {
+public class UserControllerTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	
+
+	@Mock
 	private UserStore userStore;
-	private ShaPasswordEncoder passwordEncoder;
-	private UserController userController;
+	@Mock
 	private Authentication authentication;
+	@Mock
+	private Model model;
+	private PasswordEncoder passwordEncoder;
+	@InjectMocks
+	private UserController userController;
 
 	@Before
 	public void setUp() throws IOException {
-		userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
 		passwordEncoder = new ShaPasswordEncoder();
+
+		Whitebox.setInternalState(userController, passwordEncoder);
 		
-		userController = new UserController();
-		userController.setUserStore(userStore);
-		userController.setPasswordEncoder(passwordEncoder);
-		
-		authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
 	public void addUser() {
-		Model model = mock(Model.class);
 		String view = userController.addUser(model);
 		assertEquals("/user/edit", view); //$NON-NLS-1$
 		
@@ -167,7 +172,6 @@ public class UserControllerTest {
 		User user = new User("user", "pw", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 
-		Model model = mock(Model.class);
 		String view = userController.editUser("user", model); //$NON-NLS-1$
 		assertEquals("/user/edit", view); //$NON-NLS-1$
 		

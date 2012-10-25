@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -37,42 +39,40 @@ import org.springframework.validation.BindingResult;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
-public class BranchControllerTest {
+public class BranchControllerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
-	private BranchController branchController;
+	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
 	private IPageStore pageStore;
+	@Mock
+	private UserStore userStore;
+	@Mock
 	private Authentication authentication;
+	@Mock
+	private Model model;
+	@InjectMocks
+	private BranchController branchController;
 
 	@Before
 	public void setUp() throws IOException {
-		repoManager = mock(GlobalRepositoryManager.class);
-		pageStore = mock(IPageStore.class);
-		
-		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		branchController = new BranchController();
-		branchController.setGlobalRepositoryManager(repoManager);
-		branchController.setPageStore(pageStore);
-		branchController.setUserStore(userStore);
-
-		authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
 	public void createBranch() {
-		Model model = mock(Model.class);
 		String view = branchController.createBranch(PROJECT, model);
 		assertEquals("/project/branch/edit", view); //$NON-NLS-1$
 		

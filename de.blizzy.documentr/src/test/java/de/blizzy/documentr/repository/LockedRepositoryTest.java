@@ -19,19 +19,17 @@ package de.blizzy.documentr.repository;
 
 import static org.mockito.Mockito.*;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.google.common.io.Closeables;
 
-public class LockedRepositoryTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class LockedRepositoryTest extends AbstractDocumentrTest {
+	@Mock
 	private LockManager lockManager;
 
-	@Before
-	public void setUp() {
-		lockManager = mock(LockManager.class);
-	}
-	
 	@Test
 	public void lockAndUnlockProjectCentral() {
 		Lock lock = new Lock(Thread.currentThread());

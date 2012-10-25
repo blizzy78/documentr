@@ -28,41 +28,42 @@ import java.io.IOException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
-public class ProjectControllerTest {
+public class ProjectControllerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
-	private ProjectController projectController;
+	@Mock
 	private GlobalRepositoryManager repoManager;
+	@Mock
+	private UserStore userStore;
+	@Mock
 	private Authentication authentication;
+	@Mock
+	private Model model;
+	@InjectMocks
+	private ProjectController projectController;
 
 	@Before
 	public void setUp() throws IOException {
-		repoManager = mock(GlobalRepositoryManager.class);
-		
-		UserStore userStore = mock(UserStore.class);
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		projectController = new ProjectController();
-		projectController.setGlobalRepositoryManager(repoManager);
-		projectController.setUserStore(userStore);
-
-		authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
 	
 	@Test
 	public void getProject() {
-		Model model = mock(Model.class);
 		String view = projectController.getProject(PROJECT, model);
 		assertEquals("/project/view", view); //$NON-NLS-1$
 		
@@ -71,7 +72,6 @@ public class ProjectControllerTest {
 
 	@Test
 	public void createProject() {
-		Model model = mock(Model.class);
 		String view = projectController.createProject(model);
 		assertEquals("/project/edit", view); //$NON-NLS-1$
 		

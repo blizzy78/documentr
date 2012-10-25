@@ -26,9 +26,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,13 +40,10 @@ import de.blizzy.documentr.access.User;
 @Component
 public class GlobalRepositoryManager {
 	@Autowired
-	@Setter
 	private Settings settings;
 	@Autowired
-	@Setter
 	private ProjectRepositoryManagerFactory repositoryManagerFactory;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 	private File reposDir;
 	

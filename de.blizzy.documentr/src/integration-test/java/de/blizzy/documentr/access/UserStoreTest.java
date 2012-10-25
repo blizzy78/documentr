@@ -30,14 +30,15 @@ import java.util.Set;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.LockManager;
@@ -46,26 +47,31 @@ import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
 public class UserStoreTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+	@Mock
+	private Settings settings;
+	@Mock
+	@SuppressWarnings("unused")
+	private LockManager lockManager;
 	private UserStore userStore;
-	private PasswordEncoder passwordEncoder;
+	@InjectMocks
+	private ShaPasswordEncoder passwordEncoder;
+	@InjectMocks
+	private ProjectRepositoryManagerFactory repoManagerFactory;
 
 	@Before
 	public void setUp() throws IOException, GitAPIException {
 		File dataDir = createTempDir();
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
+		
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
-		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		repoManagerFactory.setLockManager(mock(LockManager.class));
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
+		Whitebox.setInternalState(globalRepoManager, settings);
+		Whitebox.setInternalState(globalRepoManager, repoManagerFactory);
 		globalRepoManager.init();
 
 		userStore = new UserStore();
-		userStore.setGlobalRepositoryManager(globalRepoManager);
-		passwordEncoder = new ShaPasswordEncoder();
-		userStore.setPasswordEncoder(passwordEncoder);
+		Whitebox.setInternalState(userStore, globalRepoManager);
+		Whitebox.setInternalState(userStore, passwordEncoder);
 		userStore.init();
 	}
 	

@@ -29,20 +29,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.LockManager;
 import de.blizzy.documentr.repository.ProjectRepositoryManagerFactory;
-import de.blizzy.documentr.repository.TestGlobalRepositoryManagerUtil;
 
 public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -53,7 +52,6 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	private static final String EMAIL = "email"; //$NON-NLS-1$
 	private static final String EMAIL_2 = "email2"; //$NON-NLS-1$
 
-	private GlobalRepositoryManager globalRepoManager;
 	@Mock
 	private UserStore userStore;
 	@Mock
@@ -62,11 +60,23 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	private User user;
 	@Mock
 	private User user2;
+	@Mock
+	private Settings settings;
+	@Mock
+	@SuppressWarnings("unused")
+	private LockManager lockManager;
 	@InjectMocks
 	private SubscriptionStore subscriptionStore;
+	@InjectMocks
+	private ProjectRepositoryManagerFactory repoManagerFactory;
+	private GlobalRepositoryManager globalRepoManager;
 	
 	@Before
 	public void setUp() throws IOException {
+		File dataDir = createTempDir();
+		
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
+
 		when(user.getLoginName()).thenReturn(USER);
 		when(user.getEmail()).thenReturn(EMAIL);
 		when(user2.getLoginName()).thenReturn(USER_2);
@@ -75,19 +85,13 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 		when(userStore.getUser(USER)).thenReturn(user);
 		when(userStore.getUser(USER_2)).thenReturn(user2);
 		
-		File dataDir = createTempDir();
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
-
 		globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
-		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		repoManagerFactory.setLockManager(mock(LockManager.class));
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
-		TestGlobalRepositoryManagerUtil.setEventBus(globalRepoManager, eventBus);
+		Whitebox.setInternalState(globalRepoManager, settings); 
+		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
+		Whitebox.setInternalState(globalRepoManager, eventBus); 
 		globalRepoManager.init();
 		
-		subscriptionStore.setGlobalRepositoryManager(globalRepoManager);
+		Whitebox.setInternalState(subscriptionStore, globalRepoManager);
 	}
 	
 	@Test

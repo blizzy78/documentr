@@ -24,12 +24,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.ui.Model;
 
-public class AccessControllerTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class AccessControllerTest extends AbstractDocumentrTest {
+	@Mock
+	private AuthenticationException authenticationException;
+	@Mock
+	private AccessDeniedException accessDeniedException;
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private Model model;
+	@Mock
+	private HttpSession session;
+	
 	@Test
 	public void login() {
 		assertEquals("/login", new AccessController().login()); //$NON-NLS-1$
@@ -37,11 +51,8 @@ public class AccessControllerTest {
 
 	@Test
 	public void loginError() {
-		AuthenticationException ex = mock(AuthenticationException.class);
-		when(ex.getMessage()).thenReturn("message"); //$NON-NLS-1$
-		HttpSession session = mock(HttpSession.class);
-		when(session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).thenReturn(ex);
-		Model model = mock(Model.class);
+		when(authenticationException.getMessage()).thenReturn("message"); //$NON-NLS-1$
+		when(session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).thenReturn(authenticationException);
 		
 		String view = new AccessController().loginError(session, model);
 		assertEquals("/login", view); //$NON-NLS-1$
@@ -51,11 +62,8 @@ public class AccessControllerTest {
 
 	@Test
 	public void loginForbidden() {
-		AccessDeniedException ex = mock(AccessDeniedException.class);
-		when(ex.getMessage()).thenReturn("message"); //$NON-NLS-1$
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		when(request.getAttribute(WebAttributes.ACCESS_DENIED_403)).thenReturn(ex);
-		Model model = mock(Model.class);
+		when(accessDeniedException.getMessage()).thenReturn("message"); //$NON-NLS-1$
+		when(request.getAttribute(WebAttributes.ACCESS_DENIED_403)).thenReturn(accessDeniedException);
 		
 		String view = new AccessController().loginForbidden(request, model);
 		assertEquals("/login", view); //$NON-NLS-1$

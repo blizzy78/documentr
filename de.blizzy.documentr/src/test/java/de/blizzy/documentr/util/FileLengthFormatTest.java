@@ -23,14 +23,17 @@ import static org.mockito.Mockito.*;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 
-import de.blizzy.documentr.util.FileLengthFormat;
+import de.blizzy.documentr.AbstractDocumentrTest;
 
-public class FileLengthFormatTest {
+public class FileLengthFormatTest extends AbstractDocumentrTest {
+	@Mock
+	private MessageSource messageSource;
+	
 	@Test
 	public void format() {
-		MessageSource messageSource = mock(MessageSource.class);
 		when(messageSource.getMessage("sizeX.bytes", new Object[] { "123" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn("123 bytes"); //$NON-NLS-1$
 		when(messageSource.getMessage("sizeX.kb", new Object[] { "1.21" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$

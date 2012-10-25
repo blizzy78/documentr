@@ -22,23 +22,31 @@ import static org.mockito.Mockito.*;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
-public class DocumentrMethodSecurityExpressionHandlerTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class DocumentrMethodSecurityExpressionHandlerTest extends AbstractDocumentrTest {
+	@Mock
+	private MethodInvocation methodInvocation;
+	@Mock
+	@SuppressWarnings("unused")
+	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private Authentication authentication;
+	@InjectMocks
+	private DocumentrMethodSecurityExpressionHandler expressionHandler;
+	
 	@Test
 	public void createSecurityExpressionRoot() {
-		MethodInvocation methodInvocation = mock(MethodInvocation.class);
 		Object target = "this"; //$NON-NLS-1$
 		when(methodInvocation.getThis()).thenReturn(target);
 		
-		DocumentrPermissionEvaluator permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
-		
-		DocumentrMethodSecurityExpressionHandler expressionHandler = new DocumentrMethodSecurityExpressionHandler();
-		expressionHandler.setPermissionEvaluator(permissionEvaluator);
-
 		DocumentrSecurityExpressionRoot root =
 				(DocumentrSecurityExpressionRoot) expressionHandler.createSecurityExpressionRoot(
-						mock(Authentication.class), methodInvocation);
+						authentication, methodInvocation);
 		assertSame(target, root.getThis());
 	}
 }

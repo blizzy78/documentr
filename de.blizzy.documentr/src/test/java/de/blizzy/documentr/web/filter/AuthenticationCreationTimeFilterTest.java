@@ -31,6 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,28 +39,37 @@ import org.springframework.security.core.context.SecurityContextImpl;
 
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.TestUtil;
 
-public class AuthenticationCreationTimeFilterTest {
+public class AuthenticationCreationTimeFilterTest extends AbstractDocumentrTest {
+	@Mock
+	private Authentication authentication;
+	@Mock
+	private HttpSession session;
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private ServletResponse response;
+	@Mock
+	private FilterChain filterChain;
+	
 	@Test
 	public void doFilter() throws IOException, ServletException {
-		Authentication authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
 		doReturn(Sets.newHashSet(
 				new SimpleGrantedAuthority("authority1"), //$NON-NLS-1$
 				new SimpleGrantedAuthority("authority2"))) //$NON-NLS-1$
 			.when(authentication).getAuthorities();
 		
-		HttpSession session = mock(HttpSession.class);
 		when(session.getAttribute("authenticationHashCode")).thenReturn(Integer.valueOf(123)); //$NON-NLS-1$
 		
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getSession()).thenReturn(session);
 		
 		SecurityContextImpl securityContext = new SecurityContextImpl();
 		securityContext.setAuthentication(authentication);
 		SecurityContextHolder.setContext(securityContext);
-		new AuthenticationCreationTimeFilter().doFilter(request, mock(ServletResponse.class), mock(FilterChain.class));
+		new AuthenticationCreationTimeFilter().doFilter(request, response, filterChain);
 		SecurityContextHolder.clearContext();
 		
 		ArgumentCaptor<Long> timeArgument = ArgumentCaptor.forClass(Long.class);

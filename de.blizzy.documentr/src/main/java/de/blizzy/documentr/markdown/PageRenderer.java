@@ -19,8 +19,6 @@ package de.blizzy.documentr.markdown;
 
 import java.io.IOException;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +34,8 @@ import de.blizzy.documentr.util.Util;
 @Slf4j
 class PageRenderer implements IPageRenderer {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private MarkdownProcessor markdownProcessor;
 	
 	@Override

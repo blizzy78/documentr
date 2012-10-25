@@ -24,26 +24,26 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 
-public class AccountControllerTest {
+public class AccountControllerTest extends AbstractDocumentrTest {
+	@Mock
 	private UserStore userStore;
+	@Mock
+	private User user;
+	@Mock
+	private Authentication authentication;
+	@InjectMocks
 	private AccountController accountController;
 
-	@Before
-	public void setUp() {
-		userStore = mock(UserStore.class);
-
-		accountController = new AccountController();
-		accountController.setUserStore(userStore);
-	}
-	
 	@Test
 	public void getMyAccount() {
 		assertEquals("/account/index", accountController.getMyAccount()); //$NON-NLS-1$
@@ -56,10 +56,8 @@ public class AccountControllerTest {
 	
 	@Test
 	public void removeOpenId() throws IOException {
-		User user = mock(User.class);
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 
-		Authentication authentication = mock(Authentication.class);
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
 		
 		String view = accountController.removeOpenId("openId", authentication); //$NON-NLS-1$

@@ -17,9 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +39,9 @@ class MacroContext implements IMacroContext {
 	
 	@Autowired
 	@Getter
-	@Setter(AccessLevel.PACKAGE)
 	private IPageStore pageStore;
 	@Autowired
 	@Getter
-	@Setter(AccessLevel.PACKAGE)
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	@Getter
 	private String macroName;
@@ -56,7 +52,6 @@ class MacroContext implements IMacroContext {
 	@Getter
 	private HtmlSerializerContext htmlSerializerContext;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private SystemSettingsStore systemSettingsStore;
 
 	MacroContext(String macroName, String parameters, String body, HtmlSerializerContext htmlSerializerContext) {

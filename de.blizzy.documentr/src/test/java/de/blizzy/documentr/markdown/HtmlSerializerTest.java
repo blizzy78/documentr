@@ -22,8 +22,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.pegdown.ast.ExpImageNode;
 import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.Node;
@@ -37,16 +38,14 @@ import org.pegdown.ast.VerbatimNode;
 
 import com.google.common.collect.Lists;
 
-public class HtmlSerializerTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class HtmlSerializerTest extends AbstractDocumentrTest {
+	@Mock
 	private HtmlSerializerContext context;
+	@InjectMocks
 	private HtmlSerializer htmlSerializer;
 
-	@Before
-	public void setUp() {
-		context = mock(HtmlSerializerContext.class);
-		htmlSerializer = new HtmlSerializer(context);
-	}
-	
 	@Test
 	public void visitVerbatimNode() {
 		String text = "x\ny\nz"; //$NON-NLS-1$

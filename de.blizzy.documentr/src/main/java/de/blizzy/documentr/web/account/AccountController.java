@@ -19,9 +19,6 @@ package de.blizzy.documentr.web.account;
 
 import java.io.IOException;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -37,7 +34,6 @@ import de.blizzy.documentr.access.UserStore;
 @RequestMapping("/account")
 public class AccountController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 	
 	@RequestMapping(value="/myAccount", method=RequestMethod.GET)

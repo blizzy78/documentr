@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import com.google.common.collect.Lists;
@@ -87,7 +88,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 		when(repoManager.listProjects()).thenReturn(Collections.<String>emptyList());
 
-		pageIndex.setTaskExecutor(MoreExecutors.sameThreadExecutor());
+		Whitebox.setInternalState(pageIndex, MoreExecutors.sameThreadExecutor());
 		
 		pageIndex.init();
 	}

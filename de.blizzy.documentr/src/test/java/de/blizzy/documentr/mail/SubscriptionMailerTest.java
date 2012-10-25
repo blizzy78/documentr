@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -81,7 +82,7 @@ public class SubscriptionMailerTest extends AbstractDocumentrTest {
 	
 	@Before
 	public void setUp() throws IOException {
-		mailer.setTaskExecutor(MoreExecutors.sameThreadExecutor());
+		Whitebox.setInternalState(mailer, MoreExecutors.sameThreadExecutor());
 
 		Map<String, String> settings = Maps.newHashMap();
 		settings.put(SystemSettingsStore.MAIL_SENDER_EMAIL, SENDER_EMAIL);

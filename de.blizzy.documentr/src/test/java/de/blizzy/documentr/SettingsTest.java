@@ -24,21 +24,16 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
-public class SettingsTest {
+public class SettingsTest extends AbstractDocumentrTest {
+	@Mock
 	private ServletContext servletContext;
+	@InjectMocks
 	private Settings settings;
 
-	@Before
-	public void setUp() {
-		servletContext = mock(ServletContext.class);
-		
-		settings = new Settings();
-		settings.setServletContext(servletContext);
-	}
-	
 	@Test
 	public void init() {
 		when(servletContext.getInitParameter("documentr.dataDir")).thenReturn("dataDir"); //$NON-NLS-1$ //$NON-NLS-2$

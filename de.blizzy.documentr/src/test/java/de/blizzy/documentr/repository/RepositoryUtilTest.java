@@ -25,11 +25,16 @@ import java.io.File;
 import org.eclipse.jgit.lib.Repository;
 import org.junit.Test;
 import org.junit.Test.None;
+import org.mockito.Mock;
 
-public class RepositoryUtilTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class RepositoryUtilTest extends AbstractDocumentrTest {
+	@Mock
+	private Repository repo;
+	
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyWithRepository() {
-		Repository repo = mock(Repository.class);
 		RepositoryUtil.closeQuietly(repo);
 		verify(repo).close();
 	}
@@ -41,7 +46,6 @@ public class RepositoryUtilTest {
 
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyMustCatchExceptions() {
-		Repository repo = mock(Repository.class);
 		doThrow(new RuntimeException()).when(repo).close();
 		
 		RepositoryUtil.closeQuietly(repo);
@@ -49,7 +53,6 @@ public class RepositoryUtilTest {
 	
 	@Test
 	public void getWorkingDir() {
-		Repository repo = mock(Repository.class);
 		File dir = new File("."); //$NON-NLS-1$
 		when(repo.getDirectory()).thenReturn(dir);
 		assertEquals(dir.getParentFile(), RepositoryUtil.getWorkingDir(repo));

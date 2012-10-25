@@ -24,25 +24,22 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.collect.Sets;
 
-public class DocumentrUserDetailsServiceTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class DocumentrUserDetailsServiceTest extends AbstractDocumentrTest {
+	@Mock
 	private UserStore userStore;
+	@InjectMocks
 	private LoginNameUserDetailsService userDetailsService;
 
-	@Before
-	public void setUp() {
-		userStore = mock(UserStore.class);
-		
-		userDetailsService = new LoginNameUserDetailsService();
-		userDetailsService.setUserStore(userStore);
-	}
-	
 	@Test
 	public void loadUserByUsername() throws IOException {
 		User user = new User("user", "pw", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

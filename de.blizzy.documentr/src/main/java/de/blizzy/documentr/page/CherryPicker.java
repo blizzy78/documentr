@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.CherryPickResult;
 import org.eclipse.jgit.api.CherryPickResult.CherryPickStatus;
@@ -57,10 +54,8 @@ import de.blizzy.documentr.util.Util;
 @Component
 class CherryPicker implements ICherryPicker {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private EventBus eventBus;
 	@Autowired
 	private IPageStore pageStore;

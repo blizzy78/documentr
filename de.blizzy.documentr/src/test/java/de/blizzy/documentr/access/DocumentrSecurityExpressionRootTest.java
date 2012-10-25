@@ -22,31 +22,29 @@ import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
-public class DocumentrSecurityExpressionRootTest {
+public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
+	@Mock
 	private Authentication authentication;
+	@Mock
 	private GlobalRepositoryManager repoManager;
-	private DocumentrSecurityExpressionRoot root;
+	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private HttpServletRequest request;
+	@InjectMocks
+	private DocumentrSecurityExpressionRoot root;
 
-	@Before
-	public void setUp() {
-		authentication = mock(Authentication.class);
-		repoManager = mock(GlobalRepositoryManager.class);
-		permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
-		
-		root = new DocumentrSecurityExpressionRoot(authentication, repoManager);
-		root.setPermissionEvaluator(permissionEvaluator);
-	}
-	
 	@Test
 	@SuppressWarnings("boxing")
 	public void hasApplicationPermission() {
@@ -108,7 +106,6 @@ public class DocumentrSecurityExpressionRootTest {
 	
 	@Test
 	public void setAndGetRequest() {
-		HttpServletRequest request = mock(HttpServletRequest.class);
 		root.setRequest(request);
 		assertSame(request, root.getRequest());
 	}

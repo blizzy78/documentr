@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.BeanFactory;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
@@ -48,9 +49,9 @@ public class MacroContextTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() {
 		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$
-		ctx.setPageStore(pageStore);
-		ctx.setPermissionEvaluator(permissionEvaluator);
-		ctx.setSystemSettingsStore(systemSettingsStore);
+		Whitebox.setInternalState(ctx, pageStore);
+		Whitebox.setInternalState(ctx, permissionEvaluator);
+		Whitebox.setInternalState(ctx, systemSettingsStore);
 		
 		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(ctx);

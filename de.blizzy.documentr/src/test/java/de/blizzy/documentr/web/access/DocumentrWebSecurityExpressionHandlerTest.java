@@ -18,26 +18,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.access;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 
+import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.DocumentrSecurityExpressionRoot;
 
-public class DocumentrWebSecurityExpressionHandlerTest {
+public class DocumentrWebSecurityExpressionHandlerTest extends AbstractDocumentrTest {
+	@Mock
+	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Mock
+	private Authentication authentication;
+	@Mock
+	private FilterInvocation filterInvocation;
+	
 	@Test
 	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
-		DocumentrPermissionEvaluator permissionEvaluator = mock(DocumentrPermissionEvaluator.class);
-
 		DocumentrWebSecurityExpressionHandler expressionHandler = new DocumentrWebSecurityExpressionHandler();
 		expressionHandler.setPermissionEvaluator(permissionEvaluator);
 		
 		SecurityExpressionOperations root = expressionHandler.createSecurityExpressionRoot(
-				mock(Authentication.class), mock(FilterInvocation.class));
+				authentication, filterInvocation);
 		assertTrue(root instanceof DocumentrSecurityExpressionRoot);
 	}
 }

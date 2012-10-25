@@ -35,8 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
@@ -158,7 +156,6 @@ public class PageIndex {
 	@Autowired
 	private UserStore userStore;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private ListeningExecutorService taskExecutor;
 	private Analyzer analyzer;
 	private Directory directory;

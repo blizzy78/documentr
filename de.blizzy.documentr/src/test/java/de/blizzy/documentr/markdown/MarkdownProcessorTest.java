@@ -59,18 +59,20 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	@Mock
 	@SuppressWarnings("unused")
 	private SystemSettingsStore systemSettingsStore;
+	@Mock
+	private IMacroDescriptor descriptor;
+	@Mock
+	private IMacroRunnable runnable;
+	@Mock
+	private IMacro macro;
 	@InjectMocks
 	private MarkdownProcessor markdownProcessor;
 
 	@Test
 	@SuppressWarnings("boxing")
 	public void markdownToHtml() {
-		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
 		when(descriptor.isCacheable()).thenReturn(true);
 
-		IMacroRunnable runnable = mock(IMacroRunnable.class);
-		
-		IMacro macro = mock(IMacro.class);
 		when(macro.getDescriptor()).thenReturn(descriptor);
 		when(macro.createRunnable()).thenReturn(runnable);
 		
@@ -98,10 +100,8 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void markdownToHtmlMustNotRenderNonCacheableMacros() {
-		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
 		when(descriptor.isCacheable()).thenReturn(false);
 		
-		IMacro macro = mock(IMacro.class);
 		when(macro.getDescriptor()).thenReturn(descriptor);
 		
 		when(macroFactory.get(MACRO)).thenReturn(macro);
@@ -120,12 +120,8 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	@Test
 	@SuppressWarnings("boxing")
 	public void processNonCacheableMacros() {
-		IMacroDescriptor descriptor = mock(IMacroDescriptor.class);
 		when(descriptor.isCacheable()).thenReturn(false);
 
-		IMacroRunnable runnable = mock(IMacroRunnable.class);
-		
-		IMacro macro = mock(IMacro.class);
 		when(macro.getDescriptor()).thenReturn(descriptor);
 		when(macro.createRunnable()).thenReturn(runnable);
 

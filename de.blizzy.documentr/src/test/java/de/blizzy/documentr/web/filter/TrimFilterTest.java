@@ -36,17 +36,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Charsets;
 
-public class TrimFilterTest {
+import de.blizzy.documentr.AbstractDocumentrTest;
+
+public class TrimFilterTest extends AbstractDocumentrTest {
 	private static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
 	private static final String TEXT = "  foo  \r\n"; //$NON-NLS-1$
 	private static final String TRIMMED_TEXT = "foo\n"; //$NON-NLS-1$
 	private static final byte[] TRIMMED_TEXT_DATA = TRIMMED_TEXT.getBytes(Charsets.UTF_8);
 	
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private HttpServletResponse response;
+	@Mock
+	private FilterChain filterChain;
+
 	@Test
 	public void doFilterWithOutputStream() throws IOException, ServletException {
 		doFilter(new Answer<Void>() {
@@ -124,10 +134,6 @@ public class TrimFilterTest {
 	}
 	
 	private void doFilter(Answer<Void> doFilterAnswer, String contentType, byte[] expectedData) throws IOException, ServletException {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		FilterChain filterChain = mock(FilterChain.class);
-
 		when(response.getCharacterEncoding()).thenReturn(Charsets.UTF_8.name());
 		when(response.getContentType()).thenReturn(contentType);
 

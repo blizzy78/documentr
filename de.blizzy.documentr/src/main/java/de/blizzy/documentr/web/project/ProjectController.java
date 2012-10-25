@@ -21,9 +21,6 @@ import java.io.IOException;
 
 import javax.validation.Valid;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,10 +47,8 @@ import de.blizzy.documentr.repository.ILockedRepository;
 @RequestMapping("/project")
 public class ProjectController {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private UserStore userStore;
 
 	@RequestMapping(value="/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)

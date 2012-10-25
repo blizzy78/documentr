@@ -27,47 +27,48 @@ import java.util.List;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
-import de.blizzy.documentr.TestSettingsUtil;
 import de.blizzy.documentr.access.User;
 
 public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
-	private File allReposDir;
-	private GlobalRepositoryManager globalRepoManager;
+	@Mock
+	private Settings settings;
+	@Mock
 	private ProjectRepositoryManager repoManager;
-	private ILockedRepository repo;
+	@Mock
+	private ProjectRepositoryManagerFactory repoManagerFactory;
+	@Mock
+	@SuppressWarnings("unused")
 	private EventBus eventBus;
+	@Mock
+	private ILockedRepository repo;
+	@Mock
+	private LockManager lockManager;
+	private File allReposDir;
+	@InjectMocks
+	private GlobalRepositoryManager globalRepoManager;
 
 	@Before
 	public void setUp() {
 		File dataDir = new File("."); //$NON-NLS-1$
 		allReposDir = new File(dataDir, "repositories"); //$NON-NLS-1$
 
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		
-		repoManager = mock(ProjectRepositoryManager.class);
-		
-		ProjectRepositoryManagerFactory repoManagerFactory = mock(ProjectRepositoryManagerFactory.class);
 		when(repoManagerFactory.getManager(allReposDir, PROJECT)).thenReturn(repoManager);
 		
-		eventBus = mock(EventBus.class);
-		
-		globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
-		globalRepoManager.setEventBus(eventBus);
 		globalRepoManager.init();
-
-		repo = mock(ILockedRepository.class);
 	}
 	
 	@Test
@@ -104,13 +105,12 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	@Test
 	public void listProjects() throws IOException, GitAPIException {
 		File dataDir = createTempDir();
-		Settings settings = new Settings();
-		TestSettingsUtil.setDataDir(settings, dataDir);
-		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
-		globalRepoManager.setSettings(settings);
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		repoManagerFactory.setLockManager(mock(LockManager.class));
-		globalRepoManager.setRepositoryManagerFactory(repoManagerFactory);
+		Whitebox.setInternalState(repoManagerFactory, lockManager); 
+		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
+		Whitebox.setInternalState(globalRepoManager, settings); 
+		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
 		globalRepoManager.init();
 		globalRepoManager.createProjectCentralRepository("project1", USER); //$NON-NLS-1$
 		globalRepoManager.createProjectCentralRepository("project2", USER); //$NON-NLS-1$

@@ -20,9 +20,6 @@ package de.blizzy.documentr.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +28,6 @@ import de.blizzy.documentr.validation.annotation.ProjectExists;
 
 public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
 	@Autowired
-	@Setter(AccessLevel.PACKAGE)
 	private GlobalRepositoryManager globalRepositoryManager;
 	
 	@Override
