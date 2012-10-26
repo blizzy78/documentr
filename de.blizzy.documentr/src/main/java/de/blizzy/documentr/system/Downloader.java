@@ -29,9 +29,7 @@ import org.springframework.http.HttpStatus.Series;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 class Downloader {
 	private static final long TIMEOUT = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
 

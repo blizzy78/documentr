@@ -34,8 +34,6 @@ public class UpdateChecker {
 	
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
-	@Autowired
-	private Downloader downloader;
 	@Getter
 	private boolean updateAvailable;
 	@Getter
@@ -94,7 +92,7 @@ public class UpdateChecker {
 	private Version getCurrentVersion() {
 		InputStreamReader in = null;
 		try {
-			InputStream stream = getClass().getClassLoader().getResourceAsStream("/documentr-version.properties"); //$NON-NLS-1$
+			InputStream stream = getResourceAsStream("/documentr-version.properties"); //$NON-NLS-1$
 			if (stream != null) {
 				in = new InputStreamReader(stream, Charsets.UTF_8);
 				Properties props = new Properties();
@@ -110,6 +108,10 @@ public class UpdateChecker {
 			IOUtils.closeQuietly(in);
 		}
 		return null;
+	}
+
+	private InputStream getResourceAsStream(String name) {
+		return getClass().getClassLoader().getResourceAsStream(name);
 	}
 
 	private Version getLatestVersionFromServer() {
@@ -141,7 +143,7 @@ public class UpdateChecker {
 	
 	private String loadLatestVersionsFromServer() {
 		try {
-			return downloader.getTextFromUrl(UPDATE_PROPERTIES_URL, Charsets.UTF_8);
+			return new Downloader().getTextFromUrl(UPDATE_PROPERTIES_URL, Charsets.UTF_8);
 		} catch (UnknownHostException e) {
 			log.info("couldn't retrieve {}: unknown host", UPDATE_PROPERTIES_URL); //$NON-NLS-1$
 		} catch (SocketTimeoutException e) {
