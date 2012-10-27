@@ -56,8 +56,12 @@ public class DocumentrParser extends Parser {
 		return NodeSequence(
 				"{{", //$NON-NLS-1$
 				MacroNameAndParameters(macroName, params, true),
-				push(new MacroNode(macroName.get(), params.get())),
+				push(new MacroNode(getSimpleMacroName(macroName.get()), params.get())),
 				"/}}"); //$NON-NLS-1$
+	}
+	
+	String getSimpleMacroName(String macroName) {
+		return StringUtils.substringBefore(macroName, ":"); //$NON-NLS-1$
 	}
 	
 	@SuppressWarnings("boxing")
@@ -74,7 +78,7 @@ public class DocumentrParser extends Parser {
 				"{{/", //$NON-NLS-1$
 				MacroName(macroName),
 				"}}", //$NON-NLS-1$
-				push(new MacroNode(macroName.get(), params.get(),
+				push(new MacroNode(getSimpleMacroName(macroName.get()), params.get(),
 						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
 	
@@ -104,7 +108,10 @@ public class DocumentrParser extends Parser {
 	@SuppressWarnings("boxing")
 	public Rule MacroName(StringVar macroName) {
 		return Sequence(
-				OneOrMore(Alphanumeric()),
+				Sequence(
+						OneOrMore(Alphanumeric()),
+						Optional(Sequence(':', OneOrMore(Digit())))
+				),
 				macroName.isSet() && match().equals(macroName.get()) ||
 					macroName.isNotSet() && macroName.set(match()));
 	}
