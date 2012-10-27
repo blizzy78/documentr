@@ -109,8 +109,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
 		Whitebox.setInternalState(repoManagerFactory, lockManager); 
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings); 
-		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory); 
 		globalRepoManager.init();
 		globalRepoManager.createProjectCentralRepository("project1", USER); //$NON-NLS-1$
 		globalRepoManager.createProjectCentralRepository("project2", USER); //$NON-NLS-1$

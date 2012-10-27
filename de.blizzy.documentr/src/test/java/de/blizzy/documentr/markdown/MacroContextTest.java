@@ -49,9 +49,7 @@ public class MacroContextTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() {
 		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$
-		Whitebox.setInternalState(ctx, pageStore);
-		Whitebox.setInternalState(ctx, permissionEvaluator);
-		Whitebox.setInternalState(ctx, systemSettingsStore);
+		Whitebox.setInternalState(ctx, pageStore, permissionEvaluator, systemSettingsStore);
 		
 		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(ctx);

@@ -81,14 +81,11 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings); 
-		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
-		Whitebox.setInternalState(globalRepoManager, eventBus); 
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus); 
 		globalRepoManager.init();
 
 		pageStore = new PageStore();
-		Whitebox.setInternalState(pageStore, globalRepoManager); 
-		Whitebox.setInternalState(pageStore, eventBus); 
+		Whitebox.setInternalState(pageStore, globalRepoManager, eventBus); 
 	}
 	
 	@Test

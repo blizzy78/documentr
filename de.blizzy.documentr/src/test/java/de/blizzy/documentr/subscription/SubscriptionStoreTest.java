@@ -86,9 +86,7 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 		when(userStore.getUser(USER_2)).thenReturn(user2);
 		
 		globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings); 
-		Whitebox.setInternalState(globalRepoManager, repoManagerFactory); 
-		Whitebox.setInternalState(globalRepoManager, eventBus); 
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus); 
 		globalRepoManager.init();
 		
 		Whitebox.setInternalState(subscriptionStore, globalRepoManager);

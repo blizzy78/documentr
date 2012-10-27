@@ -65,13 +65,11 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings);
-		Whitebox.setInternalState(globalRepoManager, repoManagerFactory);
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory);
 		globalRepoManager.init();
 
 		userStore = new UserStore();
-		Whitebox.setInternalState(userStore, globalRepoManager);
-		Whitebox.setInternalState(userStore, passwordEncoder);
+		Whitebox.setInternalState(userStore, globalRepoManager, passwordEncoder);
 		userStore.init();
 	}
 	
