@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -45,6 +47,9 @@ public class GroovyMacroScannerTest extends AbstractDocumentrTest {
 				"IMacroRunnable createRunnable() { null }\n" +
 			"}";
 	
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+
 	@Mock
 	private Settings settings;
 	@InjectMocks
@@ -52,7 +57,7 @@ public class GroovyMacroScannerTest extends AbstractDocumentrTest {
 	
 	@Before
 	public void setUp() throws IOException {
-		File dataDir = createTempDir();
+		File dataDir = tempDir.getRoot();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		
 		File macrosDir = new File(dataDir, GroovyMacroScanner.MACROS_DIR_NAME);

@@ -17,14 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
-import static junit.framework.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.MockitoAnnotations;
@@ -35,15 +29,7 @@ import com.google.common.io.Closeables;
 import de.blizzy.documentr.repository.ILockedRepository;
 
 public abstract class AbstractDocumentrTest {
-	private static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
-	
-	private Set<File> tempDirs = Sets.newHashSet();
 	private Set<ILockedRepository> repositories = Sets.newHashSet();
-	
-	@Before
-	public void setUpTempDirs() {
-		assertTrue(StringUtils.isNotBlank(TEMP_DIR_PATH));
-	}
 	
 	@Before
 	public void initMocks() {
@@ -51,32 +37,11 @@ public abstract class AbstractDocumentrTest {
 	}
 
 	@After
-	public void deleteTempDirs() {
+	public void closeRepositories() {
 		for (ILockedRepository repo : repositories) {
 			Closeables.closeQuietly(repo);
 		}
 		repositories.clear();
-		
-		for (File dir : tempDirs) {
-			try {
-				FileUtils.forceDelete(dir);
-			} catch (IOException e) {
-				// ignore
-			}
-		}
-		tempDirs.clear();
-	}
-	
-	protected File createTempDir() {
-		File tempDir = new File(TEMP_DIR_PATH);
-		try {
-			File dir = new File(tempDir, "documentr-tests-" + (long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
-			FileUtils.forceMkdir(dir);
-			tempDirs.add(dir);
-			return dir;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	protected void register(ILockedRepository repository) {

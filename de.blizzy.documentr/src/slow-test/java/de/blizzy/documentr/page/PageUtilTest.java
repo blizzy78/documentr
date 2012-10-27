@@ -29,7 +29,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
@@ -39,6 +41,9 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class PageUtilTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
+
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
 
 	@Mock
 	private PageStore pageStore;
@@ -58,7 +63,7 @@ public class PageUtilTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void toPageVersion() throws GitAPIException, IOException {
-		File repoDir = createTempDir();
+		File repoDir = tempDir.getRoot();
 		Git git = Git.init().setDirectory(repoDir).call();
 		PersonIdent ident = new PersonIdent("user", "user@example.com"); //$NON-NLS-1$ //$NON-NLS-2$
 		git.commit().setAuthor(ident).setCommitter(ident).setMessage("test").call(); //$NON-NLS-1$

@@ -24,8 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Test.None;
+import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
@@ -33,6 +35,9 @@ import com.google.common.io.Closeables;
 import de.blizzy.documentr.AbstractDocumentrTest;
 
 public class UtilTest extends AbstractDocumentrTest {
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+
 	@Test
 	public void toRealPagePath() {
 		assertEquals("x/y/z", Util.toRealPagePath("x,y,z")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -64,7 +69,7 @@ public class UtilTest extends AbstractDocumentrTest {
 	
 	@Test(expected=None.class)
 	public void deleteQuietly() throws IOException {
-		File dir = createTempDir();
+		File dir = tempDir.getRoot();
 		File file = new File(dir, "test.txt"); //$NON-NLS-1$
 		FileUtils.touch(file);
 		// check that file actually exists
@@ -84,7 +89,7 @@ public class UtilTest extends AbstractDocumentrTest {
 	
 	@Test(expected=None.class)
 	public void deleteQuietlyMustCatchExceptions() throws IOException {
-		File dir = createTempDir();
+		File dir = tempDir.getRoot();
 		File file = new File(dir, "test.txt"); //$NON-NLS-1$
 		FileOutputStream out = new FileOutputStream(file);
 		

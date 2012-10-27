@@ -30,7 +30,9 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gitective.core.CommitUtils;
 import org.gitective.core.RepositoryUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
 import com.google.common.eventbus.EventBus;
@@ -42,6 +44,9 @@ import de.blizzy.documentr.access.User;
 public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+
 	@Mock
 	private LockManager lockManager;
 	@Mock
@@ -49,7 +54,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 
 	@Test
 	public void createCentralRepository() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository lockedRepo = null;
 		try {
@@ -71,7 +76,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void createCentralRepositoryMustThrowIllegalStateExceptionIfExists() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository lockedRepo = null;
 		try {
@@ -86,7 +91,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void getCentralRepository() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		File gitDir;
@@ -109,14 +114,14 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 
 	@Test(expected=RepositoryNotFoundException.class)
 	public void getCentralRepositoryMustThrowRepositoryNotFoundExceptionIfNonexistent() throws IOException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		register(repoManager.getCentralRepository());
 	}
 	
 	@Test
 	public void createBranchRepositoryWithoutStartingBranch() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
@@ -145,7 +150,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void createBranchRepositoryMustThrowIllegalStateExceptionIfExists() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
@@ -167,7 +172,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void createBranchRepositoryWithoutStartingBranchAndExistingBranch() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
@@ -194,7 +199,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void createBranchRepository() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
@@ -224,7 +229,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 
 	@Test
 	public void getBranchRepository() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {
@@ -251,14 +256,14 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 
 	@Test(expected=RepositoryNotFoundException.class)
 	public void getBranchRepositoryMustThrowRepositoryNotFoundExceptionIfNonexistent() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		register(repoManager.getBranchRepository("branch")); //$NON-NLS-1$
 	}
 	
 	@Test
 	public void listBranches() throws IOException, GitAPIException {
-		File reposDir = createTempDir();
+		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
 		ILockedRepository repo = null;
 		try {

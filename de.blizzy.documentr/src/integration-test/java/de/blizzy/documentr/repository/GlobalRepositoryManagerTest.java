@@ -26,7 +26,9 @@ import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
@@ -42,6 +44,9 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+
 	@Mock
 	private Settings settings;
 	@Mock
@@ -104,7 +109,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void listProjects() throws IOException, GitAPIException {
-		File dataDir = createTempDir();
+		File dataDir = tempDir.getRoot();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
 		Whitebox.setInternalState(repoManagerFactory, lockManager); 

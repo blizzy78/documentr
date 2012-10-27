@@ -28,7 +28,9 @@ import java.util.concurrent.TimeoutException;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
@@ -57,8 +59,9 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE_PATH = "foo/bar"; //$NON-NLS-1$
 	
-	@InjectMocks
-	private PageIndex pageIndex;
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+
 	@Mock
 	private Settings settings;
 	@Mock
@@ -78,10 +81,12 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private GlobalRepositoryManager repoManager;
 	@Mock
 	private UserStore userStore;
+	@InjectMocks
+	private PageIndex pageIndex;
 	
 	@Before
 	public void setUp() throws IOException {
-		File dataDir = createTempDir();
+		File dataDir = tempDir.getRoot();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		
 		when(anonymousAuthenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME)).thenReturn(authentication);

@@ -26,7 +26,9 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
@@ -52,6 +54,9 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	private static final String EMAIL = "email"; //$NON-NLS-1$
 	private static final String EMAIL_2 = "email2"; //$NON-NLS-1$
 
+	@Rule
+	public TemporaryFolder tempDir = new TemporaryFolder();
+	
 	@Mock
 	private UserStore userStore;
 	@Mock
@@ -73,7 +78,8 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	
 	@Before
 	public void setUp() throws IOException {
-		File dataDir = createTempDir();
+		File dataDir = tempDir.getRoot();
+		System.out.println(dataDir.getAbsolutePath());
 		
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
