@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +37,9 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.AbstractDocumentrTest;
 
 public class DocumentrUserDetailsServiceTest extends AbstractDocumentrTest {
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	@Mock
 	private UserStore userStore;
 	@InjectMocks
@@ -68,10 +73,11 @@ public class DocumentrUserDetailsServiceTest extends AbstractDocumentrTest {
 		assertFalse(details.isEnabled());
 	}
 
-	@Test(expected=UsernameNotFoundException.class)
+	@Test
 	public void loadUserByUsernameUnknown() throws IOException {
 		when(userStore.getUser("nonexistent")).thenThrow(new UserNotFoundException("nonexistent")); //$NON-NLS-1$ //$NON-NLS-2$
 		
+		expectedException.expect(UsernameNotFoundException.class);
 		userDetailsService.loadUserByUsername("nonexistent"); //$NON-NLS-1$
 	}
 }

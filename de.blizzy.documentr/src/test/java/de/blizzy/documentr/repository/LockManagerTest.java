@@ -20,9 +20,14 @@ package de.blizzy.documentr.repository;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class LockManagerTest {
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+	
 	private LockManager lockManager;
 
 	@Before
@@ -59,16 +64,20 @@ public class LockManagerTest {
 		lockManager.lockAll();
 	}
 	
-	@Test(expected=IllegalStateException.class)
+	@Test
 	public void unlockWithUnknownLock() {
 		Lock lock = new Lock(Thread.currentThread());
+		
+		expectedException.expect(IllegalStateException.class);
 		lockManager.unlock(lock);
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test
 	public void unlockTooOften() {
 		ILock lock = lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
 		lockManager.unlock(lock);
+		
+		expectedException.expect(IllegalStateException.class);
 		lockManager.unlock(lock);
 	}
 }

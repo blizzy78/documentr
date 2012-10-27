@@ -24,7 +24,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -37,8 +39,9 @@ import de.blizzy.documentr.web.access.DocumentrOpenIdAuthenticationFilter;
 import de.blizzy.documentr.web.util.FacadeHostRequestWrapperFactory;
 
 public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTest {
-	@InjectMocks
-	private DocumentrOpenIdAuthenticationFilter filter;
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	@Mock
 	private OpenIDConsumer consumer;
 	@Mock
@@ -49,9 +52,10 @@ public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTe
 	private HttpServletResponse response;
 	@Mock
 	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
+	@InjectMocks
+	private DocumentrOpenIdAuthenticationFilter filter;
 	
-	
-	@Test(expected=AuthenticationServiceException.class)
+	@Test
 	@SuppressWarnings("unchecked")
 	public void attemptAuthentication() throws AuthenticationException, IOException, OpenIDConsumerException {
 		when(facadeHostRequestWrapperFactory.create(request)).thenReturn(requestWrapper);
@@ -60,6 +64,7 @@ public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTe
 		
 		when(consumer.endConsumption(requestWrapper)).thenThrow(OpenIDConsumerException.class);
 		
+		expectedException.expect(AuthenticationServiceException.class);
 		filter.attemptAuthentication(request, response);
 	}
 }

@@ -19,7 +19,9 @@ package de.blizzy.documentr.repository;
 
 import static org.mockito.Mockito.*;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 
 import com.google.common.io.Closeables;
@@ -27,6 +29,9 @@ import com.google.common.io.Closeables;
 import de.blizzy.documentr.AbstractDocumentrTest;
 
 public class LockedRepositoryTest extends AbstractDocumentrTest {
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	@Mock
 	private LockManager lockManager;
 
@@ -52,12 +57,14 @@ public class LockedRepositoryTest extends AbstractDocumentrTest {
 		verify(lockManager).unlock(lock);
 	}
 	
-	@Test(expected=IllegalStateException.class)
+	@Test
 	public void rMustThrowIllegalStateExceptionIfNoRepository() {
 		Lock lock = new Lock(Thread.currentThread());
 		when(lockManager.lockProjectCentral("project")).thenReturn(lock); //$NON-NLS-1$
 
 		ILockedRepository repo = LockedRepository.lockProjectCentral("project", lockManager); //$NON-NLS-1$
+		
+		expectedException.expect(IllegalStateException.class);
 		repo.r();
 	}
 }
