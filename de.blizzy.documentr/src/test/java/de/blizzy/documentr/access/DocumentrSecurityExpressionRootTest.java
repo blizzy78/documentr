@@ -20,8 +20,6 @@ package de.blizzy.documentr.access;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,8 +38,6 @@ public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
 	private GlobalRepositoryManager repoManager;
 	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
-	@Mock
-	private HttpServletRequest request;
 	@InjectMocks
 	private DocumentrSecurityExpressionRoot root;
 
@@ -102,11 +98,5 @@ public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
 		Object target = "this"; //$NON-NLS-1$
 		root.setThis(target);
 		assertSame(target, root.getThis());
-	}
-	
-	@Test
-	public void setAndGetRequest() {
-		root.setRequest(request);
-		assertSame(request, root.getRequest());
 	}
 }

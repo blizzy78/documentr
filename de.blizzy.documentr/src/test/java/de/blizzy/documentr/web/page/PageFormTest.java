@@ -43,46 +43,6 @@ public class PageFormTest {
 	}
 	
 	@Test
-	public void getProjectName() {
-		assertEquals(PROJECT, form.getProjectName());
-	}
-	
-	@Test
-	public void getBranchName() {
-		assertEquals(BRANCH, form.getBranchName());
-	}
-	
-	@Test
-	public void getPath() {
-		assertEquals(PAGE, form.getPath());
-	}
-	
-	@Test
-	public void getParentPagePath() {
-		assertEquals(PARENT, form.getParentPagePath());
-	}
-
-	@Test
-	public void getTitle() {
-		assertEquals(TITLE, form.getTitle());
-	}
-	
-	@Test
-	public void getText() {
-		assertEquals(TEXT, form.getText());
-	}
-	
-	@Test
-	public void getViewRestrictionRole() {
-		assertEquals(VIEW_ROLE, form.getViewRestrictionRole());
-	}
-	
-	@Test
-	public void getCommit() {
-		assertEquals(COMMIT, form.getCommit());
-	}
-	
-	@Test
 	public void getTags() {
 		assertTrue(Arrays.equals(TAGS, form.getTags()));
 	}

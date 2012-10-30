@@ -76,26 +76,6 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void getProjectName() {
-		assertEquals(PROJECT, htmlSerializerContext.getProjectName());
-	}
-
-	@Test
-	public void getBranchName() {
-		assertEquals(BRANCH, htmlSerializerContext.getBranchName());
-	}
-	
-	@Test
-	public void getPagePath() {
-		assertEquals(PAGE, htmlSerializerContext.getPagePath());
-	}
-	
-	@Test
-	public void getAuthentication() {
-		assertSame(authentication, htmlSerializerContext.getAuthentication());
-	}
-	
-	@Test
 	public void getAttachmentUri() {
 		String uri = htmlSerializerContext.getAttachmentUri("test.png"); //$NON-NLS-1$
 		assertEquals(CONTEXT + "/attachment/" + PROJECT + "/" + BRANCH + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -18,23 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import static de.blizzy.documentr.TestUtil.*;
-import static junit.framework.Assert.*;
 
 import org.junit.Test;
 
 public class OpenIdTest {
-	@Test
-	public void getDelegateId() {
-		OpenId openId = new OpenId("delegateId", "realId"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("delegateId", openId.getDelegateId()); //$NON-NLS-1$
-	}
-
-	@Test
-	public void getRealId() {
-		OpenId openId = new OpenId("delegateId", "realId"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("realId", openId.getRealId()); //$NON-NLS-1$
-	}
-	
 	@Test
 	public void testEquals() {
 		assertEqualsContract(

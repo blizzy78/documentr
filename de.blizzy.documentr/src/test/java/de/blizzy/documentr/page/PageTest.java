@@ -30,13 +30,6 @@ public class PageTest {
 	private static final String IMAGE_PNG = "image/png"; //$NON-NLS-1$
 
 	@Test
-	public void setAndGetParentPagePath() {
-		Page page = Page.fromText(TITLE, TEXT);
-		page.setParentPagePath("parent"); //$NON-NLS-1$
-		assertEquals("parent", page.getParentPagePath()); //$NON-NLS-1$
-	}
-
-	@Test
 	public void getTitle() {
 		PageTextData pageData = new PageTextData(TEXT); 
 		Page page = new Page(TITLE, pageData.getContentType(), pageData); 
@@ -66,13 +59,6 @@ public class PageTest {
 		
 		page = Page.fromMeta(TITLE, IMAGE_PNG); 
 		assertEquals(IMAGE_PNG, page.getContentType()); 
-	}
-	
-	@Test
-	public void setAndGetViewRestrictionRole() {
-		Page page = Page.fromMeta(TITLE, IMAGE_PNG);
-		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
-		assertEquals("viewRole", page.getViewRestrictionRole()); //$NON-NLS-1$
 	}
 	
 	@Test

@@ -36,21 +36,6 @@ public class CommitCherryPickConflictResolveTest {
 	}
 	
 	@Test
-	public void getTargetBranch() {
-		assertEquals(BRANCH, resolve.getTargetBranch());
-	}
-	
-	@Test
-	public void getCommit() {
-		assertEquals(COMMIT, resolve.getCommit());
-	}
-	
-	@Test
-	public void getText() {
-		assertEquals(TEXT, resolve.getText());
-	}
-	
-	@Test
 	public void isApplicable() {
 		assertTrue(resolve.isApplicable(BRANCH, COMMIT));
 		assertFalse(resolve.isApplicable("branch2", COMMIT)); //$NON-NLS-1$

@@ -24,21 +24,12 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.blizzy.documentr.page.PageData;
-
 public class PageDataTest {
 	@Test
 	public void getData() {
 		byte[] data = { 1, 2, 3 };
 		PageData pageData = new PageData(data, "image/png"); //$NON-NLS-1$
 		assertTrue(Arrays.equals(data, pageData.getData()));
-	}
-	
-	@Test
-	public void getContentType() {
-		byte[] data = { 1, 2, 3 };
-		PageData pageData = new PageData(data, "image/png"); //$NON-NLS-1$
-		assertEquals("image/png", pageData.getContentType()); //$NON-NLS-1$
 	}
 	
 	@Test

@@ -29,17 +29,8 @@ public class CommitCherryPickResultTest extends AbstractDocumentrTest {
 	private PageVersion pageVersion;
 	
 	@Test
-	public void getPageVersion() {
-		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN);
-		assertEquals(pageVersion, result.getPageVersion());
-	}
-
-	@Test
-	public void getStatus() {
-		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.UNKNOWN);
-		assertSame(CommitCherryPickResult.Status.UNKNOWN, result.getStatus());
-
-		result = new CommitCherryPickResult(pageVersion, "conflictText"); //$NON-NLS-1$
+	public void getStatusForConflict() {
+		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, "conflictText"); //$NON-NLS-1$
 		assertSame(CommitCherryPickResult.Status.CONFLICT, result.getStatus());
 	}
 

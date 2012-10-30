@@ -18,27 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.access;
 
 import static de.blizzy.documentr.TestUtil.*;
-import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 
 public class PermissionGrantedAuthorityTest {
-	@Test
-	public void getTarget() {
-		GrantedAuthorityTarget target = new GrantedAuthorityTarget("project", Type.PROJECT); //$NON-NLS-1$
-		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(target, Permission.ADMIN);
-		assertEquals(target, authority.getTarget());
-	}
-
-	@Test
-	public void getPermission() {
-		GrantedAuthorityTarget target = new GrantedAuthorityTarget("project", Type.PROJECT); //$NON-NLS-1$
-		PermissionGrantedAuthority authority = new PermissionGrantedAuthority(target, Permission.ADMIN);
-		assertEquals(Permission.ADMIN, authority.getPermission());
-	}
-	
 	@Test
 	public void testEquals() {
 		assertEqualsContract(

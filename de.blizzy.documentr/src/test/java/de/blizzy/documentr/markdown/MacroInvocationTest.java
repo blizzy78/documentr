@@ -23,24 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.blizzy.documentr.markdown.MacroInvocation;
-
 public class MacroInvocationTest {
 	private MacroInvocation invocation;
 
 	@Before
 	public void setUp() {
 		invocation = new MacroInvocation("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-	
-	@Test
-	public void getMacroName() {
-		assertEquals("macro", invocation.getMacroName()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void getParameters() {
-		assertEquals("params", invocation.getParameters()); //$NON-NLS-1$
 	}
 	
 	@Test

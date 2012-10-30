@@ -27,32 +27,6 @@ import com.google.common.collect.Sets;
 
 public class UserTest {
 	@Test
-	public void getLoginName() {
-		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertEquals("user", user.getLoginName()); //$NON-NLS-1$
-	}
-
-	@Test
-	public void getPassword() {
-		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertEquals("password", user.getPassword()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void getEmail() {
-		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertEquals("email", user.getEmail()); //$NON-NLS-1$
-	}
-	
-	@Test
-	public void isDisabled() {
-		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertFalse(user.isDisabled());
-		user = new User("user", "password", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertTrue(user.isDisabled());
-	}
-	
-	@Test
 	public void getOpenIds() {
 		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		Set<OpenId> openIds = Sets.newHashSet(
