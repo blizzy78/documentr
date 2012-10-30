@@ -50,7 +50,7 @@ var documentr = {};
 			};
 		}
 		
-		var startUrl;
+		var startUrl = '';
 		if (documentr.isSomething(options.start)) {
 			if (options.start.type === 'project') {
 				startUrl = getProjectUrl(options.start.projectName);
@@ -339,15 +339,6 @@ var documentr = {};
 		return dlg;
 	};
 	
-	documentr.toggleSiteSearch = function() {
-		var divEl = $('#site-search');
-		divEl.slideToggle('fast', function() {
-			if (divEl.css('display') !== 'none') {
-				$('#site-search input').select();
-			}
-		});
-	};
-	
 	documentr.fixTwitterCss = function() {
 		var twitterCssEl = null;
 		var documentrCssEl = null;
@@ -371,8 +362,9 @@ var documentr = {};
 	
 	documentr.setupCodeViews = function() {
 		$('.code-view-wrapper .code-view').each(function() {
-			if (!$(this).hasClass('ace_editor')) {
-				$(this).setupCodeView();
+			var thiz = $(this);
+			if (!thiz.hasClass('ace_editor')) {
+				thiz.setupCodeView();
 			}
 		});
 	};
