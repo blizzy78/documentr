@@ -24,13 +24,13 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -234,8 +234,22 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@Ignore
-	public void getCommitsList() {
-		// TODO: implement test
+	public void getCommitsList() throws IOException {
+		pageStore = mock(PageStore.class);
+		Whitebox.setInternalState(cherryPicker, pageStore);
+		
+		@SuppressWarnings("nls")
+		List<PageVersion> versions = Lists.newArrayList(
+				new PageVersion("commit5", "user", new Date()),
+				new PageVersion("commit4", "user", new Date()),
+				new PageVersion("commit3", "user", new Date()),
+				new PageVersion("commit2", "user", new Date()),
+				new PageVersion("commit1", "user", new Date())
+		);
+		when(pageStore.listPageVersions(PROJECT, BRANCH_1, PAGE)).thenReturn(versions);
+		
+		List<String> result = cherryPicker.getCommitsList(PROJECT, BRANCH_1, PAGE, "commit2", "commit4"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<String> commits = Lists.newArrayList("commit3", "commit4"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(commits, result);
 	}
 }
