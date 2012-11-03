@@ -19,6 +19,7 @@ package de.blizzy.documentr.page;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -33,9 +34,9 @@ public interface ICherryPicker {
 			@CacheEvict(value="page_header_html", allEntries=true),
 			@CacheEvict(value="page_view_restriction_role", allEntries=true)
 	})
-	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
-			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
-			User user) throws IOException;
+	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String branchName, String path,
+			List<String> commits, Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves,
+			boolean dryRun, User user, Locale locale) throws IOException;
 
 	List<String> getCommitsList(String projectName, String branchName, String path,
 			String version1, String version2) throws IOException;

@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CherryPickResult;
 import org.eclipse.jgit.api.CherryPickResult.CherryPickStatus;
 import org.eclipse.jgit.api.Git;
@@ -34,6 +36,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.gitective.core.CommitUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -59,11 +62,13 @@ class CherryPicker implements ICherryPicker {
 	private EventBus eventBus;
 	@Autowired
 	private IPageStore pageStore;
+	@Autowired
+	private MessageSource messageSource;
 	
 	@Override
-	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String path, List<String> commits,
-			Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun,
-			User user) throws IOException {
+	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String branchName, String path,
+			List<String> commits, Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves,
+			boolean dryRun, User user, Locale locale) throws IOException {
 
 		Assert.hasLength(projectName);
 		Assert.hasLength(path);
@@ -75,7 +80,7 @@ class CherryPicker implements ICherryPicker {
 		// always do a dry run first and return early if it fails
 		if (!dryRun) {
 			SortedMap<String, List<CommitCherryPickResult>> results = cherryPick(
-					projectName, path, commits, targetBranches, conflictResolves, true, user);
+					projectName, branchName, path, commits, targetBranches, conflictResolves, true, user, locale);
 			for (List<CommitCherryPickResult> branchResults : results.values()) {
 				for (CommitCherryPickResult result : branchResults) {
 					if (result.getStatus() != CommitCherryPickResult.Status.OK) {
@@ -89,7 +94,7 @@ class CherryPicker implements ICherryPicker {
 			SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 			for (String targetBranch : targetBranches) {
 				List<CommitCherryPickResult> branchResults = cherryPick(
-						projectName, path, commits, targetBranch, conflictResolves, dryRun, user);
+						projectName, branchName, path, commits, targetBranch, conflictResolves, dryRun, user, locale);
 				results.put(targetBranch, branchResults);
 			}
 			return results;
@@ -98,9 +103,9 @@ class CherryPicker implements ICherryPicker {
 		}
 	}
 
-	private List<CommitCherryPickResult> cherryPick(String projectName, String path, List<String> commits,
-			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun, User user)
-			throws IOException, GitAPIException {
+	private List<CommitCherryPickResult> cherryPick(String projectName, String branchName, String path, List<String> commits,
+			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun, User user,
+			Locale locale) throws IOException, GitAPIException {
 		
 		ILockedRepository repo = null;
 		List<CommitCherryPickResult> cherryPickResults = Lists.newArrayList();
@@ -125,7 +130,7 @@ class CherryPicker implements ICherryPicker {
 				PageVersion pageVersion = PageUtil.toPageVersion(CommitUtils.getCommit(repo.r(), commit));
 				if (!hadConflicts) {
 					CommitCherryPickResult singleCherryPickResult =
-							cherryPick(repo, path, pageVersion, targetBranch, conflictResolves, user);
+							cherryPick(repo, branchName, path, pageVersion, targetBranch, conflictResolves, user, locale);
 					if (singleCherryPickResult != null) {
 						cherryPickResults.add(singleCherryPickResult);
 						if (singleCherryPickResult.getStatus() == CommitCherryPickResult.Status.CONFLICT) {
@@ -175,8 +180,8 @@ class CherryPicker implements ICherryPicker {
 		return cherryPickResults;
 	}
 	
-	private CommitCherryPickResult cherryPick(ILockedRepository repo, String path, PageVersion pageVersion,
-			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, User user)
+	private CommitCherryPickResult cherryPick(ILockedRepository repo, String branchName, String path, PageVersion pageVersion,
+			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, User user, Locale locale)
 			throws IOException, GitAPIException {
 		
 		CommitCherryPickResult cherryPickResult;
@@ -189,7 +194,8 @@ class CherryPicker implements ICherryPicker {
 				cherryPickResult = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
 				break;
 			case CONFLICTING:
-				cherryPickResult = tryResolveConflict(repo, path, pageVersion, targetBranch, conflictResolves, user);
+				cherryPickResult = tryResolveConflict(repo, branchName, path, pageVersion, targetBranch, conflictResolves,
+						user, locale);
 				break;
 			default:
 				cherryPickResult = null;
@@ -198,9 +204,9 @@ class CherryPicker implements ICherryPicker {
 		return cherryPickResult;
 	}
 
-	private CommitCherryPickResult tryResolveConflict(ILockedRepository repo, String path, PageVersion pageVersion,
-			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, User user)
-			throws IOException, GitAPIException {
+	private CommitCherryPickResult tryResolveConflict(ILockedRepository repo, String branchName, String path,
+			PageVersion pageVersion, String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves,
+			User user, Locale locale) throws IOException, GitAPIException {
 		
 		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 		File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
@@ -223,6 +229,10 @@ class CherryPicker implements ICherryPicker {
 			result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
 		} else {
 			String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
+			text = StringUtils.replace(text, "<<<<<<< OURS", //$NON-NLS-1$
+					"<<<<<<< " + messageSource.getMessage("targetBranchX", new Object[] { targetBranch }, locale)); //$NON-NLS-1$ //$NON-NLS-2$
+			text = StringUtils.replace(text, ">>>>>>> THEIRS", //$NON-NLS-1$
+					">>>>>>> " + messageSource.getMessage("sourceBranchX", new Object[] { branchName }, locale)); //$NON-NLS-1$ //$NON-NLS-2$
 			result = new CommitCherryPickResult(pageVersion, text);
 		}
 		return result;

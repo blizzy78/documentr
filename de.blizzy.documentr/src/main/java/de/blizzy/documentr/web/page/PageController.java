@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -498,7 +499,7 @@ public class PageController {
 	public String cherryPick(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String version1, @RequestParam String version2,
 			@RequestParam("branch") Set<String> targetBranches, @RequestParam boolean dryRun,
-			WebRequest request, Model model, Authentication authentication) throws IOException {
+			WebRequest request, Model model, Authentication authentication, Locale locale) throws IOException {
 
 		path = Util.toRealPagePath(path);
 
@@ -532,7 +533,7 @@ public class PageController {
 		}
 
 		Map<String, List<CommitCherryPickResult>> results = cherryPicker.cherryPick(
-				projectName, path, commits, targetBranches, resolves, dryRun, user);
+				projectName, branchName, path, commits, targetBranches, resolves, dryRun, user, locale);
 		if (results.keySet().size() != targetBranches.size()) {
 			throw new IllegalStateException();
 		}

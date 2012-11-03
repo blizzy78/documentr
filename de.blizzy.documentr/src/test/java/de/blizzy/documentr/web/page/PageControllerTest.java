@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -84,6 +85,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	private static final String PARENT_PAGE = DocumentrConstants.HOME_PAGE_NAME;
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final Locale LOCALE = Locale.ENGLISH;
 	
 	@Mock
 	private IPageStore pageStore;
@@ -496,12 +498,13 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						CommitCherryPickResult.Status.OK));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
+		when(cherryPicker.cherryPick(PROJECT, BRANCH, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, //$NON-NLS-1$
+				USER, LOCALE))
 				.thenReturn(results);
 
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication, LOCALE); //$NON-NLS-1$
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 	}
@@ -524,12 +527,13 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						"conflictText"));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, USER)) //$NON-NLS-1$
+		when(cherryPicker.cherryPick(PROJECT, BRANCH, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, //$NON-NLS-1$
+				USER, LOCALE))
 				.thenReturn(results);
 		
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication, LOCALE); //$NON-NLS-1$
 		assertEquals("/project/branch/page/cherryPick", view); //$NON-NLS-1$
 
 		verify(model).addAttribute("cherryPickResults", results); //$NON-NLS-1$
@@ -559,8 +563,8 @@ public class PageControllerTest extends AbstractDocumentrTest {
 						CommitCherryPickResult.Status.OK));
 		SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 		results.put("targetBranch", branchResults); //$NON-NLS-1$
-		when(cherryPicker.cherryPick(PROJECT, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), resolves, false, USER)) //$NON-NLS-1$
+		when(cherryPicker.cherryPick(PROJECT, BRANCH, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
+				Sets.newHashSet("targetBranch"), resolves, false, USER, LOCALE)) //$NON-NLS-1$
 				.thenReturn(results);
 		
 		Map<String, String[]> params = Maps.newHashMap();
@@ -568,7 +572,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(webRequest.getParameterMap()).thenReturn(params);
 		
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
-				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication); //$NON-NLS-1$
+				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication, LOCALE); //$NON-NLS-1$
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 	}
