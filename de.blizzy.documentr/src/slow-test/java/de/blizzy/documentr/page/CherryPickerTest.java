@@ -202,7 +202,8 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
 		
 		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet(
-				new CommitCherryPickConflictResolve(BRANCH_2, commit2, "aaa\nb\nc\nd\ne\nf\ng\nhhh xxx\ni\n")); //$NON-NLS-1$
+				new CommitCherryPickConflictResolve(BRANCH_2, commit2,
+						"<<<<<<< OURS\nxxx\n=======\nyyy\n>>>>>>> THEIRS\n")); //$NON-NLS-1$
 		Map<String, List<CommitCherryPickResult>> results = cherryPicker.cherryPick(
 				PROJECT, BRANCH_1, PAGE, Lists.newArrayList(commit1, commit2, commit3), Sets.newHashSet(BRANCH_2),
 				resolves, false, USER, LOCALE);
@@ -213,14 +214,15 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 		assertNull(commit1Result.getConflictText());
 		CommitCherryPickResult commit2Result = branchResults.get(1);
 		assertEquals(commit2, commit2Result.getPageVersion().getCommitName());
-		assertSame(CommitCherryPickResult.Status.OK, commit2Result.getStatus());
-		assertNull(commit2Result.getConflictText());
+		assertSame(CommitCherryPickResult.Status.CONFLICT, commit2Result.getStatus());
+		assertEquals("<<<<<<< OURS\nxxx\n=======\nyyy\n>>>>>>> THEIRS\n", //$NON-NLS-1$
+				commit2Result.getConflictText());
 		CommitCherryPickResult commit3Result = branchResults.get(2);
 		assertEquals(commit3, commit3Result.getPageVersion().getCommitName());
-		assertSame(CommitCherryPickResult.Status.OK, commit3Result.getStatus());
+		assertSame(CommitCherryPickResult.Status.UNKNOWN, commit3Result.getStatus());
 		assertNull(commit3Result.getConflictText());
 		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
-		assertEquals("aaa\nbbb\nc\nd\ne\nf\ng\nhhh xxx\ni\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+		assertEquals("a\nb\nc\nd\ne\nf\ng\nxxx\ni\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -242,6 +244,52 @@ public class CherryPickerTest extends AbstractDocumentrTest {
 		assertEquals("a\nb\nc\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
 	}
 
+	@Test
+	public void cherryPickConflictingEditsWithUnresolvedConflictResolves() throws IOException, GitAPIException {
+		register(globalRepoManager.createProjectCentralRepository(PROJECT, USER));
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_1, null));
+		Page page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		sleep(1000); // must wait because commit time is stored in seconds
+		
+		register(globalRepoManager.createProjectBranchRepository(PROJECT, BRANCH_2, BRANCH_1));
+		page = Page.fromText("title", "a\nb\nc\nd\ne\nf\ng\nxxx\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_2, PAGE, page, null, USER);
+		
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit1 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
+		page = Page.fromText("title", "aaa\nb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit2 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		sleep(1000); // must wait because commit time is stored in seconds
+		page = Page.fromText("title", "aaa\nbbb\nc\nd\ne\nf\ng\nhhh\ni\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		pageStore.savePage(PROJECT, BRANCH_1, PAGE, page, null, USER);
+		String commit3 = pageStore.getPageMetadata(PROJECT, BRANCH_1, PAGE).getCommit();
+		
+		Set<CommitCherryPickConflictResolve> resolves = Sets.newHashSet(
+				new CommitCherryPickConflictResolve(BRANCH_2, commit2, "aaa\nb\nc\nd\ne\nf\ng\nhhh xxx\ni\n")); //$NON-NLS-1$
+		Map<String, List<CommitCherryPickResult>> results = cherryPicker.cherryPick(
+				PROJECT, BRANCH_1, PAGE, Lists.newArrayList(commit1, commit2, commit3), Sets.newHashSet(BRANCH_2),
+				resolves, false, USER, LOCALE);
+		List<CommitCherryPickResult> branchResults = results.get(BRANCH_2);
+		CommitCherryPickResult commit1Result = branchResults.get(0);
+		assertEquals(commit1, commit1Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit1Result.getStatus());
+		assertNull(commit1Result.getConflictText());
+		CommitCherryPickResult commit2Result = branchResults.get(1);
+		assertEquals(commit2, commit2Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit2Result.getStatus());
+		assertNull(commit2Result.getConflictText());
+		CommitCherryPickResult commit3Result = branchResults.get(2);
+		assertEquals(commit3, commit3Result.getPageVersion().getCommitName());
+		assertSame(CommitCherryPickResult.Status.OK, commit3Result.getStatus());
+		assertNull(commit3Result.getConflictText());
+		page = pageStore.getPage(PROJECT, BRANCH_2, PAGE, true);
+		assertEquals("aaa\nbbb\nc\nd\ne\nf\ng\nhhh xxx\ni\n", ((PageTextData) page.getData()).getText()); //$NON-NLS-1$
+	}
+	
 	@Test
 	public void getCommitsList() throws IOException {
 		pageStore = mock(PageStore.class);

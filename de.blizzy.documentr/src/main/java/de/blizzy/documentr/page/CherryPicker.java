@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,9 @@ import de.blizzy.documentr.util.Util;
 
 @Component
 class CherryPicker implements ICherryPicker {
+	private static final Pattern CONFLICT_MARKERS_RE = Pattern.compile(
+			"^.*?[\\r\\n]<<<<<<< .*?[\\r\\n]=======.*?[\\r\\n]>>>>>>> .*$", Pattern.DOTALL + Pattern.MULTILINE); //$NON-NLS-1$
+	
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
@@ -215,18 +219,22 @@ class CherryPicker implements ICherryPicker {
 		String resolveText = getCherryPickConflictResolveText(conflictResolves, targetBranch, pageVersion.getCommitName());
 		CommitCherryPickResult result;
 		if (resolveText != null) {
-			FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
-			Git git = Git.wrap(repo.r());
-			git.add()
-				.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
-				.call();
-			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
-			git.commit()
-				.setAuthor(ident)
-				.setCommitter(ident)
-				.setMessage(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
-				.call();
-			result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
+			if (!CONFLICT_MARKERS_RE.matcher("\n" + resolveText).matches()) { //$NON-NLS-1$
+				FileUtils.writeStringToFile(workingFile, resolveText, Charsets.UTF_8.name());
+				Git git = Git.wrap(repo.r());
+				git.add()
+					.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+					.call();
+				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+				git.commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
+					.call();
+				result = new CommitCherryPickResult(pageVersion, CommitCherryPickResult.Status.OK);
+			} else {
+				result = new CommitCherryPickResult(pageVersion, resolveText);
+			}
 		} else {
 			String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 			text = StringUtils.replace(text, "<<<<<<< OURS", //$NON-NLS-1$
@@ -237,7 +245,7 @@ class CherryPicker implements ICherryPicker {
 		}
 		return result;
 	}
-
+	
 	private String getCherryPickConflictResolveText(Set<CommitCherryPickConflictResolve> conflictResolves,
 			String targetBranch, String commit) {
 		
