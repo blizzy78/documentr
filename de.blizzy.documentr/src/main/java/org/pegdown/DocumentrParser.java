@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package org.pegdown;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Rule;
 import org.parboiled.annotations.Cached;
@@ -34,7 +36,8 @@ public class DocumentrParser extends Parser {
 			Extensions.QUOTES - Extensions.SMARTS - Extensions.SMARTYPANTS;
 
 	public DocumentrParser() {
-		super(Integer.valueOf(PEGDOWN_OPTIONS));
+		super(Integer.valueOf(PEGDOWN_OPTIONS), Long.valueOf(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS)),
+				Parser.DefaultParseRunnerProvider);
 	}
 
 	@Override
