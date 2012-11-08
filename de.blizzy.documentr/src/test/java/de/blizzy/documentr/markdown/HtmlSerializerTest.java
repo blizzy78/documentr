@@ -51,7 +51,18 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		String text = "x\ny\nz"; //$NON-NLS-1$
 		VerbatimNode node = new VerbatimNode(text);
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<div class=\"code-view-wrapper\">\n<!--__NOTRIM__--><div class=\"code-view\">" + text + "</div><!--__/NOTRIM__-->\n</div>", //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("<div class=\"code-view-wrapper\">\n<!--__NOTRIM__--><div class=\"code-view\">" + //$NON-NLS-1$
+				text + "</div><!--__/NOTRIM__-->\n</div>", //$NON-NLS-1$
+				removeTextRange(html));
+	}
+	
+	@Test
+	public void visitVerbatimNodeWithType() {
+		String text = "x\ny\nz"; //$NON-NLS-1$
+		VerbatimNode node = new VerbatimNodeWithType(text, "xml"); //$NON-NLS-1$
+		String html = htmlSerializer.toHtml(root(node));
+		assertEquals("<div class=\"code-view-wrapper\">\n<!--__NOTRIM__--><div class=\"code-view\" data-type=\"xml\">" + //$NON-NLS-1$
+				text + "</div><!--__/NOTRIM__-->\n</div>", //$NON-NLS-1$
 				removeTextRange(html));
 	}
 	
