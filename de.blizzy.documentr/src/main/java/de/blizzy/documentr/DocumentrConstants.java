@@ -55,6 +55,9 @@ public final class DocumentrConstants {
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
 			"(?:create|save|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
 	
+	/** Pattern a macro name must match against. */
+	public static final String MACRO_NAME_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$
+
 	/** Default content type for binary data. */
 	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
 	

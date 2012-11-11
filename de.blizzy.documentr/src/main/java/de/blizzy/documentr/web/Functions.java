@@ -266,6 +266,10 @@ public final class Functions {
 		return updateChecker.isUpdateAvailable() ? updateChecker.getLatestVersion() : null;
 	}
 	
+	public static List<String> getGroovyMacros() {
+		return macroFactory.listGroovyMacros();
+	}
+	
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

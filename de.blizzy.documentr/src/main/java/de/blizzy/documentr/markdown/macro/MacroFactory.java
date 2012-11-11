@@ -17,7 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,8 +50,7 @@ public class MacroFactory implements Lifecycle {
 	// have already been constructed, thus causing us to not pick up some macros
 	@Override
 	public void start() {
-		registerMacrosFromClasses();
-		registerGroovyMacros();
+		rescanAllMacros();
 		running.set(true);
 	}
 
@@ -72,6 +73,12 @@ public class MacroFactory implements Lifecycle {
 				// ignore
 			}
 		}
+	}
+
+	private void rescanAllMacros() {
+		macros.clear();
+		registerMacrosFromClasses();
+		registerGroovyMacros();
 	}
 
 	private void registerMacrosFromClasses() {
@@ -114,5 +121,27 @@ public class MacroFactory implements Lifecycle {
 			}
 		};
 		return Sets.newHashSet(Collections2.transform(macros.values(), function));
+	}
+
+	public List<String> listGroovyMacros() {
+		return groovyMacroScanner.listMacros();
+	}
+
+	public String getGroovyMacroCode(String name) throws IOException {
+		return groovyMacroScanner.getMacroCode(name);
+	}
+
+	public List<CompilationMessage> verifyGroovyMacro(String code) {
+		return groovyMacroScanner.verifyMacro(code);
+	}
+
+	public void saveGroovyMacro(String name, String code) throws IOException {
+		groovyMacroScanner.saveMacro(name, code);
+		rescanAllMacros();
+	}
+
+	public void deleteGroovyMacro(String name) throws IOException {
+		groovyMacroScanner.deleteMacro(name);
+		rescanAllMacros();
 	}
 }

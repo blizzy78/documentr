@@ -188,4 +188,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<function-class>de.blizzy.documentr.web.Functions</function-class>
 		<function-signature>java.lang.String getLatestVersionForUpdate()</function-signature>
 	</function>
+
+	<function>
+		<name>getGroovyMacros</name>
+		<function-class>de.blizzy.documentr.web.Functions</function-class>
+		<function-signature>java.util.List getGroovyMacros()</function-signature>
+	</function>
 </taglib>
