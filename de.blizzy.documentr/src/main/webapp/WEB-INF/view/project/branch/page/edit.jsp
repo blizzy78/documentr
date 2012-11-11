@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var allTags = [];
 var allTagsLoaded = false;
+var dirty = false;
 
 function togglePreview() {
 	var previewEl = $('#preview');
@@ -459,6 +460,7 @@ function deleteTag(tagToDelete) {
 		}
 	});
 	updateTags();
+	dirty = true;
 }
 
 function hookTags() {
@@ -477,6 +479,7 @@ function hookTags() {
 function prepareForm() {
 	var text = $('#editor').data('editor').getValue();
 	$('#pageForm input[name="text"]').val(text);
+	dirty = false;
 	return true;
 }
 
@@ -568,6 +571,19 @@ $(function() {
 	editor.renderer.setShowPrintMargin(false);
 	editor.session.setUseSoftTabs(false);
 	editor.setHighlightSelectedWord(false);
+
+	$(window).bind('beforeunload', function() {
+		if (dirty) {
+			return '<spring:message code="confirmLeavePage"/>';
+		}
+	});
+	
+	$('input, select').on('keypress change select', function() {
+		dirty = true;
+	});
+	editor.session.on('change', function() {
+		dirty = true;
+	});
 });
 
 </dt:headerJS>

@@ -183,6 +183,7 @@ function addRole() {
 	<%-- TODO: sort authorities again like UserStore does --%>
 	
 	updateAuthorities();
+	dirty = true;
 }
 
 function removeRole(type, targetId, roleName) {
@@ -197,9 +198,15 @@ function removeRole(type, targetId, roleName) {
 	}
 	authorities = newAuthorities;
 	updateAuthorities();
+	dirty = true;
+}
+
+function clearDirty() {
+	dirty = false;
 }
 
 var authorities = [];
+var dirty = false;
 
 <c:if test="${!empty userForm.loginName}">
 	<c:set var="authorities" value="${d:getUserAuthorities(userForm.loginName)}"/>
@@ -231,6 +238,16 @@ $(function() {
 		userFormEl.find('input[name="email"]').attr('disabled', 'true');
 		userFormEl.find('input[name="disabled"]').attr('disabled', 'true');
 	</c:if>
+	
+	$(window).bind('beforeunload', function() {
+		if (dirty) {
+			return '<spring:message code="confirmLeavePage"/>';
+		}
+	});
+	
+	$('input').on('keypress change', function() {
+		dirty = true;
+	});
 });
 
 </dt:headerJS>
@@ -255,7 +272,7 @@ $(function() {
 
 <p>
 <c:set var="action"><c:url value="/user/save"/></c:set>
-<form:form commandName="userForm" action="${action}" method="POST" cssClass="well form-horizontal">
+<form:form commandName="userForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<ul id="userDetailsTabs" class="nav nav-tabs">
 		<li class="active"><a href="#userDetails"><spring:message code="title.details"/></a></li>
 		<li><a href="#userPermissions"><spring:message code="title.roles"/></a></li>

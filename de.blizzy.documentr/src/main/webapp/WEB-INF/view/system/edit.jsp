@@ -25,6 +25,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission(ADMIN)">
 
+<dt:headerJS>
+
+var dirty = false;
+
+function clearDirty() {
+	dirty = false;
+}
+
+$(function() {
+	$(window).bind('beforeunload', function() {
+		if (dirty) {
+			return '<spring:message code="confirmLeavePage"/>';
+		}
+	});
+	
+	$('input, select, textarea').on('keypress change select', function() {
+		dirty = true;
+	});
+});
+
+</dt:headerJS>
+
 <dt:breadcrumbs>
 	<li class="active"><spring:message code="title.systemSettings"/></li>
 </dt:breadcrumbs>
@@ -37,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <p>
 <c:set var="action"><c:url value="/system/save"/></c:set>
-<form:form commandName="systemSettingsForm" action="${action}" method="POST" cssClass="well form-horizontal">
+<form:form commandName="systemSettingsForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<fieldset>
 		<legend><spring:message code="title.general"/></legend>
 	
@@ -144,7 +166,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	<div class="form-actions">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </form:form>
 </p>

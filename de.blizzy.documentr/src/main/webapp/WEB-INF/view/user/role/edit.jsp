@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:headerJS>
 
+var dirty = false;
+
 function updatePermissions() {
 	var controlsBox = $('#permissionControls');
 	var adminCheckbox = controlsBox.find('input:checkbox:checked[value="ADMIN"]');
@@ -38,8 +40,22 @@ function updatePermissions() {
 	}
 }
 
+function clearDirty() {
+	dirty = false;
+}
+
 $(function() {
 	updatePermissions();
+	
+	$(window).bind('beforeunload', function() {
+		if (dirty) {
+			return '<spring:message code="confirmLeavePage"/>';
+		}
+	});
+	
+	$('input').on('keypress change', function() {
+		dirty = true;
+	});
 });
 
 </dt:headerJS>
@@ -64,7 +80,7 @@ $(function() {
 
 <p>
 <c:set var="action"><c:url value="/role/save"/></c:set>
-<form:form commandName="roleForm" action="${action}" method="POST" cssClass="well form-horizontal">
+<form:form commandName="roleForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<fieldset>
 		<c:set var="errorText"><form:errors path="name"/></c:set>
 		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
