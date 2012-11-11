@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="siteNotice" value="${d:getSystemSetting('siteNotice')}"/>
 
 <c:set var="pageContents"><%--
---%><c:if test="${!empty siteNotice}"><div class="alert alert-error alert-block"><h4><spring:message code="title.siteNotice"/></h4><c:out value="${siteNotice}"/></div></c:if><%--
+--%><c:if test="${!empty siteNotice}"><div class="alert alert-error alert-block site-notice"><h4><spring:message code="title.siteNotice"/></h4><c:out value="${siteNotice}"/></div></c:if><%--
 --%><jsp:doBody/><%--
 --%></c:set>
 
