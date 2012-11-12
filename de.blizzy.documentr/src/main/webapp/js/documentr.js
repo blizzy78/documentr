@@ -222,7 +222,7 @@ var documentr = {};
 	
 	documentr.diffMarkdownAndGetHtml = function(markdown1, markdown2) {
 		var dmp = new diff_match_patch();
-		var diffs = dmp.diff_main(markdown1, markdown2);
+		var diffs = dmp.diff_main(markdown1.replace(/\r/g, ''), markdown2.replace(/\r/g, ''));
 		dmp.diff_cleanupSemantic(diffs);
 	
 		var html = [];
