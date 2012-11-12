@@ -63,6 +63,8 @@ public class GroovyMacroScannerTest extends AbstractDocumentrTest {
 		File macrosDir = new File(dataDir, GroovyMacroScanner.MACROS_DIR_NAME);
 		File macroFile = new File(macrosDir, "test.groovy"); //$NON-NLS-1$
 		FileUtils.writeStringToFile(macroFile, MACRO, Charsets.UTF_8);
+		
+		scanner.init();
 	}
 	
 	@Test
