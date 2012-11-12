@@ -331,4 +331,13 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenThrow(PageNotFoundException.class);
 		assertFalse(Functions.pageExists(PROJECT, BRANCH, PAGE));
 	}
+	
+	@Test
+	public void getGroovyMacros() {
+		List<String> macros = Lists.newArrayList("macro1", "macro2"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(macroFactory.listGroovyMacros()).thenReturn(macros);
+		
+		List<String> result = Functions.getGroovyMacros();
+		assertEquals(macros, result);
+	}
 }

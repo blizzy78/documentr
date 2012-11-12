@@ -38,6 +38,7 @@ import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.web.access.RoleForm;
 import de.blizzy.documentr.web.access.UserForm;
 import de.blizzy.documentr.web.branch.BranchForm;
+import de.blizzy.documentr.web.macro.MacroForm;
 import de.blizzy.documentr.web.page.PageForm;
 import de.blizzy.documentr.web.project.ProjectForm;
 
@@ -191,5 +192,17 @@ public final class DocumentrMatchers {
 	@SuppressWarnings("unchecked")
 	public static String notEq(String s) {
 		return Matchers.<String>argThat(new Not(new Equals(s)));
+	}
+	
+	public static MacroForm argMacroForm(final String name, final String code) {
+		Matcher<MacroForm> matcher = new ArgumentMatcher<MacroForm>() {
+			@Override
+			public boolean matches(Object argument) {
+				MacroForm form = (MacroForm) argument;
+				return StringUtils.equals(form.getName(), name) &&
+						StringUtils.equals(form.getCode(), code);
+			}
+		};
+		return argThat(matcher);
 	}
 }

@@ -70,7 +70,7 @@ public class MacroController {
 	@RequestMapping(value="/verify/json", method=RequestMethod.POST)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	@ResponseBody
-	public Map<String, Object> verify(@RequestParam String code) {
+	public Map<String, Object> verifyMacro(@RequestParam String code) {
 		Map<String, Object> result = Maps.newHashMap();
 		List<CompilationMessage> verificationMessages = macroFactory.verifyGroovyMacro(code);
 		if (!verificationMessages.isEmpty()) {
@@ -90,10 +90,10 @@ public class MacroController {
 	private Map<String, Object> toJson(CompilationMessage message) {
 		Map<String, Object> result = Maps.newHashMap();
 		result.put("type", message.getType().name()); //$NON-NLS-1$
-		result.put("startLine", String.valueOf(message.getStartLine())); //$NON-NLS-1$
-		result.put("startColumn", String.valueOf(message.getStartColumn())); //$NON-NLS-1$
-		result.put("endLine", String.valueOf(message.getEndLine())); //$NON-NLS-1$
-		result.put("endColumn", String.valueOf(message.getEndColumn())); //$NON-NLS-1$
+		result.put("startLine", Integer.valueOf(message.getStartLine())); //$NON-NLS-1$
+		result.put("startColumn", Integer.valueOf(message.getStartColumn())); //$NON-NLS-1$
+		result.put("endLine", Integer.valueOf(message.getEndLine())); //$NON-NLS-1$
+		result.put("endColumn", Integer.valueOf(message.getEndColumn())); //$NON-NLS-1$
 		result.put("message", message.getMessage()); //$NON-NLS-1$
 		return result;
 	}
@@ -112,7 +112,7 @@ public class MacroController {
 	
 	@RequestMapping(value="/delete/{name:" + DocumentrConstants.MACRO_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
-	public String saveMacro(@PathVariable String name) throws IOException {
+	public String deleteMacro(@PathVariable String name) throws IOException {
 		macroFactory.deleteGroovyMacro(name);
 		return "redirect:/macros"; //$NON-NLS-1$
 	}

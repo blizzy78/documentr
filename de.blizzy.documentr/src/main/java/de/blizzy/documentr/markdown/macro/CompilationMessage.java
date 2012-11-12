@@ -39,7 +39,7 @@ public class CompilationMessage {
 	@Getter
 	private String message;
 
-	CompilationMessage(Type type, int startLine, int startColumn, int endLine, int endColumn, String message) {
+	public CompilationMessage(Type type, int startLine, int startColumn, int endLine, int endColumn, String message) {
 		Assert.notNull(type);
 		Assert.isTrue(startLine >= 1);
 		Assert.isTrue(startColumn >= 1);

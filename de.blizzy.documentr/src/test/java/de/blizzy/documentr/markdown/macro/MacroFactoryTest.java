@@ -20,15 +20,19 @@ package de.blizzy.documentr.markdown.macro;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.ListableBeanFactory;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -86,5 +90,46 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 	public void getDescriptors() {
 		Set<IMacroDescriptor> descriptors = macroFactory.getDescriptors();
 		assertEquals(Sets.newHashSet(descriptor, groovyDescriptor), descriptors);
+	}
+	
+	@Test
+	public void listGroovyMacros() {
+		List<String> macros = Lists.newArrayList("macro1", "macro2"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(groovyMacroScanner.listMacros()).thenReturn(macros);
+		
+		assertEquals(macros, macroFactory.listGroovyMacros());
+	}
+	
+	@Test
+	public void getGroovyMacroCode() throws IOException {
+		when(groovyMacroScanner.getMacroCode(GROOVY_MACRO)).thenReturn("code"); //$NON-NLS-1$
+		assertEquals("code", macroFactory.getGroovyMacroCode(GROOVY_MACRO)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void test() {
+		List<CompilationMessage> errors = Lists.newArrayList(mock(CompilationMessage.class));
+		when(groovyMacroScanner.verifyMacro("code")).thenReturn(errors); //$NON-NLS-1$
+		
+		List<CompilationMessage> result = macroFactory.verifyGroovyMacro("code"); //$NON-NLS-1$
+		assertEquals(errors, result);
+	}
+	
+	@Test
+	public void saveGroovyMacro() throws IOException {
+		macroFactory.saveGroovyMacro(GROOVY_MACRO, "code"); //$NON-NLS-1$
+
+		InOrder inOrder = inOrder(groovyMacroScanner);
+		inOrder.verify(groovyMacroScanner).saveMacro(GROOVY_MACRO, "code"); //$NON-NLS-1$
+		inOrder.verify(groovyMacroScanner).findGroovyMacros();
+	}
+
+	@Test
+	public void deleteGroovyMacro() throws IOException {
+		macroFactory.deleteGroovyMacro(GROOVY_MACRO);
+		
+		InOrder inOrder = inOrder(groovyMacroScanner);
+		inOrder.verify(groovyMacroScanner).deleteMacro(GROOVY_MACRO);
+		inOrder.verify(groovyMacroScanner).findGroovyMacros();
 	}
 }
