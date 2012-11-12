@@ -79,7 +79,6 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() throws IOException {
 		File dataDir = tempDir.getRoot();
-		System.out.println(dataDir.getAbsolutePath());
 		
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
