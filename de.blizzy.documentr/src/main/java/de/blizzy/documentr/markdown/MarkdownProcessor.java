@@ -63,6 +63,9 @@ public class MarkdownProcessor {
 			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", "<ul $1$2"),
 			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", "<ol $1$2"),
 			
+			Replacement.dotAllNoCase("<p></p>", StringUtils.EMPTY),
+			Replacement.dotAllNoCase("(<br/>)+</p>", "</p>"),
+			
 			Replacement.dotAllNoCase(
 					"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
 					"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
