@@ -48,6 +48,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.Settings;
 
 @Component
@@ -59,16 +60,6 @@ class GroovyMacroScanner {
 			return file.isFile() && file.getName().endsWith(".groovy"); //$NON-NLS-1$
 		}
 	}
-
-	@SuppressWarnings("nls")
-	private static final String[] DEFAULT_IMPORTS = new String[] {
-			"de.blizzy.documentr.access",
-			"de.blizzy.documentr.markdown",
-			"de.blizzy.documentr.markdown.macro",
-			"de.blizzy.documentr.page",
-			"de.blizzy.documentr.system",
-			"org.apache.commons.lang3"
-	};
 
 	static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
 	
@@ -109,7 +100,7 @@ class GroovyMacroScanner {
 
 	private GroovyClassLoader getGroovyClassLoader() {
 		ImportCustomizer importCustomizer = new ImportCustomizer();
-		importCustomizer.addStarImports(DEFAULT_IMPORTS);
+		importCustomizer.addStarImports(DocumentrConstants.GROOVY_DEFAULT_IMPORTS);
 		CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 		compilerConfiguration.addCompilationCustomizers(importCustomizer);
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();

@@ -88,5 +88,16 @@ public final class DocumentrConstants {
 	/** Number of iterations the bcrypt password encoder must perform. */
 	public static final int PASSWORD_ENCODER_BCRYPT_ITERATIONS = 12;
 
+	/** Default imports for Groovy scripts. */
+	@SuppressWarnings("nls")
+	public static final String[] GROOVY_DEFAULT_IMPORTS = new String[] {
+			"de.blizzy.documentr.access",
+			"de.blizzy.documentr.markdown",
+			"de.blizzy.documentr.markdown.macro",
+			"de.blizzy.documentr.page",
+			"de.blizzy.documentr.system",
+			"org.apache.commons.lang3"
+	};
+
 	private DocumentrConstants() {}
 }
