@@ -255,7 +255,7 @@ public class MarkdownProcessor {
 
 			html = StringUtils.replace(html,
 					startMarkerPrefix + idx + "__" + macroCallWithBody + endMarkerPrefix + idx + "__", //$NON-NLS-1$ //$NON-NLS-2$
-					macroRunnable.getHtml(macroContext));
+					StringUtils.defaultString(macroRunnable.getHtml(macroContext)));
 
 			MacroInvocation invocation = new MacroInvocation(macroName, params);
 			html = cleanupHtml(html, Collections.singletonList(invocation), false);
