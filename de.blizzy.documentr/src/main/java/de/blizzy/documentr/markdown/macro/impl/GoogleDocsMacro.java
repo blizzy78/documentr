@@ -77,7 +77,7 @@ public class GoogleDocsMacro implements IMacroRunnable {
 					.build();
 			return buildImg(components);
 		} else {
-			return StringUtils.EMPTY;
+			return null;
 		}
 	}
 

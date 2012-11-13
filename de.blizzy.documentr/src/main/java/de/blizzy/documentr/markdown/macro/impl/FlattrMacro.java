@@ -73,7 +73,7 @@ public class FlattrMacro implements IMacroRunnable {
 		} catch (IOException e) {
 			log.warn("error while rendering Flattr macro", e); //$NON-NLS-1$
 		}
-		return StringUtils.EMPTY;
+		return null;
 	}
 
 	@Override

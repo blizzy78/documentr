@@ -22,7 +22,6 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
@@ -71,7 +70,7 @@ public class NeighborsMacro implements IMacroRunnable {
 				throw new RuntimeException(e);
 			}
 		} else {
-			return StringUtils.EMPTY;
+			return null;
 		}
 	}
 	
