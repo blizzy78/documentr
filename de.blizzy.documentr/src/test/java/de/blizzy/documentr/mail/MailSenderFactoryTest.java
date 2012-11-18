@@ -25,6 +25,8 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import com.google.common.collect.Maps;
 
@@ -43,7 +45,10 @@ public class MailSenderFactoryTest extends AbstractDocumentrTest {
 		settings.put(SystemSettingsStore.MAIL_HOST_NAME, "host"); //$NON-NLS-1$
 		settings.put(SystemSettingsStore.MAIL_HOST_PORT, "25"); //$NON-NLS-1$
 		when(systemSettingsStore.getSettings()).thenReturn(settings);
-		assertNotNull(mailSenderFactory.createSender());
+		JavaMailSender sender = mailSenderFactory.createSender();
+		assertEquals("host", Whitebox.getInternalState(sender, "host")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(25, ((Integer) Whitebox.getInternalState(sender, "port")).intValue()); //$NON-NLS-1$
+		
 
 		settings.remove(SystemSettingsStore.MAIL_HOST_NAME);
 		assertNull(mailSenderFactory.createSender());

@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.context;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -54,12 +55,20 @@ public class EventBusBeanPostProcessorTest extends AbstractDocumentrTest {
 	@Test
 	public void postProcessBeforeInitialization() {
 		Subscriber subscriber = new Subscriber();
-		NonSubscriber nonSubscriber = new NonSubscriber();
 
-		beanPostProcessor.postProcessBeforeInitialization(subscriber, "subscriber"); //$NON-NLS-1$
-		beanPostProcessor.postProcessBeforeInitialization(nonSubscriber, "nonSubscriber"); //$NON-NLS-1$
+		Object result = beanPostProcessor.postProcessBeforeInitialization(subscriber, "subscriber"); //$NON-NLS-1$
+		assertSame(subscriber, result);
 		
 		verify(eventBus).register(subscriber);
+	}
+
+	@Test
+	public void postProcessBeforeInitializationWithNonSubscriber() {
+		NonSubscriber nonSubscriber = new NonSubscriber();
+		
+		Object result = beanPostProcessor.postProcessBeforeInitialization(nonSubscriber, "nonSubscriber"); //$NON-NLS-1$
+		assertSame(nonSubscriber, result);
+		
 		verify(eventBus, never()).register(nonSubscriber);
 	}
 }

@@ -24,6 +24,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.security.core.Authentication;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
@@ -32,7 +33,6 @@ public class DocumentrMethodSecurityExpressionHandlerTest extends AbstractDocume
 	@Mock
 	private MethodInvocation methodInvocation;
 	@Mock
-	@SuppressWarnings("unused")
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	@Mock
 	private Authentication authentication;
@@ -48,5 +48,6 @@ public class DocumentrMethodSecurityExpressionHandlerTest extends AbstractDocume
 				(DocumentrSecurityExpressionRoot) expressionHandler.createSecurityExpressionRoot(
 						authentication, methodInvocation);
 		assertSame(target, root.getThis());
+		assertSame(permissionEvaluator, Whitebox.getInternalState(root, DocumentrPermissionEvaluator.class));
 	}
 }

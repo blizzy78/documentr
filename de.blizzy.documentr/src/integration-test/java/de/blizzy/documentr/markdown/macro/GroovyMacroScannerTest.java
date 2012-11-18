@@ -34,7 +34,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.google.common.base.Charsets;
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.Settings;
