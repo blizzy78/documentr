@@ -44,6 +44,7 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = DocumentrConstants.HOME_PAGE_NAME + "/foo"; //$NON-NLS-1$
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
+	private static final String DOCUMENTR_HOST = "http://www.example.com:1234"; //$NON-NLS-1$
 
 	@Mock
 	private MarkdownProcessor markdownProcessor;
@@ -65,6 +66,8 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
 		when(request.getScheme()).thenReturn("http"); //$NON-NLS-1$
 		when(request.getContextPath()).thenReturn(CONTEXT);
+		
+		when(systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST)).thenReturn(DOCUMENTR_HOST);
 		
 		ServletRequestAttributes attrs = new ServletRequestAttributes(request);
 		RequestContextHolder.setRequestAttributes(attrs);
@@ -90,6 +93,12 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 		assertEquals(CONTEXT + "/page/" + PROJECT + "/" + BRANCH + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Util.toUrlPagePath(page),
 				uri);
+	}
+	
+	@Test
+	public void getUrl() {
+		String result = htmlSerializerContext.getUrl(CONTEXT + "/foo/bar"); //$NON-NLS-1$
+		assertEquals(DOCUMENTR_HOST + "/foo/bar", result); //$NON-NLS-1$
 	}
 	
 	@Test
