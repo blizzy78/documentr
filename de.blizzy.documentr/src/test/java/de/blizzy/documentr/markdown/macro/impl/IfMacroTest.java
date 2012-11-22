@@ -30,7 +30,18 @@ import de.blizzy.documentr.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.markdown.macro.IMacroContext;
 
 public class IfMacroTest extends AbstractDocumentrTest {
-	private static final String EXPRESSION = "branchName == 'branch'"; //$NON-NLS-1$
+	public static String projectName;
+	public static String branchName;
+	public static String pagePath;
+	
+	@SuppressWarnings("nls")
+	private static final String EXPRESSION =
+			"{ ->\n" +
+				IfMacroTest.class.getName() + ".projectName = projectName\n" +
+				IfMacroTest.class.getName() + ".branchName = branchName\n" +
+				IfMacroTest.class.getName() + ".pagePath = pagePath\n" +
+				"true\n" +
+			"}.call()";
 	private static final String BODY = "body"; //$NON-NLS-1$
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
@@ -52,11 +63,19 @@ public class IfMacroTest extends AbstractDocumentrTest {
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(PAGE);
+		
+		projectName = null;
+		branchName = null;
+		pagePath = null;
 	}
 	
 	@Test
 	public void getHtml() {
 		String html = macro.getHtml(context);
 		assertEquals(BODY, html);
+		// verify bindings
+		assertEquals(PROJECT, projectName);
+		assertEquals(BRANCH, branchName);
+		assertEquals(PAGE, pagePath);
 	}
 }
