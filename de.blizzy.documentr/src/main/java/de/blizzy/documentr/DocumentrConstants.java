@@ -17,7 +17,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr;
 
+import java.util.List;
+
 import org.eclipse.jgit.lib.Constants;
+
+import com.google.common.collect.ImmutableList;
 
 /** Defines various constants used throughout documentr. */
 public final class DocumentrConstants {
@@ -90,14 +94,13 @@ public final class DocumentrConstants {
 
 	/** Default imports for Groovy scripts. */
 	@SuppressWarnings("nls")
-	public static final String[] GROOVY_DEFAULT_IMPORTS = new String[] {
+	public static final List<String> GROOVY_DEFAULT_IMPORTS = ImmutableList.of(
 			"de.blizzy.documentr.access",
 			"de.blizzy.documentr.markdown",
 			"de.blizzy.documentr.markdown.macro",
 			"de.blizzy.documentr.page",
 			"de.blizzy.documentr.system",
-			"org.apache.commons.lang3"
-	};
+			"org.apache.commons.lang3");
 
 	private DocumentrConstants() {}
 }

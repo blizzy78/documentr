@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
@@ -100,7 +101,7 @@ class GroovyMacroScanner {
 
 	private GroovyClassLoader getGroovyClassLoader() {
 		ImportCustomizer importCustomizer = new ImportCustomizer();
-		importCustomizer.addStarImports(DocumentrConstants.GROOVY_DEFAULT_IMPORTS);
+		importCustomizer.addStarImports(DocumentrConstants.GROOVY_DEFAULT_IMPORTS.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
 		CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 		compilerConfiguration.addCompilationCustomizers(importCustomizer);
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();

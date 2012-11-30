@@ -21,6 +21,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -59,7 +60,7 @@ public class IfMacro implements IMacroRunnable {
 		binding.setVariable("branchName", htmlSerializerContext.getBranchName()); //$NON-NLS-1$
 		binding.setVariable("pagePath", htmlSerializerContext.getPagePath()); //$NON-NLS-1$
 		ImportCustomizer importCustomizer = new ImportCustomizer();
-		importCustomizer.addStarImports(DocumentrConstants.GROOVY_DEFAULT_IMPORTS);
+		importCustomizer.addStarImports(DocumentrConstants.GROOVY_DEFAULT_IMPORTS.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
 		CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 		compilerConfiguration.addCompilationCustomizers(importCustomizer);
 		return new GroovyShell(binding, compilerConfiguration);
