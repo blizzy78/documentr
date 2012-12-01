@@ -408,7 +408,7 @@ public class PageController {
 		String markdown = ((PageTextData) page.getData()).getText();
 		Map<String, String> result = Maps.newHashMap();
 		markdown = markdown.substring(rangeStart, Math.min(rangeEnd, markdown.length()));
-		markdown = markdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		markdown = markdown.replaceAll("[\\r\\n]+$", StringUtils.EMPTY); //$NON-NLS-1$
 		result.put("markdown", markdown); //$NON-NLS-1$
 		return result;
 	}
@@ -440,7 +440,7 @@ public class PageController {
 		
 		path = Util.toRealPagePath(path);
 		
-		markdown = markdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		markdown = markdown.replaceAll("[\\r\\n]+$", StringUtils.EMPTY); //$NON-NLS-1$
 		int rangeStart = Integer.parseInt(StringUtils.substringBefore(range, ",")); //$NON-NLS-1$
 		int rangeEnd = Integer.parseInt(StringUtils.substringAfter(range, ",")); //$NON-NLS-1$
 		
@@ -449,7 +449,7 @@ public class PageController {
 		rangeEnd = Math.min(rangeEnd, text.length());
 
 		String oldMarkdown = text.substring(rangeStart, rangeEnd);
-		String cleanedOldMarkdown = oldMarkdown.replaceAll("[\\r\\n]+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		String cleanedOldMarkdown = oldMarkdown.replaceAll("[\\r\\n]+$", StringUtils.EMPTY); //$NON-NLS-1$
 		rangeEnd -= oldMarkdown.length() - cleanedOldMarkdown.length();
 		
 		String newText = text.substring(0, rangeStart) + markdown + text.substring(Math.min(rangeEnd, text.length()));
