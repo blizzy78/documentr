@@ -161,7 +161,7 @@ public class UserStore {
 	 * @throws UserNotFoundException when the user could not be found
 	 */
 	public User getUser(String loginName) throws IOException {
-		Assert.notNull(loginName);
+		Assert.hasLength(loginName);
 		
 		ILockedRepository repo = null;
 		try {
@@ -299,7 +299,7 @@ public class UserStore {
 	 * @throws RoleNotFoundException when the role could not be found
 	 */
 	public Role getRole(String roleName) throws IOException {
-		Assert.notNull(roleName);
+		Assert.hasLength(roleName);
 		
 		ILockedRepository repo = null;
 		try {
@@ -336,7 +336,7 @@ public class UserStore {
 	public void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities, User currentUser)
 			throws IOException {
 		
-		Assert.notNull(loginName);
+		Assert.hasLength(loginName);
 		Assert.notNull(authorities);
 		Assert.notNull(currentUser);
 		if (!loginName.equals(ANONYMOUS_USER_LOGIN_NAME)) {
@@ -389,7 +389,7 @@ public class UserStore {
 	 * @throws UserNotFoundException when the user does not exist
 	 */
 	public List<RoleGrantedAuthority> getUserAuthorities(String loginName) throws IOException {
-		Assert.notNull(loginName);
+		Assert.hasLength(loginName);
 		
 		ILockedRepository repo = null;
 		try {
