@@ -578,7 +578,7 @@ $(function() {
 		}
 	});
 	
-	$('input, select').on('keypress change select', function() {
+	$('#pageForm input, #pageForm select').on('keypress change select', function() {
 		dirty = true;
 	});
 	editor.session.on('change', function() {

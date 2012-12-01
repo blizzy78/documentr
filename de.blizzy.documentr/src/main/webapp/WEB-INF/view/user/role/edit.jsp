@@ -53,7 +53,7 @@ $(function() {
 		}
 	});
 	
-	$('input').on('keypress change', function() {
+	$('#roleForm input').on('keypress change', function() {
 		dirty = true;
 	});
 });

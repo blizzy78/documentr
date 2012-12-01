@@ -107,7 +107,7 @@ $(function() {
 		}
 	});
 	
-	$('input').on('keypress', function() {
+	$('#macroForm input').on('keypress', function() {
 		dirty = true;
 	});
 

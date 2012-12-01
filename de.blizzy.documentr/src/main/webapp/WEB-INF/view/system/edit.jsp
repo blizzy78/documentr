@@ -40,9 +40,10 @@ $(function() {
 		}
 	});
 	
-	$('input, select, textarea').on('keypress change select', function() {
-		dirty = true;
-	});
+	$('#systemSettingsForm input, #systemSettingsForm select, #systemSettingsForm textarea')
+		.on('keypress change select', function() {
+			dirty = true;
+		});
 });
 
 </dt:headerJS>

@@ -245,7 +245,7 @@ $(function() {
 		}
 	});
 	
-	$('input').on('keypress change', function() {
+	$('#userForm input').on('keypress change', function() {
 		dirty = true;
 	});
 });
