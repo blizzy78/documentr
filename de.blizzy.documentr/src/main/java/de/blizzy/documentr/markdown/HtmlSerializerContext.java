@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Collections;
 import java.util.List;
 
 import lombok.AccessLevel;
@@ -30,6 +29,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.page.IPageStore;
@@ -124,7 +124,7 @@ public class HtmlSerializerContext {
 	}
 	
 	public List<Header> getHeaders() {
-		return Collections.unmodifiableList(headers);
+		return ImmutableList.copyOf(headers);
 	}
 
 	public MacroInvocation addMacroInvocation(String macroName, String params) {

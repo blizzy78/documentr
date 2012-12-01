@@ -33,6 +33,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.ImmutableSet;
+
 @Component(MessageSourceMacroDescriptor.ID)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 class MessageSourceMacroDescriptor implements IMacroDescriptor {
@@ -89,7 +91,7 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	}
 	
 	MessageSourceMacroDescriptor settings(Set<MacroSetting> settings) {
-		this.settings = Collections.unmodifiableSet(settings);
+		this.settings = ImmutableSet.copyOf(settings);
 		return this;
 	}
 }
