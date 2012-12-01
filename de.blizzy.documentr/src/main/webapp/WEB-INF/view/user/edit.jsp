@@ -201,6 +201,34 @@ function removeRole(type, targetId, roleName) {
 	dirty = true;
 }
 
+<c:if test="${(!empty userForm.loginName) and (userForm.loginName ne '_anonymous')}">
+function showDeleteDialog() {
+	<sec:authorize access="isAdmin('${userForm.loginName}')">
+		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
+			"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.loginName}"/>'), [
+			{
+				text: '<spring:message code="button.close"/>',
+				cancel: true
+			}
+		]);
+	</sec:authorize>
+	<sec:authorize access="!isAdmin('${userForm.loginName}')">
+		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
+			"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.loginName}"/>'), [
+			{
+				text: '<spring:message code="button.delete"/>',
+				href: '<c:url value="/user/delete/${userForm.loginName}"/>',
+				type: 'danger'
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		]);
+	</sec:authorize>
+}
+</c:if>
+
 function clearDirty() {
 	dirty = false;
 }
@@ -331,6 +359,9 @@ $(function() {
 	</div>
 
 	<div class="form-actions">
+		<c:if test="${(!empty userForm.loginName) and (userForm.loginName ne '_anonymous')}">
+			<a href="javascript:void(showDeleteDialog());" class="btn btn-warning"><spring:message code="button.delete"/></a>
+		</c:if>
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</div>

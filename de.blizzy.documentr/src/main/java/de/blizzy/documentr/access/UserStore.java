@@ -471,4 +471,27 @@ public class UserStore {
 		}
 		return result;
 	}
+
+	public void deleteUser(String loginName, User currentUser) throws IOException {
+		Assert.hasLength(loginName);
+		Assert.notNull(currentUser);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			Git git = Git.wrap(repo.r());
+			git.rm().addFilepattern(loginName + USER_SUFFIX).call();
+			git.rm().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("delete " + loginName) //$NON-NLS-1$
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Closeables.closeQuietly(repo);
+		}
+	}
 }

@@ -19,6 +19,7 @@ package de.blizzy.documentr.access;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,8 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -62,6 +65,8 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	private UserStore userStore;
 	@Autowired
 	private GlobalRepositoryManager repoManager;
+	@Autowired
+	private LoginNameUserDetailsService userDetailsService;
 
 	@Override
 	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -87,7 +92,13 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	}
 	
 	public boolean hasApplicationPermission(Authentication authentication, Permission permission) {
-		for (GrantedAuthority authority : authentication.getAuthorities()) {
+		return hasApplicationPermission(authentication.getAuthorities(), permission);
+	}
+
+	private boolean hasApplicationPermission(Collection<? extends GrantedAuthority> authorities,
+			Permission permission) {
+		
+		for (GrantedAuthority authority : authorities) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
 				GrantedAuthorityTarget target = pga.getTarget();
@@ -228,6 +239,16 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		} catch (IOException e) {
 			throw new AuthenticationServiceException(e.getMessage(), e);
 		}
+	}
+	
+	public boolean isAdmin(String loginName) {
+		try {
+			UserDetails user = userDetailsService.loadUserByUsername(loginName);
+			return hasApplicationPermission(user.getAuthorities(), Permission.ADMIN);
+		} catch (UsernameNotFoundException e) {
+			// okay
+		}
+		return false;
 	}
 
 	private boolean hasRoleOnBranch(Authentication authentication, String projectName, String branchName,

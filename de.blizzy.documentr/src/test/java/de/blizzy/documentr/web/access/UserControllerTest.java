@@ -178,4 +178,13 @@ public class UserControllerTest extends AbstractDocumentrTest {
 		verify(model).addAttribute(eq("userForm"), //$NON-NLS-1$
 				argUserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, false)); //$NON-NLS-1$
 	}
+	
+	@Test
+	public void deleteUser() throws IOException {
+		String view = userController.deleteUser("user", authentication); //$NON-NLS-1$
+		assertEquals("/users", removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
+		
+		verify(userStore).deleteUser("user", USER); //$NON-NLS-1$
+	}
 }

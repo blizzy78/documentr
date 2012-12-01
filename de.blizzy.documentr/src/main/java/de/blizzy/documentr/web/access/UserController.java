@@ -155,6 +155,14 @@ public class UserController {
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
 	}
+	
+	@RequestMapping(value="/delete/{loginName:" + DocumentrConstants.USER_LOGIN_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("hasApplicationPermission(ADMIN) and !isAdmin(#loginName)")
+	public String deleteUser(@PathVariable String loginName, Authentication authentication) throws IOException {
+		User user = userStore.getUser(authentication.getName());
+		userStore.deleteUser(loginName, user);
+		return "redirect:/users"; //$NON-NLS-1$
+	}
 
 	@ModelAttribute
 	public UserForm createUserForm(@RequestParam(required=false) String loginName,

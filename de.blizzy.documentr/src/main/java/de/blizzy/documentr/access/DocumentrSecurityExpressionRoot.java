@@ -92,6 +92,10 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 		return permissionEvaluator.hasPagePermissionInOtherBranches(authentication, projectName, branchName, path, permission);
 	}
 	
+	public boolean isAdmin(String loginName) {
+		return permissionEvaluator.isAdmin(loginName);
+	}
+	
 	public boolean projectExists(String projectName) {
 		return repoManager.listProjects().contains(StringUtils.defaultString(projectName));
 	}

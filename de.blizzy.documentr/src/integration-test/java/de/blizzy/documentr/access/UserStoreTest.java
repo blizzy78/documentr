@@ -31,6 +31,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -51,6 +52,8 @@ public class UserStoreTest extends AbstractDocumentrTest {
 
 	@Rule
 	public TemporaryFolder tempDir = new TemporaryFolder();
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Mock
 	private Settings settings;
@@ -124,6 +127,36 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		assertEquals(user.getPassword(), result.getPassword());
 		assertEquals(user.isDisabled(), result.isDisabled());
 		assertEquals(user.getOpenIds(), result.getOpenIds());
+	}
+	
+	@Test
+	public void deleteUserMustDeleteUser() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+
+		RoleGrantedAuthority rga = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga), USER); //$NON-NLS-1$
+		
+		userStore.deleteUser("user", USER); //$NON-NLS-1$
+		
+		expectedException.expect(UserNotFoundException.class);
+		userStore.getUser("user"); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void deleteUserMustDeleteUserAuthorities() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+		
+		RoleGrantedAuthority rga = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga), USER); //$NON-NLS-1$
+		
+		userStore.deleteUser("user", USER); //$NON-NLS-1$
+		
+		expectedException.expect(UserNotFoundException.class);
+		userStore.getUserAuthorities("user"); //$NON-NLS-1$
 	}
 	
 	@Test
