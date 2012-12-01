@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
+import static de.blizzy.documentr.DocumentrMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -54,7 +55,6 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	@Mock
 	private ProjectRepositoryManagerFactory repoManagerFactory;
 	@Mock
-	@SuppressWarnings("unused")
 	private EventBus eventBus;
 	@Mock
 	private ILockedRepository repo;
@@ -98,6 +98,8 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	public void createProjectBranchRepository() throws IOException, GitAPIException {
 		when(repoManager.createBranchRepository("branch", "startingBranch")).thenReturn(repo); //$NON-NLS-1$ //$NON-NLS-2$
 		assertSame(repo, globalRepoManager.createProjectBranchRepository(PROJECT, "branch", "startingBranch")); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		verify(eventBus).post(eqReflection(new BranchCreatedEvent(PROJECT, "branch"))); //$NON-NLS-1$
 	}
 	
 	@Test

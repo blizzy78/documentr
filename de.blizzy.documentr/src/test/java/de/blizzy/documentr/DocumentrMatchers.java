@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
@@ -201,6 +202,16 @@ public final class DocumentrMatchers {
 				MacroForm form = (MacroForm) argument;
 				return StringUtils.equals(form.getName(), name) &&
 						StringUtils.equals(form.getCode(), code);
+			}
+		};
+		return argThat(matcher);
+	}
+	
+	public static <T> T eqReflection(final T expected) {
+		Matcher<T> matcher = new ArgumentMatcher<T>() {
+			@Override
+			public boolean matches(Object argument) {
+				return EqualsBuilder.reflectionEquals(expected, argument);
 			}
 		};
 		return argThat(matcher);
