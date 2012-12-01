@@ -23,6 +23,7 @@ import static org.powermock.api.support.membermodification.MemberMatcher.*;
 import static org.powermock.api.support.membermodification.MemberModifier.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -53,13 +54,12 @@ public class UpdateCheckerTest extends AbstractDocumentrTest {
 	private Downloader downloader;
 	@InjectMocks
 	private UpdateChecker updateChecker;
+	private String updatePropertiesUrl;
 	
 	@Before
 	public void setUp() throws Exception {
 		Field updatePropertiesUrlField = Whitebox.getField(UpdateChecker.class, "UPDATE_PROPERTIES_URL"); //$NON-NLS-1$
-		String updatePropertiesUrl = updatePropertiesUrlField.get(null).toString();
-		when(downloader.getTextFromUrl(updatePropertiesUrl, Charsets.UTF_8))
-			.thenReturn(LATEST_VERSION + "=2012-10-26"); //$NON-NLS-1$
+		updatePropertiesUrl = updatePropertiesUrlField.get(null).toString();
 		
 		PowerMockito.whenNew(Downloader.class).withNoArguments().thenReturn(downloader);
 		
@@ -77,9 +77,21 @@ public class UpdateCheckerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	public void checkForUpdate() {
+	public void checkForUpdate() throws IOException {
+		when(downloader.getTextFromUrl(updatePropertiesUrl, Charsets.UTF_8))
+			.thenReturn(LATEST_VERSION + "=2012-10-26"); //$NON-NLS-1$
+
 		updateChecker.checkForUpdate();
 		assertTrue(updateChecker.isUpdateAvailable());
 		assertEquals(LATEST_VERSION, updateChecker.getLatestVersion()); 
+	}
+
+	@Test
+	public void checkForUpdateButNoUpdateAvailable() throws IOException {
+		when(downloader.getTextFromUrl(updatePropertiesUrl, Charsets.UTF_8))
+			.thenReturn(CURRENT_VERSION + "=2012-10-26"); //$NON-NLS-1$
+		
+		updateChecker.checkForUpdate();
+		assertFalse(updateChecker.isUpdateAvailable());
 	}
 }
