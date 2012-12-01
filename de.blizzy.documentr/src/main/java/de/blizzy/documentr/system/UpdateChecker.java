@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 
 @Component
 @Slf4j
@@ -105,7 +105,7 @@ public class UpdateChecker {
 		} catch (IOException e) {
 			log.error(StringUtils.EMPTY, e);
 		} finally {
-			IOUtils.closeQuietly(in);
+			Closeables.closeQuietly(in);
 		}
 		return null;
 	}
