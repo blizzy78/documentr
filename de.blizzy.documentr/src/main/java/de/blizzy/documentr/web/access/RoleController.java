@@ -91,6 +91,14 @@ public class RoleController {
 		return "redirect:/roles"; //$NON-NLS-1$
 	}
 
+	@RequestMapping(value="/delete/{roleName:" + DocumentrConstants.ROLE_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("hasApplicationPermission(ADMIN) and !isLastAdminRole(#roleName)")
+	public String deleteRole(@PathVariable String roleName, Authentication authentication) throws IOException {
+		User user = userStore.getUser(authentication.getName());
+		userStore.deleteRole(roleName, user);
+		return "redirect:/roles"; //$NON-NLS-1$
+	}
+
 	@ModelAttribute
 	public RoleForm createRoleForm(@RequestParam(required=false) String name,
 			@RequestParam(required=false) Set<String> permissions) {

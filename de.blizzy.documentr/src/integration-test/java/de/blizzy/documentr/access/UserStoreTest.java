@@ -240,6 +240,33 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
+	public void deleteRoleMustDeleteRole() throws IOException {
+		Role role = new Role("role", EnumSet.of(Permission.VIEW)); //$NON-NLS-1$
+		userStore.saveRole(role, USER);
+		
+		userStore.deleteRole("role", USER); //$NON-NLS-1$
+		
+		expectedException.expect(RoleNotFoundException.class);
+		userStore.getRole("role"); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void deleteRoleMustRemoveRoleFromUsers() throws IOException {
+		Role role = new Role("role", EnumSet.of(Permission.VIEW)); //$NON-NLS-1$
+		userStore.saveRole(role, USER);
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+		RoleGrantedAuthority rga1 = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		RoleGrantedAuthority rga2 = new RoleGrantedAuthority(
+				new GrantedAuthorityTarget("project", Type.PROJECT), "role"); //$NON-NLS-1$ //$NON-NLS-2$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga1, rga2), USER); //$NON-NLS-1$
+		
+		userStore.deleteRole("role", USER); //$NON-NLS-1$
+		assertEquals(1, userStore.getUserAuthorities("user").size()); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void saveAndGetUserAuthorities() throws IOException {
 		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		userStore.saveUser(user, USER);

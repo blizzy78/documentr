@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -199,6 +200,18 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 				GrantedAuthorityTarget.APPLICATION, Permission.ADMIN));
 		assertTrue(permissionEvaluator.hasPagePermission(authentication,
 				"project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.VIEW)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+	
+	@Test
+	@Ignore
+	public void isAdmin() {
+		// TODO: implement test
+	}
+	
+	@Test
+	@Ignore
+	public void isLastAdminRole() {
+		// TODO: implement test
 	}
 	
 	private Authentication mockAuthentication(GrantedAuthority... authorities) {

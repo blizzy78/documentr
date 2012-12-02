@@ -250,6 +250,46 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
+	
+	public boolean isLastAdminRole(String roleName) {
+		try {
+			if (userStore.getRole(roleName).getPermissions().contains(Permission.ADMIN)) {
+				Set<String> roles = Sets.newHashSet(userStore.listRoles());
+				roles.remove(roleName);
+				
+				// find all roles containing the ADMIN permission
+				Set<String> adminRoles = Sets.newHashSet();
+				for (String role : roles) {
+					Role r = userStore.getRole(role);
+					if (r.getPermissions().contains(Permission.ADMIN)) {
+						adminRoles.add(role);
+					}
+				}
+				
+				// check whether any of the admin roles is granted to any user on the "application" object
+				if (!adminRoles.isEmpty()) {
+					List<String> users = userStore.listUsers();
+					for (String user : users) {
+						List<RoleGrantedAuthority> authorities = userStore.getUserAuthorities(user);
+						for (RoleGrantedAuthority rga : authorities) {
+							for (String role : adminRoles) {
+								if (rga.getRoleName().equals(role) &&
+									rga.getTarget().equals(GrantedAuthorityTarget.APPLICATION)) {
+									
+									return false;
+								}
+							}
+						}
+					}
+				}
+				
+				return true;
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return false;
+	}
 
 	private boolean hasRoleOnBranch(Authentication authentication, String projectName, String branchName,
 			String roleName) throws IOException {

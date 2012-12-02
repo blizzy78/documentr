@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,26 +202,30 @@ public class UserStore {
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			FileFilter filter = new FileFilter() {
-				@Override
-				public boolean accept(File file) {
-					return file.isFile() && file.getName().endsWith(USER_SUFFIX);
-				}
-			};
-			List<File> files = Lists.newArrayList(workingDir.listFiles(filter));
-			Function<File, String> function = new Function<File, String>() {
-				@Override
-				public String apply(File file) {
-					return StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
-				}
-			};
-			List<String> users = Lists.newArrayList(Lists.transform(files, function));
-			Collections.sort(users);
-			return users;
+			return listUsers(repo);
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
+	}
+
+	private List<String> listUsers(ILockedRepository repo) {
+		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+		FileFilter filter = new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return file.isFile() && file.getName().endsWith(USER_SUFFIX);
+			}
+		};
+		List<File> files = Lists.newArrayList(workingDir.listFiles(filter));
+		Function<File, String> function = new Function<File, String>() {
+			@Override
+			public String apply(File file) {
+				return StringUtils.substringBeforeLast(file.getName(), USER_SUFFIX);
+			}
+		};
+		List<String> users = Lists.newArrayList(Lists.transform(files, function));
+		Collections.sort(users);
+		return users;
 	}
 
 	/**
@@ -347,37 +352,44 @@ public class UserStore {
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			saveUserAuthorities(loginName, authorities, repo, currentUser, true);
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Closeables.closeQuietly(repo);
+		}
+	}
 
-			Map<String, Set<String>> authoritiesMap = new HashMap<String, Set<String>>();
-			for (RoleGrantedAuthority rga : authorities) {
-				GrantedAuthorityTarget target = rga.getTarget();
-				String targetStr = target.getType().name() + ":" + target.getTargetId(); //$NON-NLS-1$
-				Set<String> roleNames = authoritiesMap.get(targetStr);
-				if (roleNames == null) {
-					roleNames = Sets.newHashSet();
-					authoritiesMap.put(targetStr, roleNames);
-				}
-				roleNames.add(rga.getRoleName());
+	private void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities,
+			ILockedRepository repo, User currentUser, boolean commit) throws IOException, GitAPIException {
+		
+		Map<String, Set<String>> authoritiesMap = new HashMap<String, Set<String>>();
+		for (RoleGrantedAuthority rga : authorities) {
+			GrantedAuthorityTarget target = rga.getTarget();
+			String targetStr = target.getType().name() + ":" + target.getTargetId(); //$NON-NLS-1$
+			Set<String> roleNames = authoritiesMap.get(targetStr);
+			if (roleNames == null) {
+				roleNames = Sets.newHashSet();
+				authoritiesMap.put(targetStr, roleNames);
 			}
-			
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			String json = gson.toJson(authoritiesMap);
-			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			File workingFile = new File(workingDir, loginName + AUTHORITIES_SUFFIX);
-			FileUtils.write(workingFile, json, Charsets.UTF_8);
+			roleNames.add(rga.getRoleName());
+		}
+		
+		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		String json = gson.toJson(authoritiesMap);
+		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+		File workingFile = new File(workingDir, loginName + AUTHORITIES_SUFFIX);
+		FileUtils.write(workingFile, json, Charsets.UTF_8);
 
-			Git git = Git.wrap(repo.r());
-			git.add().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
+		Git git = Git.wrap(repo.r());
+		git.add().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
+		if (commit) {
 			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
 				.setMessage(loginName)
 				.call();
-		} catch (GitAPIException e) {
-			throw new IOException(e);
-		} finally {
-			Closeables.closeQuietly(repo);
 		}
 	}
 
@@ -394,30 +406,34 @@ public class UserStore {
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			String json = BlobUtils.getHeadContent(repo.r(), loginName + AUTHORITIES_SUFFIX);
-			if (json == null) {
-				throw new UserNotFoundException(loginName);
-			}
-			
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Map<String, Set<String>> authoritiesMap = gson.fromJson(
-					json, new TypeToken<Map<String, Set<String>>>(){}.getType());
-			List<RoleGrantedAuthority> authorities = Lists.newArrayList();
-			for (Map.Entry<String, Set<String>> entry : authoritiesMap.entrySet()) {
-				String targetStr = entry.getKey();
-				Type type = Type.valueOf(StringUtils.substringBefore(targetStr, ":")); //$NON-NLS-1$
-				String targetId = StringUtils.substringAfter(targetStr, ":"); //$NON-NLS-1$
-				for (String roleName : entry.getValue()) {
-					authorities.add(new RoleGrantedAuthority(new GrantedAuthorityTarget(targetId, type), roleName));
-				}
-			}
-			
-			Collections.sort(authorities, new RoleGrantedAuthorityComparator());
-			
-			return authorities;
+			return getUserAuthorities(loginName, repo);
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
+	}
+
+	private List<RoleGrantedAuthority> getUserAuthorities(String loginName, ILockedRepository repo) {
+		String json = BlobUtils.getHeadContent(repo.r(), loginName + AUTHORITIES_SUFFIX);
+		if (json == null) {
+			throw new UserNotFoundException(loginName);
+		}
+		
+		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		Map<String, Set<String>> authoritiesMap = gson.fromJson(
+				json, new TypeToken<Map<String, Set<String>>>(){}.getType());
+		List<RoleGrantedAuthority> authorities = Lists.newArrayList();
+		for (Map.Entry<String, Set<String>> entry : authoritiesMap.entrySet()) {
+			String targetStr = entry.getKey();
+			Type type = Type.valueOf(StringUtils.substringBefore(targetStr, ":")); //$NON-NLS-1$
+			String targetId = StringUtils.substringAfter(targetStr, ":"); //$NON-NLS-1$
+			for (String roleName : entry.getValue()) {
+				authorities.add(new RoleGrantedAuthority(new GrantedAuthorityTarget(targetId, type), roleName));
+			}
+		}
+		
+		Collections.sort(authorities, new RoleGrantedAuthorityComparator());
+		
+		return authorities;
 	}
 
 	/**
@@ -486,7 +502,7 @@ public class UserStore {
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
-				.setMessage("delete " + loginName) //$NON-NLS-1$
+				.setMessage("delete user " + loginName) //$NON-NLS-1$
 				.call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -530,6 +546,49 @@ public class UserStore {
 				.setAuthor(ident)
 				.setCommitter(ident)
 				.setMessage("rename " + loginName + " to " + newLoginName) //$NON-NLS-1$ //$NON-NLS-2$
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Closeables.closeQuietly(repo);
+		}
+	}
+
+	public void deleteRole(String roleName, User currentUser) throws IOException {
+		Assert.hasLength(roleName);
+		Assert.notNull(currentUser);
+		// check that role exists by trying to load it
+		getRole(roleName);
+		
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			Git git = Git.wrap(repo.r());
+			
+			git.rm().addFilepattern(roleName + ROLE_SUFFIX).call();
+
+			// remove role from all users
+			List<String> users = listUsers(repo);
+			for (String user : users) {
+				List<RoleGrantedAuthority> authorities = getUserAuthorities(user, repo);
+				boolean changed = false;
+				for (Iterator<RoleGrantedAuthority> iter = authorities.iterator(); iter.hasNext();) {
+					RoleGrantedAuthority rga = iter.next();
+					if (rga.getRoleName().equals(roleName)) {
+						iter.remove();
+						changed = true;
+					}
+				}
+				if (changed) {
+					saveUserAuthorities(user, Sets.newHashSet(authorities), repo, currentUser, false);
+				}
+			}
+			
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("delete role " + roleName) //$NON-NLS-1$
 				.call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);

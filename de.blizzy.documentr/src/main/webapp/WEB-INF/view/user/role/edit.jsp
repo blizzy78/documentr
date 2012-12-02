@@ -40,6 +40,40 @@ function updatePermissions() {
 	}
 }
 
+<c:if test="${!empty roleForm.name}">
+function showDeleteDialog() {
+	<c:set var="lastAdminRole" value="${false}"/>
+	<sec:authorize access="isLastAdminRole('${roleForm.name}')">
+		<c:set var="lastAdminRole" value="${true}"/>
+	</sec:authorize>
+	<c:choose>
+		<c:when test="${lastAdminRole}">
+			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
+				"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.name}"/>'), [
+					{
+						text: '<spring:message code="button.close"/>',
+						cancel: true
+					}
+				]);
+		</c:when>
+		<c:otherwise>
+			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
+				"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.name}"/>'), [
+					{
+						text: '<spring:message code="button.delete"/>',
+						href: '<c:url value="/role/delete/${roleForm.name}"/>',
+						type: 'danger'
+					},
+					{
+						text: '<spring:message code="button.cancel"/>',
+						cancel: true
+					}
+				]);
+		</c:otherwise>
+	</c:choose>
+}
+</c:if>
+
 function clearDirty() {
 	dirty = false;
 }
@@ -130,6 +164,9 @@ $(function() {
 		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<c:if test="${!empty roleForm.name}">
+				<a href="javascript:void(showDeleteDialog());" class="btn btn-warning"><spring:message code="button.delete"/></a>
+			</c:if>
 			<a href="<c:url value="/roles"/>" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</fieldset>

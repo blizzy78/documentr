@@ -150,7 +150,12 @@ public class UserController {
 				return "/user/edit"; //$NON-NLS-1$
 			}
 	
-			User newUser = new User(form.getOriginalLoginName(), password, form.getEmail(), form.isDisabled());
+			String newUserName = form.getOriginalLoginName();
+			if (StringUtils.isBlank(newUserName)) {
+				newUserName = form.getLoginName();
+			}
+			
+			User newUser = new User(newUserName, password, form.getEmail(), form.isDisabled());
 			if (existingUser != null) {
 				for (OpenId openId : existingUser.getOpenIds()) {
 					newUser.addOpenId(openId);
@@ -158,7 +163,9 @@ public class UserController {
 			}
 			userStore.saveUser(newUser, user);
 
-			if (!StringUtils.equals(form.getLoginName(), form.getOriginalLoginName())) {
+			if (StringUtils.isNotBlank(form.getOriginalLoginName()) &&
+				!StringUtils.equals(form.getLoginName(), form.getOriginalLoginName())) {
+				
 				userStore.renameUser(form.getOriginalLoginName(), form.getLoginName(), user);
 			}
 		}

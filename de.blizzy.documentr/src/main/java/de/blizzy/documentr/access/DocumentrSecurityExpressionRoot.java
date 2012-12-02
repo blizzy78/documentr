@@ -96,6 +96,10 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 		return permissionEvaluator.isAdmin(loginName);
 	}
 	
+	public boolean isLastAdminRole(String roleName) {
+		return permissionEvaluator.isLastAdminRole(roleName);
+	}
+	
 	public boolean projectExists(String projectName) {
 		return repoManager.listProjects().contains(StringUtils.defaultString(projectName));
 	}
