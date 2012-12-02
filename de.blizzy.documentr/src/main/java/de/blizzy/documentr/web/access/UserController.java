@@ -59,7 +59,7 @@ public class UserController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String addUser(Model model) {
-		UserForm form = new UserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
+		UserForm form = new UserForm(StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
 				StringUtils.EMPTY, false, null);
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
@@ -72,7 +72,40 @@ public class UserController {
 		
 		User user = userStore.getUser(authentication.getName());
 
+		if (StringUtils.isNotBlank(form.getOriginalLoginName()) &&
+			!form.getOriginalLoginName().equals(UserStore.ANONYMOUS_USER_LOGIN_NAME) &&
+			StringUtils.equals(form.getLoginName(), UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
+			
+			bindingResult.rejectValue("loginName", "user.loginName.invalid"); //$NON-NLS-1$ //$NON-NLS-2$
+			return "/user/edit"; //$NON-NLS-1$
+		}
+		
 		if (!form.getLoginName().equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
+			if (StringUtils.isNotBlank(form.getLoginName()) &&
+				(StringUtils.isBlank(form.getOriginalLoginName()) ||
+						!form.getLoginName().equals(form.getOriginalLoginName()))) {
+				
+				try {
+					if (userStore.getUser(form.getLoginName()) != null) {
+						bindingResult.rejectValue("loginName", "user.loginName.exists"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				} catch (UserNotFoundException e) {
+					// okay
+				}
+			}
+			
+			if (StringUtils.isBlank(form.getOriginalLoginName()) &&
+				StringUtils.isBlank(form.getPassword1())) {
+				
+				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+			if (StringUtils.isBlank(form.getOriginalLoginName()) &&
+					StringUtils.isBlank(form.getPassword2())) {
+				
+				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
 			if (StringUtils.isBlank(form.getPassword1()) && StringUtils.isNotBlank(form.getPassword2())) {
 				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -95,11 +128,13 @@ public class UserController {
 	
 			User existingUser = null;
 			String password = null;
-			try {
-				existingUser = userStore.getUser(form.getLoginName());
-				password = existingUser.getPassword();
-			} catch (UserNotFoundException e) {
-				// okay
+			if (StringUtils.isNotBlank(form.getOriginalLoginName())) {
+				try {
+					existingUser = userStore.getUser(form.getOriginalLoginName());
+					password = existingUser.getPassword();
+				} catch (UserNotFoundException e) {
+					// okay
+				}
 			}
 	
 			if (StringUtils.isNotBlank(form.getPassword1())) {
@@ -115,13 +150,17 @@ public class UserController {
 				return "/user/edit"; //$NON-NLS-1$
 			}
 	
-			User newUser = new User(form.getLoginName(), password, form.getEmail(), form.isDisabled());
+			User newUser = new User(form.getOriginalLoginName(), password, form.getEmail(), form.isDisabled());
 			if (existingUser != null) {
 				for (OpenId openId : existingUser.getOpenIds()) {
 					newUser.addOpenId(openId);
 				}
 			}
 			userStore.saveUser(newUser, user);
+
+			if (!StringUtils.equals(form.getLoginName(), form.getOriginalLoginName())) {
+				userStore.renameUser(form.getOriginalLoginName(), form.getLoginName(), user);
+			}
 		}
 		
 		String[] authorityStrs = StringUtils.defaultString(form.getAuthorities()).split("\\|"); //$NON-NLS-1$
@@ -150,7 +189,7 @@ public class UserController {
 		} else {
 			user = userStore.getUser(loginName);
 		}
-		UserForm form = new UserForm(loginName, StringUtils.EMPTY, StringUtils.EMPTY,
+		UserForm form = new UserForm(loginName, loginName, StringUtils.EMPTY, StringUtils.EMPTY,
 				user.getEmail(), user.isDisabled(), null);
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
@@ -166,12 +205,13 @@ public class UserController {
 
 	@ModelAttribute
 	public UserForm createUserForm(@RequestParam(required=false) String loginName,
+			@RequestParam(required=false) String originalLoginName,
 			@RequestParam(required=false) String password1, @RequestParam(required=false) String password2,
 			@RequestParam(required=false) String email, @RequestParam(required=false) boolean disabled,
 			@RequestParam(required=false) String authorities) {
 		
 		return (loginName != null) ?
-				new UserForm(loginName, password1, password2, email, disabled, authorities) :
+				new UserForm(loginName, originalLoginName, password1, password2, email, disabled, authorities) :
 				null;
 	}
 }

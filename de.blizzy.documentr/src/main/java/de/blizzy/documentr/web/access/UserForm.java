@@ -32,6 +32,8 @@ public class UserForm {
 	@Getter
 	private String loginName;
 	@Getter
+	private String originalLoginName;
+	@Getter
 	private String password1;
 	@Getter
 	private String password2;
@@ -44,10 +46,11 @@ public class UserForm {
 	@Getter
 	private String authorities;
 
-	public UserForm(String loginName, String password1, String password2, String email,
+	public UserForm(String loginName, String originalLoginName, String password1, String password2, String email,
 			boolean disabled, String authorities) {
 		
 		this.loginName = loginName;
+		this.originalLoginName = originalLoginName;
 		this.password1 = password1;
 		this.password2 = password2;
 		this.email = email;

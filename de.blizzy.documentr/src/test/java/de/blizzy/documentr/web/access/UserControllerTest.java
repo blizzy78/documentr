@@ -81,7 +81,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveUser() throws IOException {
-		UserForm user = new UserForm("user", "pw", "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "user", "pw", "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		when(userStore.getUser("user")).thenThrow(new UserNotFoundException("user")); //$NON-NLS-1$ //$NON-NLS-2$
 		
@@ -96,7 +96,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveExistingUser() throws IOException {
-		UserForm user = new UserForm("user", "newPW", "newPW", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "user", "newPW", "newPW", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 
 		User oldUser = new User("user", "oldPW", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -119,7 +119,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveExistingUserButKeepPassword() throws IOException {
-		UserForm user = new UserForm("user", StringUtils.EMPTY, StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$
+		UserForm user = new UserForm("user", "user", StringUtils.EMPTY, StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		User oldUser = new User("user", "oldPW", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -135,7 +135,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveUserPassword1Blank() throws IOException {
-		UserForm user = new UserForm("user", StringUtils.EMPTY, "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		UserForm user = new UserForm("user", "user", StringUtils.EMPTY, "pw", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -146,7 +146,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 
 	@Test
 	public void saveUserPassword2Blank() throws IOException {
-		UserForm user = new UserForm("user", "pw", StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		UserForm user = new UserForm("user", "user", "pw", StringUtils.EMPTY, "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);
@@ -157,7 +157,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveUserPasswordsDiffer() throws IOException {
-		UserForm user = new UserForm("user", "pw", "pw2", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		UserForm user = new UserForm("user", "user", "pw", "pw2", "email", true, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "userForm"); //$NON-NLS-1$
 		
 		String view = userController.saveUser(user, bindingResult, authentication);

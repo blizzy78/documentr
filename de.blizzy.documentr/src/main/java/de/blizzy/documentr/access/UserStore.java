@@ -494,4 +494,47 @@ public class UserStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
+
+	public void renameUser(String loginName, String newLoginName, User currentUser) throws IOException {
+		Assert.hasLength(loginName);
+		Assert.hasLength(newLoginName);
+		Assert.notNull(currentUser);
+		// check that user exists by trying to load it
+		getUser(loginName);
+		// check that new user does not exist by trying to load it
+		try {
+			getUser(newLoginName);
+			throw new IllegalArgumentException("user already exists: " + newLoginName); //$NON-NLS-1$
+		} catch (UserNotFoundException e) {
+			// okay
+		}
+
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File file = new File(workingDir, loginName + USER_SUFFIX);
+			File newFile = new File(workingDir, newLoginName + USER_SUFFIX);
+			FileUtils.copyFile(file, newFile);
+			file = new File(workingDir, loginName + AUTHORITIES_SUFFIX);
+			newFile = new File(workingDir, newLoginName + AUTHORITIES_SUFFIX);
+			FileUtils.copyFile(file, newFile);
+			Git git = Git.wrap(repo.r());
+			git.rm().addFilepattern(loginName + USER_SUFFIX).call();
+			git.rm().addFilepattern(loginName + AUTHORITIES_SUFFIX).call();
+			git.add().addFilepattern(newLoginName + USER_SUFFIX).call();
+			git.add().addFilepattern(newLoginName + AUTHORITIES_SUFFIX).call();
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("rename " + loginName + " to " + newLoginName) //$NON-NLS-1$ //$NON-NLS-2$
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Closeables.closeQuietly(repo);
+		}
+	}
 }

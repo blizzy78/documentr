@@ -160,6 +160,38 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
+	public void renameUserMustRenameUser() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+
+		RoleGrantedAuthority rga = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga), USER); //$NON-NLS-1$
+
+		userStore.renameUser("user", "user2", USER); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNotNull(userStore.getUser("user2")); //$NON-NLS-1$
+		
+		expectedException.expect(UserNotFoundException.class);
+		userStore.getUser("user"); //$NON-NLS-1$
+	}
+
+	@Test
+	public void renameUserMustRenameUserAuthorities() throws IOException {
+		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		userStore.saveUser(user, USER);
+		
+		RoleGrantedAuthority rga = new RoleGrantedAuthority(
+				GrantedAuthorityTarget.APPLICATION, "Reader"); //$NON-NLS-1$
+		userStore.saveUserAuthorities("user", Sets.newHashSet(rga), USER); //$NON-NLS-1$
+		
+		userStore.renameUser("user", "user2", USER); //$NON-NLS-1$ //$NON-NLS-2$
+		assertFalse(userStore.getUserAuthorities("user2").isEmpty()); //$NON-NLS-1$
+		
+		expectedException.expect(UserNotFoundException.class);
+		userStore.getUserAuthorities("user"); //$NON-NLS-1$
+	}
+	
+	@Test
 	public void getUserByOpenId() throws IOException {
 		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		user.addOpenId(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$

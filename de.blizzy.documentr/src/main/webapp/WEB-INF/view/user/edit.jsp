@@ -201,23 +201,23 @@ function removeRole(type, targetId, roleName) {
 	dirty = true;
 }
 
-<c:if test="${(!empty userForm.loginName) and (userForm.loginName ne '_anonymous')}">
+<c:if test="${(!empty userForm.originalLoginName) and (userForm.originalLoginName ne '_anonymous')}">
 function showDeleteDialog() {
-	<sec:authorize access="isAdmin('${userForm.loginName}')">
+	<sec:authorize access="isAdmin('${userForm.originalLoginName}')">
 		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
-			"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.loginName}"/>'), [
+			"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
 			{
 				text: '<spring:message code="button.close"/>',
 				cancel: true
 			}
 		]);
 	</sec:authorize>
-	<sec:authorize access="!isAdmin('${userForm.loginName}')">
+	<sec:authorize access="!isAdmin('${userForm.originalLoginName}')">
 		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
-			"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.loginName}"/>'), [
+			"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
 			{
 				text: '<spring:message code="button.delete"/>',
-				href: '<c:url value="/user/delete/${userForm.loginName}"/>',
+				href: '<c:url value="/user/delete/${userForm.originalLoginName}"/>',
 				type: 'danger'
 			},
 			{
@@ -236,8 +236,8 @@ function clearDirty() {
 var authorities = [];
 var dirty = false;
 
-<c:if test="${!empty userForm.loginName}">
-	<c:set var="authorities" value="${d:getUserAuthorities(userForm.loginName)}"/>
+<c:if test="${!empty userForm.originalLoginName}">
+	<c:set var="authorities" value="${d:getUserAuthorities(userForm.originalLoginName)}"/>
 	<c:forEach var="rga" items="${authorities}">
 		authorities.push(createAuthority('<c:out value="${rga.target.type}"/>', '<c:out value="${rga.target.targetId}"/>', '<c:out value="${rga.roleName}"/>'));
 	</c:forEach>
@@ -259,7 +259,7 @@ $(function() {
 		addRoleFormEl.find('select[name="branchName"]').attr('disabled', 'true');
 	</c:if>
 	
-	<c:if test="${userForm.loginName eq '_anonymous'}">
+	<c:if test="${userForm.originalLoginName eq '_anonymous'}">
 		var userFormEl = $('#userForm');
 		userFormEl.find('input[name="password1"]').attr('disabled', 'true');
 		userFormEl.find('input[name="password2"]').attr('disabled', 'true');
@@ -309,13 +309,15 @@ $(function() {
 	<div class="tab-content">
 		<div class="tab-pane active" id="userDetails">
 			<fieldset>
+				<input type="hidden" name="originalLoginName" value="${userForm.originalLoginName}"/>
+			
 				<c:set var="errorText"><form:errors path="loginName"/></c:set>
 				<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
 					<form:label path="loginName" cssClass="control-label"><spring:message code="label.loginName"/>:</form:label>
 					<c:choose>
-						<c:when test="${(!empty userForm.loginName) && (empty errorText)}">
+						<c:when test="${userForm.originalLoginName eq '_anonymous'}">
 							<form:hidden path="loginName"/>
-							<form:input path="loginName" cssClass="input-xlarge disabled" disabled="true"/>
+							<input type="text" value="(<spring:message code="label.anonymousUser"/>)" class="input-xlarge disabled" disabled="true"/>
 						</c:when>
 						<c:otherwise>
 							<form:input path="loginName" cssClass="input-xlarge"/>
@@ -359,10 +361,10 @@ $(function() {
 	</div>
 
 	<div class="form-actions">
-		<c:if test="${(!empty userForm.loginName) and (userForm.loginName ne '_anonymous')}">
+		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+		<c:if test="${(!empty userForm.originalLoginName) and (userForm.originalLoginName ne '_anonymous')}">
 			<a href="javascript:void(showDeleteDialog());" class="btn btn-warning"><spring:message code="button.delete"/></a>
 		</c:if>
-		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </form:form>
