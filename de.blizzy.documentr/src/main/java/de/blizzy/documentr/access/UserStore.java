@@ -31,6 +31,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -59,6 +61,7 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 
 /** Manages storage of user account data. */
 @Component
+@Slf4j
 public class UserStore {
 	/** The login name of the anonymous user. */
 	public static final String ANONYMOUS_USER_LOGIN_NAME = "_anonymous"; //$NON-NLS-1$
@@ -545,7 +548,68 @@ public class UserStore {
 			git.commit()
 				.setAuthor(ident)
 				.setCommitter(ident)
-				.setMessage("rename " + loginName + " to " + newLoginName) //$NON-NLS-1$ //$NON-NLS-2$
+				.setMessage("rename user " + loginName + " to " + newLoginName) //$NON-NLS-1$ //$NON-NLS-2$
+				.call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Closeables.closeQuietly(repo);
+		}
+	}
+	
+	public void renameRole(String roleName, String newRoleName, User currentUser) throws IOException {
+		Assert.hasLength(roleName);
+		Assert.hasLength(newRoleName);
+		Assert.notNull(currentUser);
+		// check that role exists by trying to load it
+		getRole(roleName);
+		// check that new role does not exist by trying to load it
+		try {
+			getRole(newRoleName);
+			throw new IllegalArgumentException("role already exists: " + newRoleName); //$NON-NLS-1$
+		} catch (RoleNotFoundException e) {
+			// okay
+		}
+		
+		log.info("renaming role: {} -> {}", roleName, newRoleName); //$NON-NLS-1$
+
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			
+			File file = new File(workingDir, roleName + ROLE_SUFFIX);
+			File newFile = new File(workingDir, newRoleName + ROLE_SUFFIX);
+			FileUtils.copyFile(file, newFile);
+			Git git = Git.wrap(repo.r());
+			git.rm().addFilepattern(roleName + ROLE_SUFFIX).call();
+			git.add().addFilepattern(newRoleName + ROLE_SUFFIX).call();
+
+			List<String> users = listUsers(repo);
+			users.add(ANONYMOUS_USER_LOGIN_NAME);
+			for (String user : users) {
+				List<RoleGrantedAuthority> authorities = getUserAuthorities(user, repo);
+				Set<RoleGrantedAuthority> newAuthorities = Sets.newHashSet();
+				for (Iterator<RoleGrantedAuthority> iter = authorities.iterator(); iter.hasNext();) {
+					RoleGrantedAuthority rga = iter.next();
+					if (rga.getRoleName().equals(roleName)) {
+						RoleGrantedAuthority newRga = new RoleGrantedAuthority(rga.getTarget(), newRoleName);
+						newAuthorities.add(newRga);
+						iter.remove();
+					}
+				}
+				if (!newAuthorities.isEmpty()) {
+					authorities.addAll(newAuthorities);
+					saveUserAuthorities(user, Sets.newHashSet(authorities), repo, currentUser, false);
+				}
+			}
+			
+			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("rename role " + roleName + " to " + newRoleName) //$NON-NLS-1$ //$NON-NLS-2$
 				.call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -569,6 +633,7 @@ public class UserStore {
 
 			// remove role from all users
 			List<String> users = listUsers(repo);
+			users.add(ANONYMOUS_USER_LOGIN_NAME);
 			for (String user : users) {
 				List<RoleGrantedAuthority> authorities = getUserAuthorities(user, repo);
 				boolean changed = false;

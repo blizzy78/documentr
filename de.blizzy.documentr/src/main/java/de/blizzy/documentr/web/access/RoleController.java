@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.access.Role;
+import de.blizzy.documentr.access.RoleNotFoundException;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 
@@ -53,7 +55,7 @@ public class RoleController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String addRole(Model model) {
-		RoleForm form = new RoleForm(null, Collections.<String>emptySet());
+		RoleForm form = new RoleForm(null, null, Collections.<String>emptySet());
 		model.addAttribute("roleForm", form); //$NON-NLS-1$
 		return "/user/role/edit"; //$NON-NLS-1$
 	}
@@ -66,7 +68,7 @@ public class RoleController {
 		for (Permission permission : role.getPermissions()) {
 			permissions.add(permission.name());
 		}
-		RoleForm form = new RoleForm(role.getName(), permissions);
+		RoleForm form = new RoleForm(role.getName(), role.getName(), permissions);
 		model.addAttribute("roleForm", form); //$NON-NLS-1$
 		return "/user/role/edit"; //$NON-NLS-1$
 	}
@@ -75,6 +77,19 @@ public class RoleController {
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String saveRole(@ModelAttribute @Valid RoleForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
+
+		if (StringUtils.isNotBlank(form.getName()) &&
+			(StringUtils.isBlank(form.getOriginalName()) ||
+					!form.getName().equals(form.getOriginalName()))) {
+			
+			try {
+				if (userStore.getRole(form.getName()) != null) {
+					bindingResult.rejectValue("name", "role.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			} catch (RoleNotFoundException e) {
+				// okay
+			}
+		}
 		
 		if (bindingResult.hasErrors()) {
 			return "/user/role/edit"; //$NON-NLS-1$
@@ -84,9 +99,19 @@ public class RoleController {
 		for (String permission : form.getPermissions()) {
 			permissions.add(Permission.valueOf(permission));
 		}
-		Role role = new Role(form.getName(), permissions);
+		String newRoleName = form.getOriginalName();
+		if (StringUtils.isBlank(newRoleName)) {
+			newRoleName = form.getName();
+		}
+		Role role = new Role(newRoleName, permissions);
 		User user = userStore.getUser(authentication.getName());
 		userStore.saveRole(role, user);
+		
+		if (StringUtils.isNotBlank(form.getOriginalName()) && StringUtils.isNotBlank(form.getName()) &&
+				!StringUtils.equals(form.getName(), form.getOriginalName())) {
+			
+			userStore.renameRole(form.getOriginalName(), form.getName(), user);
+		}
 		
 		return "redirect:/roles"; //$NON-NLS-1$
 	}
@@ -101,13 +126,14 @@ public class RoleController {
 
 	@ModelAttribute
 	public RoleForm createRoleForm(@RequestParam(required=false) String name,
+			@RequestParam(required=false) String originalName,
 			@RequestParam(required=false) Set<String> permissions) {
 		
 		if (permissions == null) {
 			permissions = Collections.emptySet();
 		}
 		return (name != null) ?
-				new RoleForm(name, permissions) :
+				new RoleForm(name, originalName, permissions) :
 				null;
 	}
 }

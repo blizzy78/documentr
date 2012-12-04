@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -189,6 +190,18 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		
 		expectedException.expect(UserNotFoundException.class);
 		userStore.getUserAuthorities("user"); //$NON-NLS-1$
+	}
+	
+	@Test
+	@Ignore
+	public void renameRoleMustRenameRole() {
+		// TODO: implement test
+	}
+	
+	@Test
+	@Ignore
+	public void renameRoleMustRenameRoleInUserAuthorities() {
+		// TODO: implement test
 	}
 	
 	@Test

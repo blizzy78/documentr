@@ -40,16 +40,16 @@ function updatePermissions() {
 	}
 }
 
-<c:if test="${!empty roleForm.name}">
+<c:if test="${!empty roleForm.originalName}">
 function showDeleteDialog() {
 	<c:set var="lastAdminRole" value="${false}"/>
-	<sec:authorize access="isLastAdminRole('${roleForm.name}')">
+	<sec:authorize access="isLastAdminRole('${roleForm.originalName}')">
 		<c:set var="lastAdminRole" value="${true}"/>
 	</sec:authorize>
 	<c:choose>
 		<c:when test="${lastAdminRole}">
 			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
-				"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.name}"/>'), [
+				"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
 					{
 						text: '<spring:message code="button.close"/>',
 						cancel: true
@@ -58,10 +58,10 @@ function showDeleteDialog() {
 		</c:when>
 		<c:otherwise>
 			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
-				"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.name}"/>'), [
+				"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
 					{
 						text: '<spring:message code="button.delete"/>',
-						href: '<c:url value="/role/delete/${roleForm.name}"/>',
+						href: '<c:url value="/role/delete/${roleForm.originalName}"/>',
 						type: 'danger'
 					},
 					{
@@ -116,19 +116,13 @@ $(function() {
 <c:set var="action"><c:url value="/role/save"/></c:set>
 <form:form commandName="roleForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<fieldset>
+		<input type="hidden" name="originalName" value="<c:out value="${roleForm.originalName}"/>"/>
+	
 		<c:set var="errorText"><form:errors path="name"/></c:set>
 		<div class="control-group <c:if test="${!empty errorText}">error</c:if>">
 			<form:label path="name" cssClass="control-label"><spring:message code="label.roleName"/>:</form:label>
 			<div class="controls">
-				<c:choose>
-					<c:when test="${(!empty roleForm.name) && (empty errorText)}">
-						<form:hidden path="name"/>
-						<form:input path="name" cssClass="input-xlarge disabled" disabled="true"/>
-					</c:when>
-					<c:otherwise>
-						<form:input path="name" cssClass="input-xlarge"/>
-					</c:otherwise>
-				</c:choose>
+				<form:input path="name" cssClass="input-xlarge"/>
 				<c:if test="${!empty errorText}"><span class="help-inline"><c:out value="${errorText}" escapeXml="false"/></span></c:if>
 			</div>
 		</div>
@@ -164,7 +158,7 @@ $(function() {
 		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-			<c:if test="${!empty roleForm.name}">
+			<c:if test="${!empty roleForm.originalName}">
 				<a href="javascript:void(showDeleteDialog());" class="btn btn-warning"><spring:message code="button.delete"/></a>
 			</c:if>
 			<a href="<c:url value="/roles"/>" class="btn"><spring:message code="button.cancel"/></a>

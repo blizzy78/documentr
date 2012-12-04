@@ -33,11 +33,15 @@ public class RoleForm {
 	@ValidRoleName
 	@Getter
 	private String name;
+	@ValidRoleName
+	@Getter
+	private String originalName;
 	@Getter
 	private Set<String> permissions;
 
-	public RoleForm(String name, Set<String> permissions) {
+	public RoleForm(String name, String originalName, Set<String> permissions) {
 		this.name = name;
+		this.originalName = originalName;
 		this.permissions = permissions;
 	}
 }

@@ -85,7 +85,7 @@ public class RoleControllerTest extends AbstractDocumentrTest {
 	
 	@Test
 	public void saveRole() throws IOException {
-		RoleForm form = new RoleForm("role", Sets.newHashSet( //$NON-NLS-1$
+		RoleForm form = new RoleForm("role", null, Sets.newHashSet( //$NON-NLS-1$
 			Permission.EDIT_BRANCH.name(), Permission.EDIT_PAGE.name()));
 		BindingResult bindingResult = new BeanPropertyBindingResult(form, "roleForm"); //$NON-NLS-1$
 		String view = roleController.saveRole(form, bindingResult, authentication);

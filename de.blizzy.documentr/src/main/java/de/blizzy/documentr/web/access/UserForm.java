@@ -31,6 +31,7 @@ public class UserForm {
 	@ValidLoginName
 	@Getter
 	private String loginName;
+	@ValidLoginName
 	@Getter
 	private String originalLoginName;
 	@Getter
