@@ -95,13 +95,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.4.12</version>
+			<version>1.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.4.12</version>
+			<version>1.5</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -134,7 +134,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>4.3.0.Final</version>
+			<version>4.3.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -220,7 +220,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.0.7</version>
+			<version>1.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
