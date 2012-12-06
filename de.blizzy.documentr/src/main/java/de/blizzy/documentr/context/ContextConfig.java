@@ -87,6 +87,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setFallbackToSystemLocale(false);
 		messageSource.setBasenames(new String[] { "documentr_messages", "ValidationMessages" }); //$NON-NLS-1$ //$NON-NLS-2$
 		return messageSource;
 	}
