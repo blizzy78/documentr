@@ -47,18 +47,19 @@ var resolveTexts = {};
 </c:forEach>
 
 function editConflict(branchName, commit) {
-	var textEl = $('#conflictText');
 	var text;
 	if (documentr.isSomething(resolveTexts[branchName + '/' + commit])) {
 		text = resolveTexts[branchName + '/' + commit];
 	} else {
 		text = conflictTexts[branchName + '/' + commit];
 	}
-	textEl.val(text);
 	var dlg = $('#conflict-dialog');
+	var editor = dlg.data('editor');
+	editor.setValue(text);
 	dlg.data('branchName', branchName).data('commit', commit)
 		.showModal();
-	textEl.focus();
+	editor.moveCursorTo(0, 0);
+	editor.focus();
 }
 
 function saveResolveText() {
@@ -66,8 +67,8 @@ function saveResolveText() {
 	dlg.hideModal();
 	var branchName = dlg.data('branchName');
 	var commit = dlg.data('commit');
-	var textEl = $('#conflictText');
-	var text = textEl.val();
+	var editor = dlg.data('editor');
+	var text = editor.getValue();
 	resolveTexts[branchName + '/' + commit] = text;
 	preview();
 }
@@ -105,6 +106,20 @@ function preview() {
 
 	</c:otherwise>
 </c:choose>
+
+$(function() {
+	var editor = ace.edit('editor');
+	$('#conflict-dialog').data('editor', editor);
+	editor.setTheme('ace/theme/chrome');
+	editor.session.setMode('ace/mode/merge_conflict');
+	editor.setDisplayIndentGuides(true);
+	editor.renderer.setShowGutter(false);
+	editor.session.setUseWrapMode(true);
+	editor.session.setWrapLimitRange(null, null);
+	editor.renderer.setShowPrintMargin(false);
+	editor.session.setUseSoftTabs(false);
+	editor.setHighlightSelectedWord(false);
+});
 
 </dt:headerJS>
 
@@ -184,7 +199,7 @@ function preview() {
 		<h3><spring:message code="title.resolveConflict"/></h3>
 	</div>
 	<div class="modal-body">
-		<textarea id="conflictText" rows="19" class="code"></textarea>
+		<div class="editor-wrapper"><div id="editor"></div></div>
 	</div>
 	<div class="modal-footer">
 		<a href="javascript:void(saveResolveText());" class="btn btn-primary"><spring:message code="button.save"/></a>
