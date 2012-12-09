@@ -335,7 +335,7 @@ function saveInlineEditor() {
 		type: 'POST',
 		dataType: 'json',
 		data: {
-			markdown: formEl.find('textarea').val(),
+			markdown: formEl.data('editor').getValue(),
 			range: $(textEl).attr('data-text-range'),
 			commit: currentCommit
 		},
@@ -381,9 +381,11 @@ function startInlineEditor(textEl, range) {
 			$(textEl).hide();
 			toggleHideFloatingElements(true);
 			formEl.data('textEl', textEl);
-			formEl.find('textarea').val(result.markdown);
+			var editor = formEl.data('editor');
+			editor.setValue(result.markdown);
 			formEl.show();
-			formEl.find('textarea').focus();
+			editor.focus();
+			editor.moveCursorTo(0, 0);
 		}
 	});
 }
@@ -504,6 +506,19 @@ $(function() {
 	<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 		hookupInlineEditorToolbar();
 		hookupSplitCursor();
+
+		var editor = ace.edit('editor');
+		$('#inlineEditorForm').data('editor', editor);
+		editor.setTheme('ace/theme/chrome');
+		editor.session.setMode('ace/mode/markdown');
+		editor.setDisplayIndentGuides(true);
+		editor.renderer.setShowGutter(false);
+		editor.session.setUseWrapMode(true);
+		editor.session.setWrapLimitRange(null, null);
+		editor.renderer.setShowPrintMargin(false);
+		editor.session.setUseSoftTabs(false);
+		editor.setHighlightSelectedWord(false);
+		editor.setHighlightActiveLine(false);
 	</sec:authorize>
 });
 
@@ -650,7 +665,7 @@ $(function() {
 	</div>
 	
 	<form id="inlineEditorForm" class="inline-editor" style="display: none;">
-		<textarea class="code span12" rows="7"></textarea>
+		<div class="editor-wrapper"><div id="editor"></div></div>
 		<a class="btn btn-mini btn-primary" href="javascript:void(saveInlineEditor())"><spring:message code="button.save"/></a>
 		<a class="btn btn-mini" href="javascript:void(cancelInlineEditor())"><spring:message code="button.cancel"/></a>
 	</form>
