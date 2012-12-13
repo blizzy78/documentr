@@ -28,8 +28,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	ul {
 		margin: 0;
+
+		// copied from Bootstrap since they've switched to ".breadcrumb > li"
+		li {
+			display: inline-block;
+			.ie7-inline-block();
+			text-shadow: 0 1px 0 @white;
+			
+			> .divider {
+				padding: 0 5px;
+				color: #ccc;
+			}
+		}
 	}
 	
+	// copied from Bootstrap since they've switched to ".breadcrumb > .active"
+	.active {
+		color: @grayLight;
+	}
+
 	.btn-toolbar {
 		margin: 0;
 	}
