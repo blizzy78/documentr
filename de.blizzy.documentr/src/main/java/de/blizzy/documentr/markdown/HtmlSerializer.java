@@ -95,25 +95,19 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		}
 		
 		if (thumbnail) {
-			printer.print("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" ") //$NON-NLS-1$
-				.print("rel=\"lightbox[images]\" href=\"") //$NON-NLS-1$
-				.print(context.getAttachmentUri(url)).print("\""); //$NON-NLS-1$
-			
-			if (StringUtils.isNotBlank(title)) {
-				printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			printer.print(">"); //$NON-NLS-1$
+			printer.print("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" href=\"") //$NON-NLS-1$
+				.print(context.getAttachmentUri(url)).print("\">"); //$NON-NLS-1$
 		}
 		
 		printer.print("<img src=\"").print(context.getAttachmentUri(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		if (StringUtils.isNotBlank(altText)) {
 			printer.print(" alt=\"").printEncoded(altText).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (StringUtils.isNotBlank(title)) {
-			printer.print(" title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		if (thumbnail) {
-			printer.print(" width=\"260\""); //$NON-NLS-1$
+			printer.print(" data-lightbox=\"lightbox\" width=\"260\""); //$NON-NLS-1$
+		}
+		if (StringUtils.isNotBlank(title)) {
+			printer.print(" rel=\"tooltip\" data-title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		printer.print("/>"); //$NON-NLS-1$
 		

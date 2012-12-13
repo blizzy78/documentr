@@ -113,8 +113,9 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		refNode.setUrl("url | thumbnail"); //$NON-NLS-1$
 		rootNode.setReferences(Lists.newArrayList(refNode));
 		String html = htmlSerializer.toHtml(rootNode);
-		assertEquals("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" rel=\"lightbox[images]\" " + //$NON-NLS-1$
-				"href=\"/foo.png\"><img src=\"/foo.png\" alt=\"alttext\" width=\"260\"/></a></li></ul>", html); //$NON-NLS-1$
+		assertEquals("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" " + //$NON-NLS-1$
+				"href=\"/foo.png\"><img src=\"/foo.png\" alt=\"alttext\" data-lightbox=\"lightbox\" " + //$NON-NLS-1$
+				"width=\"260\"/></a></li></ul>", html); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -123,7 +124,7 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		
 		ExpImageNode node = new ExpImageNode("title", "url", new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String html = htmlSerializer.toHtml(root(node));
-		assertEquals("<img src=\"/foo.png\" alt=\"alttext\" title=\"title\"/>", html); //$NON-NLS-1$
+		assertEquals("<img src=\"/foo.png\" alt=\"alttext\" rel=\"tooltip\" data-title=\"title\"/>", html); //$NON-NLS-1$
 	}
 
 	@Test
