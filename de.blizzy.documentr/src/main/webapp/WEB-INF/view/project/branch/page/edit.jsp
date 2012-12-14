@@ -486,7 +486,7 @@ function prepareForm() {
 $(function() {
 	<c:if test="${empty pageForm.path}">
 	
-		var el = $('#pageForm').find('#title');
+		var el = $('#pageForm #title');
 		el.blur(function() {
 			var pinPathButton = $('#pinPathButton');
 			if (!pinPathButton.hasClass('active')) {
@@ -504,7 +504,8 @@ $(function() {
 							title: value
 						},
 						success: function(result) {
-							$('#pageForm').find('#path').val(result.path);
+							console.log(result);
+							$('#pageForm #path').val(result.path);
 							if (result.exists) {
 								fieldset.addClass('warning');
 								var controls = $('#pathControls');

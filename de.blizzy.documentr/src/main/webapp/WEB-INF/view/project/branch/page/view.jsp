@@ -50,7 +50,7 @@ function copyToBranchSelected() {
 	var button = $('#copyToBranchButton');
 	button.setButtonDisabled(true);
 	
-	var el = $('#copyToBranchForm').find('select');
+	var el = $('#copyToBranchForm select');
 	var branch = el.val();
 	$.ajax({
 		url: '<c:url value="/page/generateName/${projectName}/"/>' + branch + '/<c:out value="${d:toUrlPagePath(parentPagePath)}"/>/json',
@@ -151,7 +151,7 @@ function showRelocateDialog() {
 							} else {
 								button.removeClass('btn-warning').addClass('btn-primary');
 							}
-							$('#relocateForm').find('input:hidden[name="newParentPagePath"]').val(node.data('path'));
+							$('#relocateForm input:hidden[name="newParentPagePath"]').val(node.data('path'));
 						},
 						complete: function() {
 							button.setButtonDisabled(false);

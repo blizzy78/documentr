@@ -70,7 +70,7 @@ function updateAuthoritiesInForm() {
 		}
 		authoritiesStr = authoritiesStr + authorities[i].type + ':' + authorities[i].targetId + ':' + authorities[i].roleName;
 	}
-	$('#userForm').find('input:hidden[name="authorities"]').val(authoritiesStr);
+	$('#userForm input:hidden[name="authorities"]').val(authoritiesStr);
 }
 
 function updateAuthorities() {
@@ -389,7 +389,7 @@ $(function() {
 							<input type="radio" name="targetType" value="PROJECT"/>
 							<spring:message code="label.roleTarget.project"/>:
 						</label>
-						<select name="projectName" onmousedown="$('#addRoleForm').find('input:radio[value=&quot;PROJECT&quot;]').each(function() { this.checked = 'checked'; });">
+						<select name="projectName" onmousedown="$('#addRoleForm input:radio[value=&quot;PROJECT&quot;]').each(function() { this.checked = 'checked'; });">
 							<c:forEach var="project" items="${projects}">
 								<option value="<c:out value="${project}"/>"><c:out value="${project}"/></option>
 							</c:forEach>
@@ -400,7 +400,7 @@ $(function() {
 							<input type="radio" name="targetType" value="BRANCH"/>
 							<spring:message code="label.roleTarget.branch"/>:
 						</label>
-						<select name="branchName" onmousedown="$('#addRoleForm').find('input:radio[value=&quot;BRANCH&quot;]').each(function() { this.checked = 'checked'; });">
+						<select name="branchName" onmousedown="$('#addRoleForm input:radio[value=&quot;BRANCH&quot;]').each(function() { this.checked = 'checked'; });">
 							<c:forEach var="project" items="${projects}">
 								<c:set var="branches" value="${d:listProjectBranches(project)}"/>
 								<c:forEach var="branch" items="${branches}">

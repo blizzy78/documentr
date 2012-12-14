@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
-<script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-1.8.3.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.2.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/slimbox-2.04.js"/>"></script>
 <sec:authorize access="isAuthenticated()">
