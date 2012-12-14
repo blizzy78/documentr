@@ -19,6 +19,7 @@ package de.blizzy.documentr.system;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,7 +37,6 @@ import org.springframework.context.Lifecycle;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.Closeables;
@@ -143,7 +143,7 @@ public class SystemSettingsStore implements Lifecycle {
 
 	public Map<String, String> getSettings() {
 		synchronized (settings) {
-			return ImmutableMap.copyOf(settings);
+			return Collections.unmodifiableMap(Maps.newHashMap(settings));
 		}
 	}
 	
