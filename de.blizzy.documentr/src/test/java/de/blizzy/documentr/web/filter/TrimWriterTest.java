@@ -38,6 +38,7 @@ public class TrimWriterTest {
 			String text =
 					"xyz\r\n" +
 					"\tfoo\r\n" +
+					"  <pre> single </pre>  \r\n" +
 					"  bar  \r\n" +
 					"<pre class=\"xyz\">  a b c  \r\n" +
 					"  d e  \r\n" +
@@ -46,7 +47,7 @@ public class TrimWriterTest {
 					"<textarea class=\"test\">  a b c  \r\n" +
 					"  d e  \r\n" +
 					"  f g  </textarea>\r\n" +
-					"  zzz \t  \r\n";
+					"  zz<!-- hello world-->z \t  \r\n";
 			writer.write(text, out, Charsets.UTF_8);
 		} finally {
 			Closeables.closeQuietly(out);
@@ -57,6 +58,7 @@ public class TrimWriterTest {
 		String expected =
 				"xyz\n" +
 				"foo\n" +
+				"<pre> single </pre>\n" +
 				"bar\n" +
 				"<pre class=\"xyz\">  a b c  \n" +
 				"  d e  \n" +

@@ -27,48 +27,66 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.io.Closeables;
 
+import de.blizzy.documentr.util.Replacement;
+
 class TrimWriter {
+	private static final Replacement REMOVE_COMMENT = new Replacement("<!--.*?-->", StringUtils.EMPTY); //$NON-NLS-1$
+	private static final Replacement TRIM_LEFT = new Replacement("^[ \t]+", StringUtils.EMPTY); //$NON-NLS-1$
+	private static final Replacement TRIM_RIGHT = new Replacement("[ \t]+$", StringUtils.EMPTY); //$NON-NLS-1$
+	
 	void write(String text, OutputStream out, Charset charset) throws IOException {
 		BufferedReader in = null;
 		try {
 			in = new BufferedReader(new StringReader(text));
 			String line;
-			boolean textarea = false;
-			boolean pre = false;
-			boolean notrim = false;
+			boolean textareaTag = false;
+			boolean preTag = false;
+			boolean notrimTag = false;
+			boolean trim = true;
 			while ((line = in.readLine()) != null) {
 				String origLine = line;
 
 				line = StringUtils.replace(line, "__NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
 				line = StringUtils.replace(line, "__/NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
+				line = REMOVE_COMMENT.replaceAll(line);
+				
+				if (trim) {
+					line = TRIM_LEFT.replaceAll(line);
+				}
 				
 				if (origLine.contains("<textarea")) { //$NON-NLS-1$
-					textarea = true;
+					textareaTag = true;
 				}
 				if (origLine.contains("<pre")) { //$NON-NLS-1$
-					pre = true;
+					preTag = true;
 				}
 				if (origLine.contains("__NOTRIM__")) { //$NON-NLS-1$
-					notrim = true;
+					notrimTag = true;
 				}
-
-				if (textarea || pre || notrim) {
-					writeln(line, out, charset);
-				} else {
-					line = line.trim();
-					if (StringUtils.isNotBlank(line)) {
-						writeln(line, out, charset);
-					}
+				if (textareaTag || preTag || notrimTag) {
+					trim = false;
 				}
 
 				if (origLine.contains("</textarea")) { //$NON-NLS-1$
-					textarea = false;
+					textareaTag = false;
 				}
 				if (origLine.contains("</pre")) { //$NON-NLS-1$
-					pre = false;
+					preTag = false;
 				}
 				if (origLine.contains("__/NOTRIM__")) { //$NON-NLS-1$
-					notrim = false;
+					notrimTag = false;
+				}
+				if (!textareaTag && !preTag && !notrimTag) {
+					trim = true;
+				}
+
+				if (trim) {
+					line = TRIM_RIGHT.replaceAll(line);
+				}
+
+				boolean doWrite = !trim || StringUtils.isNotBlank(line);
+				if (doWrite) {
+					writeln(line, out, charset);
 				}
 			}
 		} finally {
