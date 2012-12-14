@@ -88,15 +88,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 								</tr>
 								<tr>
 									<td><h4>&Uuml;berschrift 3</h4></td>
-									<td><pre><code>### &Uuml;berschrift 3</td>
+									<td><pre><code>### &Uuml;berschrift 3</code></pre></td>
 								</tr>
 								<tr>
 									<td><h5>&Uuml;berschrift 4</h5></td>
-									<td><pre><code>#### &Uuml;berschrift 4</td>
+									<td><pre><code>#### &Uuml;berschrift 4</code></pre></td>
 								</tr>
 								<tr>
 									<td><h6>&Uuml;berschrift 5</h6></td>
-									<td><pre><code>##### &Uuml;berschrift 5</td>
+									<td><pre><code>##### &Uuml;berschrift 5</code></pre></td>
 								</tr>
 							</tbody>
 						</table>
@@ -122,15 +122,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 								</tr>
 								<tr>
 									<td><h4>Heading 3</h4></td>
-									<td><pre><code>### Heading 3</td>
+									<td><pre><code>### Heading 3</code></pre></td>
 								</tr>
 								<tr>
 									<td><h5>Heading 4</h5></td>
-									<td><pre><code>#### Heading 4</td>
+									<td><pre><code>#### Heading 4</code></pre></td>
 								</tr>
 								<tr>
 									<td><h6>Heading 5</h6></td>
-									<td><pre><code>##### Heading 5</td>
+									<td><pre><code>##### Heading 5</code></pre></td>
 								</tr>
 							</tbody>
 						</table>
@@ -308,7 +308,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 									<td><div class="code-view-wrapper">
 										<!--__NOTRIM__--><div class="code-view">Zeile 1
 Zeile 2
-Zeile 3</div><!--__/NOTRIM-->
+Zeile 3</div><!--__/NOTRIM__-->
 </div></td>
 									<td><pre><code>    Zeile 1<br/>    Zeile 2<br/>    Zeile 3</code></pre><em class="alternative">oder</em><pre><code>~~~<br/>Zeile 1<br/>Zeile 2<br/>Zeile 3<br/>~~~</code></pre></td>
 								</tr>
@@ -318,7 +318,7 @@ Zeile 3</div><!--__/NOTRIM-->
 Hervorhebung --&gt;
 &lt;p class=&quot;header&quot;&gt;
 Hallo
-&lt;p&gt;</div><!--__/NOTRIM-->
+&lt;p&gt;</div><!--__/NOTRIM__-->
 </div></td>
 									<td><pre><code>~~~html<br/>&lt;!-- Quellcode mit<br/>Hervorhebung --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
@@ -336,7 +336,7 @@ Hallo
 									<td><div class="code-view-wrapper">
 										<!--__NOTRIM__--><div class="code-view">Line 1
 Line 2
-Line 3</div><!--__/NOTRIM-->
+Line 3</div><!--__/NOTRIM__-->
 </div></td>
 									<td><pre><code>    Line 1<br/>    Line 2<br/>    Line 3</code></pre><em class="alternative">or</em><pre><code>~~~<br/>Line 1<br/>Line 2<br/>Line 3<br/>~~~</code></pre></td>
 								</tr>
@@ -346,7 +346,7 @@ Line 3</div><!--__/NOTRIM-->
 with highlighting --&gt;
 &lt;p class=&quot;header&quot;&gt;
 Hello
-&lt;p&gt;</div><!--__/NOTRIM-->
+&lt;p&gt;</div><!--__/NOTRIM__-->
 </div></td>
 									<td><pre><code>~~~html<br/>&lt;!-- Source code<br/>with highlighting --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
