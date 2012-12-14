@@ -451,9 +451,14 @@ $(function() {
 	$('body').tooltip({
 		selector: '[rel="tooltip"]'
 	});
-	$('img[data-lightbox="lightbox"]').slimbox(null, function(el) {
-		return [el.parentElement.href, $(el).attr('data-title')];
-	}, null);
+
+	var images = $('img[data-lightbox="lightbox"]');
+	if (images.length > 0) {
+		images.slimbox(null, function(el) {
+			return [el.parentElement.href, $(el).attr('data-title')];
+		}, null);
+	}
+	
 	$('#siteSearch input').bind('webkitspeechchange', function() {
 		$('#siteSearch')[0].submit();
 	});
