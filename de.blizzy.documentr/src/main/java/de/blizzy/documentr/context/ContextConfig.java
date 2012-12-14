@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -86,9 +86,12 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 	
 	@Bean
 	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setFallbackToSystemLocale(false);
-		messageSource.setBasenames(new String[] { "documentr_messages", "ValidationMessages" }); //$NON-NLS-1$ //$NON-NLS-2$
+		messageSource.setCacheSeconds(10);
+		messageSource.setBasenames(new String[] {
+				"classpath:documentr_messages", "classpath:ValidationMessages" //$NON-NLS-1$ //$NON-NLS-2$
+		});
 		return messageSource;
 	}
 	
