@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 
+var jqXHRs = [];
+
 function showDeleteDialog(name) {
 	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
 	documentr.openMessageDialog('<spring:message code="title.deleteAttachment"/>', text, [
@@ -44,6 +46,38 @@ function showDeleteDialog(name) {
 		}
 	]);
 }
+
+function cancelUpload() {
+	$('#upload-dialog .modal-footer a').setButtonDisabled(true);
+	$.each(jqXHRs, function(idx, jqXHR) {
+		jqXHR.abort();
+	});
+	jqXHRs = [];
+}
+
+$(function() {
+	$('input[type="file"]').fileupload({
+		url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/json"/>',
+		dataType: 'json',
+		add: function(e, data) {
+			var jqXHR = data.submit();
+			jqXHRs.push(jqXHR);
+		},
+		progressall: function(e, data) {
+			$('#upload-dialog').showModal();
+			var percent = parseInt(data.loaded / data.total * 100, 10);
+			$('#upload-dialog .progress .bar').css('width', percent + '%');
+		},
+		always: function() {
+			$('#upload-dialog').hideModal();
+			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+			$('#upload-dialog .progress .bar').css('width', '0%');
+		},
+		done: function(e, data) {
+			window.location.reload();
+		}
+	});
+});
 
 </sec:authorize>
 
@@ -105,10 +139,29 @@ function showDeleteDialog(name) {
 	</c:otherwise>
 </c:choose>
 
+<p><spring:message code="dropFilesToUpload"/></p>
+
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 	<p>
 	<a href="<c:url value="/attachment/create/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.addAttachment"/></a>
 	</p>
+
+	<input type="file" name="file" style="display: none;"/>
+
+	<div class="modal" id="upload-dialog" style="display: none;">
+		<div class="modal-header">
+			<button class="close" onclick="cancelUpload();">×</button>
+			<h3><spring:message code="title.upload"/></h3>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="bar"></div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="javascript:void(cancelUpload());" class="btn"><spring:message code="button.cancel"/></a>
+		</div>
+	</div>
 </sec:authorize>
 
 </dt:page>

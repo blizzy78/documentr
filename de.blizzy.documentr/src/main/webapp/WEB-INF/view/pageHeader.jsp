@@ -37,8 +37,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.2.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/slimbox-2.04.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/diff_match_patch-20120106.js"/>"></script>
+<sec:authorize access="isAuthenticated()">
+	<script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/js/diff_match_patch-20120106.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/vendor/jquery.ui.widget.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/jquery.iframe-transport.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/jquery.fileupload.js"/>"></script>
+</sec:authorize>
 <script type="text/javascript" src="<c:url value="/js/ace-1.0.0/ace.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 

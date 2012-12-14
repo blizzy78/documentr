@@ -26,6 +26,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 
 <c:set var="pagePathUrl" value="${d:toUrlPagePath(pagePath)}"/>
+
+<dt:headerJS>
+
+var jqXHRs = [];
+
+function cancelUpload() {
+	$('#upload-dialog .modal-footer a').setButtonDisabled(true);
+	$.each(jqXHRs, function(idx, jqXHR) {
+		jqXHR.abort();
+	});
+	jqXHRs = [];
+}
+
+$(function() {
+	$('input[type="file"]').fileupload({
+		url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${pagePathUrl}/json"/>',
+		dataType: 'json',
+		add: function(e, data) {
+			var jqXHR = data.submit();
+			jqXHRs.push(jqXHR);
+		},
+		progressall: function(e, data) {
+			$('#upload-dialog').showModal();
+			var percent = parseInt(data.loaded / data.total * 100, 10);
+			$('#upload-dialog .progress .bar').css('width', percent + '%');
+		},
+		always: function() {
+			$('#upload-dialog').hideModal();
+			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+			$('#upload-dialog .progress .bar').css('width', '0%');
+		},
+		done: function(e, data) {
+			window.location.href = '<c:url value="/attachment/list/${projectName}/${branchName}/${pagePathUrl}"/>';
+		}
+	});
+});
+
+</dt:headerJS>
+
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
 	<li><a href="<c:url value="/project/${projectName}"/>"><c:out value="${projectName}"/></a> <span class="divider">/</span></li>
@@ -63,6 +102,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 	</fieldset>	
 </form>
+
+<div class="modal" id="upload-dialog" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="cancelUpload();">×</button>
+		<h3><spring:message code="title.upload"/></h3>
+	</div>
+	<div class="modal-body">
+		<div class="progress">
+			<div class="bar"></div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(cancelUpload());" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</div>
 
 </dt:page>
 

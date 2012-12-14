@@ -18,9 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.attachment;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +41,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.AuthenticationUtil;
@@ -52,6 +60,7 @@ import de.blizzy.documentr.util.Util;
 
 @Controller
 @RequestMapping("/attachment")
+@Slf4j
 public class AttachmentController {
 	@Autowired
 	private IPageStore pageStore;
@@ -144,6 +153,42 @@ public class AttachmentController {
 			@PathVariable String pagePath, @RequestParam MultipartFile file, Authentication authentication)
 			throws IOException {
 
+		saveAttachmentInternal(projectName, branchName, pagePath, file, authentication);
+		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + pagePath; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	@RequestMapping(value="/saveViaJson/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
+			method=RequestMethod.POST)
+	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)")
+	@ResponseBody
+	public Map<String, Object> saveAttachmentViaJson(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String pagePath, @RequestParam MultipartFile file, Authentication authentication)
+					throws IOException {
+		
+		log.info("saving attachment via JSON: {}", file.getOriginalFilename()); //$NON-NLS-1$
+		saveAttachmentInternal(projectName, branchName, pagePath, file, authentication);
+		
+		Map<String, Object> fileResult = Maps.newHashMap();
+		fileResult.put("name", file.getOriginalFilename()); //$NON-NLS-1$
+		fileResult.put("size", Long.valueOf(file.getSize())); //$NON-NLS-1$
+		fileResult.put("url", StringUtils.EMPTY); //$NON-NLS-1$
+		fileResult.put("thumbnail_url", StringUtils.EMPTY); //$NON-NLS-1$
+		fileResult.put("delete_url", StringUtils.EMPTY); //$NON-NLS-1$
+		fileResult.put("delete_type", StringUtils.EMPTY); //$NON-NLS-1$
+		List<Map<String, Object>> filesList = Lists.newArrayList();
+		filesList.add(fileResult);
+		Map<String, Object> result = Maps.newHashMap();
+		result.put("files", filesList); //$NON-NLS-1$
+		return result;
+	}
+	
+	private void saveAttachmentInternal(String projectName, String branchName, String pagePath,
+			MultipartFile file, Authentication authentication) throws IOException {
+		
+		log.debug("saving attachment: {}", file.getOriginalFilename()); //$NON-NLS-1$
+		
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		String contentType = servletContext.getMimeType(file.getOriginalFilename());
 		if (StringUtils.isBlank(contentType)) {
@@ -153,9 +198,6 @@ public class AttachmentController {
 		pagePath = Util.toRealPagePath(pagePath);
 		User user = userStore.getUser(authentication.getName());
 		pageStore.saveAttachment(projectName, branchName, pagePath, file.getOriginalFilename(), attachment, user);
-		
-		return "redirect:/attachment/list/" + projectName + "/" + branchName + "/" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			Util.toUrlPagePath(pagePath);
 	}
 
 	@RequestMapping(value="/delete/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
