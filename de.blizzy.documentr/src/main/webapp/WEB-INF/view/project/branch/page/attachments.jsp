@@ -139,7 +139,7 @@ $(function() {
 	</c:otherwise>
 </c:choose>
 
-<p><spring:message code="dropFilesToUpload"/></p>
+<p><spring:message code="dragFilesOntoPageToUpload"/></p>
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 	<p>

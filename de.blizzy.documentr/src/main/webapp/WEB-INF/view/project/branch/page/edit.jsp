@@ -734,6 +734,7 @@ $(function() {
 				<div class="editor-wrapper">
 					<!--__NOTRIM__--><div id="editor"><c:out value="${pageForm.text}"/></div><!--__/NOTRIM__-->
 				</div>
+				<span class="help-block"><spring:message code="dragFilesOntoEditorToUpload"/></span>
 			</div>
 		</div>
 		<div id="tagsFieldset" class="control-group">
