@@ -39,6 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 var allTags = [];
 var allTagsLoaded = false;
 var dirty = false;
+var jqXHRs = [];
 
 function togglePreview() {
 	var previewEl = $('#preview');
@@ -197,7 +198,7 @@ function updateInsertLinkButton() {
 	$('#insert-link-button').setButtonDisabled(!valid);
 }
 
-function openInsertLinkDialog() {
+function openInsertLinkDialog(selectInitial) {
 	var editor = $('#editor').data('editor');
 	var linkText = editor.session.getTextRange(editor.getSelectionRange());
 	$('#insert-attachment-link-text, #insert-page-link-text, #insert-static-page-link-text, #insert-link-dialog input[name="externalLinkText"]')
@@ -210,8 +211,12 @@ function openInsertLinkDialog() {
 		$('#insert-link-dialog').showModal();
 	}
 
-	if ($('#linked-attachment-tree').children().length === 0) {
-		documentr.createPageTree($('#linked-attachment-tree'), {
+	if (documentr.isSomething(selectInitial)) {
+		$('#linked-attachment-tree').destroyPageTree();
+	}
+
+	if (!$('#linked-attachment-tree').isPageTree()) {
+		var tree = documentr.createPageTree($('#linked-attachment-tree'), {
 				start: {
 					type: 'page',
 					projectName: '<c:out value="${projectName}"/>',
@@ -234,6 +239,11 @@ function openInsertLinkDialog() {
 				$('#insert-link-dialog').data('linkedAttachment', null);
 				updateInsertLinkButton();
 			});
+		if (documentr.isSomething(selectInitial)) {
+			tree.bind('loaded.jstree', function() {
+				tree.selectAttachment(selectInitial);
+			});
+		}
 
 		documentr.createPageTree($('#linked-page-tree'), {
 				start: {
@@ -340,7 +350,7 @@ function updateInsertImageButton() {
 	$('#insert-image-button').setButtonDisabled(!documentr.isSomething(linkedImage) || (altText.length === 0));
 }
 
-function openInsertImageDialog() {
+function openInsertImageDialog(selectInitial) {
 	function showDialog() {
 		$('#insert-image-alttext').val('');
 		updateInsertImageButton();
@@ -348,7 +358,12 @@ function openInsertImageDialog() {
 	}
 
 	var treeEl = $('#linked-image-tree');
-	if (treeEl.children().length === 0) {
+
+	if (documentr.isSomething(selectInitial)) {
+		treeEl.destroyPageTree();
+	}
+
+	if (!treeEl.isPageTree()) {
 		documentr.createPageTree(treeEl, {
 				start: {
 					type: 'page',
@@ -370,6 +385,11 @@ function openInsertImageDialog() {
 				$('#insert-image-dialog').data('linkedImage', null);
 				updateInsertImageButton();
 			});
+		if (documentr.isSomething(selectInitial)) {
+			treeEl.bind('loaded.jstree', function() {
+				treeEl.selectAttachment(selectInitial);
+			});
+		}
 
 		window.setTimeout(showDialog, 500);
 	} else {
@@ -483,9 +503,16 @@ function prepareForm() {
 	return true;
 }
 
+function cancelUpload() {
+	$('#upload-dialog .modal-footer a').setButtonDisabled(true);
+	$.each(jqXHRs, function(idx, jqXHR) {
+		jqXHR.abort();
+	});
+	jqXHRs = [];
+}
+
 $(function() {
 	<c:if test="${empty pageForm.path}">
-	
 		var el = $('#pageForm #title');
 		el.blur(function() {
 			var pinPathButton = $('#pinPathButton');
@@ -518,7 +545,6 @@ $(function() {
 				}
 			}
 		});
-	
 	</c:if>
 
 	$('#insert-link-dialog .nav-tabs a').click(function(e) {
@@ -572,6 +598,34 @@ $(function() {
 	editor.renderer.setShowPrintMargin(false);
 	editor.session.setUseSoftTabs(false);
 	editor.setHighlightSelectedWord(false);
+
+	$('input[type="file"]').fileupload({
+		dropZone: $('#editor'),
+		url: '<c:url value="/attachment/saveViaJson/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}/json"/>',
+		dataType: 'json',
+		add: function(e, data) {
+			var jqXHR = data.submit();
+			jqXHRs.push(jqXHR);
+		},
+		progressall: function(e, data) {
+			$('#upload-dialog').showModal();
+			var percent = parseInt(data.loaded / data.total * 100, 10);
+			$('#upload-dialog .progress .bar').css('width', percent + '%');
+		},
+		always: function() {
+			$('#upload-dialog').hideModal();
+			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+			$('#upload-dialog .progress .bar').css('width', '0%');
+		},
+		done: function(e, data) {
+			var file = data.files[0];
+			if (file.type.indexOf('image/') === 0) {
+				openInsertImageDialog(file.name);
+			} else {
+				openInsertLinkDialog(file.name);
+			}
+		}
+	});
 
 	$(window).bind('beforeunload', function() {
 		if (dirty) {
@@ -827,6 +881,23 @@ $(function() {
 	<div class="modal-footer">
 		<a id="insert-image-button" href="javascript:void(insertImage());" class="btn btn-primary"><spring:message code="button.insertImage"/></a>
 		<a href="javascript:void($('#insert-image-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
+	</div>
+</div>
+
+<input type="file" name="file" style="display: none;"/>
+
+<div class="modal" id="upload-dialog" style="display: none;">
+	<div class="modal-header">
+		<button class="close" onclick="cancelUpload();">&#x00D7</button>
+		<h3><spring:message code="title.upload"/></h3>
+	</div>
+	<div class="modal-body">
+		<div class="progress">
+			<div class="bar"></div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(cancelUpload());" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </div>
 

@@ -26,6 +26,11 @@ var documentr = {};
 	};
 	
 	documentr.createPageTree = function(treeEl, options) {
+		var jstree = $.jstree._reference(treeEl);
+		if (documentr.isSomething(jstree)) {
+			return treeEl;
+		}
+		
 		function getApplicationUrl() {
 			return documentr.pageTreeOptions.applicationUrl;
 		}
@@ -46,7 +51,7 @@ var documentr = {};
 			options = {
 				start: {
 					type: 'application'
-				}
+				},
 			};
 		}
 		
@@ -70,6 +75,10 @@ var documentr = {};
 		
 		var showPages = documentr.isSomething(options.showPages) ? options.showPages : true;
 		var showAttachments = documentr.isSomething(options.showAttachments) ? options.showAttachments : false;
+
+		var idPrefix = parseInt(Math.random() * 100000000, 10);
+		var currentAttachmentId = 1;
+		var attachmentIds = {};
 		
 		var tree = treeEl.jstree({
 			plugins: ['themes', 'json_data', 'ui', 'types'],
@@ -194,10 +203,13 @@ var documentr = {};
 									});
 								}
 							} else if (node.type === 'ATTACHMENT') {
+								var id = 'tree_' + idPrefix + '_attachment_' + currentAttachmentId;
+								currentAttachmentId++;
 								treeNodes.push({
 									data: node.name,
 									attr: {
-										rel: 'attachment'
+										rel: 'attachment',
+										id: id
 									},
 									metadata: {
 										type: 'attachment',
@@ -207,6 +219,8 @@ var documentr = {};
 										name: node.name
 									}
 								});
+								var attachmentId = node.name;
+								attachmentIds[attachmentId] = id;
 							}
 						}
 						return treeNodes;
@@ -216,6 +230,15 @@ var documentr = {};
 		})
 		.delegate('a', 'click', function(event) {
 			event.preventDefault();
+		});
+		jstree = $.jstree._reference(tree);
+		tree.extend({
+			selectAttachment: function(attachmentId) {
+				var id = attachmentIds[attachmentId];
+				if (documentr.isSomething(id)) {
+					jstree.select_node('#' + id, true);
+				}
+			}
 		});
 		return tree;
 	};
@@ -437,6 +460,18 @@ var documentr = {};
 			this.parent().css('height', (lines * 20) + 'px');
 			editor.resize();
 			return this;
+		},
+		
+		destroyPageTree: function() {
+			var jstree = $.jstree._reference(this);
+			if (documentr.isSomething(jstree)) {
+				jstree.destroy();
+			}
+		},
+		
+		isPageTree: function() {
+			var jstree = $.jstree._reference(this);
+			return documentr.isSomething(jstree);
 		}
 	});
 })();
