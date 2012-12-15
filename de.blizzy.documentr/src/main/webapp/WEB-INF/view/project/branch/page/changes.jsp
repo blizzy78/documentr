@@ -189,7 +189,7 @@ $(function() {
 
 <div class="modal modal-wide" id="changes-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#changes-dialog').hideModal();">×</button>
+		<button class="close" onclick="$('#changes-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.changes"/></h3>
 	</div>
 	<div class="modal-body" id="changes-dialog-body"></div>
@@ -204,7 +204,7 @@ $(function() {
 <sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
 	<div class="modal" id="cherrypick-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#cherrypick-dialog').hideModal();">×</button>
+			<button class="close" onclick="$('#cherrypick-dialog').hideModal();">&#x00D7</button>
 			<h3><spring:message code="title.copyChangesToOtherBranches"/></h3>
 		</div>
 		<div class="modal-body" id="cherrypick-dialog-body">

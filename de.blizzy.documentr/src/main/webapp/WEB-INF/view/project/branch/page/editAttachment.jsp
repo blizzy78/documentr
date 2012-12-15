@@ -105,7 +105,7 @@ $(function() {
 
 <div class="modal" id="upload-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="cancelUpload();">×</button>
+		<button class="close" onclick="cancelUpload();">&#x00D7</button>
 		<h3><spring:message code="title.upload"/></h3>
 	</div>
 	<div class="modal-body">

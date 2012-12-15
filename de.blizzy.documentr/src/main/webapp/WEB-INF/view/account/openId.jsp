@@ -82,7 +82,7 @@ function showRemoveDialog(openId) {
 
 <div class="modal" id="add-openid-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#add-openid-dialog').hideModal();">×</button>
+		<button class="close" onclick="$('#add-openid-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.addOpenId"/></h3>
 	</div>
 	<div class="modal-body">

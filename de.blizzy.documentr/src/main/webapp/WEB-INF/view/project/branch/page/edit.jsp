@@ -714,7 +714,7 @@ $(function() {
 
 <div class="modal" id="insert-link-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#insert-link-dialog').hideModal();">×</button>
+		<button class="close" onclick="$('#insert-link-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.insertLink"/></h3>
 	</div>
 	<div class="modal-body">
@@ -797,7 +797,7 @@ $(function() {
 
 <div class="modal" id="insert-image-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#insert-image-dialog').hideModal();">×</button>
+		<button class="close" onclick="$('#insert-image-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.insertImage"/></h3>
 	</div>
 	<div class="modal-body">

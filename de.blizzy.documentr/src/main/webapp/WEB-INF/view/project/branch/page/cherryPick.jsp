@@ -195,7 +195,7 @@ $(function() {
 
 <div class="modal modal-wide" id="conflict-dialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#conflict-dialog').hideModal();">×</button>
+		<button class="close" onclick="$('#conflict-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.resolveConflict"/></h3>
 	</div>
 	<div class="modal-body">

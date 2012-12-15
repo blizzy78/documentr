@@ -674,7 +674,7 @@ $(function() {
 <sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
 	<div class="modal" id="copy-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#copy-dialog').hideModal();">×</button>
+			<button class="close" onclick="$('#copy-dialog').hideModal();">&#x00D7</button>
 			<h3><spring:message code="title.copyPageToBranch"/></h3>
 		</div>
 		<div class="modal-body">
@@ -712,7 +712,7 @@ $(function() {
 
 	<div class="modal" id="relocate-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#relocate-dialog').hideModal();">×</button>
+			<button class="close" onclick="$('#relocate-dialog').hideModal();">&#x00D7</button>
 			<h3><spring:message code="title.relocatePage"/></h3>
 		</div>
 		<div class="modal-body">
@@ -739,7 +739,7 @@ $(function() {
 <sec:authorize access="isAuthenticated()">
 	<div class="modal modal-wide" id="changes-dialog" style="display: none;">
 		<div class="modal-header">
-			<button class="close" onclick="$('#changes-dialog').hideModal();">×</button>
+			<button class="close" onclick="$('#changes-dialog').hideModal();">&#x00D7</button>
 			<h3><spring:message code="title.changes"/></h3>
 		</div>
 		<div class="modal-body" id="changes-dialog-body"></div>

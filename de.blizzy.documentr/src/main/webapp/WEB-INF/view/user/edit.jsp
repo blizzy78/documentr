@@ -372,7 +372,7 @@ $(function() {
 
 <div class="modal" id="addRoleDialog" style="display: none;">
 	<div class="modal-header">
-		<button class="close" onclick="$('#addRoleDialog').hideModal();">×</button>
+		<button class="close" onclick="$('#addRoleDialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.addRole"/></h3>
 	</div>
 	<div class="modal-body">
