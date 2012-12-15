@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 
 	<groupId>de.blizzy.documentr</groupId>
 	<artifactId>documentr</artifactId>
-	<version>0.8.0</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	
 	<name>documentr</name>
@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<connection>scm:git:git://github.com/blizzy78/documentr.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/blizzy78/documentr.git</developerConnection>
 		<url>https://github.com/blizzy78/documentr</url>
-	  <tag>documentr-0.8.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 	
 	<ciManagement>
