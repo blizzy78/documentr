@@ -448,14 +448,14 @@ function restoreOldVersion() {
 <sec:authorize access="isAuthenticated()">
 
 function showChangesDialog() {
-	require(['documentr/diffMarkdown']);
+	require(['documentr/diffMarkdown', 'documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest,previous"/>',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			var previous = documentr.isSomething(result.previous) ? result[result.previous] : '';
-			require(['documentr/diffMarkdown'], function(diffMarkdown) {
+			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
 				var html = diffMarkdown.diff(previous, result[result.latest]);
 				$('#changes-dialog-body').html(html);
 				if (documentr.isSomething(result.previous)) {
