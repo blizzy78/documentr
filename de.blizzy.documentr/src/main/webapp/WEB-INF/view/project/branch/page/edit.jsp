@@ -204,97 +204,100 @@ function openInsertLinkDialog(selectInitial) {
 	$('#insert-attachment-link-text, #insert-page-link-text, #insert-static-page-link-text, #insert-link-dialog input[name="externalLinkText"]')
 		.val(linkText);
 	$('#insert-link-dialog input[name="externalLinkUrl"]').val('');
-	$('#insert-link-dialog .nav-tabs a:first').tab('show');
-
-	function showDialog() {
-		updateInsertLinkButton();
-		$('#insert-link-dialog').showModal();
-	}
-
-	if (documentr.isSomething(selectInitial)) {
-		$('#linked-attachment-tree').destroyPageTree();
-	}
-
-	if (!$('#linked-attachment-tree').isPageTree()) {
-		var tree = documentr.createPageTree($('#linked-attachment-tree'), {
-				start: {
-					type: 'page',
-					projectName: '<c:out value="${projectName}"/>',
-					branchName: '<c:out value="${branchName}"/>',
-					pagePath: '<c:out value="${path}"/>'
-				},
-				checkBranchPermissions: 'VIEW',
-				showPages: false,
-				showAttachments: true
-			})
-			.bind('select_node.jstree', function(event, data) {
-				var node = data.rslt.obj;
-				var linkedAttachment = {
-					path: node.data('name')
-				};
-				$('#insert-link-dialog').data('linkedAttachment', linkedAttachment);
-				updateInsertLinkButton();
-			})
-			.bind('deselect_node.jstree', function() {
-				$('#insert-link-dialog').data('linkedAttachment', null);
-				updateInsertLinkButton();
-			});
-		if (documentr.isSomething(selectInitial)) {
-			tree.bind('loaded.jstree', function() {
-				tree.selectAttachment(selectInitial);
-			});
+	
+	require(['documentr/pageTree', 'documentr/dialog'], function(pageTree) {
+		$('#insert-link-dialog .nav-tabs a:first').tab('show');
+	
+		function showDialog() {
+			updateInsertLinkButton();
+			$('#insert-link-dialog').showModal();
 		}
-
-		documentr.createPageTree($('#linked-page-tree'), {
-				start: {
-					type: 'branch',
-					projectName: '<c:out value="${projectName}"/>',
-					branchName: '<c:out value="${branchName}"/>'
-				},
-				checkBranchPermissions: 'VIEW'
-			})
-			.bind('select_node.jstree', function(event, data) {
-				var node = data.rslt.obj;
-				var linkedPage = {
-					path: node.data('path').replace(/\//g, ',')
-				};
-				$('#insert-link-dialog').data('linkedPage', linkedPage);
-				updateInsertLinkButton();
-			})
-			.bind('deselect_node.jstree', function() {
-				$('#insert-link-dialog').data('linkedPage', null);
-				updateInsertLinkButton();
-			});
-
-		documentr.createPageTree($('#linked-static-page-tree'), {
-				start: {
-					type: 'application'
-				},
-				selectable: {
-					projects: false,
-					branches: false
-				},
-				checkBranchPermissions: 'VIEW'
-			})
-			.bind('select_node.jstree', function(event, data) {
-				var node = data.rslt.obj;
-				var linkedStaticPage = {
-					projectName: node.data('projectName'),
-					branchName: node.data('branchName'),
-					path: node.data('path')
-				};
-				$('#insert-link-dialog').data('linkedStaticPage', linkedStaticPage);
-				updateInsertLinkButton();
-			})
-			.bind('deselect_node.jstree', function() {
-				$('#insert-link-dialog').data('linkedStaticPage', null);
-				updateInsertLinkButton();
-			});
-		
-		window.setTimeout(showDialog, 500);
-	} else {
-		showDialog();
-	}
+	
+		if (documentr.isSomething(selectInitial)) {
+			$('#linked-attachment-tree').destroyPageTree();
+		}
+	
+		if (!$('#linked-attachment-tree').isPageTree()) {
+			var tree = pageTree.createPageTree($('#linked-attachment-tree'), {
+					start: {
+						type: 'page',
+						projectName: '<c:out value="${projectName}"/>',
+						branchName: '<c:out value="${branchName}"/>',
+						pagePath: '<c:out value="${path}"/>'
+					},
+					checkBranchPermissions: 'VIEW',
+					showPages: false,
+					showAttachments: true
+				})
+				.bind('select_node.jstree', function(event, data) {
+					var node = data.rslt.obj;
+					var linkedAttachment = {
+						path: node.data('name')
+					};
+					$('#insert-link-dialog').data('linkedAttachment', linkedAttachment);
+					updateInsertLinkButton();
+				})
+				.bind('deselect_node.jstree', function() {
+					$('#insert-link-dialog').data('linkedAttachment', null);
+					updateInsertLinkButton();
+				});
+			if (documentr.isSomething(selectInitial)) {
+				tree.bind('loaded.jstree', function() {
+					tree.selectAttachment(selectInitial);
+				});
+			}
+	
+			pageTree.createPageTree($('#linked-page-tree'), {
+					start: {
+						type: 'branch',
+						projectName: '<c:out value="${projectName}"/>',
+						branchName: '<c:out value="${branchName}"/>'
+					},
+					checkBranchPermissions: 'VIEW'
+				})
+				.bind('select_node.jstree', function(event, data) {
+					var node = data.rslt.obj;
+					var linkedPage = {
+						path: node.data('path').replace(/\//g, ',')
+					};
+					$('#insert-link-dialog').data('linkedPage', linkedPage);
+					updateInsertLinkButton();
+				})
+				.bind('deselect_node.jstree', function() {
+					$('#insert-link-dialog').data('linkedPage', null);
+					updateInsertLinkButton();
+				});
+	
+			pageTree.createPageTree($('#linked-static-page-tree'), {
+					start: {
+						type: 'application'
+					},
+					selectable: {
+						projects: false,
+						branches: false
+					},
+					checkBranchPermissions: 'VIEW'
+				})
+				.bind('select_node.jstree', function(event, data) {
+					var node = data.rslt.obj;
+					var linkedStaticPage = {
+						projectName: node.data('projectName'),
+						branchName: node.data('branchName'),
+						path: node.data('path')
+					};
+					$('#insert-link-dialog').data('linkedStaticPage', linkedStaticPage);
+					updateInsertLinkButton();
+				})
+				.bind('deselect_node.jstree', function() {
+					$('#insert-link-dialog').data('linkedStaticPage', null);
+					updateInsertLinkButton();
+				});
+			
+			window.setTimeout(showDialog, 500);
+		} else {
+			showDialog();
+		}
+	});
 }
 
 function insertLink() {
@@ -351,50 +354,52 @@ function updateInsertImageButton() {
 }
 
 function openInsertImageDialog(selectInitial) {
-	function showDialog() {
-		$('#insert-image-alttext').val('');
-		updateInsertImageButton();
-		$('#insert-image-dialog').showModal();
-	}
-
-	var treeEl = $('#linked-image-tree');
-
-	if (documentr.isSomething(selectInitial)) {
-		treeEl.destroyPageTree();
-	}
-
-	if (!treeEl.isPageTree()) {
-		documentr.createPageTree(treeEl, {
-				start: {
-					type: 'page',
-					projectName: '<c:out value="${projectName}"/>',
-					branchName: '<c:out value="${branchName}"/>',
-					pagePath: '<c:out value="${path}"/>'
-				},
-				checkBranchPermissions: 'VIEW',
-				showPages: false,
-				showAttachments: true
-			})
-			.bind('select_node.jstree', function(event, data) {
-				var node = data.rslt.obj;
-				var linkedImage = node.data('name');
-				$('#insert-image-dialog').data('linkedImage', linkedImage);
-				updateInsertImageButton();
-			})
-			.bind('deselect_node.jstree', function() {
-				$('#insert-image-dialog').data('linkedImage', null);
-				updateInsertImageButton();
-			});
-		if (documentr.isSomething(selectInitial)) {
-			treeEl.bind('loaded.jstree', function() {
-				treeEl.selectAttachment(selectInitial);
-			});
+	require(['documentr/pageTree', 'documentr/dialog'], function(pageTree) {
+		function showDialog() {
+			$('#insert-image-alttext').val('');
+			updateInsertImageButton();
+			$('#insert-image-dialog').showModal();
 		}
-
-		window.setTimeout(showDialog, 500);
-	} else {
-		showDialog();
-	}
+	
+		var treeEl = $('#linked-image-tree');
+	
+		if (documentr.isSomething(selectInitial)) {
+			treeEl.destroyPageTree();
+		}
+	
+		if (!treeEl.isPageTree()) {
+			pageTree.createPageTree(treeEl, {
+					start: {
+						type: 'page',
+						projectName: '<c:out value="${projectName}"/>',
+						branchName: '<c:out value="${branchName}"/>',
+						pagePath: '<c:out value="${path}"/>'
+					},
+					checkBranchPermissions: 'VIEW',
+					showPages: false,
+					showAttachments: true
+				})
+				.bind('select_node.jstree', function(event, data) {
+					var node = data.rslt.obj;
+					var linkedImage = node.data('name');
+					$('#insert-image-dialog').data('linkedImage', linkedImage);
+					updateInsertImageButton();
+				})
+				.bind('deselect_node.jstree', function() {
+					$('#insert-image-dialog').data('linkedImage', null);
+					updateInsertImageButton();
+				});
+			if (documentr.isSomething(selectInitial)) {
+				treeEl.bind('loaded.jstree', function() {
+					treeEl.selectAttachment(selectInitial);
+				});
+			}
+	
+			window.setTimeout(showDialog, 500);
+		} else {
+			showDialog();
+		}
+	});
 }
 
 function insertImage() {
@@ -587,44 +592,55 @@ $(function() {
 	
 	hookTags();
 	
-	var editor = ace.edit('editor');
-	$('#editor').data('editor', editor);
-	editor.setTheme('ace/theme/chrome');
-	editor.session.setMode('ace/mode/markdown');
-	editor.setDisplayIndentGuides(true);
-	editor.renderer.setShowGutter(false);
-	editor.session.setUseWrapMode(true);
-	editor.session.setWrapLimitRange(null, null);
-	editor.renderer.setShowPrintMargin(false);
-	editor.session.setUseSoftTabs(false);
-	editor.setHighlightSelectedWord(false);
+	require(['ace'], function(ace) {
+		var editor = ace.edit('editor');
+		$('#editor').data('editor', editor);
+		editor.setTheme('ace/theme/chrome');
+		editor.session.setMode('ace/mode/markdown');
+		editor.setDisplayIndentGuides(true);
+		editor.renderer.setShowGutter(false);
+		editor.session.setUseWrapMode(true);
+		editor.session.setWrapLimitRange(null, null);
+		editor.renderer.setShowPrintMargin(false);
+		editor.session.setUseSoftTabs(false);
+		editor.setHighlightSelectedWord(false);
+		editor.session.on('change', function() {
+			dirty = true;
+		});
+	});
 
-	$('input[type="file"]').fileupload({
-		dropZone: $('#editor'),
-		url: '<c:url value="/attachment/saveViaJson/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}/json"/>',
-		dataType: 'json',
-		add: function(e, data) {
-			var jqXHR = data.submit();
-			jqXHRs.push(jqXHR);
-		},
-		progressall: function(e, data) {
-			$('#upload-dialog').showModal();
-			var percent = parseInt(data.loaded / data.total * 100, 10);
-			$('#upload-dialog .progress .bar').css('width', percent + '%');
-		},
-		always: function() {
-			$('#upload-dialog').hideModal();
-			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
-			$('#upload-dialog .progress .bar').css('width', '0%');
-		},
-		done: function(e, data) {
-			var file = data.files[0];
-			if (file.type.indexOf('image/') === 0) {
-				openInsertImageDialog(file.name);
-			} else {
-				openInsertLinkDialog(file.name);
+	require(['jquery.fileupload'], function() {
+		$('input[type="file"]').fileupload({
+			dropZone: $('#editor'),
+			url: '<c:url value="/attachment/saveViaJson/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}/json"/>',
+			dataType: 'json',
+			add: function(e, data) {
+				var jqXHR = data.submit();
+				jqXHRs.push(jqXHR);
+			},
+			progressall: function(e, data) {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').showModal();
+					var percent = parseInt(data.loaded / data.total * 100, 10);
+					$('#upload-dialog .progress .bar').css('width', percent + '%');
+				});
+			},
+			always: function() {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').hideModal();
+					$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+					$('#upload-dialog .progress .bar').css('width', '0%');
+				});
+			},
+			done: function(e, data) {
+				var file = data.files[0];
+				if (file.type.indexOf('image/') === 0) {
+					openInsertImageDialog(file.name);
+				} else {
+					openInsertLinkDialog(file.name);
+				}
 			}
-		}
+		});
 	});
 
 	$(window).bind('beforeunload', function() {
@@ -634,9 +650,6 @@ $(function() {
 	});
 	
 	$('#pageForm input, #pageForm select').on('keypress change select', function() {
-		dirty = true;
-	});
-	editor.session.on('change', function() {
 		dirty = true;
 	});
 });

@@ -84,21 +84,25 @@ function prepareForm() {
 }
 
 $(function() {
-	var editor = ace.edit('editor');
-	$('#editor').data('editor', editor);
-	editor.setTheme('ace/theme/chrome');
-	editor.session.setMode('ace/mode/groovy');
-	editor.setDisplayIndentGuides(true);
-	editor.renderer.setShowGutter(true);
-	editor.session.setUseWrapMode(false);
-	editor.session.setWrapLimitRange(null, null);
-	editor.renderer.setShowPrintMargin(false);
-	editor.session.setUseSoftTabs(false);
-	editor.setHighlightSelectedWord(false);
-	
-	editor.session.on('change', function() {
-		startVerifyTimeout();
-		dirty = true;
+	require(['ace'], function(ace) {
+		var editor = ace.edit('editor');
+		$('#editor').data('editor', editor);
+		editor.setTheme('ace/theme/chrome');
+		editor.session.setMode('ace/mode/groovy');
+		editor.setDisplayIndentGuides(true);
+		editor.renderer.setShowGutter(true);
+		editor.session.setUseWrapMode(false);
+		editor.session.setWrapLimitRange(null, null);
+		editor.renderer.setShowPrintMargin(false);
+		editor.session.setUseSoftTabs(false);
+		editor.setHighlightSelectedWord(false);
+		
+		editor.session.on('change', function() {
+			startVerifyTimeout();
+			dirty = true;
+		});
+
+		verify();
 	});
 
 	$(window).bind('beforeunload', function() {
@@ -110,8 +114,6 @@ $(function() {
 	$('#macroForm input').on('keypress', function() {
 		dirty = true;
 	});
-
-	verify();
 });
 
 </dt:headerJS>

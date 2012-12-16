@@ -28,30 +28,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="projects" value="${d:listProjects()}"/>
 <c:set var="roles" value="${d:listRoles()}"/>
 
-<dt:headerJSFile uri="/js/zxcvbn-20120416.js"/>
-
 <dt:headerJS>
 
 function updatePasswordStrengthIndicator() {
-	var result = zxcvbn($('#password1').val(), [ 'documentr' ]);
-
-	$('#password1Error').remove();
-
-	var indicator = $('#passwordStrengthIndicator');
-	if (indicator.length === 0) {
-		indicator = $('<span class="help-inline" id="passwordStrengthIndicator"><div class="progress password-strength-indicator"><div class="bar"></div></div></span>');
-		$('#password1Fieldset').append(indicator);
-	}
-
-	indicator.find('.bar').width(((result.score + 1) * 20) + '%');
-	indicator.removeClass('progress-success').removeClass('progress-warning').removeClass('progress-danger');
-	if (result.score <= 1) {
-		indicator.addClass('progress-danger');
-	} else if (result.score <= 3) {
-		indicator.addClass('progress-warning');
-	} else {
-		indicator.addClass('progress-success');
-	}
+	require(['zxcvbn'], function(zxcvbn) {
+		var result = zxcvbn($('#password1').val(), [ 'documentr' ]);
+	
+		$('#password1Error').remove();
+	
+		var indicator = $('#passwordStrengthIndicator');
+		if (indicator.length === 0) {
+			indicator = $('<span class="help-inline" id="passwordStrengthIndicator"><div class="progress password-strength-indicator"><div class="bar"></div></div></span>');
+			$('#password1Fieldset').append(indicator);
+		}
+	
+		indicator.find('.bar').width(((result.score + 1) * 20) + '%');
+		indicator.removeClass('progress-success').removeClass('progress-warning').removeClass('progress-danger');
+		if (result.score <= 1) {
+			indicator.addClass('progress-danger');
+		} else if (result.score <= 3) {
+			indicator.addClass('progress-warning');
+		} else {
+			indicator.addClass('progress-success');
+		}
+	});
 }
 
 function createAuthority(type, targetId, roleName) {
@@ -151,17 +151,19 @@ function getAuthoritiesByType(type) {
 }
 
 function showAddRoleDialog() {
-	<c:choose>
-		<c:when test="${!empty roles}">
-			$('#addRoleForm').each(function() {
-				this.reset();
-			});
-			$('#addRoleDialog').showModal();
-		</c:when>
-		<c:otherwise>
-			window.alert('<spring:message code="noRolesConfigured"/>');
-		</c:otherwise>
-	</c:choose>
+	require(['documentr/dialog'], function() {
+		<c:choose>
+			<c:when test="${!empty roles}">
+				$('#addRoleForm').each(function() {
+					this.reset();
+				});
+				$('#addRoleDialog').showModal();
+			</c:when>
+			<c:otherwise>
+				window.alert('<spring:message code="noRolesConfigured"/>');
+			</c:otherwise>
+		</c:choose>
+	});
 }
 
 function addRole() {
@@ -203,29 +205,31 @@ function removeRole(type, targetId, roleName) {
 
 <c:if test="${(!empty userForm.originalLoginName) and (userForm.originalLoginName ne '_anonymous')}">
 function showDeleteDialog() {
-	<sec:authorize access="isAdmin('${userForm.originalLoginName}')">
-		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
-			"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
-			{
-				text: '<spring:message code="button.close"/>',
-				cancel: true
-			}
-		]);
-	</sec:authorize>
-	<sec:authorize access="!isAdmin('${userForm.originalLoginName}')">
-		documentr.openMessageDialog('<spring:message code="title.deleteUser"/>',
-			"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
-			{
-				text: '<spring:message code="button.delete"/>',
-				href: '<c:url value="/user/delete/${userForm.originalLoginName}"/>',
-				type: 'danger'
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
-	</sec:authorize>
+	require(['documentr/dialog'], function(dialog) {
+		<sec:authorize access="isAdmin('${userForm.originalLoginName}')">
+			dialog.openMessageDialog('<spring:message code="title.deleteUser"/>',
+				"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
+				{
+					text: '<spring:message code="button.close"/>',
+					cancel: true
+				}
+			]);
+		</sec:authorize>
+		<sec:authorize access="!isAdmin('${userForm.originalLoginName}')">
+			dialog.openMessageDialog('<spring:message code="title.deleteUser"/>',
+				"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
+				{
+					text: '<spring:message code="button.delete"/>',
+					href: '<c:url value="/user/delete/${userForm.originalLoginName}"/>',
+					type: 'danger'
+				},
+				{
+					text: '<spring:message code="button.cancel"/>',
+					cancel: true
+				}
+			]);
+		</sec:authorize>
+	});
 }
 </c:if>
 

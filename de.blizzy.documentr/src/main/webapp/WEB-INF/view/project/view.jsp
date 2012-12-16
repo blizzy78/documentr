@@ -32,30 +32,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <sec:authorize access="hasProjectPermission(#name, ADMIN)">
 
 function importSampleContents() {
-	var dlg = documentr.openMessageDialog('<spring:message code="title.importSampleContents"/>',
-		"<spring:message code="importSampleContents" arguments="${name}"/>", [
-			{
-				text: '<spring:message code="button.import"/>',
-				type: 'primary',
-				onclick: function() {
-					dlg.setText('<spring:message code="importingContents"/>');
-					dlg.setAllButtonsDisabled();
-
-					$.ajax({
-						url: '<c:url value="/project/importSample/${name}/json"/>',
-						type: 'GET',
-						dataType: 'json',
-						success: function(result) {
-							window.location.reload(true);
-						}
-					});
+	require(['documentr/dialog'], function(dialog) {
+		dialog.openMessageDialog('<spring:message code="title.importSampleContents"/>',
+			"<spring:message code="importSampleContents" arguments="${name}"/>", [
+				{
+					text: '<spring:message code="button.import"/>',
+					type: 'primary',
+					onclick: function() {
+						dlg.setText('<spring:message code="importingContents"/>');
+						dlg.setAllButtonsDisabled();
+	
+						$.ajax({
+							url: '<c:url value="/project/importSample/${name}/json"/>',
+							type: 'GET',
+							dataType: 'json',
+							success: function(result) {
+								window.location.reload(true);
+							}
+						});
+					}
+				},
+				{
+					text: '<spring:message code="button.cancel"/>',
+					cancel: true
 				}
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
+			]);
+	});
 }
 
 </sec:authorize>

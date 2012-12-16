@@ -46,7 +46,7 @@ public class TwitterMacro implements IMacroRunnable {
 					"live: true," +
 					"behavior: 'default'" +
 				"}" +
-			"}).render().start(); documentr.fixTwitterCss();\n" +
+			"}).render().start(); require(['documentr/fixTwitterCss']);\n" +
 			"</script>\n";
 		return html;
 	}

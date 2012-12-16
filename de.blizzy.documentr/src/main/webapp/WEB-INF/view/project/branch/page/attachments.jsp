@@ -33,18 +33,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 var jqXHRs = [];
 
 function showDeleteDialog(name) {
-	var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
-	documentr.openMessageDialog('<spring:message code="title.deleteAttachment"/>', text, [
-		{
-			text: '<spring:message code="button.delete"/>',
-			type: 'danger',
-			href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/"/>' + name
-		},
-		{
-			text: '<spring:message code="button.cancel"/>',
-			cancel: true
-		}
-	]);
+	require(['documentr/dialog'], function(dialog) {
+		var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
+		dialog.openMessageDialog('<spring:message code="title.deleteAttachment"/>', text, [
+			{
+				text: '<spring:message code="button.delete"/>',
+				type: 'danger',
+				href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/"/>' + name
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		]);
+	});
 }
 
 function cancelUpload() {
@@ -56,26 +58,32 @@ function cancelUpload() {
 }
 
 $(function() {
-	$('input[type="file"]').fileupload({
-		url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/json"/>',
-		dataType: 'json',
-		add: function(e, data) {
-			var jqXHR = data.submit();
-			jqXHRs.push(jqXHR);
-		},
-		progressall: function(e, data) {
-			$('#upload-dialog').showModal();
-			var percent = parseInt(data.loaded / data.total * 100, 10);
-			$('#upload-dialog .progress .bar').css('width', percent + '%');
-		},
-		always: function() {
-			$('#upload-dialog').hideModal();
-			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
-			$('#upload-dialog .progress .bar').css('width', '0%');
-		},
-		done: function(e, data) {
-			window.location.reload();
-		}
+	require(['jquery.fileupload'], function() {
+		$('input[type="file"]').fileupload({
+			url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/json"/>',
+			dataType: 'json',
+			add: function(e, data) {
+				var jqXHR = data.submit();
+				jqXHRs.push(jqXHR);
+			},
+			progressall: function(e, data) {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').showModal();
+					var percent = parseInt(data.loaded / data.total * 100, 10);
+					$('#upload-dialog .progress .bar').css('width', percent + '%');
+				});
+			},
+			always: function() {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').hideModal();
+					$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+					$('#upload-dialog .progress .bar').css('width', '0%');
+				});
+			},
+			done: function(e, data) {
+				window.location.reload();
+			}
+		});
 	});
 });
 

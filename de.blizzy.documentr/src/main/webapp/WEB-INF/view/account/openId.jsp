@@ -26,19 +26,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:headerJS>
 
+function showAddDialog() {
+	require(['documentr/dialog'], function() {
+		$('#add-openid-dialog').showModal();
+	});
+}
+
 function showRemoveDialog(openId) {
-	documentr.openMessageDialog('<spring:message code="title.removeOpenId"/>',
-		"<spring:message code="removeOpenIdX" arguments=" "/>".replace(/' '/, '\'' + openId + '\''), [
-		{
-			text: '<spring:message code="button.remove"/>',
-			href: '<c:url value="/account/removeOpenId"/>?openId=' + encodeURIComponent(openId),
-			type: 'primary'
-		},
-		{
-			text: '<spring:message code="button.cancel"/>',
-			cancel: true
-		}
-	]);
+	require(['documentr/dialog'], function(dialog) {
+		dialog.openMessageDialog('<spring:message code="title.removeOpenId"/>',
+			"<spring:message code="removeOpenIdX" arguments=" "/>".replace(/' '/, '\'' + openId + '\''), [
+			{
+				text: '<spring:message code="button.remove"/>',
+				href: '<c:url value="/account/removeOpenId"/>?openId=' + encodeURIComponent(openId),
+				type: 'primary'
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		]);
+	});
 }
 
 </dt:headerJS>
@@ -77,7 +85,7 @@ function showRemoveDialog(openId) {
 </c:choose>
 
 <p>
-<a href="javascript:void($('#add-openid-dialog').showModal());" class="btn"><i class="icon-plus"></i> <spring:message code="button.addOpenId"/></a>
+<a href="javascript:void(showAddDialog());" class="btn"><i class="icon-plus"></i> <spring:message code="button.addOpenId"/></a>
 </p>
 
 <div class="modal" id="add-openid-dialog" style="display: none;">

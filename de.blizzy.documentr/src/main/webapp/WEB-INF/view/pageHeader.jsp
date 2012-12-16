@@ -34,17 +34,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
+<script>
+var require = {
+	baseUrl: '<c:url value="/js"/>',
+	map: {
+		'*': {
+			diff_match_patch: 'diff_match_patch-20120106',
+			'jquery.fileupload': 'jquery-file-upload-20121212/jquery.fileupload',
+			'jquery.ui.widget': 'jquery-file-upload-20121212/vendor/jquery.ui.widget',
+			slimbox: 'slimbox-2.04',
+			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min',
+			ace: 'ace-1.0.0/ace',
+			zxcvbn: 'zxcvbn-20120416'
+		}
+	},
+	shim: {
+		'diff_match_patch-20120106': {
+			exports: 'diff_match_patch'
+		},
+		'ace-1.0.0/ace': {
+			exports: 'ace'
+		},
+		'zxcvbn-20120416': {
+			exports: 'zxcvbn'
+		}
+	}<sec:authorize access="isAuthenticated()">,
+	config: {
+		'documentr/pageTree': {
+			applicationUrl: '<c:url value="/pageTree/application/json"/>',
+			projectUrl: '<c:url value="/pageTree/project/_PROJECTNAME_/json"/>',
+			branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
+			pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
+			projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
+			branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>",
+			iconUrls: {
+				project: '<c:url value="/img/project.png"/>',
+				branch: '<c:url value="/img/branch.png"/>',
+				page: '<c:url value="/img/page.png"/>',
+				attachment: '<c:url value="/img/attachment.png"/>'
+			}
+		}
+	}</sec:authorize>
+};
+</script>
+<script type="text/javascript" src="<c:url value="/js/require-2.1.2.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.8.3.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.2.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/slimbox-2.04.js"/>"></script>
-<sec:authorize access="isAuthenticated()">
-	<script type="text/javascript" src="<c:url value="/js/jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/js/diff_match_patch-20120106.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/vendor/jquery.ui.widget.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/jquery.iframe-transport.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/js/jquery-file-upload-20121212/jquery.fileupload.js"/>"></script>
-</sec:authorize>
-<script type="text/javascript" src="<c:url value="/js/ace-1.0.0/ace.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <c:if test="${!empty requestScope._headerJSFiles}">
@@ -56,28 +91,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:out value="${requestScope._headerHTML}" escapeXml="false"/>
 
 <script type="text/javascript">
-
-<sec:authorize access="isAuthenticated()">
-
-documentr.pageTreeOptions = {
-	applicationUrl: '<c:url value="/pageTree/application/json"/>',
-	projectUrl: '<c:url value="/pageTree/project/_PROJECTNAME_/json"/>',
-	branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
-	pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
-	projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
-	branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>",
-	iconUrls: {
-		project: '<c:url value="/img/project.png"/>',
-		branch: '<c:url value="/img/branch.png"/>',
-		page: '<c:url value="/img/page.png"/>',
-		attachment: '<c:url value="/img/attachment.png"/>'
-	}
-};
-
-</sec:authorize>
-
 <c:out value="${requestScope._headerJS}" escapeXml="false"/>
-
 </script>
 
 </head>

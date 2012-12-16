@@ -42,8 +42,10 @@ var currentCommit = '<c:out value="${commit}"/>';
 <sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
 
 function showCopyToBranchDialog() {
-	$('#copy-dialog').showModal();
-	copyToBranchSelected();
+	require(['documentr/dialog'], function() {
+		$('#copy-dialog').showModal();
+		copyToBranchSelected();
+	});
 }
 
 function copyToBranchSelected() {
@@ -93,88 +95,92 @@ function toggleHideFloatingElements(hide) {
 }
 
 function showDeleteDialog() {
-	documentr.openMessageDialog('<spring:message code="title.deletePage"/>',
-		<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/></c:set>
-		'<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>', [
-		{
-			text: '<spring:message code="button.delete"/>',
-			type: 'danger',
-			href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
-		},
-		{
-			text: '<spring:message code="button.cancel"/>',
-			cancel: true
-		}
-	], {
-		messageAsHtml: true
+	require(['documentr/dialog'], function(dialog) {
+		dialog.openMessageDialog('<spring:message code="title.deletePage"/>',
+			<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/></c:set>
+			'<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>', [
+			{
+				text: '<spring:message code="button.delete"/>',
+				type: 'danger',
+				href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
+			},
+			{
+				text: '<spring:message code="button.cancel"/>',
+				cancel: true
+			}
+		], {
+			messageAsHtml: true
+		});
 	});
 }
 
 function showRelocateDialog() {
-	function showDialog() {
-		$('#relocate-dialog').showModal();
-	}
-
-	var treeEl = $('#relocate-target-tree');
-	if (treeEl.children().length === 0) {
-		documentr.createPageTree(treeEl, {
-				start: {
-					type: 'branch',
-					projectName: '<c:out value="${projectName}"/>',
-					branchName: '<c:out value="${branchName}"/>'
-				},
-				selectable: {
-					projects: false,
-					branches: false
-				},
-				checkBranchPermissions: 'EDIT_PAGE',
-				filterPage: '<c:out value="${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
-			})
-			.bind('select_node.jstree', function(event, data) {
-				var node = data.rslt.obj;
-				var button = $('#relocate-button');
-				if ((node.data('type') === 'page') && node.data('hasBranchPermissions') &&
-					(node.data('path') !== '<c:out value="${parentPagePath}"/>')) {
-					button.setButtonDisabled(true);
-					
-					$.ajax({
-						url: '<c:url value="/page/generateName/"/>' + node.data('projectName') + '/' + node.data('branchName') + '/' + node.data('path').replace(/\//g, ',') + '/json',
-						type: 'POST',
-						dataType: 'json',
-						data: {
-							title: '<c:out value="${pageName}"/>'
-						},
-						success: function(result) {
-							button.text(result.exists ? '<spring:message code="button.overwriteAndRelocate"/>' : '<spring:message code="button.relocate"/>');
-							if (result.exists) {
-								button.removeClass('btn-primary').addClass('btn-warning');
-							} else {
-								button.removeClass('btn-warning').addClass('btn-primary');
+	require(['documentr/pageTree', 'documentr/dialog'], function(pageTree) {
+		function showDialog() {
+			$('#relocate-dialog').showModal();
+		}
+		
+		var treeEl = $('#relocate-target-tree');
+		if (treeEl.children().length === 0) {
+			pageTree.createPageTree(treeEl, {
+					start: {
+						type: 'branch',
+						projectName: '<c:out value="${projectName}"/>',
+						branchName: '<c:out value="${branchName}"/>'
+					},
+					selectable: {
+						projects: false,
+						branches: false
+					},
+					checkBranchPermissions: 'EDIT_PAGE',
+					filterPage: '<c:out value="${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
+				})
+				.bind('select_node.jstree', function(event, data) {
+					var node = data.rslt.obj;
+					var button = $('#relocate-button');
+					if ((node.data('type') === 'page') && node.data('hasBranchPermissions') &&
+						(node.data('path') !== '<c:out value="${parentPagePath}"/>')) {
+						button.setButtonDisabled(true);
+						
+						$.ajax({
+							url: '<c:url value="/page/generateName/"/>' + node.data('projectName') + '/' + node.data('branchName') + '/' + node.data('path').replace(/\//g, ',') + '/json',
+							type: 'POST',
+							dataType: 'json',
+							data: {
+								title: '<c:out value="${pageName}"/>'
+							},
+							success: function(result) {
+								button.text(result.exists ? '<spring:message code="button.overwriteAndRelocate"/>' : '<spring:message code="button.relocate"/>');
+								if (result.exists) {
+									button.removeClass('btn-primary').addClass('btn-warning');
+								} else {
+									button.removeClass('btn-warning').addClass('btn-primary');
+								}
+								$('#relocateForm input:hidden[name="newParentPagePath"]').val(node.data('path'));
+							},
+							complete: function() {
+								button.setButtonDisabled(false);
 							}
-							$('#relocateForm input:hidden[name="newParentPagePath"]').val(node.data('path'));
-						},
-						complete: function() {
-							button.setButtonDisabled(false);
-						}
-					});
-				} else {
+						});
+					} else {
+						button.text('<spring:message code="button.relocate"/>');
+						button.removeClass('btn-warning').addClass('btn-primary');
+						button.setButtonDisabled(true);
+					}
+				})
+				.bind('deselect_node.jstree', function() {
+					var button = $('#relocate-button');
 					button.text('<spring:message code="button.relocate"/>');
 					button.removeClass('btn-warning').addClass('btn-primary');
 					button.setButtonDisabled(true);
-				}
-			})
-			.bind('deselect_node.jstree', function() {
-				var button = $('#relocate-button');
-				button.text('<spring:message code="button.relocate"/>');
-				button.removeClass('btn-warning').addClass('btn-primary');
-				button.setButtonDisabled(true);
-			});
-
-		window.setTimeout(showDialog, 500);
-		$('#relocate-button').setButtonDisabled(true);
-	} else {
-		showDialog();
-	}
+				});
+	
+			window.setTimeout(showDialog, 500);
+			$('#relocate-button').setButtonDisabled(true);
+		} else {
+			showDialog();
+		}
+	});
 }
 
 function startPageSplit() {
@@ -442,54 +448,63 @@ function restoreOldVersion() {
 <sec:authorize access="isAuthenticated()">
 
 function showChangesDialog() {
+	require(['documentr/diffMarkdown']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest,previous"/>',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			var previous = documentr.isSomething(result.previous) ? result[result.previous] : '';
-			var html = documentr.diffMarkdownAndGetHtml(previous, result[result.latest]);
-			$('#changes-dialog-body').html(html);
-			if (documentr.isSomething(result.previous)) {
-				$('#changes-dialog').data('previousCommit', result.previous);
-				$('#restore-old-commit-button').show();
-			} else {
-				$('#changes-dialog').data('previousCommit', null);
-				$('#restore-old-commit-button').hide();
-			}
-			$('#changes-dialog').showModal();
+			require(['documentr/diffMarkdown'], function(diffMarkdown) {
+				var html = diffMarkdown.diff(previous, result[result.latest]);
+				$('#changes-dialog-body').html(html);
+				if (documentr.isSomething(result.previous)) {
+					$('#changes-dialog').data('previousCommit', result.previous);
+					$('#restore-old-commit-button').show();
+				} else {
+					$('#changes-dialog').data('previousCommit', null);
+					$('#restore-old-commit-button').hide();
+				}
+				$('#changes-dialog').showModal();
+			});
 		}
 	});
 }
 
 function subscribe() {
+	require(['documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/subscription/subscribe/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'GET',
 		success: function() {
-			documentr.openMessageDialog('<spring:message code="title.subscribe"/>',
-				'<spring:message code="subscribedSuccessfully"/>', [
-					{
-						text: '<spring:message code="button.close"/>',
-						cancel: true
-					}
-				]);
+			require(['documentr/dialog'], function(dialog) {
+				dialog.openMessageDialog('<spring:message code="title.subscribe"/>',
+					'<spring:message code="subscribedSuccessfully"/>', [
+						{
+							text: '<spring:message code="button.close"/>',
+							cancel: true
+						}
+					]);
+			});
 		}
 	});
 }
 
 function unsubscribe() {
+	require(['documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/subscription/unsubscribe/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
 		type: 'GET',
 		success: function() {
-			documentr.openMessageDialog('<spring:message code="title.unsubscribe"/>',
-				'<spring:message code="unsubscribedSuccessfully"/>', [
-					{
-						text: '<spring:message code="button.close"/>',
-						cancel: true
-					}
-				]);
+			require(['documentr/dialog'], function(dialog) {
+				dialog.openMessageDialog('<spring:message code="title.unsubscribe"/>',
+					'<spring:message code="unsubscribedSuccessfully"/>', [
+						{
+							text: '<spring:message code="button.close"/>',
+							cancel: true
+						}
+					]);
+			});
 		}
 	});
 }
@@ -507,18 +522,20 @@ $(function() {
 		hookupInlineEditorToolbar();
 		hookupSplitCursor();
 
-		var editor = ace.edit('editor');
-		$('#inlineEditorForm').data('editor', editor);
-		editor.setTheme('ace/theme/chrome');
-		editor.session.setMode('ace/mode/markdown');
-		editor.setDisplayIndentGuides(true);
-		editor.renderer.setShowGutter(false);
-		editor.session.setUseWrapMode(true);
-		editor.session.setWrapLimitRange(null, null);
-		editor.renderer.setShowPrintMargin(false);
-		editor.session.setUseSoftTabs(false);
-		editor.setHighlightSelectedWord(false);
-		editor.setHighlightActiveLine(false);
+		require(['ace'], function(ace) {
+			var editor = ace.edit('editor');
+			$('#inlineEditorForm').data('editor', editor);
+			editor.setTheme('ace/theme/chrome');
+			editor.session.setMode('ace/mode/markdown');
+			editor.setDisplayIndentGuides(true);
+			editor.renderer.setShowGutter(false);
+			editor.session.setUseWrapMode(true);
+			editor.session.setWrapLimitRange(null, null);
+			editor.renderer.setShowPrintMargin(false);
+			editor.session.setUseSoftTabs(false);
+			editor.setHighlightSelectedWord(false);
+			editor.setHighlightActiveLine(false);
+		});
 	</sec:authorize>
 });
 

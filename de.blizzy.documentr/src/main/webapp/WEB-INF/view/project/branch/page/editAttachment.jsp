@@ -40,26 +40,32 @@ function cancelUpload() {
 }
 
 $(function() {
-	$('input[type="file"]').fileupload({
-		url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${pagePathUrl}/json"/>',
-		dataType: 'json',
-		add: function(e, data) {
-			var jqXHR = data.submit();
-			jqXHRs.push(jqXHR);
-		},
-		progressall: function(e, data) {
-			$('#upload-dialog').showModal();
-			var percent = parseInt(data.loaded / data.total * 100, 10);
-			$('#upload-dialog .progress .bar').css('width', percent + '%');
-		},
-		always: function() {
-			$('#upload-dialog').hideModal();
-			$('#upload-dialog .modal-footer a').setButtonDisabled(false);
-			$('#upload-dialog .progress .bar').css('width', '0%');
-		},
-		done: function(e, data) {
-			window.location.href = '<c:url value="/attachment/list/${projectName}/${branchName}/${pagePathUrl}"/>';
-		}
+	require(['jquery.fileupload'], function() {
+		$('input[type="file"]').fileupload({
+			url: '<c:url value="/attachment/saveViaJson/${projectName}/${branchName}/${pagePathUrl}/json"/>',
+			dataType: 'json',
+			add: function(e, data) {
+				var jqXHR = data.submit();
+				jqXHRs.push(jqXHR);
+			},
+			progressall: function(e, data) {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').showModal();
+					var percent = parseInt(data.loaded / data.total * 100, 10);
+					$('#upload-dialog .progress .bar').css('width', percent + '%');
+				});
+			},
+			always: function() {
+				require(['documentr/dialog'], function() {
+					$('#upload-dialog').hideModal();
+					$('#upload-dialog .modal-footer a').setButtonDisabled(false);
+					$('#upload-dialog .progress .bar').css('width', '0%');
+				});
+			},
+			done: function(e, data) {
+				window.location.href = '<c:url value="/attachment/list/${projectName}/${branchName}/${pagePathUrl}"/>';
+			}
+		});
 	});
 });
 

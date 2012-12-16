@@ -47,19 +47,20 @@ var resolveTexts = {};
 </c:forEach>
 
 function editConflict(branchName, commit) {
-	var text;
-	if (documentr.isSomething(resolveTexts[branchName + '/' + commit])) {
-		text = resolveTexts[branchName + '/' + commit];
-	} else {
-		text = conflictTexts[branchName + '/' + commit];
-	}
-	var dlg = $('#conflict-dialog');
-	var editor = dlg.data('editor');
-	editor.setValue(text);
-	dlg.data('branchName', branchName).data('commit', commit)
-		.showModal();
-	editor.moveCursorTo(0, 0);
-	editor.focus();
+	require(['documentr/dialog'], function() {
+		var text;
+		if (documentr.isSomething(resolveTexts[branchName + '/' + commit])) {
+			text = resolveTexts[branchName + '/' + commit];
+		} else {
+			text = conflictTexts[branchName + '/' + commit];
+		}
+		var dlg = $('#conflict-dialog');
+		var editor = dlg.data('editor');
+		editor.setValue(text);
+		dlg.data('branchName', branchName).data('commit', commit).showModal();
+		editor.moveCursorTo(0, 0);
+		editor.focus();
+	});
 }
 
 function saveResolveText() {
@@ -108,17 +109,19 @@ function preview() {
 </c:choose>
 
 $(function() {
-	var editor = ace.edit('editor');
-	$('#conflict-dialog').data('editor', editor);
-	editor.setTheme('ace/theme/chrome');
-	editor.session.setMode('ace/mode/merge_conflict');
-	editor.setDisplayIndentGuides(true);
-	editor.renderer.setShowGutter(false);
-	editor.session.setUseWrapMode(true);
-	editor.session.setWrapLimitRange(null, null);
-	editor.renderer.setShowPrintMargin(false);
-	editor.session.setUseSoftTabs(false);
-	editor.setHighlightSelectedWord(false);
+	require(['ace'], function(ace) {
+		var editor = ace.edit('editor');
+		$('#conflict-dialog').data('editor', editor);
+		editor.setTheme('ace/theme/chrome');
+		editor.session.setMode('ace/mode/merge_conflict');
+		editor.setDisplayIndentGuides(true);
+		editor.renderer.setShowGutter(false);
+		editor.session.setUseWrapMode(true);
+		editor.session.setWrapLimitRange(null, null);
+		editor.renderer.setShowPrintMargin(false);
+		editor.session.setUseSoftTabs(false);
+		editor.setHighlightSelectedWord(false);
+	});
 });
 
 </dt:headerJS>

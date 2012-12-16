@@ -63,15 +63,17 @@ function showChangesDialog() {
 	var version1 = $('#versions input:radio:checked[name="version1"]').val();
 	var version2 = $('#versions input:radio:checked[name="version2"]').val();
 
+	require(['documentr/diffMarkdown']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var html = documentr.diffMarkdownAndGetHtml(result[version1], result[version2]);
-			$('#changes-dialog-body').html(html);
-			$('#changes-dialog').data('previousCommit', version1)
-				.showModal();
+			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
+				var html = diffMarkdown.diff(result[version1], result[version2]);
+				$('#changes-dialog-body').html(html);
+				$('#changes-dialog').data('previousCommit', version1).showModal();
+			});
 		}
 	});
 }
@@ -96,6 +98,12 @@ function restoreOldVersion() {
 </sec:authorize>
 
 <sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
+
+function showCopyChangesDialog() {
+	require(['documentr/dialog'], function() {
+		$('#cherrypick-dialog').showModal();
+	});
+}
 
 function startCherryPick() {
 	var version1 = $('#versions input:radio:checked[name="version1"]').val();
@@ -182,7 +190,7 @@ $(function() {
 	<p>
 		<a href="javascript:void(showChangesDialog());" class="btn"><spring:message code="button.showChanges"/></a>
 		<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, EDIT_PAGE)">
-			<a href="javascript:void($('#cherrypick-dialog').showModal());" class="btn"><spring:message code="button.copyChangesToOtherBranches"/></a>
+			<a href="javascript:void(showCopyChangesDialog());" class="btn"><spring:message code="button.copyChangesToOtherBranches"/></a>
 		</sec:authorize>
 	</p>
 </c:if>

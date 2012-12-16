@@ -46,31 +46,33 @@ function showDeleteDialog() {
 	<sec:authorize access="isLastAdminRole('${roleForm.originalName}')">
 		<c:set var="lastAdminRole" value="${true}"/>
 	</sec:authorize>
-	<c:choose>
-		<c:when test="${lastAdminRole}">
-			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
-				"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
-					{
-						text: '<spring:message code="button.close"/>',
-						cancel: true
-					}
-				]);
-		</c:when>
-		<c:otherwise>
-			documentr.openMessageDialog('<spring:message code="title.deleteRole"/>',
-				"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
-					{
-						text: '<spring:message code="button.delete"/>',
-						href: '<c:url value="/role/delete/${roleForm.originalName}"/>',
-						type: 'danger'
-					},
-					{
-						text: '<spring:message code="button.cancel"/>',
-						cancel: true
-					}
-				]);
-		</c:otherwise>
-	</c:choose>
+	require(['documentr/dialog'], function(dialog) {
+		<c:choose>
+			<c:when test="${lastAdminRole}">
+				dialog.openMessageDialog('<spring:message code="title.deleteRole"/>',
+					"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
+						{
+							text: '<spring:message code="button.close"/>',
+							cancel: true
+						}
+					]);
+			</c:when>
+			<c:otherwise>
+				dialog.openMessageDialog('<spring:message code="title.deleteRole"/>',
+					"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
+						{
+							text: '<spring:message code="button.delete"/>',
+							href: '<c:url value="/role/delete/${roleForm.originalName}"/>',
+							type: 'danger'
+						},
+						{
+							text: '<spring:message code="button.cancel"/>',
+							cancel: true
+						}
+					]);
+			</c:otherwise>
+		</c:choose>
+	});
 }
 </c:if>
 

@@ -1,4 +1,4 @@
-<%--
+/*
 documentr - Edit, maintain, and present software documentation on the web.
 Copyright (C) 2012 Maik Schreiber
 
@@ -14,10 +14,27 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
---%>
-<%@ tag pageEncoding="UTF-8" body-content="empty" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ attribute name="uri" required="true" rtexprvalue="true" %>
+*/
 
-<c:if test="${!empty requestScope._headerJSFiles}"><c:set var="delimiter" value="|"/></c:if>
-<c:set var="_headerJSFiles" scope="request" value="${requestScope._headerJSFiles}${delimiter}${uri}"/>
+define([], function() {
+	"use strict";
+	
+	var twitterCssEl = null;
+	var documentrCssEl = null;
+	$('link[rel="stylesheet"]').each(function() {
+		var el = $(this);
+		var href = el.attr('href');
+		if (documentr.isSomething(href)) {
+			if (href.indexOf('.twimg.com') > 0) {
+				twitterCssEl = el;
+			} else if (href.indexOf('/documentr.css') > 0) {
+				documentrCssEl = el;
+			}
+		}
+	});
+	if ((twitterCssEl !== null) && (documentrCssEl !== null)) {
+		twitterCssEl.detach();
+		documentrCssEl.before(twitterCssEl);
+	}
+	$('.twtr-widget').removeAttr('id');
+});
