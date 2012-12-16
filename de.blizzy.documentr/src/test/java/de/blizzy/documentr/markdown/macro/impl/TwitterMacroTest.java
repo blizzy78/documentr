@@ -61,7 +61,7 @@ public class TwitterMacroTest extends AbstractDocumentrTest {
 					"live: true," +
 					"behavior: 'default'" +
 				"}" +
-			"}).render().start(); documentr.fixTwitterCss();\n" +
+			"}).render().start(); require(['documentr/fixTwitterCss']);\n" +
 			"</script>\n";
 		assertEquals(expectedHtml, html);
 	}
