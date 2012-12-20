@@ -67,7 +67,6 @@ public class DownloaderTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getTextFromUrl() throws IOException {
 		when(requestFactory.createRequest(URI.create(URL), HttpMethod.GET)).thenReturn(request);
 		when(request.execute()).thenReturn(response);
@@ -85,10 +84,10 @@ public class DownloaderTest extends AbstractDocumentrTest {
 		
 		ArgumentCaptor<Integer> connectTimeoutCaptor = ArgumentCaptor.forClass(Integer.class);
 		verify(requestFactory).setConnectTimeout(connectTimeoutCaptor.capture());
-		assertTrue(connectTimeoutCaptor.getValue().intValue() > 0);
+		assertTrue(connectTimeoutCaptor.getValue() > 0);
 
 		ArgumentCaptor<Integer> readTimeoutCaptor = ArgumentCaptor.forClass(Integer.class);
 		verify(requestFactory).setReadTimeout(readTimeoutCaptor.capture());
-		assertTrue(readTimeoutCaptor.getValue().intValue() > 0);
+		assertTrue(readTimeoutCaptor.getValue() > 0);
 	}
 }

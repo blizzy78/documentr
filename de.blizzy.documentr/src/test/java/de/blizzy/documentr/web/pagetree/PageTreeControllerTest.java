@@ -56,7 +56,6 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 	private PageTreeController pageTreeController;
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getApplicationChildren() {
 		when(repoManager.listProjects()).thenReturn(
 				Lists.newArrayList("project1", "project2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -80,7 +79,6 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getProjectChildren() throws IOException {
 		when(repoManager.listProjectBranches("project")).thenReturn( //$NON-NLS-1$
 				Lists.newArrayList("branch1", "branch2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -109,7 +107,6 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		getBranchChildren(false);
 	}
 	
-	@SuppressWarnings("boxing")
 	private void getBranchChildren(boolean hasBranchPermission) throws IOException {
 		when(pageStore.getPage("project", "branch", "home", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -137,7 +134,6 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		getPageChildren(false);
 	}
 	
-	@SuppressWarnings("boxing")
 	private void getPageChildren(boolean hasBranchPermission) throws IOException {
 		when(pageStore.listChildPagePaths("project", "branch", "home/foo")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Lists.newArrayList("home/foo/page1", "home/foo/page2")); //$NON-NLS-1$ //$NON-NLS-2$

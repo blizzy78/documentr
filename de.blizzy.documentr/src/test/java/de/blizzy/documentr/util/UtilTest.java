@@ -61,10 +61,10 @@ public class UtilTest extends AbstractDocumentrTest {
 	@Test
 	public void join() {
 		assertEquals("1, 2, 3", Util.join( //$NON-NLS-1$
-				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }, ", ")); //$NON-NLS-1$
+				new Integer[] { 1, 2, 3 }, ", ")); //$NON-NLS-1$
 		assertEquals("1, 2, 3", Util.join(Lists.newArrayList( //$NON-NLS-1$
-				new Integer[] { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) }), ", ")); //$NON-NLS-1$
-		assertEquals("123", Util.join(Integer.valueOf(123), ", ")); //$NON-NLS-1$ //$NON-NLS-2$
+				new Integer[] { 1, 2, 3 }), ", ")); //$NON-NLS-1$
+		assertEquals("123", Util.join(123, ", ")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@Test(expected=None.class)

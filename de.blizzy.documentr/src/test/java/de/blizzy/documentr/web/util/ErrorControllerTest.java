@@ -45,7 +45,7 @@ public class ErrorControllerTest extends AbstractDocumentrTest {
 		String view = errorController.sendError(HttpServletResponse.SC_FORBIDDEN, "key", model); //$NON-NLS-1$
 		assertEquals("/sendError", view); //$NON-NLS-1$
 		
-		verify(model).addAttribute("statusCode", Integer.valueOf(HttpServletResponse.SC_FORBIDDEN)); //$NON-NLS-1$
+		verify(model).addAttribute("statusCode", HttpServletResponse.SC_FORBIDDEN); //$NON-NLS-1$
 		verify(model).addAttribute("messageKey", "key"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

@@ -37,7 +37,7 @@ public class AuthenticationUtilTest extends AbstractDocumentrTest {
 	@Test
 	public void setAuthenticationCreationTime() {
 		AuthenticationUtil.setAuthenticationCreationTime(session, 123);
-		verify(session).setAttribute("authenticationCreationTime", Long.valueOf(123)); //$NON-NLS-1$
+		verify(session).setAttribute("authenticationCreationTime", 123L); //$NON-NLS-1$
 	}
 	
 	@Test
@@ -45,7 +45,7 @@ public class AuthenticationUtilTest extends AbstractDocumentrTest {
 		Calendar c = new GregorianCalendar(2012, Calendar.JUNE, 17);
 		c.set(Calendar.MILLISECOND, 123);
 		long time = c.getTimeInMillis();
-		when(session.getAttribute("authenticationCreationTime")).thenReturn(Long.valueOf(time)); //$NON-NLS-1$
+		when(session.getAttribute("authenticationCreationTime")).thenReturn(time); //$NON-NLS-1$
 		assertEquals(time / 1000L * 1000L, AuthenticationUtil.getAuthenticationCreationTime(session));
 	}
 }

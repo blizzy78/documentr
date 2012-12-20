@@ -193,8 +193,8 @@ public class SystemControllerTest extends AbstractDocumentrTest {
 		when(webRequest.getParameterMap()).thenReturn(params);
 
 		SystemSettingsForm form = systemController.createSystemSettingsForm(DOCUMENTR_HOST,
-				SITE_NOTICE, MAIL_HOST_NAME, Integer.valueOf(123), MAIL_SENDER_EMAIL, MAIL_SENDER_NAME,
-				MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, Integer.valueOf(234), PAGE_FOOTER_HTML,
+				SITE_NOTICE, MAIL_HOST_NAME, 123, MAIL_SENDER_EMAIL, MAIL_SENDER_NAME,
+				MAIL_SUBJECT_PREFIX, MAIL_DEFAULT_LANGUAGE, 234, PAGE_FOOTER_HTML,
 				UPDATE_CHECK_INTERVAL, webRequest);
 		assertEquals(DOCUMENTR_HOST, form.getDocumentrHost()); 
 		assertEquals(SITE_NOTICE, form.getSiteNotice()); 

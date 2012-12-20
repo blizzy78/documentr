@@ -71,6 +71,6 @@ public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 	}
 
 	private Long salt() {
-		return Long.valueOf(ignoredRandom.nextLong());
+		return ignoredRandom.nextLong();
 	}
 }

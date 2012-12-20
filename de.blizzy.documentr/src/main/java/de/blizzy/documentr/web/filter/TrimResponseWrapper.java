@@ -112,7 +112,7 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 	@Override
 	public void setContentLength(int len) {
 		if ((trimmable == null) || trimmable.booleanValue()) {
-			contentLength = Integer.valueOf(len);
+			contentLength = len;
 			// don't send to superclass
 		} else {
 			super.setContentLength(len);
@@ -154,7 +154,7 @@ class TrimResponseWrapper extends HttpServletResponseWrapper {
 	
 	private void setContentLengthIfNecessary() {
 		if (contentLength != null) {
-			super.setContentLength(contentLength.intValue());
+			super.setContentLength(contentLength);
 			contentLength = null;
 		}
 	}

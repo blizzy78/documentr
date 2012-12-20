@@ -36,7 +36,7 @@ public class DocumentrParser extends Parser {
 			Extensions.QUOTES - Extensions.SMARTS - Extensions.SMARTYPANTS;
 
 	public DocumentrParser() {
-		super(Integer.valueOf(PEGDOWN_OPTIONS), Long.valueOf(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS)),
+		super(PEGDOWN_OPTIONS, TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS),
 				Parser.DefaultParseRunnerProvider);
 	}
 
@@ -52,7 +52,6 @@ public class DocumentrParser extends Parser {
 				.add(Symbol()).get());
 	}
 
-	@SuppressWarnings("boxing")
 	public Rule StandaloneMacro() {
 		StringVar macroName = new StringVar();
 		StringVar params = new StringVar();
@@ -67,7 +66,6 @@ public class DocumentrParser extends Parser {
 		return StringUtils.substringBefore(macroName, ":"); //$NON-NLS-1$
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule BodyMacro() {
 		StringVar macroName = new StringVar();
 		StringVar params = new StringVar();
@@ -85,7 +83,6 @@ public class DocumentrParser extends Parser {
 						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule BodyMacroBody(StringBuilderVar inner, StringVar macroName) {
 		return Sequence(
 				ZeroOrMore(BlankLine()),
@@ -108,7 +105,6 @@ public class DocumentrParser extends Parser {
 		);
 	}
 
-	@SuppressWarnings("boxing")
 	public Rule MacroName(StringVar macroName) {
 		return Sequence(
 				Sequence(
@@ -119,7 +115,6 @@ public class DocumentrParser extends Parser {
 					macroName.isNotSet() && macroName.set(match()));
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule MacroParameters(StringVar params, boolean standalone) {
 		return Sequence(
 				OneOrMore(
@@ -131,7 +126,6 @@ public class DocumentrParser extends Parser {
 
 	@Override
 	@Cached
-	@SuppressWarnings("boxing")
 	public Rule LinkSource() {
 		StringBuilderVar url = new StringBuilderVar();
 		return FirstOf(
@@ -143,24 +137,20 @@ public class DocumentrParser extends Parser {
 		);
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule AnchorName(StringBuilderVar url) {
 		return Sequence(AnchorNameChars(url), push("#" + url.getString())); //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("boxing")
 	public Rule Url(StringBuilderVar url) {
 		return Sequence(UrlChars(url), push(url.getString()));
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule AnchorNameChars(StringBuilderVar url) {
 		return OneOrMore(
 				Sequence(NoneOf("()<>[]#"), url.append(matchedChar())) //$NON-NLS-1$
 		);
 	}
 
-	@SuppressWarnings("boxing")
 	public Rule UrlChars(StringBuilderVar url) {
 		return OneOrMore(
 				FirstOf(
@@ -173,7 +163,6 @@ public class DocumentrParser extends Parser {
 		);
 	}
 
-	@SuppressWarnings("boxing")
 	public Rule PageHeader() {
 		StringBuilderVar inner = new StringBuilderVar();
 		return NodeSequence(
@@ -185,7 +174,6 @@ public class DocumentrParser extends Parser {
 						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
 	
-	@SuppressWarnings("boxing")
 	public Rule PageHeaderBody(StringBuilderVar inner) {
 		return Sequence(
 				ZeroOrMore(BlankLine()),
@@ -198,7 +186,6 @@ public class DocumentrParser extends Parser {
 
     // adapted from https://github.com/sirthias/pegdown/pull/60
     @Override
-	@SuppressWarnings("boxing")
 	public Rule FencedCodeBlock() {
         StringBuilderVar text = new StringBuilderVar();
         Var<Integer> markerLength = new Var<Integer>();
@@ -215,7 +202,6 @@ public class DocumentrParser extends Parser {
     }
     
 	@Cached
-	@SuppressWarnings("boxing")
     public Rule CodeFenceWithType(Var<Integer> markerLength, StringBuilderVar codeType) {
         return Sequence(
                 FirstOf(NOrMore('~', 3), NOrMore('`', 3)),

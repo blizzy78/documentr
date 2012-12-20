@@ -117,7 +117,6 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void saveAndGetUser() throws IOException {
 		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		user.addOpenId(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$

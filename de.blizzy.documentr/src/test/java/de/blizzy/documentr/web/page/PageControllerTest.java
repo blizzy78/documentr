@@ -121,7 +121,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	private PageController pageController;
 
 	@Before
-	@SuppressWarnings("boxing")
 	public void setUp() throws IOException {
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
@@ -132,7 +131,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getPage() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
@@ -143,7 +141,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getPageMustReturnNormallyIfModified() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
@@ -178,7 +175,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getPageMustReturn404IfNotFound() throws IOException {
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		
@@ -193,7 +189,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getPageMustReturn304IfNotModified() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 2).getTime().getTime());
@@ -481,7 +476,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void cherryPick() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
@@ -510,7 +504,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void cherryPickWithConflicts() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
@@ -543,7 +536,6 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void cherryPickWithConflictsAndResolveTexts() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$

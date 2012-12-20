@@ -257,8 +257,8 @@ public class PageController {
 
 			Page parentPage = pageStore.getPage(projectName, branchName, parentPagePath, true);
 			String text = ((PageTextData) parentPage.getData()).getText();
-			end = Integer.valueOf(Math.min(end.intValue(), text.length()));
-			text = text.substring(0, start.intValue()) + text.substring(end.intValue());
+			end = Math.min(end, text.length());
+			text = text.substring(0, start) + text.substring(end);
 			parentPage.setData(new PageTextData(text));
 			pageStore.savePage(projectName, branchName, parentPagePath, parentPage, null, user);
 		}
@@ -573,8 +573,7 @@ public class PageController {
 			Model model) throws IOException {
 
 		log.info("splitting off {}-{} of {}/{}/{}", //$NON-NLS-1$
-				Integer.valueOf(rangeStart), Integer.valueOf(rangeEnd),
-				projectName, branchName, path);
+				rangeStart, rangeEnd, projectName, branchName, path);
 
 		path = Util.toRealPagePath(path);
 		Page page = pageStore.getPage(projectName, branchName, path, true);
@@ -583,8 +582,8 @@ public class PageController {
 		text = text.substring(rangeStart, rangeEnd).trim();
 		PageForm form = new PageForm(projectName, branchName, null, path,
 				null, text, StringUtils.EMPTY, null, ArrayUtils.EMPTY_STRING_ARRAY);
-		form.setParentPageSplitRangeStart(Integer.valueOf(rangeStart));
-		form.setParentPageSplitRangeEnd(Integer.valueOf(rangeEnd));
+		form.setParentPageSplitRangeStart(rangeStart);
+		form.setParentPageSplitRangeEnd(rangeEnd);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}

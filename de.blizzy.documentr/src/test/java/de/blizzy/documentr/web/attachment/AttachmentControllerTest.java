@@ -83,7 +83,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	private AttachmentController attachmentController;
 
 	@Before
-	@SuppressWarnings("boxing")
 	public void setUp() throws IOException {
 		when(servletContext.getMimeType("test.png")).thenReturn("image/png"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -104,7 +103,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getAttachment() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
@@ -115,7 +113,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturnNormallyIfModified() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
@@ -127,7 +124,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getAttachmentAsDownload() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
@@ -160,7 +156,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturn404IfNotFound() throws IOException {
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 
@@ -173,7 +168,6 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void getAttachmentMustReturn304IfNotModified() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 1).getTime().getTime());

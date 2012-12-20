@@ -47,7 +47,7 @@ public class MailSenderFactoryTest extends AbstractDocumentrTest {
 		when(systemSettingsStore.getSettings()).thenReturn(settings);
 		JavaMailSender sender = mailSenderFactory.createSender();
 		assertEquals("host", Whitebox.getInternalState(sender, "host")); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals(25, ((Integer) Whitebox.getInternalState(sender, "port")).intValue()); //$NON-NLS-1$
+		assertEquals(25, (int) ((Integer) Whitebox.getInternalState(sender, "port"))); //$NON-NLS-1$
 		
 
 		settings.remove(SystemSettingsStore.MAIL_HOST_NAME);

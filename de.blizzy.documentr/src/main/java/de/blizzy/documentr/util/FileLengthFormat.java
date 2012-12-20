@@ -75,7 +75,7 @@ public class FileLengthFormat extends Format {
 
 	/** Formats the specific length into human-readable format. */
 	public String format(long length) {
-		return format(Long.valueOf(length), new StringBuffer(), null).toString();
+		return format(length, new StringBuffer(), null).toString();
 	}
 	
 	private String formatNumber(double d) {

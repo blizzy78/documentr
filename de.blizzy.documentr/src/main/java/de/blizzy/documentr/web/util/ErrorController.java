@@ -32,7 +32,7 @@ public class ErrorController {
 	@RequestMapping("/{statusCode:[0-9]+}/{messageKey:[a-zA-Z0-9\\.]+}")
 	@PreAuthorize("permitAll")
 	public String sendError(@PathVariable int statusCode, @PathVariable String messageKey, Model model) {
-		model.addAttribute("statusCode", Integer.valueOf(statusCode)); //$NON-NLS-1$
+		model.addAttribute("statusCode", statusCode); //$NON-NLS-1$
 		model.addAttribute("messageKey", messageKey); //$NON-NLS-1$
 		return "/sendError"; //$NON-NLS-1$
 	}

@@ -56,7 +56,7 @@ public class SearchController {
 			Authentication authentication, Model model) throws IOException {
 		
 		if (page == null) {
-			page = Integer.valueOf(1);
+			page = 1;
 		}
 
 		// TODO: why can authentication be null here?
@@ -65,7 +65,7 @@ public class SearchController {
 		}
 		
 		try {
-			SearchResult result = pageIndex.findPages(searchText, page.intValue(), authentication);
+			SearchResult result = pageIndex.findPages(searchText, page, authentication);
 			model.addAttribute("searchText", searchText); //$NON-NLS-1$
 			model.addAttribute("searchResult", result); //$NON-NLS-1$
 			model.addAttribute("page", page); //$NON-NLS-1$

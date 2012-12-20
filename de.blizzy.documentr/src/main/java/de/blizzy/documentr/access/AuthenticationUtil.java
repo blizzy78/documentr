@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.security.core.Authentication;
+
 /** {@link Authentication} utility methods. */
 public final class AuthenticationUtil {
 	private static final String AUTHENTICATION_CREATION_TIME = "authenticationCreationTime"; //$NON-NLS-1$
@@ -29,7 +31,7 @@ public final class AuthenticationUtil {
 
 	/** Stores the creation time of the current user's {@link Authentication} into their session. */
 	public static void setAuthenticationCreationTime(HttpSession session, long time) {
-		session.setAttribute(AUTHENTICATION_CREATION_TIME, Long.valueOf(time));
+		session.setAttribute(AUTHENTICATION_CREATION_TIME, time);
 	}
 
 	/** Retrieves the creation time of the current user's {@link Authentication} from their session. */
@@ -37,7 +39,7 @@ public final class AuthenticationUtil {
 		Long time = (Long) session.getAttribute(AUTHENTICATION_CREATION_TIME);
 		if (time != null) {
 			// shave off milliseconds
-			long seconds = TimeUnit.SECONDS.convert(time.longValue(), TimeUnit.MILLISECONDS);
+			long seconds = TimeUnit.SECONDS.convert(time, TimeUnit.MILLISECONDS);
 			return TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS);
 		} else {
 			return 0;

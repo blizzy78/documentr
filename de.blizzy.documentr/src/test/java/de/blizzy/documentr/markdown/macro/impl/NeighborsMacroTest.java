@@ -121,7 +121,6 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 		}
 	}
 	
-	@SuppressWarnings("boxing")
 	private void setupPagePermissions() {
 		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
 					eq(PROJECT), eq(BRANCH), notEq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))

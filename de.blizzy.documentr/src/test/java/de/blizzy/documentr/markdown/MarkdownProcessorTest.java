@@ -69,7 +69,6 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	private MarkdownProcessor markdownProcessor;
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void markdownToHtml() {
 		when(descriptor.isCacheable()).thenReturn(true);
 
@@ -98,7 +97,6 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	@SuppressWarnings("boxing")
 	public void markdownToHtmlMustNotRenderNonCacheableMacros() {
 		when(descriptor.isCacheable()).thenReturn(false);
 		
@@ -118,7 +116,6 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void processNonCacheableMacros() {
 		when(descriptor.isCacheable()).thenReturn(false);
 

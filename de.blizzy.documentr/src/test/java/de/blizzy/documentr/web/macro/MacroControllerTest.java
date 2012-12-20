@@ -79,17 +79,17 @@ public class MacroControllerTest extends AbstractDocumentrTest {
 		List<Map<String, Object>> messages = (List<Map<String, Object>>) result.get("messages"); //$NON-NLS-1$
 		Map<String, Object> message = messages.get(0);
 		assertEquals(CompilationMessage.Type.ERROR.name(), message.get("type")); //$NON-NLS-1$
-		assertEquals(1, ((Integer) message.get("startLine")).intValue()); //$NON-NLS-1$
-		assertEquals(2, ((Integer) message.get("startColumn")).intValue()); //$NON-NLS-1$
-		assertEquals(3, ((Integer) message.get("endLine")).intValue()); //$NON-NLS-1$
-		assertEquals(4, ((Integer) message.get("endColumn")).intValue()); //$NON-NLS-1$
+		assertEquals(1, (int) ((Integer) message.get("startLine"))); //$NON-NLS-1$
+		assertEquals(2, (int) ((Integer) message.get("startColumn"))); //$NON-NLS-1$
+		assertEquals(3, (int) ((Integer) message.get("endLine"))); //$NON-NLS-1$
+		assertEquals(4, (int) ((Integer) message.get("endColumn"))); //$NON-NLS-1$
 		assertEquals("message1", message.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
 		message = messages.get(1);
 		assertEquals(CompilationMessage.Type.WARNING.name(), message.get("type")); //$NON-NLS-1$
-		assertEquals(5, ((Integer) message.get("startLine")).intValue()); //$NON-NLS-1$
-		assertEquals(6, ((Integer) message.get("startColumn")).intValue()); //$NON-NLS-1$
-		assertEquals(7, ((Integer) message.get("endLine")).intValue()); //$NON-NLS-1$
-		assertEquals(8, ((Integer) message.get("endColumn")).intValue()); //$NON-NLS-1$
+		assertEquals(5, (int) ((Integer) message.get("startLine"))); //$NON-NLS-1$
+		assertEquals(6, (int) ((Integer) message.get("startColumn"))); //$NON-NLS-1$
+		assertEquals(7, (int) ((Integer) message.get("endLine"))); //$NON-NLS-1$
+		assertEquals(8, (int) ((Integer) message.get("endColumn"))); //$NON-NLS-1$
 		assertEquals("message2", message.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

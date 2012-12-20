@@ -85,7 +85,6 @@ public class InaccessibleDocIdsCollectorTest extends AbstractDocumentrTest {
 	}
 	
 	@Test
-	@SuppressWarnings("boxing")
 	public void getDocIdSet() throws IOException {
 		when(permissionEvaluator.hasPagePermission(authentication,
 				"project", "branch2", "home", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

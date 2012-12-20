@@ -45,7 +45,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 
 	private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder createEncoder() {
 		int rounds = Integer.parseInt(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS));
-		log.debug("constructing bcrypt encoder using {} rounds", Integer.valueOf(rounds)); //$NON-NLS-1$
+		log.debug("constructing bcrypt encoder using {} rounds", rounds); //$NON-NLS-1$
 		return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(rounds);
 	}
 
@@ -56,7 +56,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		String encPass = encoder.encode(rawPass);
 		stopwatch.stop();
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to encode password: {} ms", Long.valueOf(stopwatch.elapsedMillis())); //$NON-NLS-1$
+			log.trace("time taken to encode password: {} ms", stopwatch.elapsedMillis()); //$NON-NLS-1$
 		}
 		return encPass;
 	}
@@ -68,7 +68,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		boolean valid = encoder.matches(rawPass, encPass);
 		stopwatch.stop();
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to verify password: {} ms", Long.valueOf(stopwatch.elapsedMillis())); //$NON-NLS-1$
+			log.trace("time taken to verify password: {} ms", stopwatch.elapsedMillis()); //$NON-NLS-1$
 		}
 		return valid;
 	}

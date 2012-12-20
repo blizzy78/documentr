@@ -57,8 +57,8 @@ public class AuthenticationCreationTimeFilter implements Filter {
 
 		HttpSession session = ((HttpServletRequest) request).getSession();
 		Integer lastAuthenticationHashCode = (Integer) session.getAttribute(AUTHENTICATION_HASH_CODE);
-		if ((lastAuthenticationHashCode == null) || (lastAuthenticationHashCode.intValue() != hashCode)) {
-			session.setAttribute(AUTHENTICATION_HASH_CODE, Integer.valueOf(hashCode));
+		if ((lastAuthenticationHashCode == null) || (lastAuthenticationHashCode != hashCode)) {
+			session.setAttribute(AUTHENTICATION_HASH_CODE, hashCode);
 			AuthenticationUtil.setAuthenticationCreationTime(session, System.currentTimeMillis());
 		}
 		

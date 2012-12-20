@@ -90,10 +90,10 @@ public class MacroController {
 	private Map<String, Object> toJson(CompilationMessage message) {
 		Map<String, Object> result = Maps.newHashMap();
 		result.put("type", message.getType().name()); //$NON-NLS-1$
-		result.put("startLine", Integer.valueOf(message.getStartLine())); //$NON-NLS-1$
-		result.put("startColumn", Integer.valueOf(message.getStartColumn())); //$NON-NLS-1$
-		result.put("endLine", Integer.valueOf(message.getEndLine())); //$NON-NLS-1$
-		result.put("endColumn", Integer.valueOf(message.getEndColumn())); //$NON-NLS-1$
+		result.put("startLine", message.getStartLine()); //$NON-NLS-1$
+		result.put("startColumn", message.getStartColumn()); //$NON-NLS-1$
+		result.put("endLine", message.getEndLine()); //$NON-NLS-1$
+		result.put("endColumn", message.getEndColumn()); //$NON-NLS-1$
 		result.put("message", message.getMessage()); //$NON-NLS-1$
 		return result;
 	}

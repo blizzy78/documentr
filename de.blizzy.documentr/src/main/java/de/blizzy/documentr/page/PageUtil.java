@@ -50,12 +50,12 @@ public final class PageUtil {
 	}
 	
 	static void updateProjectEditTime(String projectName) {
-		projectEditTimes.put(projectName, Long.valueOf(System.currentTimeMillis()));
+		projectEditTimes.put(projectName, System.currentTimeMillis());
 	}
 
 	public static long getProjectEditTime(String projectName) {
 		Long time = projectEditTimes.get(projectName);
-		return (time != null) ? time.longValue() : -1;
+		return (time != null) ? time : -1;
 	}
 
 	public static PageVersion toPageVersion(RevCommit commit) {

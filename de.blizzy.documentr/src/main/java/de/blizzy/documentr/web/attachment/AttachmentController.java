@@ -172,7 +172,7 @@ public class AttachmentController {
 		
 		Map<String, Object> fileResult = Maps.newHashMap();
 		fileResult.put("name", file.getOriginalFilename()); //$NON-NLS-1$
-		fileResult.put("size", Long.valueOf(file.getSize())); //$NON-NLS-1$
+		fileResult.put("size", file.getSize()); //$NON-NLS-1$
 		fileResult.put("url", StringUtils.EMPTY); //$NON-NLS-1$
 		fileResult.put("thumbnail_url", StringUtils.EMPTY); //$NON-NLS-1$
 		fileResult.put("delete_url", StringUtils.EMPTY); //$NON-NLS-1$

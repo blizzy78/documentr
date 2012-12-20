@@ -28,7 +28,7 @@ class RoleGrantedAuthorityComparator implements Comparator<RoleGrantedAuthority>
 		GrantedAuthorityTarget target2 = rga2.getTarget();
 		Type type1 = target1.getType();
 		Type type2 = target2.getType();
-		int result = Integer.valueOf(type1.ordinal()).compareTo(Integer.valueOf(type2.ordinal()));
+		int result = ((Integer) type1.ordinal()).compareTo(type2.ordinal());
 		if (result != 0) {
 			return result;
 		}

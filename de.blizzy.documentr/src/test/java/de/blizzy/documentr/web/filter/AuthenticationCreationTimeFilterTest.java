@@ -62,7 +62,7 @@ public class AuthenticationCreationTimeFilterTest extends AbstractDocumentrTest 
 				new SimpleGrantedAuthority("authority2"))) //$NON-NLS-1$
 			.when(authentication).getAuthorities();
 		
-		when(session.getAttribute("authenticationHashCode")).thenReturn(Integer.valueOf(123)); //$NON-NLS-1$
+		when(session.getAttribute("authenticationHashCode")).thenReturn(123); //$NON-NLS-1$
 		
 		when(request.getSession()).thenReturn(session);
 		
@@ -74,6 +74,6 @@ public class AuthenticationCreationTimeFilterTest extends AbstractDocumentrTest 
 		
 		ArgumentCaptor<Long> timeArgument = ArgumentCaptor.forClass(Long.class);
 		verify(session).setAttribute(eq("authenticationCreationTime"), timeArgument.capture()); //$NON-NLS-1$
-		TestUtil.assertSecondsAgo(new Date(timeArgument.getValue().longValue()), 5);
+		TestUtil.assertSecondsAgo(new Date(timeArgument.getValue()), 5);
 	}
 }
