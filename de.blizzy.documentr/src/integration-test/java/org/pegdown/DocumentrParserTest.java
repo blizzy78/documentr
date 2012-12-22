@@ -42,9 +42,10 @@ public class DocumentrParserTest {
 	
 	@Test
 	public void fencedCodeBlock() {
-		RootNode rootNode = parse("~~~java\nxyz\n~~~"); //$NON-NLS-1$
+		RootNode rootNode = parse("~~~java:title 123\nxyz\n~~~"); //$NON-NLS-1$
 		VerbatimNodeWithType verbatimNode = (VerbatimNodeWithType) rootNode.getChildren().get(0);
 		assertEquals("java", verbatimNode.getType()); //$NON-NLS-1$
+		assertEquals("title 123", verbatimNode.getTitle()); //$NON-NLS-1$
 		assertEquals("xyz", verbatimNode.getText().trim()); //$NON-NLS-1$
 	}
 	
