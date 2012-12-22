@@ -32,9 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
+<jsp:include page="/WEB-INF/view/requireConfig.jsp"/>
+
+<script type="text/javascript" src="<c:url value="/js/require-2.1.2.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.8.3.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bootstrap-2.2.2.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/ace-1.0.0/ace.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <body id="#top" class="markdown-help">
@@ -322,6 +324,16 @@ Hallo
 </div></td>
 									<td><pre><code>~~~html<br/>&lt;!-- Quellcode mit<br/>Hervorhebung --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
+								<tr>
+									<td><div class="code-view-title">Ein Titel</div><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view" data-type="html">&lt;!-- Quellcode mit
+Hervorhebung und Titel --&gt;
+&lt;p class=&quot;header&quot;&gt;
+Hallo
+&lt;p&gt;</div><!--__/NOTRIM__-->
+</div></td>
+									<td><pre><code>~~~html:Ein Titel<br/>&lt;!-- Quellcode mit<br/>Hervorhebung und Titel --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
+								</tr>
 							</tbody>
 						</table>
 					</c:when>
@@ -349,6 +361,16 @@ Hello
 &lt;p&gt;</div><!--__/NOTRIM__-->
 </div></td>
 									<td><pre><code>~~~html<br/>&lt;!-- Source code<br/>with highlighting --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
+								</tr>
+								<tr>
+									<td><div class="code-view-title">A Title</div><div class="code-view-wrapper">
+										<!--__NOTRIM__--><div class="code-view" data-type="html">&lt;!-- Source code
+with highlighting and title --&gt;
+&lt;p class=&quot;header&quot;&gt;
+Hello
+&lt;p&gt;</div><!--__/NOTRIM__-->
+</div></td>
+									<td><pre><code>~~~html:A Title<br/>&lt;!-- Source code<br/>with highlighting and title --&gt;<br/>&lt;p class=&quot;header&quot;&gt;<br/>Hallo<br/>&lt;p&gt;<br/>~~~</code></pre></td>
 								</tr>
 							</tbody>
 						</table>

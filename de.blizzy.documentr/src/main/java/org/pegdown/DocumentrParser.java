@@ -184,37 +184,54 @@ public class DocumentrParser extends Parser {
 				ZeroOrMore(BlankLine()));
 	}
 
-    // adapted from https://github.com/sirthias/pegdown/pull/60
-    @Override
+	// adapted from https://github.com/sirthias/pegdown/pull/60
+	@Override
 	public Rule FencedCodeBlock() {
-        StringBuilderVar text = new StringBuilderVar();
-        Var<Integer> markerLength = new Var<Integer>();
-        StringBuilderVar codeType = new StringBuilderVar();
-        return NodeSequence(
-                CodeFenceWithType(markerLength, codeType),
-                TestNot(CodeFence(markerLength)), // prevent empty matches
-                ZeroOrMore(BlankLine(), text.append('\n')),
-                OneOrMore(TestNot(Newline(), CodeFence(markerLength)), ANY, text.append(matchedChar())),
-                Newline(),
-                push(new VerbatimNodeWithType(text.appended('\n').getString(), codeType.getString())),
-                CodeFence(markerLength)
-        );
-    }
-    
+		StringBuilderVar text = new StringBuilderVar();
+		Var<Integer> markerLength = new Var<Integer>();
+		StringBuilderVar codeType = new StringBuilderVar();
+		StringBuilderVar title = new StringBuilderVar();
+		return NodeSequence(
+				CodeFenceWithTypeAndTitle(markerLength, codeType, title),
+				TestNot(CodeFence(markerLength)), // prevent empty matches
+				ZeroOrMore(BlankLine(), text.append('\n')),
+				OneOrMore(TestNot(Newline(), CodeFence(markerLength)), ANY, text.append(matchedChar())),
+				Newline(),
+				push(new VerbatimNodeWithType(
+						text.appended('\n').getString(), codeType.getString(), title.getString())),
+				CodeFence(markerLength)
+		);
+	}
+	
 	@Cached
-    public Rule CodeFenceWithType(Var<Integer> markerLength, StringBuilderVar codeType) {
-        return Sequence(
-                FirstOf(NOrMore('~', 3), NOrMore('`', 3)),
-                (markerLength.isSet() && matchLength() == markerLength.get()) ||
-                        (markerLength.isNotSet() && markerLength.set(matchLength())),
-                Sp(),
-                ZeroOrMore(TestNot(Newline()), ANY, codeType.append(matchedChar())), // GFM code type identifier
-                Newline()
-        );
-    }
-    
-    @Override
-    public Rule CodeFence(Var<Integer> markerLength) {
-    	return CodeFenceWithType(markerLength, new StringBuilderVar());
-    }
+	public Rule CodeFenceWithTypeAndTitle(Var<Integer> markerLength, StringBuilderVar codeType, StringBuilderVar title) {
+		return Sequence(
+				FirstOf(NOrMore('~', 3), NOrMore('`', 3)),
+				(markerLength.isSet() && matchLength() == markerLength.get()) ||
+					(markerLength.isNotSet() && markerLength.set(matchLength())),
+				Optional(
+						Sequence(
+								OneOrMore(
+										TestNot(FirstOf(Newline(), ':')),
+										ANY, codeType.append(matchedChar())
+								),
+								Optional(
+										Sequence(
+												':',
+												OneOrMore(
+														TestNot(Newline()),
+														ANY, title.append(matchedChar())
+												)
+										)
+								)
+						)
+				),
+				Newline()
+		);
+	}
+	
+	@Override
+	public Rule CodeFence(Var<Integer> markerLength) {
+		return CodeFenceWithTypeAndTitle(markerLength, new StringBuilderVar(), new StringBuilderVar());
+	}
 }

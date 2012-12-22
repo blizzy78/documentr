@@ -51,6 +51,14 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	
 	@Override
 	public void visit(VerbatimNode node) {
+		if (node instanceof VerbatimNodeWithType) {
+			String title = ((VerbatimNodeWithType) node).getTitle();
+			if (StringUtils.isNotBlank(title)) {
+				printer.print("<div class=\"code-view-title\">") //$NON-NLS-1$
+					.printEncoded(title.trim())
+					.print("</div>"); //$NON-NLS-1$
+			}
+		}
 		printer.print("<div class=\"code-view-wrapper\">").println() //$NON-NLS-1$
 			.print("<!--__NOTRIM__--><div class=\"code-view\" data-text-range=\"") //$NON-NLS-1$
 			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
@@ -58,12 +66,12 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		if (node instanceof VerbatimNodeWithType) {
 			String type = ((VerbatimNodeWithType) node).getType();
 			if (StringUtils.isNotBlank(type)) {
-				printer.print(" data-type=\"").printEncoded(type).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
+				printer.print(" data-type=\"").printEncoded(type.trim()).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		printer.print(">") //$NON-NLS-1$
 			.printEncoded(node.getText().replaceFirst("[\\r\\n]*$", StringUtils.EMPTY)); //$NON-NLS-1$
-		printer.print("</div><!--__/NOTRIM__-->").println().print("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.print("</div><!--__/NOTRIM__-->").println().print("</div>"); //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 	
 	@Override
