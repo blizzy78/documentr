@@ -211,22 +211,30 @@ public class DocumentrParser extends Parser {
 					(markerLength.isNotSet() && markerLength.set(matchLength())),
 				Optional(
 						Sequence(
-								OneOrMore(
-										TestNot(FirstOf(Newline(), ':')),
-										ANY, codeType.append(matchedChar())
-								),
+								CodeType(codeType),
 								Optional(
 										Sequence(
 												':',
-												OneOrMore(
-														TestNot(Newline()),
-														ANY, title.append(matchedChar())
-												)
+												CodeTitle(title)
 										)
 								)
 						)
 				),
 				Newline()
+		);
+	}
+	
+	public Rule CodeType(StringBuilderVar codeType) {
+		return OneOrMore(
+				TestNot(FirstOf(Newline(), ':')),
+				ANY, codeType.append(matchedChar())
+		);
+	}
+	
+	public Rule CodeTitle(StringBuilderVar title) {
+		return OneOrMore(
+				TestNot(Newline()),
+				ANY, title.append(matchedChar())
 		);
 	}
 	
