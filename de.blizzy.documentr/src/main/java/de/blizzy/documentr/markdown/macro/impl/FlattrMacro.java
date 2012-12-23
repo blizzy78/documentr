@@ -42,10 +42,10 @@ public class FlattrMacro implements IMacroRunnable {
 	@Override
 	public String getHtml(IMacroContext macroContext) {
 		try {
-			HtmlSerializerContext htmlSerializerContext = macroContext.getHtmlSerializerContext();
 			IMacroSettings settings = macroContext.getSettings();
 			String userId = settings.getSetting("userId"); //$NON-NLS-1$ 
 			if (StringUtils.isNotBlank(userId)) {
+				HtmlSerializerContext htmlSerializerContext = macroContext.getHtmlSerializerContext();
 				String projectName = htmlSerializerContext.getProjectName();
 				String branchName = htmlSerializerContext.getBranchName();
 				String path = htmlSerializerContext.getPagePath();

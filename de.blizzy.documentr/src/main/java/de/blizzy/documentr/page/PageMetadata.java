@@ -17,11 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.page;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import lombok.Getter;
 
-public class PageMetadata {
+public class PageMetadata implements Serializable {
+	private static final long serialVersionUID = -3763833054250717367L;
+	
 	@Getter
 	private String lastEditedBy;
 	@Getter

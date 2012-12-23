@@ -132,6 +132,13 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
 			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
 		ehCacheManager.addCache(new Cache(new CacheConfiguration()
+			.name("page_metadata") //$NON-NLS-1$
+			.overflowToDisk(true)
+			.diskPersistent(true)
+			.maxEntriesLocalHeap(1000)
+			.maxBytesLocalDisk(10, MemoryUnit.MEGABYTES)
+			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
+		ehCacheManager.addCache(new Cache(new CacheConfiguration()
 			.name("page_view_restriction_role") //$NON-NLS-1$
 			.overflowToDisk(true)
 			.diskPersistent(true)

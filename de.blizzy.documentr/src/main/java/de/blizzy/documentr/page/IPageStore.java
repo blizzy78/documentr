@@ -32,14 +32,16 @@ public interface IPageStore {
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #path"),
 			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path"),
-			@CacheEvict(value="page_view_restriction_role", key="#projectName + '/' + #branchName + '/' + #path")
+			@CacheEvict(value="page_view_restriction_role", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #path")
 	})
 	MergeConflict savePage(String projectName, String branchName, String path, Page page, String baseCommit,
 			User user) throws IOException;
 
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #pagePath"),
-			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #pagePath")
+			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #pagePath"),
+			@CacheEvict(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #pagePath")
 	})
 	void saveAttachment(String projectName, String branchName, String pagePath, String name,
 			Page attachment, User user) throws IOException;
@@ -61,10 +63,12 @@ public interface IPageStore {
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #path"),
 			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path"),
-			@CacheEvict(value="page_view_restriction_role", key="#projectName + '/' + #branchName + '/' + #path")
+			@CacheEvict(value="page_view_restriction_role", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #path")
 	})
 	void deletePage(String projectName, String branchName, String path, User user) throws IOException;
 	
+	@Cacheable(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #path")
 	PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException;
 
 	PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath, String name)
@@ -73,7 +77,8 @@ public interface IPageStore {
 	@Caching(evict={
 			@CacheEvict(value="page_html", allEntries=true),
 			@CacheEvict(value="page_header_html", allEntries=true),
-			@CacheEvict(value="page_view_restriction_role", allEntries=true)
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
 	})
 	void relocatePage(String projectName, String branchName, String path, String newParentPagePath,
 			User user) throws IOException;
@@ -85,7 +90,8 @@ public interface IPageStore {
 
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #pagePath"),
-			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #pagePath")
+			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #pagePath"),
+			@CacheEvict(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #pagePath")
 	})
 	void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException;
@@ -95,7 +101,8 @@ public interface IPageStore {
 
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #path"),
-			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path")
+			@CacheEvict(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path"),
+			@CacheEvict(value="page_metadata", key="#projectName + '/' + #branchName + '/' + #path")
 	})
 	void restorePageVersion(String projectName, String branchName, String path, String version, User user)
 			throws IOException;

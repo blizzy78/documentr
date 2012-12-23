@@ -32,7 +32,8 @@ public interface ICherryPicker {
 	@Caching(evict={
 			@CacheEvict(value="page_html", allEntries=true),
 			@CacheEvict(value="page_header_html", allEntries=true),
-			@CacheEvict(value="page_view_restriction_role", allEntries=true)
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
 	})
 	SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String branchName, String path,
 			List<String> commits, Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves,
