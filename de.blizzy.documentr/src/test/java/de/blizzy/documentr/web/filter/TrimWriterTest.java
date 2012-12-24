@@ -47,7 +47,10 @@ public class TrimWriterTest {
 					"<textarea class=\"test\">  a b c  \r\n" +
 					"  d e  \r\n" +
 					"  f g  </textarea>\r\n" +
-					"  zz<!-- hello world-->z \t  \r\n";
+					"  zz<!-- hello world-->z \t  \r\n" +
+					"\t<div class=\"code-view-wrapper\"><!--__NOTRIM__--><div class=\"code-view\">  a \r\n" +
+					"  b  \r\n" +
+					"  c   </div><!--__/NOTRIM__--></div>\t\r\n";
 			writer.write(text, out, Charsets.UTF_8);
 		} finally {
 			Closeables.closeQuietly(out);
@@ -66,7 +69,10 @@ public class TrimWriterTest {
 				"<textarea class=\"test\">  a b c  \n" +
 				"  d e  \n" +
 				"  f g  </textarea>\n" +
-				"zzz\n";
+				"zzz\n" +
+				"<div class=\"code-view-wrapper\"><div class=\"code-view\">  a \n" +
+				"  b  \n" +
+				"  c   </div></div>\n";
 		assertEquals(expected, result);
 	}
 }
