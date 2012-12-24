@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<c:otherwise><c:set var="hierarchyPagePath" value="home"/></c:otherwise>
 </c:choose>
 
-<dt:headerJS>
+<dt:pageJS>
 
 var allTags = [];
 var allTagsLoaded = false;
@@ -654,7 +654,7 @@ $(function() {
 	});
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

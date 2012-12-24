@@ -31,7 +31,7 @@ pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, VIEW)">
 
-<dt:headerJS>
+<dt:pageJS>
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 
@@ -539,7 +539,7 @@ $(function() {
 	</sec:authorize>
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission(ADMIN)">
 
-<dt:headerJS>
+<dt:pageJS>
 
 var dirty = false;
 
@@ -94,7 +94,7 @@ $(function() {
 	});
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/roles"/>"><spring:message code="title.roles"/></a> <span class="divider">/</span></li>

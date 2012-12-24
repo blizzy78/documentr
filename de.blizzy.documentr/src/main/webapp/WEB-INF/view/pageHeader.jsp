@@ -32,9 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
-
 <jsp:include page="/WEB-INF/view/requireConfig.jsp"/>
+
+<link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
 <script type="text/javascript" src="<c:url value="/js/require-2.1.2.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.8.3.min.js"/>"></script>
@@ -48,10 +48,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 </c:if>
 
 <c:out value="${requestScope._headerHTML}" escapeXml="false"/>
-
-<script type="text/javascript">
-<c:out value="${requestScope._headerJS}" escapeXml="false"/>
-</script>
 
 </head>
 

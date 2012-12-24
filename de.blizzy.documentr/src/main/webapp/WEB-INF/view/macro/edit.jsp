@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission(ADMIN)">
 
-<dt:headerJS>
+<dt:pageJS>
 
 var dirty = false;
 var verifyTimeout = null;
@@ -116,7 +116,7 @@ $(function() {
 	});
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/macros"/>"><spring:message code="title.macros"/></a> <span class="divider">/</span></li>

@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <c:if test="${fn:length(versions) >= 2}">
 
-<dt:headerJS>
+<dt:pageJS>
 
 function getCheckedRadioIndex(radiosSel, checkedRadioSel) {
 	var radioEls = $(radiosSel);
@@ -127,7 +127,7 @@ $(function() {
 	</sec:authorize>
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 </c:if>
 

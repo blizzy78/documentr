@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="projects" value="${d:listProjects()}"/>
 <c:set var="roles" value="${d:listRoles()}"/>
 
-<dt:headerJS>
+<dt:pageJS>
 
 function updatePasswordStrengthIndicator() {
 	require(['zxcvbn'], function(zxcvbn) {
@@ -282,7 +282,7 @@ $(function() {
 	});
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/users"/>"><spring:message code="title.users"/></a> <span class="divider">/</span></li>

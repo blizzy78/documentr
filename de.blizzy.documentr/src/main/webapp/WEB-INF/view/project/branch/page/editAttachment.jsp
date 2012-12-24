@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <c:set var="pagePathUrl" value="${d:toUrlPagePath(pagePath)}"/>
 
-<dt:headerJS>
+<dt:pageJS>
 
 var jqXHRs = [];
 
@@ -69,7 +69,7 @@ $(function() {
 	});
 });
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

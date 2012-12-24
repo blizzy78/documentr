@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="isAuthenticated() and hasPagePermission(#projectName, #branchName, #pagePath, VIEW)">
 
-<dt:headerJS>
+<dt:pageJS>
 
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)">
 
@@ -89,7 +89,7 @@ $(function() {
 
 </sec:authorize>
 
-</dt:headerJS>
+</dt:pageJS>
 
 <c:set var="pagePathUrl" value="${d:toUrlPagePath(pagePath)}"/>
 <dt:breadcrumbs>

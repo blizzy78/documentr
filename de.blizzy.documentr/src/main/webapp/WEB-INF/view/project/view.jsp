@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <c:set var="branches" value="${d:listProjectBranches(name)}"/>
 
-<dt:headerJS>
+<dt:pageJS>
 
 <c:if test="${empty branches}">
 <sec:authorize access="hasProjectPermission(#name, ADMIN)">
@@ -63,7 +63,7 @@ function importSampleContents() {
 </sec:authorize>
 </c:if>
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>

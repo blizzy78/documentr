@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="hasApplicationPermission(ADMIN)">
 
-<dt:headerJS>
+<dt:pageJS>
 
 function deleteMacro(name) {
 	require(['documentr/dialog'], function(dialog) {
@@ -43,7 +43,7 @@ function deleteMacro(name) {
 	});
 }
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li class="active"><spring:message code="title.macros"/></li>

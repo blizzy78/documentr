@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <sec:authorize access="isAuthenticated()">
 
-<dt:headerJS>
+<dt:pageJS>
 
 function showAddDialog() {
 	require(['documentr/dialog'], function() {
@@ -49,7 +49,7 @@ function showRemoveDialog(openId) {
 	});
 }
 
-</dt:headerJS>
+</dt:pageJS>
 
 <dt:breadcrumbs>
 	<li class="active"><spring:message code="title.userAccount"/></li>
