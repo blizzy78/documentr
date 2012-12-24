@@ -42,6 +42,8 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		super(new DocumentrLinkRenderer(context));
 		
 		this.context = context;
+		
+		printer = new DocumentrPrinter();
 	}
 
 	@Override
@@ -59,8 +61,8 @@ public class HtmlSerializer extends ToHtmlSerializer {
 					.print("</div>"); //$NON-NLS-1$
 			}
 		}
-		printer.print("<div class=\"code-view-wrapper\">").println() //$NON-NLS-1$
-			.print("<!--__NOTRIM__--><div class=\"code-view\" data-text-range=\"") //$NON-NLS-1$
+		printer.print("<div class=\"code-view-wrapper\">" + //$NON-NLS-1$
+				"<!--__NOTRIM__--><div class=\"code-view\" data-text-range=\"") //$NON-NLS-1$
 			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
 			.print("\""); //$NON-NLS-1$
 		if (node instanceof VerbatimNodeWithType) {
@@ -71,17 +73,17 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		}
 		printer.print(">") //$NON-NLS-1$
 			.printEncoded(node.getText().replaceFirst("[\\r\\n]*$", StringUtils.EMPTY)); //$NON-NLS-1$
-		printer.print("</div><!--__/NOTRIM__-->").println().print("</div>"); //$NON-NLS-1$ //$NON-NLS-2$ 
+		printer.print("</div><!--__/NOTRIM__--></div>\n"); //$NON-NLS-1$
 	}
 	
 	@Override
 	protected void printIndentedTag(SuperNode node, String tag) {
 		if (tag.equals("table")) { //$NON-NLS-1$
-			printer.println().print("<table class=\"table-documentr table-bordered table-striped " + //$NON-NLS-1$
+			printer.print("<table class=\"table-documentr table-bordered table-striped " + //$NON-NLS-1$
 					"table-condensed\" data-text-range=\"").print(String.valueOf(node.getStartIndex())) //$NON-NLS-1$
-					.print(",").print(String.valueOf(node.getEndIndex())).print("\">").indent(2); //$NON-NLS-1$ //$NON-NLS-2$
+					.print(",").print(String.valueOf(node.getEndIndex())).print("\">"); //$NON-NLS-1$ //$NON-NLS-2$
 			visitChildren(node);
-			printer.indent(-2).println().print("</table>"); //$NON-NLS-1$
+			printer.print("</table>"); //$NON-NLS-1$
 		} else {
 			super.printIndentedTag(node, tag);
 		}
