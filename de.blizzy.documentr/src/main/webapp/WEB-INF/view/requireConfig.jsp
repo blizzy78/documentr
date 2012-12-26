@@ -26,8 +26,8 @@ var require = {
 	map: {
 		'*': {
 			diff_match_patch: 'diff_match_patch-20120106',
-			'jquery.fileupload': 'jquery-file-upload-20121212/jquery.fileupload',
-			'jquery.ui.widget': 'jquery-file-upload-20121212/vendor/jquery.ui.widget',
+			'jquery.fileupload': 'jquery-file-upload-20121221/jquery.fileupload',
+			'jquery.ui.widget': 'jquery-file-upload-20121221/vendor/jquery.ui.widget',
 			slimbox: 'slimbox-2.04',
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min',
 			ace: 'ace-1.0.0/ace',
