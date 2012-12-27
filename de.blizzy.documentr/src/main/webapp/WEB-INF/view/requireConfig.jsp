@@ -30,7 +30,7 @@ var require = {
 			'jquery.ui.widget': 'jquery-file-upload-20121221/vendor/jquery.ui.widget',
 			slimbox: 'slimbox-2.04',
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min',
-			ace: 'ace-1.0.0/ace',
+			ace: 'ace-20121217/ace',
 			zxcvbn: 'zxcvbn-20120416'
 		}
 	},
@@ -38,7 +38,7 @@ var require = {
 		'diff_match_patch-20120106': {
 			exports: 'diff_match_patch'
 		},
-		'ace-1.0.0/ace': {
+		'ace-20121217/ace': {
 			exports: 'ace'
 		},
 		'zxcvbn-20120416': {
