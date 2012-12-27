@@ -29,20 +29,20 @@ define(['diff_match_patch'], function(diff_match_patch) {
 			for (var i = 0; i < diffs.length; i++) {
 				var op = diffs[i][0];
 				var text = diffs[i][1]
-				.replace(/&/g, '&amp;')
-				.replace(/</g, '&lt;')
-				.replace(/>/g, '&gt;')
-				.replace(/\n/g, '\n');
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/\n/g, '\n');
 				switch (op) {
-				case DIFF_INSERT:
-					html[i] = '<ins>' + text + '</ins>';
-					break;
-				case DIFF_DELETE:
-					html[i] = '<del>' + text + '</del>';
-					break;
-				case DIFF_EQUAL:
-					html[i] = text;
-					break;
+					case DIFF_INSERT:
+						html[i] = '<ins>' + text + '</ins>';
+						break;
+					case DIFF_DELETE:
+						html[i] = '<del>' + text + '</del>';
+						break;
+					case DIFF_EQUAL:
+						html[i] = text;
+						break;
 				}
 			}
 			return '<pre class="changes"><code>' + html.join('') + '</code></pre>';

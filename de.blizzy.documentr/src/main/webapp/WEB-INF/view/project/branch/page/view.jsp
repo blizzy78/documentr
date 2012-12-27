@@ -24,11 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<%
-long random = (long) (Math.random() * Long.MAX_VALUE);
-pageContext.setAttribute("random", Long.valueOf(random)); //$NON-NLS-1$
-%>
-
 <sec:authorize access="hasPagePermission(#projectName, #branchName, #path, VIEW)">
 
 <dt:pageJS>
@@ -97,7 +92,7 @@ function toggleHideFloatingElements(hide) {
 function showDeleteDialog() {
 	require(['documentr/dialog'], function(dialog) {
 		dialog.openMessageDialog('<spring:message code="title.deletePage"/>',
-			<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__${random}__"/></c:set>
+			<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__"/></c:set>
 			'<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>', [
 			{
 				text: '<spring:message code="button.delete"/>',
@@ -471,6 +466,49 @@ function showChangesDialog() {
 	});
 }
 
+<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, VIEW)">
+function showCompareWithBranchDialog() {
+	compareWithBranchSelected();
+}
+
+function compareWithBranchSelected() {
+	$('#compareWithBranch').attr('disabled', 'disabled');
+	var branch = $('#compareWithBranch').val();
+	var markdown = {};
+	require(['documentr/diffMarkdown', 'documentr/dialog']);
+	$.ajax({
+		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest"/>',
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			markdown.current = result[result.latest];
+		}
+	});
+	$.ajax({
+		url: '<c:url value="/page/markdown/${projectName}/__BRANCH__/${d:toUrlPagePath(path)}/json?versions=latest"/>'.replace(/__BRANCH__/, branch),
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			markdown.other = result[result.latest];
+		}
+	});
+	var waitFunc;
+	waitFunc = function() {
+		if (documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other)) {
+			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
+				var html = diffMarkdown.diff(markdown.current, markdown.other);
+				$('#compare-with-branch-dialog-body').html(html);
+				$('#compare-with-branch-dialog').showModal();
+				$('#compareWithBranch').removeAttr('disabled');
+			});
+		} else {
+			window.setTimeout(waitFunc, 150);
+		}
+	}
+	waitFunc();
+}
+</sec:authorize>
+
 function subscribe() {
 	require(['documentr/dialog']);
 	$.ajax({
@@ -611,6 +649,9 @@ $(function() {
 				<dt:dropdownEntry divider="true">
 					<sec:authorize access="isAuthenticated()">
 						<li><a href="<c:url value="/page/changes/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>"><i class="icon-book"></i> <spring:message code="button.changes"/></a></li>
+						<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, VIEW)">
+							<li><a href="javascript:void(showCompareWithBranchDialog());"><i class="icon-book"></i> <spring:message code="button.compareWithBranch"/></a></li>
+						</sec:authorize>
 						<c:choose>
 							<c:when test="${!d:isSubscribed(projectName, branchName, path)}">
 								<li><a href="javascript:void(subscribe());"><i class="icon-envelope"></i> <spring:message code="button.subscribe"/></a>
@@ -767,6 +808,29 @@ $(function() {
 			<a href="javascript:void($('#changes-dialog').hideModal());" class="btn"><spring:message code="button.close"/></a>
 		</div>
 	</div>
+	
+	<sec:authorize access="hasPagePermissionInOtherBranches(#projectName, #branchName, #path, VIEW)">
+		<div class="modal modal-wide" id="compare-with-branch-dialog" style="display: none;">
+			<div class="modal-header">
+				<button class="close" onclick="$('#compare-with-branch-dialog').hideModal();">&#x00D7</button>
+				<h3><spring:message code="title.compareWithBranch"/></h3>
+				<form class="form-inline">
+					<label for="compareWithBranch"><strong><spring:message code="label.compareWithBranch"/>:</strong></label>
+					<select id="compareWithBranch" class="input-large" onchange="compareWithBranchSelected()">
+						<c:forEach var="branch" items="${branches}">
+							<c:if test="${branch ne branchName}">
+								<option value="${branch}"><c:out value="${branch}"/></option>
+							</c:if>
+						</c:forEach>
+					</select>
+				</form>
+			</div>
+			<div class="modal-body" id="compare-with-branch-dialog-body"></div>
+			<div class="modal-footer">
+				<a href="javascript:void($('#compare-with-branch-dialog').hideModal());" class="btn"><spring:message code="button.close"/></a>
+			</div>
+		</div>
+	</sec:authorize>
 </sec:authorize>
 
 </dt:page>
