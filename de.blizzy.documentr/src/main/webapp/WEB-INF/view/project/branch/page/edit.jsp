@@ -36,8 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <dt:pageJS>
 
-var allTags = [];
-var allTagsLoaded = false;
 var dirty = false;
 var jqXHRs = [];
 
@@ -425,82 +423,6 @@ function insertImage() {
 	editor.focus();
 }
 
-function addTag(tag) {
-	var tags = [];
-	$('#pageForm input[name="tags"]').each(function() {
-		var tag = $(this).val();
-		tags.push(tag);
-	});
-	
-	if ($.inArray(tag, tags) < 0) {
-		$('#pageForm input[name="tags"]').remove();
-	
-		tags.push(tag);
-		
-		var formEl = $('#pageForm');
-		$(tags).each(function() {
-			var tag = this;
-			var el = $('<input type="hidden" name="tags"/>');
-			formEl.append(el);
-			el.val(tag);
-		});
-		
-		updateTags();
-	}
-}
-
-function updateTags() {
-	var tags = [];
-	$('#pageForm input[name="tags"]').each(function() {
-		var tag = $(this).val();
-		tags.push(tag);
-	});
-
-	tags.sort();
-
-	$('#tagsContainer .page-tag, #tagsContainer br').remove();
-	var inputEl = $('#newTagInput');
-	$(tags).each(function() {
-		var tag = this;
-		var tagEl = $('<span class="page-tag"/>');
-		tagEl.attr('data-tag', tag);
-		tagEl.text(tag);
-		var closeEl = $('<span class="close">&#x00D7</span>');
-		tagEl.append(closeEl);
-		inputEl.before(tagEl);
-	});
-	
-	if (tags.length > 0) {
-		inputEl.before($('<br/>'));
-		hookTags();
-	}
-}
-
-function deleteTag(tagToDelete) {
-	$('#pageForm input[name="tags"]').each(function() {
-		var el = $(this);
-		var tag = el.val();
-		if (tag === tagToDelete) {
-			el.remove();
-		}
-	});
-	updateTags();
-	dirty = true;
-}
-
-function hookTags() {
-	$('#tagsContainer .page-tag').each(function() {
-		var tagEl = $(this);
-		var tag = tagEl.attr('data-tag');
-		tagEl.off('click', '.close');
-		tagEl.on('click', '.close', {
-			tag: tag
-		}, function(e) {
-			deleteTag(e.data.tag);
-		});
-	});
-}
-
 function prepareForm() {
 	var text = $('#editor').data('editor').getValue();
 	$('#pageForm input[name="text"]').val(text);
@@ -557,40 +479,29 @@ $(function() {
 		$(this).tab('show');
 		updateInsertLinkButton();
 	});
-	
-	$('#newTagInput')
-		.typeahead({
-			source: allTags
-		})
-		.keydown(function(e) {
-			var el = $('#newTagInput');
-			var typeaheadShown = el.data('typeahead').shown;
-			if (e.which == 13) {
-				if (!typeaheadShown) {
-					e.preventDefault();
-		
-					var newTag = $.trim(el.val());
-					el.val('');
-					if (newTag.length > 0) {
-						addTag(newTag);
-					}
-				}
-			} else if (!allTagsLoaded) {
-				allTagsLoaded = true;
-				$.ajax({
-					url: '<c:url value="/search/tags/json"/>',
-					type: 'GET',
-					dataType: 'json',
-					success: function(result) {
-						$(result).each(function() {
-							allTags.push(this);
-						});
-					}
-				});
-			}
+
+	require(['jquery.select2']);
+	var tags = null;
+	$.ajax({
+		url: '<c:url value="/search/tags/json"/>',
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			tags = result;
+		}
+	});
+	documentr.waitFor(function() {
+		return documentr.isSomething(tags);
+	}, function() {
+		require(['jquery.select2'], function() {
+			$('#tags').select2({
+				tags: tags,
+				tokenSeparators: [','],
+				containerCssClass: 'input-xxlarge',
+				placeholder: '<spring:message code="enterNewTag"/>'
+			});
 		});
-	
-	hookTags();
+	});
 	
 	require(['ace'], function(ace) {
 		var editor = ace.edit('editor');
@@ -686,9 +597,6 @@ $(function() {
 	<fieldset>
 		<form:hidden path="parentPagePath"/>
 		<form:hidden path="commit"/>
-		<c:forEach var="tag" items="${pageForm.tags}">
-			<input type="hidden" name="tags" value="<c:out value="${tag}"/>"/>
-		</c:forEach>
 		<form:hidden path="parentPageSplitRangeStart"/>
 		<form:hidden path="parentPageSplitRangeEnd"/>
 		<input type="hidden" name="text"/>
@@ -752,15 +660,7 @@ $(function() {
 		</div>
 		<div id="tagsFieldset" class="control-group">
 			<label class="control-label"><spring:message code="label.tags"/>:</label>
-			<div class="controls" id="tagsContainer">
-				<c:if test="${!empty pageForm.tags}">
-					<c:forEach var="tag" items="${pageForm.tags}"><%--
-						--%><span class="page-tag" data-tag="<c:out value="${tag}"/>"><c:out value="${tag}"/><span class="close">&#x00D7</span></span><%--
-					--%></c:forEach>
-					<br/>
-				</c:if>
-				<input type="text" id="newTagInput" placeholder="<spring:message code="enterNewTag"/>" class="input-large" autocomplete="off"/>
-			</div>
+			<div class="controls"><form:hidden path="tags"/></div>
 		</div>
 		<div id="viewRestrictionRoleFieldset" class="control-group">
 			<form:label path="viewRestrictionRole" cssClass="control-label"><spring:message code="label.visibleForRole"/>:</form:label>

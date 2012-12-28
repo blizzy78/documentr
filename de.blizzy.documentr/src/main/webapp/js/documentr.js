@@ -35,6 +35,22 @@ var documentr = {};
 			}
 		});
 	};
+	
+	documentr.waitFor = function(checkCallback, callback, interval) {
+		if (!documentr.isSomething(interval)) {
+			interval = 100;
+		}
+		
+		var waitFunc = null;
+		waitFunc = function() {
+			if (checkCallback()) {
+				callback();
+			} else {
+				window.setTimeout(waitFunc, interval);
+			}
+		};
+		waitFunc();
+	};
 
 
 	$.fn.extend({

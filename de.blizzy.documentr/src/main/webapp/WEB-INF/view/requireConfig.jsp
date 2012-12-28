@@ -31,7 +31,8 @@ var require = {
 			slimbox: 'slimbox-2.04',
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min',
 			ace: 'ace-20121217/ace',
-			zxcvbn: 'zxcvbn-20120416'
+			zxcvbn: 'zxcvbn-20120416',
+			'jquery.select2': 'select2-3.2.min'
 		}
 	},
 	shim: {
