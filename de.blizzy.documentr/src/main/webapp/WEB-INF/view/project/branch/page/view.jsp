@@ -492,20 +492,16 @@ function compareWithBranchSelected() {
 			markdown.other = result[result.latest];
 		}
 	});
-	var waitFunc;
-	waitFunc = function() {
-		if (documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other)) {
-			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
-				var html = diffMarkdown.diff(markdown.current, markdown.other);
-				$('#compare-with-branch-dialog-body').html(html);
-				$('#compare-with-branch-dialog').showModal();
-				$('#compareWithBranch').removeAttr('disabled');
-			});
-		} else {
-			window.setTimeout(waitFunc, 150);
-		}
-	}
-	waitFunc();
+	documentr.waitFor(function() {
+		return documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other);
+	}, function() {
+		require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
+			var html = diffMarkdown.diff(markdown.current, markdown.other);
+			$('#compare-with-branch-dialog-body').html(html);
+			$('#compare-with-branch-dialog').showModal();
+			$('#compareWithBranch').removeAttr('disabled');
+		});
+	});
 }
 </sec:authorize>
 
