@@ -25,27 +25,43 @@ define(['diff_match_patch'], function(diff_match_patch) {
 			var diffs = dmp.diff_main(markdown1.replace(/\r/g, ''), markdown2.replace(/\r/g, ''));
 			dmp.diff_cleanupSemantic(diffs);
 			
-			var html = [];
+			var line = 0;
+			var col = 0;
+			var text = '';
+			var markers = [];
 			for (var i = 0; i < diffs.length; i++) {
 				var op = diffs[i][0];
-				var text = diffs[i][1]
-					.replace(/&/g, '&amp;')
-					.replace(/</g, '&lt;')
-					.replace(/>/g, '&gt;')
-					.replace(/\n/g, '\n');
-				switch (op) {
-					case DIFF_INSERT:
-						html[i] = '<ins>' + text + '</ins>';
-						break;
-					case DIFF_DELETE:
-						html[i] = '<del>' + text + '</del>';
-						break;
-					case DIFF_EQUAL:
-						html[i] = text;
-						break;
+				var diffText = diffs[i][1];
+				var marker = {
+					startLine: line,
+					startColumn: col
+				};
+				text += diffText;
+
+				var lines = diffText.split('\n');
+				for (var currLine = 0; currLine < lines.length; currLine++) {
+					if (currLine > 0) {
+						line++;
+						col = 0;
+					}
+					col += lines[currLine].length;
 				}
+
+				if (op === DIFF_EQUAL) {
+					continue;
+				}
+
+				marker.endLine = line;
+				marker.endColumn = col;
+				marker.insert = (op === DIFF_INSERT);
+				marker.delete = (op === DIFF_DELETE);
+				markers.push(marker);
 			}
-			return '<pre class="changes"><code>' + html.join('') + '</code></pre>';
+
+			return {
+				text: text,
+				markers: markers
+			};
 		}
 	};
 });

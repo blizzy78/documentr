@@ -60,19 +60,60 @@ function updateButtons() {
 }
 
 function showChangesDialog() {
+	var dlg = $('#changes-dialog');
+	var editor = null;
+
+	require(['ace'], function(ace) {
+		var ed = dlg.data('editor');
+		if (!documentr.isSomething(ed)) {
+			ed = ace.edit('changes-editor');
+			dlg.data('editor', ed);
+			ed.setTheme('ace/theme/chrome');
+			ed.session.setMode('ace/mode/markdown');
+			ed.setReadOnly(true);
+			ed.setDisplayIndentGuides(true);
+			ed.renderer.setShowGutter(false);
+			ed.session.setUseWrapMode(false);
+			ed.renderer.setShowPrintMargin(false);
+			ed.session.setUseSoftTabs(false);
+			ed.setHighlightSelectedWord(false);
+			ed.setHighlightActiveLine(false);
+			ed.renderer.hideCursor();
+		}
+		editor = ed;
+	});
+
 	var version1 = $('#versions input:radio:checked[name="version1"]').val();
 	var version2 = $('#versions input:radio:checked[name="version2"]').val();
-
 	require(['documentr/diffMarkdown', 'documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
 		type: 'GET',
 		dataType: 'json',
-		success: function(result) {
-			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
-				var html = diffMarkdown.diff(result[version1], result[version2]);
-				$('#changes-dialog-body').html(html);
-				$('#changes-dialog').data('previousCommit', version1).showModal();
+		success: function(markdownResult) {
+			require(['ace', 'documentr/diffMarkdown', 'documentr/dialog'], function(ace, diffMarkdown) {
+				var diffResult = diffMarkdown.diff(markdownResult[version1], markdownResult[version2]);
+
+				documentr.waitFor(function() {
+					return documentr.isSomething(editor);
+				}, function() {
+					$.each(editor.session.getMarkers(false), function(idx, marker) {
+						if ((marker.clazz === 'editor-marker-insert') || (marker.clazz === 'editor-marker-delete')) {
+							editor.session.removeMarker(marker.id);
+						}
+					});
+				
+					editor.setValue(diffResult.text);
+					var Range = ace.require('ace/range').Range;
+					$.each(diffResult.markers, function(idx, marker) {
+						var range = new Range(marker.startLine, marker.startColumn, marker.endLine, marker.endColumn);
+						editor.session.addMarker(range, marker.insert ? 'editor-marker-insert' : 'editor-marker-delete', 'text');
+					});
+			
+					editor.focus();
+					editor.moveCursorTo(0, 0);
+					dlg.showModal();
+				});
 			});
 		}
 	});
@@ -200,7 +241,9 @@ $(function() {
 		<button class="close" onclick="$('#changes-dialog').hideModal();">&#x00D7</button>
 		<h3><spring:message code="title.changes"/></h3>
 	</div>
-	<div class="modal-body" id="changes-dialog-body"></div>
+	<div class="modal-body" id="changes-dialog-body">
+		<div class="editor-wrapper"><div id="changes-editor"></div></div>
+	</div>
 	<div class="modal-footer">
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>

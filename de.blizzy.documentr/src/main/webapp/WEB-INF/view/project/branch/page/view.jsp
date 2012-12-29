@@ -443,24 +443,59 @@ function restoreOldVersion() {
 <sec:authorize access="isAuthenticated()">
 
 function showChangesDialog() {
+	var dlg = $('#changes-dialog');
+	var editor = null;
+
+	require(['ace'], function(ace) {
+		var ed = dlg.data('editor');
+		if (!documentr.isSomething(ed)) {
+			ed = ace.edit('changes-editor');
+			dlg.data('editor', ed);
+			ed.setTheme('ace/theme/chrome');
+			ed.session.setMode('ace/mode/markdown');
+			ed.setReadOnly(true);
+			ed.setDisplayIndentGuides(true);
+			ed.renderer.setShowGutter(false);
+			ed.session.setUseWrapMode(false);
+			ed.renderer.setShowPrintMargin(false);
+			ed.session.setUseSoftTabs(false);
+			ed.setHighlightSelectedWord(false);
+			ed.setHighlightActiveLine(false);
+			ed.renderer.hideCursor();
+		}
+		editor = ed;
+	});
+
 	require(['documentr/diffMarkdown', 'documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest,previous"/>',
 		type: 'GET',
 		dataType: 'json',
-		success: function(result) {
-			var previous = documentr.isSomething(result.previous) ? result[result.previous] : '';
-			require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
-				var html = diffMarkdown.diff(previous, result[result.latest]);
-				$('#changes-dialog-body').html(html);
-				if (documentr.isSomething(result.previous)) {
-					$('#changes-dialog').data('previousCommit', result.previous);
-					$('#restore-old-commit-button').show();
-				} else {
-					$('#changes-dialog').data('previousCommit', null);
-					$('#restore-old-commit-button').hide();
-				}
-				$('#changes-dialog').showModal();
+		success: function(markdownResult) {
+			require(['ace', 'documentr/diffMarkdown', 'documentr/dialog'], function(ace, diffMarkdown) {
+				var previous = documentr.isSomething(markdownResult.previous) ? markdownResult[markdownResult.previous] : '';
+				var diffResult = diffMarkdown.diff(previous, markdownResult[markdownResult.latest]);
+
+				documentr.waitFor(function() {
+					return documentr.isSomething(editor);
+				}, function() {
+					$.each(editor.session.getMarkers(false), function(idx, marker) {
+						if ((marker.clazz === 'editor-marker-insert') || (marker.clazz === 'editor-marker-delete')) {
+							editor.session.removeMarker(marker.id);
+						}
+					});
+				
+					editor.setValue(diffResult.text);
+					var Range = ace.require('ace/range').Range;
+					$.each(diffResult.markers, function(idx, marker) {
+						var range = new Range(marker.startLine, marker.startColumn, marker.endLine, marker.endColumn);
+						editor.session.addMarker(range, marker.insert ? 'editor-marker-insert' : 'editor-marker-delete', 'text');
+					});
+			
+					editor.focus();
+					editor.moveCursorTo(0, 0);
+					dlg.showModal();
+				});
 			});
 		}
 	});
@@ -796,7 +831,9 @@ $(function() {
 			<button class="close" onclick="$('#changes-dialog').hideModal();">&#x00D7</button>
 			<h3><spring:message code="title.changes"/></h3>
 		</div>
-		<div class="modal-body" id="changes-dialog-body"></div>
+		<div class="modal-body" id="changes-dialog-body">
+			<div class="editor-wrapper"><div id="changes-editor"></div></div>
+		</div>
 		<div class="modal-footer">
 			<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 				<a href="javascript:void(restoreOldVersion());" id="restore-old-commit-button" class="btn btn-warning"><spring:message code="button.restoreOldVersion"/></a>
