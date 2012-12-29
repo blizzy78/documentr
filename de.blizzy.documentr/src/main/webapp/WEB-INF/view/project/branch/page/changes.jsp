@@ -63,7 +63,7 @@ function showChangesDialog() {
 	var version1 = $('#versions input:radio:checked[name="version1"]').val();
 	var version2 = $('#versions input:radio:checked[name="version2"]').val();
 
-	require(['documentr/diffMarkdown']);
+	require(['documentr/diffMarkdown', 'documentr/dialog']);
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions="/>' + version1 + ',' + version2,
 		type: 'GET',
