@@ -370,23 +370,47 @@ function cancelInlineEditor() {
 function startInlineEditor(textEl, range) {
 	cancelInlineEditor();
 
+	var editor = null;
+
+	require(['ace'], function(ace) {
+		var ed = $('#inlineEditorForm').data('editor');
+		if (!documentr.isSomething(ed)) {
+			ed = ace.edit('editor');
+			$('#inlineEditorForm').data('editor', ed);
+			ed.setTheme('ace/theme/chrome');
+			ed.session.setMode('ace/mode/markdown');
+			ed.setDisplayIndentGuides(true);
+			ed.renderer.setShowGutter(false);
+			ed.session.setUseWrapMode(true);
+			ed.session.setWrapLimitRange(null, null);
+			ed.renderer.setShowPrintMargin(false);
+			ed.session.setUseSoftTabs(false);
+			ed.setHighlightSelectedWord(false);
+			ed.setHighlightActiveLine(false);
+		}
+		editor = ed;
+	});
+
 	$.ajax({
 		url: '<c:url value="/page/markdownInRange/${projectName}/${branchName}/${d:toUrlPagePath(path)}/"/>' + range + '/' + currentCommit + '/json',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			var formEl = $('#inlineEditorForm');
-			formEl.hide();
-			formEl.detach();
-			$(textEl).after(formEl);
-			$(textEl).hide();
-			toggleHideFloatingElements(true);
-			formEl.data('textEl', textEl);
-			var editor = formEl.data('editor');
-			editor.setValue(result.markdown);
-			formEl.show();
-			editor.focus();
-			editor.moveCursorTo(0, 0);
+			documentr.waitFor(function() {
+				return documentr.isSomething(editor);
+			}, function() {
+				var formEl = $('#inlineEditorForm');
+				formEl.hide();
+				formEl.detach();
+				$(textEl).after(formEl);
+				$(textEl).hide();
+				toggleHideFloatingElements(true);
+				formEl.data('textEl', textEl);
+				editor.setValue(result.markdown);
+				formEl.show();
+				editor.focus();
+				editor.moveCursorTo(0, 0);
+			});
 		}
 	});
 }
@@ -456,7 +480,8 @@ function showChangesDialog() {
 			ed.setReadOnly(true);
 			ed.setDisplayIndentGuides(true);
 			ed.renderer.setShowGutter(false);
-			ed.session.setUseWrapMode(false);
+			ed.session.setUseWrapMode(true);
+			ed.session.setWrapLimitRange(null, null);
 			ed.renderer.setShowPrintMargin(false);
 			ed.session.setUseSoftTabs(false);
 			ed.setHighlightSelectedWord(false);
@@ -590,21 +615,6 @@ $(function() {
 	<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 		hookupInlineEditorToolbar();
 		hookupSplitCursor();
-
-		require(['ace'], function(ace) {
-			var editor = ace.edit('editor');
-			$('#inlineEditorForm').data('editor', editor);
-			editor.setTheme('ace/theme/chrome');
-			editor.session.setMode('ace/mode/markdown');
-			editor.setDisplayIndentGuides(true);
-			editor.renderer.setShowGutter(false);
-			editor.session.setUseWrapMode(true);
-			editor.session.setWrapLimitRange(null, null);
-			editor.renderer.setShowPrintMargin(false);
-			editor.session.setUseSoftTabs(false);
-			editor.setHighlightSelectedWord(false);
-			editor.setHighlightActiveLine(false);
-		});
 	</sec:authorize>
 });
 
@@ -832,7 +842,7 @@ $(function() {
 			<h3><spring:message code="title.changes"/></h3>
 		</div>
 		<div class="modal-body" id="changes-dialog-body">
-			<div class="editor-wrapper"><div id="changes-editor"></div></div>
+			<div class="editor-wrapper"><div id="changes-editor" class="code-view"></div></div>
 		</div>
 		<div class="modal-footer">
 			<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">

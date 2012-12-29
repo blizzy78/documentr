@@ -73,7 +73,8 @@ function showChangesDialog() {
 			ed.setReadOnly(true);
 			ed.setDisplayIndentGuides(true);
 			ed.renderer.setShowGutter(false);
-			ed.session.setUseWrapMode(false);
+			ed.session.setUseWrapMode(true);
+			ed.session.setWrapLimitRange(null, null);
 			ed.renderer.setShowPrintMargin(false);
 			ed.session.setUseSoftTabs(false);
 			ed.setHighlightSelectedWord(false);
@@ -242,7 +243,7 @@ $(function() {
 		<h3><spring:message code="title.changes"/></h3>
 	</div>
 	<div class="modal-body" id="changes-dialog-body">
-		<div class="editor-wrapper"><div id="changes-editor"></div></div>
+		<div class="editor-wrapper"><div id="changes-editor" class="code-view"></div></div>
 	</div>
 	<div class="modal-footer">
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
