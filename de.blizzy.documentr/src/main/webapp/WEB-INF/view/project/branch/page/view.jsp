@@ -544,15 +544,44 @@ function compareWithBranchSelected() {
 	$('#compareWithBranch').attr('disabled', 'disabled');
 	var branch = $('#compareWithBranch').val();
 	var markdown = {};
-	require(['documentr/diffMarkdown', 'documentr/dialog']);
-	$.ajax({
-		url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest"/>',
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			markdown.current = result[result.latest];
+	var dlg = $('#compare-with-branch-dialog');
+	var editor = null;
+
+	require(['ace'], function(ace) {
+		var ed = dlg.data('editor');
+		if (!documentr.isSomething(ed)) {
+			ed = ace.edit('compare-with-branch-editor');
+			dlg.data('editor', ed);
+			ed.setTheme('ace/theme/chrome');
+			ed.session.setMode('ace/mode/markdown');
+			ed.setReadOnly(true);
+			ed.setDisplayIndentGuides(true);
+			ed.renderer.setShowGutter(false);
+			ed.session.setUseWrapMode(true);
+			ed.session.setWrapLimitRange(null, null);
+			ed.renderer.setShowPrintMargin(false);
+			ed.session.setUseSoftTabs(false);
+			ed.setHighlightSelectedWord(false);
+			ed.setHighlightActiveLine(false);
+			ed.renderer.hideCursor();
 		}
+		editor = ed;
 	});
+
+	require(['documentr/diffMarkdown', 'documentr/dialog']);
+	
+	markdown.current = $('body').data('currentMarkdown');
+	if (!documentr.isSomething(markdown.current)) {
+		$.ajax({
+			url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest"/>',
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				markdown.current = result[result.latest];
+				$('body').data('currentMarkdown', markdown.current);
+			}
+		});
+	}
 	$.ajax({
 		url: '<c:url value="/page/markdown/${projectName}/__BRANCH__/${d:toUrlPagePath(path)}/json?versions=latest"/>'.replace(/__BRANCH__/, branch),
 		type: 'GET',
@@ -562,12 +591,28 @@ function compareWithBranchSelected() {
 		}
 	});
 	documentr.waitFor(function() {
-		return documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other);
+		return documentr.isSomething(editor) &&
+			documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other);
 	}, function() {
 		require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
-			var html = diffMarkdown.diff(markdown.current, markdown.other);
-			$('#compare-with-branch-dialog-body').html(html);
-			$('#compare-with-branch-dialog').showModal();
+			$.each(editor.session.getMarkers(false), function(idx, marker) {
+				if ((marker.clazz === 'editor-marker-insert') || (marker.clazz === 'editor-marker-delete')) {
+					editor.session.removeMarker(marker.id);
+				}
+			});
+		
+			var diffResult = diffMarkdown.diff(markdown.current, markdown.other);
+			editor.setValue(diffResult.text);
+			var Range = ace.require('ace/range').Range;
+			$.each(diffResult.markers, function(idx, marker) {
+				var range = new Range(marker.startLine, marker.startColumn, marker.endLine, marker.endColumn);
+				editor.session.addMarker(range, marker.insert ? 'editor-marker-insert' : 'editor-marker-delete', 'text');
+			});
+
+			editor.focus();
+			editor.moveCursorTo(0, 0);
+
+			dlg.showModal();
 			$('#compareWithBranch').removeAttr('disabled');
 		});
 	});
@@ -882,7 +927,9 @@ function unsubscribe() {
 					</select>
 				</form>
 			</div>
-			<div class="modal-body" id="compare-with-branch-dialog-body"></div>
+			<div class="modal-body" id="compare-with-branch-dialog-body">
+				<div class="editor-wrapper"><div id="compare-with-branch-editor" class="code-view"></div></div>
+			</div>
 			<div class="modal-footer">
 				<a href="javascript:void($('#compare-with-branch-dialog').hideModal());" class="btn"><spring:message code="button.close"/></a>
 			</div>
