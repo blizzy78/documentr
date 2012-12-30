@@ -458,7 +458,6 @@ $(function() {
 							title: value
 						},
 						success: function(result) {
-							console.log(result);
 							$('#pageForm #path').val(result.path);
 							if (result.exists) {
 								fieldset.addClass('warning');
