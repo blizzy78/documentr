@@ -111,8 +111,11 @@ function showChangesDialog() {
 						editor.session.addMarker(range, marker.insert ? 'editor-marker-insert' : 'editor-marker-delete', 'text');
 					});
 			
+					$('#changes-dialog').data('previousCommit', version1);
+
 					editor.focus();
 					editor.moveCursorTo(0, 0);
+
 					dlg.showModal();
 				});
 			});

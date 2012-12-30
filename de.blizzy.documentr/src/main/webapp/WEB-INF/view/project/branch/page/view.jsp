@@ -516,9 +516,18 @@ function showChangesDialog() {
 						var range = new Range(marker.startLine, marker.startColumn, marker.endLine, marker.endColumn);
 						editor.session.addMarker(range, marker.insert ? 'editor-marker-insert' : 'editor-marker-delete', 'text');
 					});
-			
+
+					if (documentr.isSomething(markdownResult.previous)) {
+						$('#changes-dialog').data('previousCommit', markdownResult.previous);
+						$('#restore-old-commit-button').show();
+					} else {
+						$('#changes-dialog').data('previousCommit', null);
+						$('#restore-old-commit-button').hide();
+					}
+
 					editor.focus();
 					editor.moveCursorTo(0, 0);
+
 					dlg.showModal();
 				});
 			});
