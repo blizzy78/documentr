@@ -587,12 +587,15 @@ function compareWithBranchSelected() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			markdown.other = result[result.latest];
+			if (documentr.isSomething(result.latest)) {
+				markdown.other = result[result.latest];
+			}
+			markdown.otherLoaded = true;
 		}
 	});
 	documentr.waitFor(function() {
 		return documentr.isSomething(editor) &&
-			documentr.isSomething(markdown.current) && documentr.isSomething(markdown.other);
+			documentr.isSomething(markdown.current) && documentr.isSomething(markdown.otherLoaded);
 	}, function() {
 		require(['documentr/diffMarkdown', 'documentr/dialog'], function(diffMarkdown) {
 			$.each(editor.session.getMarkers(false), function(idx, marker) {
@@ -600,8 +603,9 @@ function compareWithBranchSelected() {
 					editor.session.removeMarker(marker.id);
 				}
 			});
-		
-			var diffResult = diffMarkdown.diff(markdown.current, markdown.other);
+
+			var markdownOther = documentr.isSomething(markdown.other) ? markdown.other : '';
+			var diffResult = diffMarkdown.diff(markdown.current, markdownOther);
 			editor.setValue(diffResult.text);
 			var Range = ace.require('ace/range').Range;
 			$.each(diffResult.markers, function(idx, marker) {

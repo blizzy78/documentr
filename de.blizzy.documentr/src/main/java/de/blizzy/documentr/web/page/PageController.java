@@ -19,6 +19,7 @@ package de.blizzy.documentr.web.page;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -390,7 +391,11 @@ public class PageController {
 	public Map<String, String> getPageMarkdown(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam Set<String> versions) throws IOException {
 
-		return pageStore.getMarkdown(projectName, branchName, Util.toRealPagePath(path), versions);
+		try {
+			return pageStore.getMarkdown(projectName, branchName, Util.toRealPagePath(path), versions);
+		} catch (PageNotFoundException e) {
+			return Collections.emptyMap();
+		}
 	}
 
 	@RequestMapping(value="/markdownInRange/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
