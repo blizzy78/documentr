@@ -29,7 +29,7 @@ var require = {
 			'jquery.fileupload': 'jquery-file-upload-20121221/jquery.fileupload',
 			'jquery.ui.widget': 'jquery-file-upload-20121221/vendor/jquery.ui.widget',
 			slimbox: 'slimbox-2.04',
-			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-1/jquery.jstree-pre-1.0-fix-1.min',
+			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-2/jquery.jstree',
 			ace: 'ace-20121217/ace',
 			zxcvbn: 'zxcvbn-20120416',
 			'jquery.select2': 'select2-3.2.min'
