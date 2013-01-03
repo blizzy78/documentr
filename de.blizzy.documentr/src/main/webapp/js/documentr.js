@@ -36,6 +36,17 @@ var documentr = {};
 		});
 	};
 	
+	documentr.setupLightbox = function() {
+		var images = $('img[data-lightbox="lightbox"]');
+		if (images.length > 0) {
+			require(['slimbox'], function() {
+				images.slimbox(null, function(el) {
+					return [el.parentElement.href, $(el).attr('data-title')];
+				}, null);
+			});
+		}
+	};
+	
 	documentr.waitFor = function(checkCallback, callback, interval) {
 		if (!documentr.isSomething(interval)) {
 			interval = 100;
@@ -81,26 +92,18 @@ var documentr = {};
 	});
 
 
-	$(function() {
-		$.ajaxSetup({
-			cache: false
-		});
+	$.ajaxSetup({
+		cache: false
+	});
 
+	$(function() {
 		documentr.setupCodeViews();
+		documentr.setupLightbox();
 
 		$('body').tooltip({
 			selector: '[rel="tooltip"]'
 		});
 
-		var images = $('img[data-lightbox="lightbox"]');
-		if (images.length > 0) {
-			require(['slimbox'], function() {
-				images.slimbox(null, function(el) {
-					return [el.parentElement.href, $(el).attr('data-title')];
-				}, null);
-			});
-		}
-		
 		$('#siteSearch input').bind('webkitspeechchange', function() {
 			$('#siteSearch')[0].submit();
 		});

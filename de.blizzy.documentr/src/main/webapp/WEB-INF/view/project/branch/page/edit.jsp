@@ -53,15 +53,15 @@ function togglePreview() {
 				markdown: text
 			},
 			success: function(result) {
-				$('#textEditorToolbar a').each(function() {
+				$('#textEditorToolbar button').not('#togglePreviewButton').each(function() {
 					$(this).setButtonDisabled(true);
 				});
-				$('#togglePreviewButton').setButtonDisabled(false);
 
 				previewEl = $('<div id="preview" class="preview"></div>');
 				previewEl.html(result.html);
 				$(document.body).append(previewEl);
 				documentr.setupCodeViews();
+				documentr.setupLightbox();
 				previewEl
 					.css('left', el.offset().left)
 					.css('top', el.offset().top)
@@ -75,7 +75,7 @@ function togglePreview() {
 			previewEl.remove();
 		});
 
-		$('#textEditorToolbar a').each(function() {
+		$('#textEditorToolbar button').each(function() {
 			$(this).setButtonDisabled(false);
 		});
 	}
@@ -636,7 +636,7 @@ $(function() {
 						<button onclick="openInsertLinkDialog(); return false;" class="btn" title="<spring:message code="button.insertLink"/>"><i class="icon-share-alt"></i></button>
 					</div>
 					<div class="btn-group">
-						<button class="btn dropdown-toggle" data-toggle="dropdown" onclick="return false;"><spring:message code="button.macros"/> <span class="caret"></span></button>
+						<button class="btn dropdown-toggle" data-toggle="dropdown" onclick="return false;"><i class="icon-play-circle"></i> <spring:message code="button.macros"/> <span class="caret"></span></button>
 						<ul class="dropdown-menu">
 							<c:set var="macros" value="${d:getMacros()}"/>
 							<c:forEach var="macro" items="${macros}">
