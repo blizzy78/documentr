@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .code-view-wrapper {
 	height: 450px;
 	position: relative;
-	border: 1px solid #ccc;
 	border-radius: 4px;
 	// http://stackoverflow.com/a/712418
 	overflow: auto;
@@ -87,8 +86,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	}
 }
 
-.ace_focus {
-	border: 1px solid #5897fb;
+.ace_editor {
+	border: 1px solid #ccc;
+	
+	&.ace_focus {
+		border: 1px solid #5897fb;
+	}
 }
 
 .ace-chrome {
