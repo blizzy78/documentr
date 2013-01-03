@@ -39,7 +39,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <div class="page-header"><h1><spring:message code="title.editBranch"/></h1></div>
 
-<p>
 <c:set var="action"><c:url value="/branch/save/${branchForm.projectName}"/></c:set>
 <c:set var="branches" value="${d:listProjectBranches(branchForm.projectName)}"/>
 <c:choose>
@@ -67,7 +66,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 	</fieldset>
 </form:form>
-</p>
 
 </dt:page>
 

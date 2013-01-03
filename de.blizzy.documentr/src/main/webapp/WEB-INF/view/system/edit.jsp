@@ -58,7 +58,6 @@ $(function() {
 
 <div class="page-header"><h1><spring:message code="title.systemSettings"/></h1></div>
 
-<p>
 <c:set var="action"><c:url value="/system/save"/></c:set>
 <form:form commandName="systemSettingsForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<fieldset>
@@ -169,7 +168,6 @@ $(function() {
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 	</div>
 </form:form>
-</p>
 
 </dt:page>
 

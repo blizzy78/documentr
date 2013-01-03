@@ -585,7 +585,6 @@ $(function() {
 
 <div class="page-header"><h1><spring:message code="title.editPage"/></h1></div>
 
-<p>
 <c:set var="action"><c:url value="/page/save/${pageForm.projectName}/${pageForm.branchName}"/></c:set>
 <form:form commandName="pageForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="prepareForm()">
 	<c:set var="errorText"><form:errors cssClass="text-error"/></c:set>
@@ -623,32 +622,32 @@ $(function() {
 			<div id="textEditor" class="texteditor">
 				<div id="textEditorToolbar" class="btn-toolbar btn-toolbar-icons">
 					<div class="btn-group">
-						<a id="togglePreviewButton" href="javascript:togglePreview();" class="btn" data-toggle="button" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></a>
-						<a href="javascript:toggleFullscreen();" class="btn" data-toggle="button" title="<spring:message code="button.zoomEditor"/>"><i class="icon-fullscreen"></i></a>
+						<button id="togglePreviewButton" onclick="togglePreview(); return false;" class="btn" data-toggle="button" title="<spring:message code="button.showPreview"/>"><i class="icon-eye-open"></i></button>
+						<button onclick="toggleFullscreen(); return false;" class="btn" data-toggle="button" title="<spring:message code="button.zoomEditor"/>"><i class="icon-fullscreen"></i></button>
 					</div>
 					<div class="btn-group">
-						<a href="javascript:toggleStyleBold();" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></a>
-						<a href="javascript:toggleStyleItalic();" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></a>
+						<button onclick="toggleStyleBold(); return false;" class="btn" title="<spring:message code="button.bold"/>"><i class="icon-bold"></i></button>
+						<button onclick="toggleStyleItalic(); return false;" class="btn" title="<spring:message code="button.italic"/>"><i class="icon-italic"></i></button>
 					</div>
 					<div class="btn-group">
-						<a href="javascript:openInsertImageDialog();" class="btn" title="<spring:message code="button.insertImage"/>"><i class="icon-picture"></i></a>
+						<button onclick="openInsertImageDialog(); return false;" class="btn" title="<spring:message code="button.insertImage"/>"><i class="icon-picture"></i></button>
 					</div>
 					<div class="btn-group">
-						<a href="javascript:openInsertLinkDialog();" class="btn" title="<spring:message code="button.insertLink"/>"><i class="icon-share-alt"></i></a>
+						<button onclick="openInsertLinkDialog(); return false;" class="btn" title="<spring:message code="button.insertLink"/>"><i class="icon-share-alt"></i></button>
 					</div>
 					<div class="btn-group">
-						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><spring:message code="button.macros"/> <span class="caret"></span></a>
+						<button class="btn dropdown-toggle" data-toggle="dropdown" onclick="return false;"><spring:message code="button.macros"/> <span class="caret"></span></button>
 						<ul class="dropdown-menu">
 							<c:set var="macros" value="${d:getMacros()}"/>
 							<c:forEach var="macro" items="${macros}">
 								<dt:dropdownEntry>
-									<li><a href="javascript:insertMacro('<c:out value="${d:escapeJavaScript(macro.insertText)}"/>');"><c:out value="${macro.title}"/> <div class="macro-description"><c:out value="${macro.description}"/></div></a></li>
+									<li><a href="javascript:;" onclick="insertMacro('<c:out value="${d:escapeJavaScript(macro.insertText)}"/>'); return false;"><c:out value="${macro.title}"/> <div class="macro-description"><c:out value="${macro.description}"/></div></a></li>
 								</dt:dropdownEntry>
 							</c:forEach>
 						</ul>
 					</div>
 					<div class="btn-group">
-						<a href="javascript:showMarkdownHelp();" class="btn" title="<spring:message code="button.showFormattingHelp"/>"><i class="icon-question-sign"></i></a>
+						<button onclick="showMarkdownHelp(); return false;" class="btn" title="<spring:message code="button.showFormattingHelp"/>"><i class="icon-question-sign"></i></button>
 					</div>
 				</div>
 				<div class="editor-wrapper">
@@ -672,12 +671,11 @@ $(function() {
 			</div>
 		</div>
 		<div class="form-actions">
-			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
+			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>" />
 			<a href="<c:url value="/page/${pageForm.projectName}/${pageForm.branchName}/${d:toUrlPagePath(hierarchyPagePath)}"/>" class="btn"><spring:message code="button.cancel"/></a>
 		</div>
 	</fieldset>
 </form:form>
-</p>
 
 <div class="modal" id="insert-link-dialog" style="display: none;">
 	<div class="modal-header">
@@ -757,8 +755,8 @@ $(function() {
 		</form>
 	</div>
 	<div class="modal-footer">
-		<a id="insert-link-button" href="javascript:void(insertLink());" class="btn btn-primary"><spring:message code="button.insertLink"/></a>
-		<a href="javascript:void($('#insert-link-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
+		<button id="insert-link-button" onclick="insertLink(); return false;" class="btn btn-primary"><spring:message code="button.insertLink"/></button>
+		<button onclick="$('#insert-link-dialog').hideModal(); return false;" class="btn"><spring:message code="button.cancel"/></button>
 	</div>
 </div>
 
@@ -792,8 +790,8 @@ $(function() {
 		</form>
 	</div>
 	<div class="modal-footer">
-		<a id="insert-image-button" href="javascript:void(insertImage());" class="btn btn-primary"><spring:message code="button.insertImage"/></a>
-		<a href="javascript:void($('#insert-image-dialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
+		<button id="insert-image-button" onclick="insertImage(); return false;" class="btn btn-primary"><spring:message code="button.insertImage"/></button>
+		<button onclick="$('#insert-image-dialog').hideModal(); return false;" class="btn"><spring:message code="button.cancel"/></button>
 	</div>
 </div>
 
@@ -810,7 +808,7 @@ $(function() {
 		</div>
 	</div>
 	<div class="modal-footer">
-		<a href="javascript:void(cancelUpload());" class="btn"><spring:message code="button.cancel"/></a>
+		<button onclick="cancelUpload(); return false;" class="btn"><spring:message code="button.cancel"/></button>
 	</div>
 </div>
 

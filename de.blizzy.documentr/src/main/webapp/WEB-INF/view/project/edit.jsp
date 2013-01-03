@@ -37,7 +37,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <div class="page-header"><h1><spring:message code="title.editProject"/></h1></div>
 
-<p>
 <c:set var="action"><c:url value="/project/save"/></c:set>
 <form:form commandName="projectForm" action="${action}" method="POST" cssClass="well form-inline">
 	<fieldset>
@@ -52,7 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 	</fieldset>
 </form:form>
-</p>
 
 </dt:page>
 

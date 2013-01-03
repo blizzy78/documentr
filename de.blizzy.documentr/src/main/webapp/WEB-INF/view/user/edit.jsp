@@ -83,7 +83,7 @@ function updateAuthorities() {
 		newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.application"/></h4>'));
 		var ulEl = $('<ul data-documentr-role="true"></ul>');
 		for (var i = 0; i < authorities.length; i++) {
-			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:;" onclick="removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'); return false;"><spring:message code="button.remove"/></a>)</li>');
 		}
 		newEls.push(ulEl);
 	}
@@ -99,7 +99,7 @@ function updateAuthorities() {
 				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.project"/>: ' + authorities[i].targetId + '</h4>'));
 				ulEl = $('<ul data-documentr-role="true"></ul>');
 			}
-			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:;" onclick="removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'); return false;"><spring:message code="button.remove"/></a>)</li>');
 			
 			targetId = authorities[i].targetId;
 		}
@@ -117,7 +117,7 @@ function updateAuthorities() {
 				newEls.push($('<h4 data-documentr-role="true"><spring:message code="title.roleTarget.branch"/>: ' + authorities[i].targetId + '</h4>'));
 				ulEl = $('<ul data-documentr-role="true"></ul>');
 			}
-			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:void(removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'));"><spring:message code="button.remove"/></a>)</li>');
+			ulEl.append('<li>' + authorities[i].roleName + ' (<a href="javascript:;" onclick="removeRole(\'' + authorities[i].type + '\', \'' + authorities[i].targetId + '\', \'' + authorities[i].roleName + '\'); return false;"><spring:message code="button.remove"/></a>)</li>');
 			
 			targetId = authorities[i].targetId;
 		}
@@ -302,7 +302,6 @@ $(function() {
 
 <h2><spring:message code="title.editUser"/></h2>
 
-<p>
 <c:set var="action"><c:url value="/user/save"/></c:set>
 <form:form commandName="userForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="clearDirty(); return true;">
 	<ul id="userDetailsTabs" class="nav nav-tabs">
@@ -359,7 +358,7 @@ $(function() {
 		<div class="tab-pane" id="userPermissions">
 			<input type="hidden" name="authorities"/>
 			<p>
-				<a href="javascript:void(showAddRoleDialog());" class="btn"><spring:message code="button.addRole"/></a>
+				<button onclick="showAddRoleDialog(); return false;" class="btn"><spring:message code="button.addRole"/></button>
 			</p>
 		</div>
 	</div>
@@ -367,12 +366,11 @@ $(function() {
 	<div class="form-actions">
 		<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
 		<c:if test="${(!empty userForm.originalLoginName) and (userForm.originalLoginName ne '_anonymous')}">
-			<a href="javascript:void(showDeleteDialog());" class="btn btn-warning"><spring:message code="button.delete"/></a>
+			<button onclick="showDeleteDialog(); return false;" class="btn btn-warning"><spring:message code="button.delete"/></button>
 		</c:if>
 		<a href="<c:url value="/users"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </form:form>
-</p>
 
 <div class="modal" id="addRoleDialog" style="display: none;">
 	<div class="modal-header">
@@ -427,8 +425,8 @@ $(function() {
 		</form>
 	</div>
 	<div class="modal-footer">
-		<a href="javascript:void(addRole());" class="btn btn-primary"><spring:message code="button.add"/></a>
-		<a href="javascript:void($('#addRoleDialog').hideModal());" class="btn"><spring:message code="button.cancel"/></a>
+		<button onclick="addRole(); return false;" class="btn btn-primary"><spring:message code="button.add"/></button>
+		<button onclick="$('#addRoleDialog').hideModal(); return false;" class="btn"><spring:message code="button.cancel"/></button>
 	</div>
 </div>
 

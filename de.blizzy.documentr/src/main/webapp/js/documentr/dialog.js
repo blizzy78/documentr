@@ -48,22 +48,21 @@ define(function() {
 			var wide = (documentr.isSomething(options) && documentr.isSomething(options.wide)) ? options.wide : false;
 			var messageAsHtml = (documentr.isSomething(options) && documentr.isSomething(options.messageAsHtml)) ? options.messageAsHtml : false;
 			
-			var id = "dialog_" + new Date().getTime();
 			var html =
-				'<div class="modal" id="' + id + '" style="display: none;">' +
-				'<div class="modal-header">' +
-				'<button class="close" id="' + id + '_close">&#x00D7</button>' +
-				'<h3 id="' + id + '_title">title</h3>' +
-				'</div>' +
-				'<div class="modal-body" id="' + id + '_body"></div>' +
-				'<div class="modal-footer" id="' + id + '_footer"></div>' +
+				'<div class="modal" style="display: none;">' +
+					'<div class="modal-header">' +
+						'<button class="close">&#x00D7</button>' +
+						'<h3></h3>' +
+					'</div>' +
+					'<div class="modal-body"></div>' +
+					'<div class="modal-footer"></div>' +
 				'</div>';
 			var dlgEl = $(html);
 			if (wide) {
 				dlgEl.addClass('modal-wide');
 			}
 			
-			var footerEl = dlgEl.find('#' + id + '_footer');
+			var footerEl = dlgEl.find('.modal-footer');
 			
 			function close() {
 				dlgEl.hideModal();
@@ -71,26 +70,27 @@ define(function() {
 			}
 			
 			function setText(message) {
+				var bodyEl = dlgEl.find('.modal-body');
 				if (messageAsHtml) {
-					dlgEl.find('#' + id + '_body').html(message);
+					bodyEl.html(message);
 				} else {
-					dlgEl.find('#' + id + '_body').text(message);
+					bodyEl.text(message);
 				}
 			}
 			
 			function setAllButtonsDisabled() {
-				footerEl.find('a').off('click').setButtonDisabled(true);
+				footerEl.find('button').off('click').setButtonDisabled(true);
 			}
 			
 			var dlg = {
-					close: close,
-					setText: setText,
-					setAllButtonsDisabled: setAllButtonsDisabled
+				close: close,
+				setText: setText,
+				setAllButtonsDisabled: setAllButtonsDisabled
 			};
 			
-			dlgEl.find('#' + id + '_title').text(title);
+			dlgEl.find('.modal-header h3').text(title);
 			setText(message);
-			dlgEl.find('#' + id + '_close').click(close);
+			dlgEl.find('.modal-header button').click(close);
 			var clickHandler = function(event) {
 				var buttonOptions = event.data;
 				var closeDlg = documentr.isSomething(buttonOptions.close) && buttonOptions.close;
@@ -105,23 +105,27 @@ define(function() {
 				if (!cancelDlg) {
 					buttonOptions.onclick.call(dlg);
 				}
+
 				event.preventDefault();
 			};
 			for (var i = 0; i < buttons.length; i++) {
 				var button = buttons[i];
-				var b = $('<a href="#" class="btn"></a>');
-				if (documentr.isSomething(button.onclick) ||
-						(documentr.isSomething(button.cancel) && button.cancel)) {
-					
-					b.click(button, clickHandler);
-				} else if (documentr.isSomething(button.href)) {
-					b.attr('href', button.href);
-				}
+				var b = $('<button class="btn"></button>');
 				b.text(button.text);
 				if (documentr.isSomething(button.type)) {
 					b.addClass('btn-' + button.type);
 				}
 				footerEl.append(b);
+				if (documentr.isSomething(button.onclick) ||
+					(documentr.isSomething(button.cancel) && button.cancel)) {
+					
+					b.click(button, clickHandler);
+				} else if (documentr.isSomething(button.href)) {
+					b.click(button, function(e) {
+						close();
+						window.location.href = e.data.href;
+					});
+				}
 			}
 			$(document.body).append(dlgEl);
 			

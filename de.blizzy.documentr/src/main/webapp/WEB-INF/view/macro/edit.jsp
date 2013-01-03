@@ -129,7 +129,6 @@ $(function() {
 
 <div class="page-header"><h1><spring:message code="title.editMacro"/></h1></div>
 
-<p>
 <c:set var="action"><c:url value="/macro/save"/></c:set>
 <form:form commandName="macroForm" action="${action}" method="POST" cssClass="well form-horizontal" onsubmit="prepareForm();">
 	<fieldset>
@@ -162,7 +161,6 @@ $(function() {
 		<a href="<c:url value="/macros"/>" class="btn"><spring:message code="button.cancel"/></a>
 	</div>
 </form:form>
-</p>
 
 </dt:page>
 
