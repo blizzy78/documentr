@@ -80,7 +80,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 		String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
 		when(runnable.cleanupHtml(anyString())).thenAnswer(new Answer<String>() {
 			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
+			public String answer(InvocationOnMock invocation) {
 				String html = (String) invocation.getArguments()[0];
 				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -127,7 +127,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 		String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
 		when(runnable.cleanupHtml(anyString())).thenAnswer(new Answer<String>() {
 			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
+			public String answer(InvocationOnMock invocation) {
 				String html = (String) invocation.getArguments()[0];
 				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
