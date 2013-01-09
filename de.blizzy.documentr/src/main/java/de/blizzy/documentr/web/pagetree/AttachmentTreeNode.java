@@ -31,7 +31,7 @@ public class AttachmentTreeNode extends AbstractTreeNode {
 
 	AttachmentTreeNode(String projectName, String branchName, String pagePath, String name) {
 		super(Type.ATTACHMENT);
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.pagePath = pagePath;

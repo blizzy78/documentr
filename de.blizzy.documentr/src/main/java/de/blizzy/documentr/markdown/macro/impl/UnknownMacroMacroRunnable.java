@@ -25,7 +25,7 @@ class UnknownMacroMacroRunnable implements IMacroRunnable {
 	public String getHtml(IMacroContext macroContext) {
 		return "<span class=\"text-error\">{{" + macroContext.getMacroName() + "/}}</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Override
 	public String cleanupHtml(String html) {
 		return null;

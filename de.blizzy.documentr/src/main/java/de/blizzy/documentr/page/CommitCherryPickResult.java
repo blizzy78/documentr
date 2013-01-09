@@ -25,7 +25,7 @@ public class CommitCherryPickResult {
 	public static enum Status {
 		OK, CONFLICT, UNKNOWN;
 	}
-	
+
 	@Getter
 	private PageVersion pageVersion;
 	@Getter
@@ -36,11 +36,11 @@ public class CommitCherryPickResult {
 	public CommitCherryPickResult(PageVersion pageVersion, Status status) {
 		Assert.notNull(pageVersion);
 		Assert.notNull(status);
-		
+
 		this.pageVersion = pageVersion;
 		this.status = status;
 	}
-	
+
 	public CommitCherryPickResult(PageVersion pageVersion, String conflictText) {
 		Assert.notNull(pageVersion);
 		Assert.notNull(conflictText);

@@ -49,7 +49,7 @@ import de.blizzy.documentr.markdown.macro.MacroFactory;
 public class MacroController {
 	@Autowired
 	private MacroFactory macroFactory;
-	
+
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String createMacro(Model model) {
@@ -86,7 +86,7 @@ public class MacroController {
 		}
 		return result;
 	}
-	
+
 	private Map<String, Object> toJson(CompilationMessage message) {
 		Map<String, Object> result = Maps.newHashMap();
 		result.put("type", message.getType().name()); //$NON-NLS-1$
@@ -104,12 +104,12 @@ public class MacroController {
 		if (bindingResult.hasErrors()) {
 			return "/macro/edit"; //$NON-NLS-1$
 		}
-		
+
 		macroFactory.saveGroovyMacro(form.getName(), form.getCode());
-		
+
 		return "redirect:/macros"; //$NON-NLS-1$
 	}
-	
+
 	@RequestMapping(value="/delete/{name:" + DocumentrConstants.MACRO_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String deleteMacro(@PathVariable String name) throws IOException {

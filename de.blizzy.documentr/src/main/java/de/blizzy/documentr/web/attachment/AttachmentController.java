@@ -68,7 +68,7 @@ public class AttachmentController {
 	private ServletContext servletContext;
 	@Autowired
 	private UserStore userStore;
-	
+
 	@RequestMapping(value="/list/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -92,12 +92,12 @@ public class AttachmentController {
 	public ResponseEntity<byte[]> getAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @PathVariable String name, @RequestParam(required=false) boolean download,
 			HttpServletRequest request) throws IOException {
-		
+
 		try {
 			pagePath = Util.toRealPagePath(pagePath);
 			PageMetadata metadata = pageStore.getAttachmentMetadata(projectName, branchName, pagePath, name);
 			HttpHeaders headers = new HttpHeaders();
-			
+
 			long lastEdited = metadata.getLastEdited().getTime();
 			long authenticationCreated = AuthenticationUtil.getAuthenticationCreationTime(request.getSession());
 			long lastModified = Math.max(lastEdited, authenticationCreated);
@@ -106,7 +106,7 @@ public class AttachmentController {
 				if (projectEditTime >= 0) {
 					lastModified = Math.max(lastModified, projectEditTime);
 				}
-	
+
 				long modifiedSince = request.getDateHeader("If-Modified-Since"); //$NON-NLS-1$
 				if ((modifiedSince >= 0) && (lastModified <= modifiedSince)) {
 					return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
@@ -128,7 +128,7 @@ public class AttachmentController {
 			return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@RequestMapping(value="/create/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{pagePath:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}",
@@ -136,7 +136,7 @@ public class AttachmentController {
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #pagePath, EDIT_PAGE)")
 	public String createAttachment(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, Model model) {
-		
+
 		model.addAttribute("projectName", projectName); //$NON-NLS-1$
 		model.addAttribute("branchName", branchName); //$NON-NLS-1$
 		pagePath = Util.toRealPagePath(pagePath);
@@ -166,10 +166,10 @@ public class AttachmentController {
 	public Map<String, Object> saveAttachmentViaJson(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String pagePath, @RequestParam MultipartFile file, Authentication authentication)
 					throws IOException {
-		
+
 		log.info("saving attachment via JSON: {}", file.getOriginalFilename()); //$NON-NLS-1$
 		saveAttachmentInternal(projectName, branchName, pagePath, file, authentication);
-		
+
 		Map<String, Object> fileResult = Maps.newHashMap();
 		fileResult.put("name", file.getOriginalFilename()); //$NON-NLS-1$
 		fileResult.put("size", file.getSize()); //$NON-NLS-1$
@@ -183,12 +183,12 @@ public class AttachmentController {
 		result.put("files", filesList); //$NON-NLS-1$
 		return result;
 	}
-	
+
 	private void saveAttachmentInternal(String projectName, String branchName, String pagePath,
 			MultipartFile file, Authentication authentication) throws IOException {
-		
+
 		log.debug("saving attachment: {}", file.getOriginalFilename()); //$NON-NLS-1$
-		
+
 		byte[] data = IOUtils.toByteArray(file.getInputStream());
 		String contentType = servletContext.getMimeType(file.getOriginalFilename());
 		if (StringUtils.isBlank(contentType)) {

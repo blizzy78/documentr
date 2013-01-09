@@ -37,7 +37,7 @@ public class VimeoMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new VimeoMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getParameters()).thenReturn("video123"); //$NON-NLS-1$
@@ -45,7 +45,7 @@ public class VimeoMacroTest extends AbstractDocumentrTest {
 				"height=\"281\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen " + //$NON-NLS-1$
 				"allowFullScreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getHtmlWithUrl() {
 		when(context.getParameters()).thenReturn("http://vimeo.com/video123?foo=bar"); //$NON-NLS-1$

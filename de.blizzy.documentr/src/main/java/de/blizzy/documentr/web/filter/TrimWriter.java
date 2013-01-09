@@ -33,7 +33,7 @@ class TrimWriter {
 	private static final Replacement REMOVE_COMMENT = new Replacement("<!--.*?-->", StringUtils.EMPTY); //$NON-NLS-1$
 	private static final Replacement TRIM_LEFT = new Replacement("^[ \t]+", StringUtils.EMPTY); //$NON-NLS-1$
 	private static final Replacement TRIM_RIGHT = new Replacement("[ \t]+$", StringUtils.EMPTY); //$NON-NLS-1$
-	
+
 	void write(String text, OutputStream out, Charset charset) throws IOException {
 		BufferedReader in = null;
 		try {
@@ -49,11 +49,11 @@ class TrimWriter {
 				line = StringUtils.replace(line, "__NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
 				line = StringUtils.replace(line, "__/NOTRIM__", StringUtils.EMPTY); //$NON-NLS-1$
 				line = REMOVE_COMMENT.replaceAll(line);
-				
+
 				if (trim) {
 					line = TRIM_LEFT.replaceAll(line);
 				}
-				
+
 				if (origLine.contains("<textarea")) { //$NON-NLS-1$
 					textareaTag = true;
 				}

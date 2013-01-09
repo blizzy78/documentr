@@ -47,7 +47,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class UpdateCheckerTest extends AbstractDocumentrTest {
 	private static final String CURRENT_VERSION = "1.0.0"; //$NON-NLS-1$
 	private static final String LATEST_VERSION = "1.1.0"; //$NON-NLS-1$
-	
+
 	@Mock
 	private SystemSettingsStore systemSettingsStore;
 	@Mock
@@ -55,14 +55,14 @@ public class UpdateCheckerTest extends AbstractDocumentrTest {
 	@InjectMocks
 	private UpdateChecker updateChecker;
 	private String updatePropertiesUrl;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		Field updatePropertiesUrlField = Whitebox.getField(UpdateChecker.class, "UPDATE_PROPERTIES_URL"); //$NON-NLS-1$
 		updatePropertiesUrl = updatePropertiesUrlField.get(null).toString();
-		
+
 		PowerMockito.whenNew(Downloader.class).withNoArguments().thenReturn(downloader);
-		
+
 		replace(method(UpdateChecker.class, "getResourceAsStream")).with(new InvocationHandler() { //$NON-NLS-1$
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) {
@@ -71,11 +71,11 @@ public class UpdateCheckerTest extends AbstractDocumentrTest {
 				return new ByteArrayInputStream(data);
 			}
 		});
-		
+
 		when(systemSettingsStore.getSetting(SystemSettingsStore.UPDATE_CHECK_INTERVAL))
 			.thenReturn(SystemSettingsStore.UPDATE_CHECK_INTERVAL_DAILY);
 	}
-	
+
 	@Test
 	public void checkForUpdate() throws IOException {
 		when(downloader.getTextFromUrl(updatePropertiesUrl, Charsets.UTF_8))
@@ -83,14 +83,14 @@ public class UpdateCheckerTest extends AbstractDocumentrTest {
 
 		updateChecker.checkForUpdate();
 		assertTrue(updateChecker.isUpdateAvailable());
-		assertEquals(LATEST_VERSION, updateChecker.getLatestVersion()); 
+		assertEquals(LATEST_VERSION, updateChecker.getLatestVersion());
 	}
 
 	@Test
 	public void checkForUpdateButNoUpdateAvailable() throws IOException {
 		when(downloader.getTextFromUrl(updatePropertiesUrl, Charsets.UTF_8))
 			.thenReturn(CURRENT_VERSION + "=2012-10-26"); //$NON-NLS-1$
-		
+
 		updateChecker.checkForUpdate();
 		assertFalse(updateChecker.isUpdateAvailable());
 	}

@@ -33,13 +33,13 @@ class DocumentrLinkRenderer extends LinkRenderer {
 
 	DocumentrLinkRenderer(HtmlSerializerContext context) {
 		Assert.notNull(context);
-		
+
 		this.context = context;
 	}
-	
+
 	/*
 	 * allows the following Wiki-style links:
-	 * 
+	 *
 	 * [[URI]]
 	 * [[URI | nofollow]]
 	 * [[URI link text]]
@@ -77,7 +77,7 @@ class DocumentrLinkRenderer extends LinkRenderer {
 			}
 
 			text = text.trim();
-			
+
 			if (params.equalsIgnoreCase("nofollow")) { //$NON-NLS-1$
 				noFollow = true;
 			}
@@ -91,7 +91,7 @@ class DocumentrLinkRenderer extends LinkRenderer {
 
 	/*
 	 * allows the following link:
-	 * 
+	 *
 	 * [text](:page)
 	 * [text](#Headline)
 	 */

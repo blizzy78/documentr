@@ -35,14 +35,14 @@ import de.blizzy.documentr.util.Util;
 
 public class HtmlSerializer extends ToHtmlSerializer {
 	private static final String IMAGE_PARAM_THUMB = "thumb"; //$NON-NLS-1$
-	
+
 	private HtmlSerializerContext context;
 
 	public HtmlSerializer(HtmlSerializerContext context) {
 		super(new DocumentrLinkRenderer(context));
-		
+
 		this.context = context;
-		
+
 		printer = new DocumentrPrinter();
 	}
 
@@ -50,7 +50,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	public void visit(ParaNode node) {
 		printTagWithTextRange(node, "p"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public void visit(VerbatimNode node) {
 		if (node instanceof VerbatimNodeWithType) {
@@ -75,7 +75,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			.printEncoded(node.getText().replaceFirst("[\\r\\n]*$", StringUtils.EMPTY)); //$NON-NLS-1$
 		printer.print("</div><!--__/NOTRIM__--></div>\n"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	protected void printIndentedTag(SuperNode node, String tag) {
 		if (tag.equals("table")) { //$NON-NLS-1$
@@ -88,7 +88,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			super.printIndentedTag(node, tag);
 		}
 	}
-	
+
 	@Override
 	protected void printImageTag(SuperNode imageNode, String url) {
 		String params = StringUtils.EMPTY;
@@ -96,19 +96,19 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			params = StringUtils.substringAfter(url, "|").trim(); //$NON-NLS-1$
 			url = StringUtils.substringBefore(url, "|").trim(); //$NON-NLS-1$
 		}
-		
+
 		boolean thumbnail = params.contains(IMAGE_PARAM_THUMB);
 		String altText = printChildrenToString(imageNode);
 		String title = null;
 		if (imageNode instanceof ExpImageNode) {
 			title = StringUtils.defaultIfBlank(((ExpImageNode) imageNode).title, altText);
 		}
-		
+
 		if (thumbnail) {
 			printer.print("<ul class=\"thumbnails\"><li class=\"span3\"><a class=\"thumbnail\" href=\"") //$NON-NLS-1$
 				.print(context.getAttachmentUri(url)).print("\">"); //$NON-NLS-1$
 		}
-		
+
 		printer.print("<img src=\"").print(context.getAttachmentUri(url)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		if (StringUtils.isNotBlank(altText)) {
 			printer.print(" alt=\"").printEncoded(altText).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -120,12 +120,12 @@ public class HtmlSerializer extends ToHtmlSerializer {
 			printer.print(" rel=\"tooltip\" data-title=\"").printEncoded(title).print("\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		printer.print("/>"); //$NON-NLS-1$
-		
+
 		if (thumbnail) {
 			printer.print("</a></li></ul>"); //$NON-NLS-1$
 		}
 	}
-	
+
 	@Override
 	public void visit(HeaderNode node) {
 		List<Node> children = node.getChildren();
@@ -144,17 +144,17 @@ public class HtmlSerializer extends ToHtmlSerializer {
 	public void visit(BulletListNode node) {
 		printTagWithTextRange(node, "ul"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public void visit(OrderedListNode node) {
 		printTagWithTextRange(node, "ol"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public void visit(DefinitionListNode node) {
 		printTagWithTextRange(node, "dl"); //$NON-NLS-1$
 	}
-	
+
 	private void printTagWithTextRange(SuperNode node, String tag) {
 		printer.print("<").print(tag).print(" data-text-range=\"") //$NON-NLS-1$ //$NON-NLS-2$
 			.print(String.valueOf(node.getStartIndex())).print(",").print(String.valueOf(node.getEndIndex())) //$NON-NLS-1$
@@ -162,7 +162,7 @@ public class HtmlSerializer extends ToHtmlSerializer {
 		visitChildren(node);
 		printer.print("</").print(tag).print(">"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Override
 	public void visit(SuperNode node) {
 		if (node instanceof MacroNode) {

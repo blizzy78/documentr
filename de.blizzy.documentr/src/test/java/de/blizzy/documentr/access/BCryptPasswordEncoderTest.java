@@ -34,7 +34,7 @@ import de.blizzy.documentr.system.SystemSettingsStore;
 
 public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 	public static final String PASSWORD = "secret"; //$NON-NLS-1$
-	
+
 	@Mock
 	private SystemSettingsStore systemSettingsStore;
 	@Mock
@@ -43,18 +43,18 @@ public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 	@InjectMocks
 	private BCryptPasswordEncoder passwordEncoder;
 	private SecureRandom ignoredRandom;
-	
+
 	@Before
 	public void setUp() {
 		ignoredRandom = new SecureRandom();
 		ignoredRandom.setSeed(System.currentTimeMillis());
 	}
-	
+
 	@Test
 	public void encodeAndCheckPassword() {
 		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
 		passwordEncoder.init();
-		
+
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
 	}
@@ -64,7 +64,7 @@ public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
 		passwordEncoder.init();
 		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
-		
+
 		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
 		passwordEncoder.init();
 		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));

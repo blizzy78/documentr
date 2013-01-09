@@ -33,7 +33,7 @@ import de.blizzy.documentr.system.SystemSettingsStore;
 
 public class MacroContextTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
-	
+
 	@Mock
 	private BeanFactory beanFactory;
 	@Mock
@@ -50,10 +50,10 @@ public class MacroContextTest extends AbstractDocumentrTest {
 	public void setUp() {
 		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$
 		Whitebox.setInternalState(ctx, pageStore, permissionEvaluator, systemSettingsStore);
-		
+
 		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(ctx);
-		
+
 		context = MacroContext.create(MACRO, "params", "body", htmlSerializerContext, beanFactory); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

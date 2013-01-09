@@ -40,7 +40,7 @@ public class TableOfContentsMacro extends AbstractMarkdownMacroRunnable {
 					smallestLevel = level;
 				}
 			}
-			
+
 			StringBuilder buf = new StringBuilder();
 			for (Header header : headers) {
 				buf.append(StringUtils.repeat("    ", header.getLevel() - 1 - smallestLevel)) //$NON-NLS-1$

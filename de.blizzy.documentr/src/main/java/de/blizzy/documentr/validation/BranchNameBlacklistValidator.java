@@ -37,7 +37,7 @@ public class BranchNameBlacklistValidator implements ConstraintValidator<BranchN
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
+
 		return !Pattern.matches("^" + DocumentrConstants.BRANCH_NAMES_BLACKLIST_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

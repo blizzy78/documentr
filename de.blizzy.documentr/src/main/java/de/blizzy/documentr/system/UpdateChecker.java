@@ -31,7 +31,7 @@ import com.google.common.io.Closeables;
 public class UpdateChecker {
 	private static final String UPDATE_PROPERTIES_URL =
 			"http://documentr.org/attachment/documentr/1.x/home,download/latest-version.txt"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Getter
@@ -39,22 +39,22 @@ public class UpdateChecker {
 	@Getter
 	private String latestVersion;
 	private long lastCheckTime = -1;
-	
+
 	@Scheduled(fixedRate=24 * 60 * 60 * 1000)
 	public void checkForUpdate() {
 		if (isCheckNecessary()) {
 			log.info("checking for documentr update"); //$NON-NLS-1$
-			
+
 			lastCheckTime = System.currentTimeMillis();
-	
+
 			Version currentVersion = getCurrentVersion();
 			if (currentVersion != null) {
 				log.debug("current version: {}", currentVersion); //$NON-NLS-1$
-				
+
 				Version latestVersion = getLatestVersionFromServer();
 				if (latestVersion != null) {
 					log.debug("latest version: {}", latestVersion); //$NON-NLS-1$
-					
+
 					if (latestVersion.compareTo(currentVersion) > 0) {
 						updateAvailable = true;
 						this.latestVersion = latestVersion.toString();
@@ -70,7 +70,7 @@ public class UpdateChecker {
 			}
 		}
 	}
-	
+
 	private boolean isCheckNecessary() {
 		String intervalStr = systemSettingsStore.getSetting(SystemSettingsStore.UPDATE_CHECK_INTERVAL);
 		boolean result = false;
@@ -88,7 +88,7 @@ public class UpdateChecker {
 		}
 		return result;
 	}
-	
+
 	private Version getCurrentVersion() {
 		InputStreamReader in = null;
 		try {
@@ -123,7 +123,7 @@ public class UpdateChecker {
 		}
 		return null;
 	}
-	
+
 	private Set<Version> getLatestVersionsFromServer() {
 		String text = loadLatestVersionsFromServer();
 		Set<Version> versions = Sets.newHashSet();
@@ -140,7 +140,7 @@ public class UpdateChecker {
 		}
 		return versions;
 	}
-	
+
 	private String loadLatestVersionsFromServer() {
 		try {
 			return new Downloader().getTextFromUrl(UPDATE_PROPERTIES_URL, Charsets.UTF_8);

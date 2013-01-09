@@ -53,7 +53,7 @@ public class AuthenticationCreationTimeFilterTest extends AbstractDocumentrTest 
 	private ServletResponse response;
 	@Mock
 	private FilterChain filterChain;
-	
+
 	@Test
 	public void doFilter() throws IOException, ServletException {
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
@@ -61,17 +61,17 @@ public class AuthenticationCreationTimeFilterTest extends AbstractDocumentrTest 
 				new SimpleGrantedAuthority("authority1"), //$NON-NLS-1$
 				new SimpleGrantedAuthority("authority2"))) //$NON-NLS-1$
 			.when(authentication).getAuthorities();
-		
+
 		when(session.getAttribute("authenticationHashCode")).thenReturn(123); //$NON-NLS-1$
-		
+
 		when(request.getSession()).thenReturn(session);
-		
+
 		SecurityContextImpl securityContext = new SecurityContextImpl();
 		securityContext.setAuthentication(authentication);
 		SecurityContextHolder.setContext(securityContext);
 		new AuthenticationCreationTimeFilter().doFilter(request, response, filterChain);
 		SecurityContextHolder.clearContext();
-		
+
 		ArgumentCaptor<Long> timeArgument = ArgumentCaptor.forClass(Long.class);
 		verify(session).setAttribute(eq("authenticationCreationTime"), timeArgument.capture()); //$NON-NLS-1$
 		TestUtil.assertSecondsAgo(new Date(timeArgument.getValue()), 5);

@@ -27,7 +27,7 @@ public class OpenIdNotFoundException extends NotFoundException {
 
 	public OpenIdNotFoundException(String openId) {
 		super("OpenID not found: " + openId); //$NON-NLS-1$
-		
+
 		this.openId = openId;
 	}
 }

@@ -63,7 +63,7 @@ class GroovyMacroScanner {
 	}
 
 	static final String MACROS_DIR_NAME = "macros"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private Settings settings;
 	@Autowired
@@ -90,7 +90,7 @@ class GroovyMacroScanner {
 		}
 		return macros;
 	}
-	
+
 	private Set<File> findGroovyMacroFiles() {
 		Set<File> result = Sets.newHashSet();
 		for (File file : macrosDir.listFiles(new GroovyFileFilterImplementation())) {
@@ -182,9 +182,9 @@ class GroovyMacroScanner {
 					if (annotation != null) {
 						if (!ISimpleMacro.class.isAssignableFrom(clazz) &&
 							!IMacroRunnable.class.isAssignableFrom(clazz)) {
-							
+
 							result.add(new CompilationMessage(CompilationMessage.Type.ERROR, 1, 1, 1, 1,
-									"Class " + clazz.getSimpleName() + " must implement IMacro or ISimpleMacro.")); //$NON-NLS-1$ //$NON-NLS-2$ 
+									"Class " + clazz.getSimpleName() + " must implement IMacro or ISimpleMacro.")); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					} else {
 						result.add(new CompilationMessage(CompilationMessage.Type.ERROR, 1, 1, 1, 1,

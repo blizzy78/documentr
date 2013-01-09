@@ -46,33 +46,33 @@ public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasApplicationPermission(authentication, Permission.EDIT_PAGE)).thenReturn(true);
 		assertTrue(root.hasApplicationPermission(Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasProjectPermission() {
 		when(permissionEvaluator.hasProjectPermission(authentication, "project", Permission.EDIT_PAGE)).thenReturn(true); //$NON-NLS-1$
 		assertTrue(root.hasProjectPermission("project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasAnyProjectPermission() {
 		when(permissionEvaluator.hasAnyProjectPermission(authentication, Permission.EDIT_PAGE)).thenReturn(true);
 		assertTrue(root.hasAnyProjectPermission(Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasBranchPermission() {
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(true);
 		assertTrue(root.hasBranchPermission("project", "branch", Permission.EDIT_PAGE)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void hasAnyBranchPermission() {
 		when(permissionEvaluator.hasAnyBranchPermission(authentication, "project", Permission.EDIT_PAGE)) //$NON-NLS-1$
 			.thenReturn(true);
 		assertTrue(root.hasAnyBranchPermission("project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasPagePermission() {
 		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
@@ -86,7 +86,7 @@ public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
 		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project1", "project2", "project3")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertTrue(root.projectExists("project1")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void setAndGetThis() {
 		Object target = "this"; //$NON-NLS-1$

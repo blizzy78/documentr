@@ -41,7 +41,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class MacroFactoryTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
 	private static final String GROOVY_MACRO = "groovyMacro"; //$NON-NLS-1$
-	
+
 	@Mock
 	private IMacro macro;
 	@Mock
@@ -66,7 +66,7 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 		when(macro.getDescriptor()).thenReturn(descriptor);
 
 		when(groovyMacro.getDescriptor()).thenReturn(groovyDescriptor);
-		
+
 		when(groovyMacroScanner.findGroovyMacros()).thenReturn(Sets.newHashSet(groovyMacro));
 
 		Map<String, IMacro> macros = Maps.newHashMap();
@@ -75,46 +75,46 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 
 		macroFactory.start();
 	}
-	
+
 	@Test
 	public void mustFindGroovyMacros() {
 		assertSame(groovyMacro, macroFactory.get(GROOVY_MACRO));
 	}
-	
+
 	@Test
 	public void get() {
 		assertSame(macro, macroFactory.get(MACRO));
 	}
-	
+
 	@Test
 	public void getDescriptors() {
 		Set<IMacroDescriptor> descriptors = macroFactory.getDescriptors();
 		assertEquals(Sets.newHashSet(descriptor, groovyDescriptor), descriptors);
 	}
-	
+
 	@Test
 	public void listGroovyMacros() {
 		List<String> macros = Lists.newArrayList("macro1", "macro2"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(groovyMacroScanner.listMacros()).thenReturn(macros);
-		
+
 		assertEquals(macros, macroFactory.listGroovyMacros());
 	}
-	
+
 	@Test
 	public void getGroovyMacroCode() throws IOException {
 		when(groovyMacroScanner.getMacroCode(GROOVY_MACRO)).thenReturn("code"); //$NON-NLS-1$
 		assertEquals("code", macroFactory.getGroovyMacroCode(GROOVY_MACRO)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void test() {
 		List<CompilationMessage> errors = Lists.newArrayList(mock(CompilationMessage.class));
 		when(groovyMacroScanner.verifyMacro("code")).thenReturn(errors); //$NON-NLS-1$
-		
+
 		List<CompilationMessage> result = macroFactory.verifyGroovyMacro("code"); //$NON-NLS-1$
 		assertEquals(errors, result);
 	}
-	
+
 	@Test
 	public void saveGroovyMacro() throws IOException {
 		macroFactory.saveGroovyMacro(GROOVY_MACRO, "code"); //$NON-NLS-1$
@@ -127,7 +127,7 @@ public class MacroFactoryTest extends AbstractDocumentrTest {
 	@Test
 	public void deleteGroovyMacro() throws IOException {
 		macroFactory.deleteGroovyMacro(GROOVY_MACRO);
-		
+
 		InOrder inOrder = inOrder(groovyMacroScanner);
 		inOrder.verify(groovyMacroScanner).deleteMacro(GROOVY_MACRO);
 		inOrder.verify(groovyMacroScanner).findGroovyMacros();

@@ -55,7 +55,7 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 				text + "</div><!--__/NOTRIM__--></div>\n", //$NON-NLS-1$
 				removeTextRange(html));
 	}
-	
+
 	@Test
 	public void visitVerbatimNodeWithType() {
 		String text = "x\ny\nz"; //$NON-NLS-1$
@@ -65,7 +65,7 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 				text + "</div><!--__/NOTRIM__--></div>\n", //$NON-NLS-1$
 				removeTextRange(html));
 	}
-	
+
 	@Test
 	public void visitVerbatimNodeWithTypeAndTitle() {
 		String text = "x\ny\nz"; //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 				text + "</div><!--__/NOTRIM__--></div>\n", //$NON-NLS-1$
 				removeTextRange(html));
 	}
-	
+
 	@Test
 	public void printTable() {
 		TableNode node = new TableNode();
@@ -84,11 +84,11 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		assertEquals("<table class=\"table-documentr table-bordered table-striped table-condensed\"></table>", //$NON-NLS-1$
 				removeTextRange(html));
 	}
-	
+
 	@Test
 	public void printImageTag() {
 		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png")), null, new TextNode(StringUtils.EMPTY)); //$NON-NLS-1$
 		RootNode rootNode = root(node);
@@ -98,11 +98,11 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		String html = htmlSerializer.toHtml(rootNode);
 		assertEquals("<img src=\"/foo.png\"/>", html); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void printImageTagWithAltText() {
 		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png")), null, new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$
 		RootNode rootNode = root(node);
@@ -112,11 +112,11 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		String html = htmlSerializer.toHtml(rootNode);
 		assertEquals("<img src=\"/foo.png\" alt=\"alttext\"/>", html); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void printImageTagAsThumbnail() {
 		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		RefImageNode node = new RefImageNode(
 				new SuperNode(new TextNode("foo.png | thumbnail")), null, new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$
 		RootNode rootNode = root(node);
@@ -128,11 +128,11 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 				"href=\"/foo.png\"><img src=\"/foo.png\" alt=\"alttext\" data-lightbox=\"lightbox\" " + //$NON-NLS-1$
 				"width=\"260\"/></a></li></ul>", html); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void printImageTagWithTitle() {
 		when(context.getAttachmentUri("url")).thenReturn("/foo.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		ExpImageNode node = new ExpImageNode("title", "url", new TextNode("alttext")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String html = htmlSerializer.toHtml(root(node));
 		assertEquals("<img src=\"/foo.png\" alt=\"alttext\" rel=\"tooltip\" data-title=\"title\"/>", html); //$NON-NLS-1$
@@ -143,20 +143,20 @@ public class HtmlSerializerTest extends AbstractDocumentrTest {
 		HeaderNode node = new HeaderNode(2, new TextNode("A Headline")); //$NON-NLS-1$
 		String html = htmlSerializer.toHtml(root(node));
 		assertEquals("<a name=\"a-headline\"></a><h3>A Headline</h3>", removeTextRange(html)); //$NON-NLS-1$
-		
+
 		verify(context).addHeader("A Headline", 2); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void visitMacroNode() {
 		MacroInvocation invocation = new MacroInvocation("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(context.addMacroInvocation("macro", "params")).thenReturn(invocation); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		MacroNode node = new MacroNode("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 		String html = htmlSerializer.toHtml(root(node));
 		assertEquals(invocation.getStartMarker() + invocation.getEndMarker(), html);
 	}
-	
+
 	private RootNode root(Node child) {
 		RootNode rootNode = new RootNode();
 		rootNode.getChildren().add(child);

@@ -37,7 +37,7 @@ public class PanelRowMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new PanelRowMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$

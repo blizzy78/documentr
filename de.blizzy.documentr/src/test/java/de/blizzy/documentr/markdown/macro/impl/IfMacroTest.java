@@ -33,7 +33,7 @@ public class IfMacroTest extends AbstractDocumentrTest {
 	public static String projectName;
 	public static String branchName;
 	public static String pagePath;
-	
+
 	@SuppressWarnings("nls")
 	private static final String EXPRESSION =
 			"{ ->\n" +
@@ -46,7 +46,7 @@ public class IfMacroTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE = "page"; //$NON-NLS-1$
-	
+
 	@Mock
 	private IMacroContext context;
 	@Mock
@@ -59,16 +59,16 @@ public class IfMacroTest extends AbstractDocumentrTest {
 		when(context.getParameters()).thenReturn(EXPRESSION);
 		when(context.getBody()).thenReturn(BODY);
 		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
-		
+
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(PAGE);
-		
+
 		projectName = null;
 		branchName = null;
 		pagePath = null;
 	}
-	
+
 	@Test
 	public void getHtml() {
 		String html = macro.getHtml(context);

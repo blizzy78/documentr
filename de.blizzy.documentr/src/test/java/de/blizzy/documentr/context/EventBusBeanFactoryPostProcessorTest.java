@@ -31,12 +31,12 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class EventBusBeanFactoryPostProcessorTest extends AbstractDocumentrTest {
 	@Mock
 	private ConfigurableListableBeanFactory beanFactory;
-	
+
 	@Test
 	public void postProcessBeanFactory() {
 		EventBusBeanFactoryPostProcessor beanFactoryPostProcessor = new EventBusBeanFactoryPostProcessor();
 		beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
-		
+
 		ArgumentCaptor<BeanPostProcessor> captor = ArgumentCaptor.forClass(BeanPostProcessor.class);
 		verify(beanFactory).addBeanPostProcessor(captor.capture());
 		assertTrue(captor.getValue() instanceof EventBusBeanPostProcessor);

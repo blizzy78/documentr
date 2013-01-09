@@ -31,7 +31,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class FileLengthFormatTest extends AbstractDocumentrTest {
 	@Mock
 	private MessageSource messageSource;
-	
+
 	@Test
 	public void format() {
 		when(messageSource.getMessage("sizeX.bytes", new Object[] { "123" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
@@ -42,7 +42,7 @@ public class FileLengthFormatTest extends AbstractDocumentrTest {
 			.thenReturn("1.21 MB"); //$NON-NLS-1$
 		when(messageSource.getMessage("sizeX.gb", new Object[] { "1.21" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn("1.21 GB"); //$NON-NLS-1$
-		
+
 		FileLengthFormat format = new FileLengthFormat(messageSource, Locale.US);
 		assertEquals("123 bytes", format.format(123)); //$NON-NLS-1$
 		assertEquals("1.21 KB", format.format(1234)); //$NON-NLS-1$

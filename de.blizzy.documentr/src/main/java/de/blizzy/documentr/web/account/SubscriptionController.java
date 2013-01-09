@@ -41,7 +41,7 @@ public class SubscriptionController {
 	private SubscriptionStore subscriptionStore;
 	@Autowired
 	private UserStore userStore;
-	
+
 	@RequestMapping(value="/subscribe/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
@@ -50,7 +50,7 @@ public class SubscriptionController {
 	@ResponseBody
 	public void subscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
 			Authentication authentication) throws IOException {
-		
+
 		User user = userStore.getUser(authentication.getName());
 		subscriptionStore.subscribe(projectName, branchName, Util.toRealPagePath(path), user);
 	}
@@ -63,7 +63,7 @@ public class SubscriptionController {
 	@ResponseBody
 	public void unsubscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
 			Authentication authentication) throws IOException {
-		
+
 		User user = userStore.getUser(authentication.getName());
 		subscriptionStore.unsubscribe(projectName, branchName, Util.toRealPagePath(path), user);
 	}

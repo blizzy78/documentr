@@ -75,7 +75,7 @@ public final class Functions {
 	private static SubscriptionStore subscriptionStore;
 	private static SystemSettingsStore systemSettingsStore;
 	private static UpdateChecker updateChecker;
-	
+
 	@Autowired
 	private GlobalRepositoryManager wiredRepoManager;
 	@Autowired
@@ -96,7 +96,7 @@ public final class Functions {
 	private SystemSettingsStore wiredSystemSettingsStore;
 	@Autowired
 	private UpdateChecker wiredUpdateChecker;
-	
+
 	@PostConstruct
 	public void init() {
 		pageStore = wiredPageStore;
@@ -114,32 +114,32 @@ public final class Functions {
 	public static List<String> listProjects() {
 		return repoManager.listProjects();
 	}
-	
+
 	public static List<String> listProjectBranches(String projectName) throws IOException {
 		return repoManager.listProjectBranches(projectName);
 	}
 
 	public static List<String> listPageAttachments(String projectName, String branchName, String path)
 			throws IOException {
-		
+
 		return pageStore.listPageAttachments(projectName, branchName, path);
 	}
-	
+
 	public static String getPageTitle(String projectName, String branchName, String path) throws IOException {
 		Page page = pageStore.getPage(projectName, branchName, path, false);
 		return page.getTitle();
 	}
-	
+
 	public static List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path)
 			throws IOException {
-		
+
 		return pageStore.getBranchesPageIsSharedWith(projectName, branchName, path);
 	}
-	
+
 	public static List<String> listUsers() throws IOException {
 		return userStore.listUsers();
 	}
-	
+
 	public static String getPageHtml(String projectName, String branchName, String path) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -157,20 +157,20 @@ public final class Functions {
 		return markdownProcessor.processNonCacheableMacros(html, projectName, branchName, path, authentication,
 				contextPath);
 	}
-	
+
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath)
 			throws IOException {
-		
+
 		return PageUtil.getPagePathHierarchy(projectName, branchName, Util.toRealPagePath(pagePath), pageStore);
 	}
-	
+
 	public static PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
 		return pageStore.getPageMetadata(projectName, branchName, path);
 	}
-	
+
 	public static PageMetadata getAttachmentMetadata(String projectName, String branchName, String pagePath,
 			String name) throws IOException {
-		
+
 		return pageStore.getAttachmentMetadata(projectName, branchName, pagePath, name);
 	}
 
@@ -185,17 +185,17 @@ public final class Functions {
 			return Collections.emptyList();
 		}
 	}
-	
+
 	public static String formatSize(long size) {
 		Locale locale = LocaleContextHolder.getLocale();
 		FileLengthFormat format = new FileLengthFormat(messageSource, locale);
 		return format.format(size);
 	}
-	
+
 	public static List<PageVersion> listPageVersions(String projectName, String branchName, String path) throws IOException {
 		return pageStore.listPageVersions(projectName, branchName, Util.toRealPagePath(path));
 	}
-	
+
 	public static List<OpenId> listMyOpenIds() throws IOException {
 		String loginName = SecurityContextHolder.getContext().getAuthentication().getName();
 		List<OpenId> openIds = Lists.newArrayList(userStore.getUser(loginName).getOpenIds());
@@ -207,7 +207,7 @@ public final class Functions {
 		});
 		return openIds;
 	}
-	
+
 	public static List<JspMacroDescriptor> getMacros() {
 		List<IMacroDescriptor> descs = Lists.newArrayList(macroFactory.getDescriptors());
 		final Locale locale = LocaleContextHolder.getLocale();
@@ -228,20 +228,20 @@ public final class Functions {
 		};
 		return Lists.transform(descs, function);
 	}
-	
+
 	public static int floor(double d) {
 		return (int) Math.floor(d);
 	}
-	
+
 	public static String getLanguage() {
 		Locale locale = LocaleContextHolder.getLocale();
 		return locale.getLanguage();
 	}
-	
+
 	public static String escapeJavaScript(String s) {
 		return StringEscapeUtils.escapeEcmaScript(s);
 	}
-	
+
 	public static boolean pageExists(String projectName, String branchName, String path) {
 		try {
 			return pageStore.getPageMetadata(projectName, branchName, path) != null;
@@ -251,25 +251,25 @@ public final class Functions {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static boolean isSubscribed(String projectName, String branchName, String path) throws IOException {
 		String loginName = SecurityContextHolder.getContext().getAuthentication().getName();
 		User user = userStore.getUser(loginName);
 		return subscriptionStore.isSubscribed(projectName, branchName, path, user);
 	}
-	
+
 	public static String getSystemSetting(String key) {
 		return StringUtils.defaultString(systemSettingsStore.getSetting(key));
 	}
-	
+
 	public static String getLatestVersionForUpdate() {
 		return updateChecker.isUpdateAvailable() ? updateChecker.getLatestVersion() : null;
 	}
-	
+
 	public static List<String> getGroovyMacros() {
 		return macroFactory.listGroovyMacros();
 	}
-	
+
 	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

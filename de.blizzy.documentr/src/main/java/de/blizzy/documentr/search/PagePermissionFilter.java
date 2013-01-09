@@ -33,7 +33,7 @@ class PagePermissionFilter extends Filter {
 		this.visibleDocIds = toBitSet(visibleDocIds);
 		this.visibleDocIdsLength = this.visibleDocIds.size();
 	}
-	
+
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) {
 		int docBase = context.docBase;
@@ -46,13 +46,13 @@ class PagePermissionFilter extends Filter {
 			}
 			if (visibleDocIds.get(i) &&
 				((acceptDocs == null) || acceptDocs.get(resultIdx))) {
-				
+
 				result.set(resultIdx);
 			}
 		}
 		return new DocIdBitSet(result);
 	}
-	
+
 	private BitSet toBitSet(Bits bits) {
 		int len = bits.length();
 		BitSet result = new BitSet(len + 1);

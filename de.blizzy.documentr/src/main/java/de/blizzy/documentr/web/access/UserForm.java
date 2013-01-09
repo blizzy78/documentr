@@ -49,7 +49,7 @@ public class UserForm {
 
 	public UserForm(String loginName, String originalLoginName, String password1, String password2, String email,
 			boolean disabled, String authorities) {
-		
+
 		this.loginName = loginName;
 		this.originalLoginName = originalLoginName;
 		this.password1 = password1;

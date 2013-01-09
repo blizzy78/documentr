@@ -32,7 +32,7 @@ import de.blizzy.documentr.validation.annotation.RoleExists;
 public class RoleExistsValidator implements ConstraintValidator<RoleExists, String> {
 	@Autowired
 	private UserStore userStore;
-	
+
 	@Override
 	public void initialize(RoleExists annotation) {
 	}
@@ -42,7 +42,7 @@ public class RoleExistsValidator implements ConstraintValidator<RoleExists, Stri
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
+
 		try {
 			return userStore.getRole(value) != null;
 		} catch (IOException e) {

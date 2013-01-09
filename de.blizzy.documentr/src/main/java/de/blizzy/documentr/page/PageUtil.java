@@ -33,22 +33,22 @@ import com.google.common.collect.Maps;
 public final class PageUtil {
 	private static Map<String, Long> projectEditTimes =
 			Collections.synchronizedMap(Maps.<String, Long>newHashMap());
-	
+
 	private PageUtil() {}
 
 	public static List<String> getPagePathHierarchy(String projectName, String branchName, String pagePath,
 			IPageStore pageStore) throws IOException {
-		
+
 		List<String> result = Lists.newArrayList(pagePath);
 		for (Page page = pageStore.getPage(projectName, branchName, pagePath, false);
 			page.getParentPagePath() != null;
 			page = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false)) {
-			
+
 			result.add(0, page.getParentPagePath());
 		}
 		return result;
 	}
-	
+
 	static void updateProjectEditTime(String projectName) {
 		projectEditTimes.put(projectName, System.currentTimeMillis());
 	}

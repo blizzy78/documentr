@@ -37,14 +37,14 @@ public class YoutubeMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new YoutubeMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getParameters()).thenReturn("video123"); //$NON-NLS-1$
 		assertEquals("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/video123?" + //$NON-NLS-1$
 				"rel=0\" frameborder=\"0\" allowfullscreen></iframe>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getHtmlWithUrl() {
 		when(context.getParameters()).thenReturn("http://www.youtube.com/watch?v=video123&feature=g-vrec"); //$NON-NLS-1$

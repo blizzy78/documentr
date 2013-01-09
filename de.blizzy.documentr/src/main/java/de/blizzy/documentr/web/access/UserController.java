@@ -69,22 +69,22 @@ public class UserController {
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String saveUser(@ModelAttribute @Valid UserForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException {
-		
+
 		User user = userStore.getUser(authentication.getName());
 
 		if (StringUtils.isNotBlank(form.getOriginalLoginName()) &&
 			!form.getOriginalLoginName().equals(UserStore.ANONYMOUS_USER_LOGIN_NAME) &&
 			StringUtils.equals(form.getLoginName(), UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
-			
+
 			bindingResult.rejectValue("loginName", "user.loginName.invalid"); //$NON-NLS-1$ //$NON-NLS-2$
 			return "/user/edit"; //$NON-NLS-1$
 		}
-		
+
 		if (!form.getLoginName().equals(UserStore.ANONYMOUS_USER_LOGIN_NAME)) {
 			if (StringUtils.isNotBlank(form.getLoginName()) &&
 				(StringUtils.isBlank(form.getOriginalLoginName()) ||
 						!form.getLoginName().equals(form.getOriginalLoginName()))) {
-				
+
 				try {
 					if (userStore.getUser(form.getLoginName()) != null) {
 						bindingResult.rejectValue("loginName", "user.loginName.exists"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -93,39 +93,39 @@ public class UserController {
 					// okay
 				}
 			}
-			
+
 			if (StringUtils.isBlank(form.getOriginalLoginName()) &&
 				StringUtils.isBlank(form.getPassword1())) {
-				
+
 				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			if (StringUtils.isBlank(form.getOriginalLoginName()) &&
 					StringUtils.isBlank(form.getPassword2())) {
-				
+
 				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			if (StringUtils.isBlank(form.getPassword1()) && StringUtils.isNotBlank(form.getPassword2())) {
 				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			if (StringUtils.isNotBlank(form.getPassword1()) && StringUtils.isBlank(form.getPassword2())) {
 				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-	
+
 			if (StringUtils.isNotBlank(form.getPassword1()) &&
 				StringUtils.isNotBlank(form.getPassword2()) &&
 				!StringUtils.equals(form.getPassword1(), form.getPassword2())) {
-				
+
 				bindingResult.rejectValue("password1", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
 				bindingResult.rejectValue("password2", "user.password.passwordsNotEqual"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-	
+
 			if (bindingResult.hasErrors()) {
 				return "/user/edit"; //$NON-NLS-1$
 			}
-	
+
 			User existingUser = null;
 			String password = null;
 			if (StringUtils.isNotBlank(form.getOriginalLoginName())) {
@@ -136,25 +136,25 @@ public class UserController {
 					// okay
 				}
 			}
-	
+
 			if (StringUtils.isNotBlank(form.getPassword1())) {
 				password = passwordEncoder.encodePassword(form.getPassword1(), form.getLoginName());
 			}
-	
+
 			if (StringUtils.isBlank(password)) {
 				bindingResult.rejectValue("password1", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 				bindingResult.rejectValue("password2", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			if (bindingResult.hasErrors()) {
 				return "/user/edit"; //$NON-NLS-1$
 			}
-	
+
 			String newUserName = form.getOriginalLoginName();
 			if (StringUtils.isBlank(newUserName)) {
 				newUserName = form.getLoginName();
 			}
-			
+
 			User newUser = new User(newUserName, password, form.getEmail(), form.isDisabled());
 			if (existingUser != null) {
 				for (OpenId openId : existingUser.getOpenIds()) {
@@ -165,11 +165,11 @@ public class UserController {
 
 			if (StringUtils.isNotBlank(form.getOriginalLoginName()) &&
 				!StringUtils.equals(form.getLoginName(), form.getOriginalLoginName())) {
-				
+
 				userStore.renameUser(form.getOriginalLoginName(), form.getLoginName(), user);
 			}
 		}
-		
+
 		String[] authorityStrs = StringUtils.defaultString(form.getAuthorities()).split("\\|"); //$NON-NLS-1$
 		Set<RoleGrantedAuthority> authorities = Sets.newHashSet();
 		for (String authorityStr : authorityStrs) {
@@ -183,7 +183,7 @@ public class UserController {
 			}
 		}
 		userStore.saveUserAuthorities(form.getLoginName(), authorities, user);
-		
+
 		return "redirect:/users"; //$NON-NLS-1$
 	}
 
@@ -201,7 +201,7 @@ public class UserController {
 		model.addAttribute("userForm", form); //$NON-NLS-1$
 		return "/user/edit"; //$NON-NLS-1$
 	}
-	
+
 	@RequestMapping(value="/delete/{loginName:" + DocumentrConstants.USER_LOGIN_NAME_PATTERN + "}", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN) and !isAdmin(#loginName)")
 	public String deleteUser(@PathVariable String loginName, Authentication authentication) throws IOException {
@@ -216,7 +216,7 @@ public class UserController {
 			@RequestParam(required=false) String password1, @RequestParam(required=false) String password2,
 			@RequestParam(required=false) String email, @RequestParam(required=false) boolean disabled,
 			@RequestParam(required=false) String authorities) {
-		
+
 		return (loginName != null) ?
 				new UserForm(loginName, originalLoginName, password1, password2, email, disabled, authorities) :
 				null;

@@ -38,7 +38,7 @@ public class RoleExistsValidatorTest extends AbstractDocumentrTest {
 	private UserStore userStore;
 	@InjectMocks
 	private RoleExistsValidator validator;
-	
+
 	@Test
 	public void isValid() throws IOException {
 		when(userStore.getRole("role")).thenReturn(role); //$NON-NLS-1$

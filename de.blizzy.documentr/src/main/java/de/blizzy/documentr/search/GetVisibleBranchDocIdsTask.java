@@ -43,7 +43,7 @@ class GetVisibleBranchDocIdsTask implements Callable<BitSet> {
 
 	GetVisibleBranchDocIdsTask(IndexSearcher searcher, Authentication authentication,
 			DocumentrPermissionEvaluator permissionEvaluator) {
-		
+
 		this.searcher = searcher;
 		this.authentication = authentication;
 		this.permissionEvaluator = permissionEvaluator;

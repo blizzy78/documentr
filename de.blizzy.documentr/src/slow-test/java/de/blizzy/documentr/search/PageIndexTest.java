@@ -58,7 +58,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String PAGE_PATH = "foo/bar"; //$NON-NLS-1$
-	
+
 	@Rule
 	public TemporaryFolder tempDir = new TemporaryFolder();
 
@@ -83,42 +83,42 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	private UserStore userStore;
 	@InjectMocks
 	private PageIndex pageIndex;
-	
+
 	@Before
 	public void setUp() throws IOException {
 		File dataDir = tempDir.getRoot();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
-		
+
 		when(anonymousAuthenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME)).thenReturn(authentication);
 
 		when(repoManager.listProjects()).thenReturn(Collections.<String>emptyList());
 
 		Whitebox.setInternalState(pageIndex, MoreExecutors.sameThreadExecutor());
-		
+
 		pageIndex.init();
 	}
-	
+
 	@After
 	public void tearDown() {
 		pageIndex.destroy();
 	}
-	
+
 	@Test
 	public void addAndFindPage() throws ParseException, IOException, TimeoutException {
 		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		pageIndex.commit();
 		pageIndex.refresh();
 
 		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
 			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
-		
+
 		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
-		
+
 		SearchResult result = pageIndex.findPages("html", 1, authentication); //$NON-NLS-1$
 		assertEquals(1, result.getTotalHits());
 		assertEquals("<strong>html</strong>", result.getHits().get(0).getTextHtml()); //$NON-NLS-1$
@@ -130,16 +130,16 @@ public class PageIndexTest extends AbstractDocumentrTest {
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		pageIndex.commit();
 		pageIndex.refresh();
-		
+
 		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
 			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
-	
+
 		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader")); //$NON-NLS-1$
-		
+
 		SearchResult result = pageIndex.findPages("htlm", 1, authentication); //$NON-NLS-1$
 		SearchTextSuggestion suggestion = result.getSuggestion();
 		assertNotNull(suggestion);
@@ -147,26 +147,26 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		assertEquals("html", suggestion.getSearchText()); //$NON-NLS-1$
 		assertEquals("<strong><em>html</em></strong>", suggestion.getSearchTextHtml()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void deletePages() throws IOException {
 		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		pageIndex.addPage(new PageChangedEvent(PROJECT, BRANCH, PAGE_PATH));
 		pageIndex.commit();
 		pageIndex.refresh();
 		// make sure page got indexed
 		assertEquals(1, pageIndex.getNumDocuments());
-		
+
 		pageIndex.deletePages(new PagesDeletedEvent(PROJECT, BRANCH, Collections.singleton(PAGE_PATH)));
 		pageIndex.commit();
 		pageIndex.refresh();
 		assertEquals(0, pageIndex.getNumDocuments());
 	}
-	
+
 	@Test
 	public void getAllTags() throws IOException, TimeoutException {
 		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
@@ -180,7 +180,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		Page page2 = Page.fromText("title2", "markdown2"); //$NON-NLS-1$ //$NON-NLS-2$
 		page2.setTags(Sets.newHashSet("tag2")); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, "branch2", PAGE_PATH, true)).thenReturn(page2); //$NON-NLS-1$
-	
+
 		when(permissionEvaluator.getBranchesForPermission(authentication, Permission.VIEW))
 			.thenReturn(Sets.newHashSet(PROJECT + "/" + BRANCH)); //$NON-NLS-1$
 
@@ -190,7 +190,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		pageIndex.refresh();
 		// make sure pages got indexed
 		assertEquals(2, pageIndex.getNumDocuments());
-		
+
 		assertEquals(Sets.newHashSet("tag"), pageIndex.getAllTags(authentication)); //$NON-NLS-1$
 	}
 }

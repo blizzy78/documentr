@@ -37,14 +37,14 @@ public class PanelMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new PanelMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getParameters()).thenReturn("3"); //$NON-NLS-1$
 		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
 		assertEquals("<div class=\"span3\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getHtmlWithBorder() {
 		when(context.getParameters()).thenReturn("3 border"); //$NON-NLS-1$

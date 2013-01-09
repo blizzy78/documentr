@@ -32,13 +32,13 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class RepositoryUtilTest extends AbstractDocumentrTest {
 	@Mock
 	private Repository repo;
-	
+
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyWithRepository() {
 		RepositoryUtil.closeQuietly(repo);
 		verify(repo).close();
 	}
-	
+
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyMustAcceptNull() {
 		RepositoryUtil.closeQuietly((Repository) null);
@@ -47,10 +47,10 @@ public class RepositoryUtilTest extends AbstractDocumentrTest {
 	@Test(expected=None.class)
 	public void closeRepositoryQuietlyMustCatchExceptions() {
 		doThrow(new RuntimeException()).when(repo).close();
-		
+
 		RepositoryUtil.closeQuietly(repo);
 	}
-	
+
 	@Test
 	public void getWorkingDir() {
 		File dir = new File("."); //$NON-NLS-1$

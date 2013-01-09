@@ -39,7 +39,7 @@ public class OpenIdUserDetailsServiceTest extends AbstractDocumentrTest {
 	@Test
 	public void loadUser() throws IOException {
 		when(userStore.getUserByOpenId("openId")).thenReturn(user); //$NON-NLS-1$
-		
+
 		User result = userDetailsService.loadUser("openId"); //$NON-NLS-1$
 		assertEquals(user, result);
 	}

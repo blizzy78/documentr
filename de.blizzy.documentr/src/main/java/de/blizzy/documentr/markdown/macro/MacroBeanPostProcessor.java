@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 public class MacroBeanPostProcessor implements BeanPostProcessor {
 	@Autowired
 	private BeanFactory beanFactory;
-	
+
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
@@ -46,7 +46,7 @@ public class MacroBeanPostProcessor implements BeanPostProcessor {
 				throw new BeanDefinitionValidationException("no macro name specified in @" + //$NON-NLS-1$
 						Macro.class.getSimpleName() + " annotation for bean: " + beanName); //$NON-NLS-1$
 			}
-			
+
 			if (!(bean instanceof IMacro)) {
 				if (bean instanceof ISimpleMacro) {
 					return createMacro((ISimpleMacro) bean, annotation);
@@ -69,7 +69,7 @@ public class MacroBeanPostProcessor implements BeanPostProcessor {
 		log.info("creating macro from simple macro: {}", annotation.name()); //$NON-NLS-1$
 		return new SimpleMacroMacro(bean, annotation, beanFactory);
 	}
-	
+
 	private IMacro createMacro(Class<? extends IMacroRunnable> clazz, Macro annotation) {
 		log.info("creating macro from macro runnable: {}", annotation.name()); //$NON-NLS-1$
 		return new MacroRunnableMacro(clazz, annotation, beanFactory);

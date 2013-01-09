@@ -30,7 +30,7 @@ public class PageTextDataTest {
 		assertEquals("foo", new PageTextData("foo").getText()); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("foo", PageTextData.fromBytes("foo".getBytes(Charsets.UTF_8)).getText()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void testEquals() {
 		assertEqualsContract(

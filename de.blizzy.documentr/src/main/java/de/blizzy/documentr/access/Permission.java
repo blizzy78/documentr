@@ -21,13 +21,13 @@ package de.blizzy.documentr.access;
 public enum Permission {
 	/** Administrative permission. Can be granted on all objects. Implies all other permissions on those objects. */
 	ADMIN,
-	
+
 	/** Viewing permission. Can be granted on all objects. */
 	VIEW,
-	
+
 	/**
 	 * <p>Edit project permission. Can be granted on:</p>
-	 * 
+	 *
 	 * <ul>
 	 *   <li>Application - Allows to create, edit, and delete projects.</li>
 	 *   <li>Project - Allows to edit project details.</li>
@@ -37,17 +37,17 @@ public enum Permission {
 
 	/**
 	 * <p>Edit branch permission. Can be granted on:</p>
-	 * 
+	 *
 	 * <ul>
 	 *   <li>Application, project - Allows to create, edit, and delete branches.</li>
 	 *   <li>Branch - Allows to edit branch details.</li>
 	 * </ul>
 	 */
 	EDIT_BRANCH,
-	
+
 	/**
 	 * <p>Edit page permission. Can be granted on:</p>
-	 * 
+	 *
 	 * <ul>
 	 *   <li>Application, project, branch - Allows to create, edit, and delete pages and attachments.</li>
 	 * </ul>

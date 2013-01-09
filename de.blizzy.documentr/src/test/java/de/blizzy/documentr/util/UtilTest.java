@@ -51,7 +51,7 @@ public class UtilTest extends AbstractDocumentrTest {
 		assertEquals("x,y,z", Util.toUrlPagePath("x,y,z")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertNull(Util.toUrlPagePath(null));
 	}
-	
+
 	@Test
 	public void simplifyForUrl() {
 		assertEquals("changes-for-1-0-x-code-name-wheatley-xl", //$NON-NLS-1$
@@ -66,7 +66,7 @@ public class UtilTest extends AbstractDocumentrTest {
 				new Integer[] { 1, 2, 3 }), ", ")); //$NON-NLS-1$
 		assertEquals("123", Util.join(123, ", ")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test(expected=None.class)
 	public void deleteQuietly() throws IOException {
 		File dir = tempDir.getRoot();
@@ -74,30 +74,30 @@ public class UtilTest extends AbstractDocumentrTest {
 		FileUtils.touch(file);
 		// check that file actually exists
 		assertTrue(file.isFile());
-		
+
 		Util.deleteQuietly(file);
 		assertFalse(file.exists());
-		
+
 		Util.deleteQuietly(dir);
 		assertFalse(dir.exists());
 	}
-	
+
 	@Test(expected=None.class)
 	public void deleteQuietlyMustAcceptNull() {
 		Util.deleteQuietly(null);
 	}
-	
+
 	@Test(expected=None.class)
 	public void deleteQuietlyMustCatchExceptions() throws IOException {
 		File dir = tempDir.getRoot();
 		File file = new File(dir, "test.txt"); //$NON-NLS-1$
 		FileOutputStream out = new FileOutputStream(file);
-		
+
 		Util.deleteQuietly(dir);
-		
+
 		Closeables.closeQuietly(out);
 	}
-	
+
 	@Test
 	public void toFile() {
 		File dir = new File("."); //$NON-NLS-1$

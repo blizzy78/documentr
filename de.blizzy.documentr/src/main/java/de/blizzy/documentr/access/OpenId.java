@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 /**
  * <p>Represents an OpenID. An OpenID consists of a delegate ID and a real ID provided by an OpenID provider.
  * Delegate and real IDs can be equal.</p>
- * 
+ *
  * <p>No two users must have OpenIDs that have the same real ID, but delegate IDs may be shared. For example,
  * &quot;yahoo.com&quot; is the common delegate ID for users using Yahoo's OpenID services.</p>
  */
@@ -38,14 +38,14 @@ public class OpenId {
 
 	/**
 	 * Constructs a new OpenID.
-	 * 
+	 *
 	 * @param delegateId the delegate ID
 	 * @param realId the real ID
 	 */
 	public OpenId(String delegateId, String realId) {
 		Assert.hasLength(delegateId);
 		Assert.hasLength(realId);
-		
+
 		this.delegateId = delegateId;
 		this.realId = realId;
 	}
@@ -63,7 +63,7 @@ public class OpenId {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(delegateId).append(realId).toHashCode();

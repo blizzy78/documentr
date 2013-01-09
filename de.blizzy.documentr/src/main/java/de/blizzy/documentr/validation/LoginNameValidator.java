@@ -37,7 +37,7 @@ public class LoginNameValidator implements ConstraintValidator<ValidLoginName, S
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
+
 		return Pattern.matches("^" + DocumentrConstants.USER_LOGIN_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

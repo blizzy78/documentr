@@ -31,7 +31,7 @@ public class PageNotFoundException extends NotFoundException {
 
 	public PageNotFoundException(String projectName, String branchName, String path) {
 		super("page not found: " + projectName + "/" + branchName + "/" + Util.toUrlPagePath(path)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;

@@ -45,10 +45,10 @@ public class TableOfContentsMacroTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() {
 		runnable = new TableOfContentsMacro();
-		
+
 		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 	}
-	
+
 	@Test
 	public void getMarkdown() {
 		List<Header> headers = Lists.newArrayList(
@@ -65,12 +65,12 @@ public class TableOfContentsMacroTest extends AbstractDocumentrTest {
 				"- [[#qux]]\n\n", //$NON-NLS-1$
 				runnable.getMarkdown(context));
 	}
-	
+
 	@Test
 	public void getMarkdownButNoHeaders() {
 		List<Header> headers = Collections.emptyList();
 		when(htmlSerializerContext.getHeaders()).thenReturn(headers);
-		
+
 		assertNull(runnable.getMarkdown(context));
 	}
 }

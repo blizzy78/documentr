@@ -39,7 +39,7 @@ public class DocumentrParserTest {
 		DocumentrParser parser = Parboiled.createParser(DocumentrParser.class);
 		processor = new PegDownProcessor(parser);
 	}
-	
+
 	@Test
 	public void fencedCodeBlock() {
 		RootNode rootNode = parse("~~~java:title 123\nxyz\n~~~"); //$NON-NLS-1$
@@ -48,7 +48,7 @@ public class DocumentrParserTest {
 		assertEquals("title 123", verbatimNode.getTitle()); //$NON-NLS-1$
 		assertEquals("xyz", verbatimNode.getText().trim()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void standaloneMacro() {
 		RootNode rootNode = parse("{{foo/}}"); //$NON-NLS-1$
@@ -58,7 +58,7 @@ public class DocumentrParserTest {
 		assertEquals("foo", macroNode.getMacroName()); //$NON-NLS-1$
 		assertNull(macroNode.getParams());
 	}
-	
+
 	@Test
 	public void standaloneMacroWithParameters() {
 		RootNode rootNode = parse("{{foo bar baz/}}"); //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class DocumentrParserTest {
 		assertEquals("foo", macroNode.getMacroName()); //$NON-NLS-1$
 		assertEquals("bar baz", macroNode.getParams()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void bodyMacro() {
 		RootNode rootNode = parse("{{foo}}xyz{{/foo}}"); //$NON-NLS-1$
@@ -96,7 +96,7 @@ public class DocumentrParserTest {
 		TextNode textNode = (TextNode) superNode.getChildren().get(0);
 		assertEquals("xyz", textNode.getText()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void pageHeader() {
 		RootNode rootNode = parse("{{:header:}}xyz{{:/header:}}"); //$NON-NLS-1$

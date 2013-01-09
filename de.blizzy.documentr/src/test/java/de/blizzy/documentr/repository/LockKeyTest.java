@@ -34,7 +34,7 @@ public class LockKeyTest {
 		assertEqualsContract(equal1, equal2, equal3, different2);
 		assertEqualsContract(equal1, equal2, equal3, different3);
 	}
-	
+
 	@Test
 	public void testHashCode() {
 		LockKey equal1 = new LockKey("p1", "b", true); //$NON-NLS-1$ //$NON-NLS-2$

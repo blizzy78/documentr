@@ -30,7 +30,7 @@ public class GroovyMacro {
 	public GroovyMacro(String name, String code) {
 		Assert.hasLength(name);
 		Assert.hasLength(code);
-		
+
 		this.name = name;
 		this.code = code;
 	}

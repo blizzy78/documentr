@@ -23,7 +23,7 @@ import lombok.Getter;
 
 public class MergeConflict implements Serializable {
 	private static final long serialVersionUID = -694341729219549082L;
-	
+
 	@Getter
 	private String text;
 	@Getter

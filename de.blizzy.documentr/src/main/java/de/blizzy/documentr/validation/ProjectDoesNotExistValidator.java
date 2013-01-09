@@ -29,7 +29,7 @@ import de.blizzy.documentr.validation.annotation.ProjectDoesNotExist;
 public class ProjectDoesNotExistValidator implements ConstraintValidator<ProjectDoesNotExist, String> {
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
-	
+
 	@Override
 	public void initialize(ProjectDoesNotExist annotation) {
 	}

@@ -70,7 +70,7 @@ public class SystemSettingsStore implements Lifecycle {
 	public static final String UPDATE_CHECK_INTERVAL_NEVER = "never"; //$NON-NLS-1$
 	public static final String UPDATE_CHECK_INTERVAL_DAILY = "daily"; //$NON-NLS-1$
 	public static final String UPDATE_CHECK_INTERVAL_WEEKLY = "weekly"; //$NON-NLS-1$
-	
+
 	private static final String REPOSITORY_NAME = "_system"; //$NON-NLS-1$
 	private static final String SETTINGS_FILE_NAME = "settings"; //$NON-NLS-1$
 	private static final String MACRO_KEY_PREFIX = "macro."; //$NON-NLS-1$
@@ -83,17 +83,17 @@ public class SystemSettingsStore implements Lifecycle {
 	private EventBus eventBus;
 	private Map<String, String> settings;
 	private boolean running;
-	
+
 	@PostConstruct
 	public void init() throws IOException {
 		settings = loadSettings();
 		setDefaultSettings();
 	}
-	
+
 	@Override
 	public void start() {
 		running = true;
-		
+
 		try {
 			User adminUser = userStore.getUser("admin"); //$NON-NLS-1$
 			ILockedRepository repo = globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
@@ -113,7 +113,7 @@ public class SystemSettingsStore implements Lifecycle {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public void stop() {
 		running = false;
@@ -123,7 +123,7 @@ public class SystemSettingsStore implements Lifecycle {
 	public boolean isRunning() {
 		return running;
 	}
-	
+
 	private void setDefaultSettings() {
 		Map<String, String> defaultSettings = Maps.newHashMap();
 		defaultSettings.put(DOCUMENTR_HOST, "http://localhost:8080"); //$NON-NLS-1$
@@ -132,8 +132,8 @@ public class SystemSettingsStore implements Lifecycle {
 		defaultSettings.put(MAIL_SUBJECT_PREFIX, "[documentr]"); //$NON-NLS-1$
 		defaultSettings.put(MAIL_DEFAULT_LANGUAGE, Locale.ENGLISH.getLanguage());
 		defaultSettings.put(BCRYPT_ROUNDS, "12"); //$NON-NLS-1$
-		defaultSettings.put(UPDATE_CHECK_INTERVAL, UPDATE_CHECK_INTERVAL_WEEKLY); 
-		
+		defaultSettings.put(UPDATE_CHECK_INTERVAL, UPDATE_CHECK_INTERVAL_WEEKLY);
+
 		for (Map.Entry<String, String> entry : defaultSettings.entrySet()) {
 			if (!settings.containsKey(entry.getKey())) {
 				settings.put(entry.getKey(), entry.getValue());
@@ -146,13 +146,13 @@ public class SystemSettingsStore implements Lifecycle {
 			return Collections.unmodifiableMap(Maps.newHashMap(settings));
 		}
 	}
-	
+
 	public String getSetting(String key) {
 		synchronized (settings) {
 			return settings.get(key);
 		}
 	}
-	
+
 	public void saveSettings(Map<String, String> newSettings, User currentUser) throws IOException {
 		Map<String,String> settingsToStore;
 		synchronized (settings) {
@@ -162,10 +162,10 @@ public class SystemSettingsStore implements Lifecycle {
 		storeSettings(settingsToStore, currentUser);
 		eventBus.post(new SystemSettingsChangedEvent());
 	}
-	
+
 	private void storeSettings(Map<String, String> settings, User currentUser) throws IOException {
 		log.info("storing system settings"); //$NON-NLS-1$
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = getOrCreateRepository(currentUser);
@@ -198,7 +198,7 @@ public class SystemSettingsStore implements Lifecycle {
 			return globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, user);
 		}
 	}
-	
+
 	private Map<String, String> loadSettings() throws IOException {
 		log.info("loading system settings"); //$NON-NLS-1$
 

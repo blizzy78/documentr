@@ -86,7 +86,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Locale LOCALE = Locale.ENGLISH;
-	
+
 	@Mock
 	private IPageStore pageStore;
 	@Mock
@@ -129,14 +129,14 @@ public class PageControllerTest extends AbstractDocumentrTest {
 
 		when(authenticatedAuthentication.isAuthenticated()).thenReturn(false);
 	}
-	
+
 	@Test
 	public void getPage() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		when(request.getSession()).thenReturn(session);
-		
+
 		getPage(request);
 	}
 
@@ -147,25 +147,25 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
-		
+
 		getPage(request);
 	}
-	
+
 	private void getPage(HttpServletRequest request) throws IOException {
 		Date lastModified = new Date();
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(
 				new PageMetadata("user", lastModified, 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
 		TestPageUtil.setParentPagePath(page, PARENT_PAGE);
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, false)).thenReturn(page);
-		
+
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, PAGE_PATH_URL, model, request, response);
 		SecurityContextHolder.clearContext();
 		assertEquals("/project/branch/page/view", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
 		verify(model).addAttribute("pageName", PAGE_NAME); //$NON-NLS-1$
 		verify(model).addAttribute("parentPagePath", PARENT_PAGE); //$NON-NLS-1$
@@ -173,21 +173,21 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		verify(model).addAttribute("viewRestrictionRole", page.getViewRestrictionRole()); //$NON-NLS-1$
 		verify(response).setDateHeader("Last-Modified", lastModified.getTime()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getPageMustReturn404IfNotFound() throws IOException {
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
-		
+
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
-		
+
 		SecurityContextHolder.setContext(createSecurityContext(authenticatedAuthentication));
 		String view = pageController.getPage(PROJECT, BRANCH, "nonexistent", model, request, response); //$NON-NLS-1$
 		SecurityContextHolder.clearContext();
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
-	
+
 	@Test
 	public void getPageMustReturn304IfNotModified() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn( //$NON-NLS-1$
@@ -196,10 +196,10 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
-		
+
 		when(pageStore.getPageMetadata(eq(PROJECT), eq(BRANCH), eq("nonexistent"))) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		TestPageUtil.clearProjectEditTimes();
 
 		SecurityContextHolder.setContext(createSecurityContext(anonymousAuthentication));
@@ -208,16 +208,16 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		assertTrue(removeViewPrefix(view).startsWith("/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
-	
+
 	@Test
 	public void createPage() {
 		String view = pageController.createPage(PROJECT, BRANCH, PARENT_PAGE, model);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("pageForm"), //$NON-NLS-1$
 				argPageForm(PROJECT, BRANCH, null, PARENT_PAGE, null, null, null));
 	}
-	
+
 	@Test
 	public void editPage() throws IOException {
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -225,56 +225,56 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH))
 			.thenReturn(new PageMetadata("user", new Date(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		String view = pageController.editPage(PROJECT, BRANCH, PAGE_PATH_URL, model, session);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("pageForm"), //$NON-NLS-1$
 				argPageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", "commit")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	@Test
 	public void editPageButNonexistent() throws IOException {
 		when(pageStore.getPage(eq(PROJECT), eq(BRANCH), eq("nonexistent"), anyBoolean())) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, "nonexistent")); //$NON-NLS-1$
-		
+
 		String view = pageController.editPage(PROJECT, BRANCH, "nonexistent", model, session); //$NON-NLS-1$
 		assertEquals("/error/" + HttpServletResponse.SC_NOT_FOUND + "/page.notFound", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertForward(view);
 	}
-	
+
 	@Test
 	public void savePage() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		
+
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage("title", "text"), isNull(String.class), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void savePageWithViewRestrictionRole() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", "viewRole", null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		
+
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage(ANY, "title", "text", "viewRole"), isNull(String.class), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	@Test
 	public void savePageMustNotChangeExistingPath() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
@@ -282,7 +282,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
-		
+
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2", null, null, //$NON-NLS-1$ //$NON-NLS-2$
@@ -297,7 +297,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage("title2", "text2"), isNull(String.class), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void savePageBlankPath() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
@@ -305,24 +305,24 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text", null, null, //$NON-NLS-1$
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		
+
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		String path = PARENT_PAGE + "/" + Util.simplifyForUrl(title); //$NON-NLS-1$
 		String pathUrl = Util.toUrlPagePath(path);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + pathUrl, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(path),
 				argPage(title, "text"), isNull(String.class), same(USER)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void savePageShouldDoNothingIfNoChanges() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
-		
+
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
@@ -331,20 +331,20 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		verify(pageStore, never()).savePage(
 				anyString(), anyString(), anyString(), Matchers.<Page>any(), anyString(), Matchers.<User>any());
 	}
-	
+
 	@Test
 	public void savePageButNonexistentBranch() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			ArrayUtils.EMPTY_STRING_ARRAY);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
-		
+
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 		assertEquals("/project/branch/page/edit", view); //$NON-NLS-1$
 		assertTrue(bindingResult.hasErrors());
 		assertTrue(bindingResult.hasFieldErrors("branchName")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void generateName() throws IOException {
 		String title = "simple as 1, 2, 3"; //$NON-NLS-1$
@@ -363,54 +363,54 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		assertEquals(path, result.get("path")); //$NON-NLS-1$
 		assertEquals(Boolean.TRUE, result.get("exists")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void markdownToHtml() {
 		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
 				authenticatedAuthentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
 				authenticatedAuthentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
-		
+
 		when(request.getContextPath()).thenReturn(CONTEXT);
-		
+
 		Map<String, String> result = pageController.markdownToHtml(
 				PROJECT, BRANCH, "markdown", PAGE_PATH, authenticatedAuthentication, request); //$NON-NLS-1$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void copyToBranch() throws IOException {
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
-		
+
 		String view = pageController.copyToBranch(PROJECT, BRANCH, PAGE_PATH_URL, "targetBranch", //$NON-NLS-1$
 				authenticatedAuthentication);
 		assertEquals("/page/edit/" + PROJECT + "/targetBranch/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$
 		assertRedirect(view);
-		
+
 		verify(pageStore).savePage(eq(PROJECT), eq("targetBranch"), eq(PAGE_PATH), //$NON-NLS-1$
 				argPage("title", "text"), isNull(String.class), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void deletePage() throws IOException {
 		String view = pageController.deletePage(PROJECT, BRANCH, PAGE_PATH_URL, authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
-		
+
 		verify(pageStore).deletePage(PROJECT, BRANCH, PAGE_PATH, USER);
 	}
-	
+
 	@Test
 	public void relocatePage() throws IOException {
 		String view = pageController.relocatePage(PROJECT, BRANCH, PAGE_PATH_URL, "home,newparent", //$NON-NLS-1$
 				authenticatedAuthentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/home,newparent,page", removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
-		
+
 		verify(pageStore).relocatePage(PROJECT, BRANCH, PAGE_PATH, "home/newparent", USER); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getPageMarkdown() throws IOException {
 		Set<String> versions = Sets.newHashSet("commit1", "commit2", "nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -418,29 +418,29 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		markdown.put("commit1", "md1"); //$NON-NLS-1$ //$NON-NLS-2$
 		markdown.put("commit2", "md2"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getMarkdown(PROJECT, BRANCH, PAGE_PATH, versions)).thenReturn(markdown);
-		
+
 		Map<String, String> result = pageController.getPageMarkdown(PROJECT, BRANCH, PAGE_PATH_URL, versions);
 		assertEquals(markdown, result);
 	}
-	
+
 	@Test
 	public void getPageMarkdownInRange() throws IOException {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, "commit", true)).thenReturn(page); //$NON-NLS-1$
-		
+
 		Map<String, String> result = pageController.getPageMarkdownInRange(
 				PROJECT, BRANCH, PAGE_PATH_URL, 2, 4, "commit"); //$NON-NLS-1$
 		assertEquals("y", result.get("markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void savePageRange() throws IOException {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, "commit", true)).thenReturn(page); //$NON-NLS-1$
-		
+
 		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication, CONTEXT))
 			.thenReturn("html"); //$NON-NLS-1$
-		
+
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
 				authenticatedAuthentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
 
@@ -448,33 +448,33 @@ public class PageControllerTest extends AbstractDocumentrTest {
 
 		when(pageMetadata.getCommit()).thenReturn("newCommit"); //$NON-NLS-1$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageMetadata);
-		
+
 		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
 				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, request); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("newCommit", result.get("commit")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(PAGE_PATH),
 				argPage("title", "x\na\nb\nc\nz\n"), eq("commit"), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	@Test
 	public void getPageChanges() {
 		String view = pageController.getPageChanges(PROJECT, BRANCH, PAGE_PATH_URL, model);
 		assertEquals("/project/branch/page/changes", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("projectName", PROJECT); //$NON-NLS-1$
 		verify(model).addAttribute("branchName", BRANCH); //$NON-NLS-1$
 		verify(model).addAttribute("path", PAGE_PATH); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void restoreVersion() throws IOException {
 		pageController.restoreVersion(PROJECT, BRANCH, PAGE_PATH_URL, "version", authenticatedAuthentication); //$NON-NLS-1$
-		
+
 		verify(pageStore).restorePageVersion(PROJECT, BRANCH, PAGE_PATH, "version", USER); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void cherryPick() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
@@ -483,7 +483,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 
 		when(cherryPicker.getCommitsList(PROJECT, BRANCH, PAGE_PATH, "version2", "version4")) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(Lists.newArrayList("version3", "version4")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		@SuppressWarnings("nls")
 		List<CommitCherryPickResult> branchResults = Lists.newArrayList(
 				new CommitCherryPickResult(new PageVersion("version3", "user", new Date()),
@@ -502,7 +502,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 	}
-	
+
 	@Test
 	public void cherryPickWithConflicts() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
@@ -524,7 +524,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 				Sets.newHashSet("targetBranch"), Collections.<CommitCherryPickConflictResolve>emptySet(), false, //$NON-NLS-1$
 				USER, LOCALE))
 				.thenReturn(results);
-		
+
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication, LOCALE); //$NON-NLS-1$
 		assertEquals("/project/branch/page/cherryPick", view); //$NON-NLS-1$
@@ -534,13 +534,13 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		verify(model).addAttribute("version2", "version4"); //$NON-NLS-1$ //$NON-NLS-2$
 		verify(model).addAttribute("resolves", Collections.emptySet()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void cherryPickWithConflictsAndResolveTexts() throws IOException {
 		when(permissionEvaluator.hasPagePermission(
 				authenticatedAuthentication, PROJECT, "targetBranch", PAGE_PATH, Permission.EDIT_PAGE)) //$NON-NLS-1$
 				.thenReturn(true);
-		
+
 		when(cherryPicker.getCommitsList(PROJECT, BRANCH, PAGE_PATH, "version2", "version4")) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(Lists.newArrayList("version3", "version4")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -558,11 +558,11 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(cherryPicker.cherryPick(PROJECT, BRANCH, PAGE_PATH, Lists.newArrayList("version3", "version4"), //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), resolves, false, USER, LOCALE)) //$NON-NLS-1$
 				.thenReturn(results);
-		
+
 		Map<String, String[]> params = Maps.newHashMap();
 		params.put("resolveText_targetBranch/version3", new String[] { "resolveText" }); //$NON-NLS-1$ //$NON-NLS-2$
 		when(webRequest.getParameterMap()).thenReturn(params);
-		
+
 		String view = pageController.cherryPick(PROJECT, BRANCH, PAGE_PATH, "version2", "version4", //$NON-NLS-1$ //$NON-NLS-2$
 				Sets.newHashSet("targetBranch"), false, webRequest, model, authenticatedAuthentication, LOCALE); //$NON-NLS-1$
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

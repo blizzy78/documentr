@@ -37,12 +37,12 @@ public class ParseQueryTaskTest {
 	public void setUp() {
 		analyzer = new StandardAnalyzer(Version.LUCENE_40);
 	}
-	
+
 	@Test
 	public void call() throws ParseException {
 		ParseQueryTask task = new ParseQueryTask("+foo -bar", analyzer); //$NON-NLS-1$
 		Query result = task.call();
-		
+
 		BooleanQuery query = new BooleanQuery();
 		query.add(new TermQuery(new Term(PageIndex.ALL_TEXT, "foo")), BooleanClause.Occur.MUST); //$NON-NLS-1$
 		query.add(new TermQuery(new Term(PageIndex.ALL_TEXT, "bar")), BooleanClause.Occur.MUST_NOT); //$NON-NLS-1$

@@ -21,7 +21,7 @@ package de.blizzy.documentr.util;
 public abstract class NotFoundException extends RuntimeException {
 	protected NotFoundException() {
 	}
-	
+
 	protected NotFoundException(String msg) {
 		super(msg);
 	}

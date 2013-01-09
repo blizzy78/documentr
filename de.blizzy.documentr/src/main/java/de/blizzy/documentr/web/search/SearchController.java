@@ -49,12 +49,12 @@ public class SearchController {
 	private PageIndex pageIndex;
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory authenticationFactory;
-	
+
 	@RequestMapping(value="/page", method=RequestMethod.GET)
 	@PreAuthorize("permitAll")
 	public String findPages(@RequestParam("q") String searchText, @RequestParam(value="p", required=false) Integer page,
 			Authentication authentication, Model model) throws IOException {
-		
+
 		if (page == null) {
 			page = 1;
 		}
@@ -63,7 +63,7 @@ public class SearchController {
 		if (authentication == null) {
 			authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		}
-		
+
 		try {
 			SearchResult result = pageIndex.findPages(searchText, page, authentication);
 			model.addAttribute("searchText", searchText); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class SearchController {
 		}
 		return "/search/result"; //$NON-NLS-1$
 	}
-	
+
 	@RequestMapping(value="/tags/json", method=RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("permitAll")
@@ -85,7 +85,7 @@ public class SearchController {
 		if (authentication == null) {
 			authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
 		}
-		
+
 		return pageIndex.getAllTags(authentication);
 	}
 }

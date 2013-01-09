@@ -49,17 +49,17 @@ public class PageRendererTest extends AbstractDocumentrTest {
 	private MarkdownProcessor markdownProcessor;
 	@InjectMocks
 	private PageRenderer pageRenderer;
-	
+
 	@Before
 	public void setUp() throws IOException {
-		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(PAGE); 
+		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(PAGE);
 	}
-	
+
 	@Test
 	public void getHtml() throws IOException {
 		when(markdownProcessor.markdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
-			.thenReturn(HTML); 
-		
+			.thenReturn(HTML);
+
 		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
 		assertEquals(HTML, result);
 	}
@@ -68,7 +68,7 @@ public class PageRendererTest extends AbstractDocumentrTest {
 	public void getHeaderHtml() throws IOException {
 		when(markdownProcessor.headerMarkdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
 			.thenReturn(HTML);
-		
+
 		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
 		assertEquals(HTML, result);
 	}

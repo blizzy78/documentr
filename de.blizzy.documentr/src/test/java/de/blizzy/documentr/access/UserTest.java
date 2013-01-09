@@ -35,10 +35,10 @@ public class UserTest {
 		for (OpenId openId : openIds) {
 			user.addOpenId(openId);
 		}
-		
+
 		assertEquals(openIds, user.getOpenIds());
 	}
-	
+
 	@Test
 	public void addOpenId() {
 		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -52,10 +52,10 @@ public class UserTest {
 		OpenId newOpenId = new OpenId("openId3", "realId3"); //$NON-NLS-1$ //$NON-NLS-2$
 		user.addOpenId(newOpenId);
 		openIds.add(newOpenId);
-		
+
 		assertEquals(openIds, user.getOpenIds());
 	}
-	
+
 	@Test
 	public void removeOpenId() {
 		User user = new User("user", "password", "email", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -66,7 +66,7 @@ public class UserTest {
 		for (OpenId openId : openIds) {
 			user.addOpenId(openId);
 		}
-		
+
 		user.removeOpenId(openId2.getDelegateId());
 		openIds.remove(openId2);
 		assertEquals(openIds, user.getOpenIds());

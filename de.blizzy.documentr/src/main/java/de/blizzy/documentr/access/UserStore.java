@@ -65,17 +65,17 @@ import de.blizzy.documentr.repository.RepositoryUtil;
 public class UserStore {
 	/** The login name of the anonymous user. */
 	public static final String ANONYMOUS_USER_LOGIN_NAME = "_anonymous"; //$NON-NLS-1$
-	
+
 	private static final String REPOSITORY_NAME = "_users"; //$NON-NLS-1$
 	private static final String USER_SUFFIX = ".user"; //$NON-NLS-1$
 	private static final String ROLE_SUFFIX = ".role"; //$NON-NLS-1$
 	private static final String AUTHORITIES_SUFFIX = ".authorities"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	@PostConstruct
 	public void init() throws IOException, GitAPIException {
 		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -91,7 +91,7 @@ public class UserStore {
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
-		
+
 		if (created) {
 			createInitialAdmin(adminUser);
 			createInitialRoles(adminUser);
@@ -101,7 +101,7 @@ public class UserStore {
 	private void createInitialAdmin(User adminUser) throws IOException {
 		saveUser(adminUser, adminUser);
 	}
-	
+
 	private void createInitialRoles(User adminUser) throws IOException {
 		saveRole(new Role("Administrator", EnumSet.of(Permission.ADMIN)), adminUser); //$NON-NLS-1$
 		saveRole(new Role("Editor", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)), adminUser); //$NON-NLS-1$
@@ -110,7 +110,7 @@ public class UserStore {
 		Set<RoleGrantedAuthority> authorities = Collections.singleton(
 				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Administrator")); //$NON-NLS-1$
 		saveUserAuthorities(adminUser.getLoginName(), authorities, adminUser);
-		
+
 		authorities = Collections.singleton(
 				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "Reader")); //$NON-NLS-1$
 		saveUserAuthorities(ANONYMOUS_USER_LOGIN_NAME, authorities, adminUser);
@@ -118,14 +118,14 @@ public class UserStore {
 
 	/**
 	 * Saves a user.
-	 * 
+	 *
 	 * @param user the user to save
 	 * @param currentUser the user performing the save operation
 	 */
 	public void saveUser(User user, User currentUser) throws IOException {
 		Assert.notNull(user);
 		Assert.notNull(currentUser);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -158,15 +158,15 @@ public class UserStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	/**
 	 * Returns the user that has the specified login name.
-	 * 
+	 *
 	 * @throws UserNotFoundException when the user could not be found
 	 */
 	public User getUser(String loginName) throws IOException {
 		Assert.hasLength(loginName);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -174,7 +174,7 @@ public class UserStore {
 			if (json == null) {
 				throw new UserNotFoundException(loginName);
 			}
-			
+
 			return getUser(loginName, json);
 		} finally {
 			Closeables.closeQuietly(repo);
@@ -233,18 +233,18 @@ public class UserStore {
 
 	/**
 	 * Saves a role.
-	 * 
+	 *
 	 * @param role the role to save
 	 * @param currentUser the user performing the save operation
 	 */
 	public void saveRole(Role role, User currentUser) throws IOException {
 		Assert.notNull(role);
 		Assert.notNull(currentUser);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			
+
 			Map<String, Object> roleMap = new HashMap<String, Object>();
 			roleMap.put("name", role.getName()); //$NON-NLS-1$
 			Set<String> permissions = Sets.newHashSet();
@@ -252,7 +252,7 @@ public class UserStore {
 				permissions.add(permission.name());
 			}
 			roleMap.put("permissions", permissions); //$NON-NLS-1$
-			
+
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			String json = gson.toJson(roleMap);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
@@ -303,12 +303,12 @@ public class UserStore {
 
 	/**
 	 * Returns the role that has the specified name.
-	 * 
+	 *
 	 * @throws RoleNotFoundException when the role could not be found
 	 */
 	public Role getRole(String roleName) throws IOException {
 		Assert.hasLength(roleName);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -316,7 +316,7 @@ public class UserStore {
 			if (json == null) {
 				throw new RoleNotFoundException(roleName);
 			}
-			
+
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> roleMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
 			@SuppressWarnings("unchecked")
@@ -331,19 +331,19 @@ public class UserStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	/**
 	 * Saves a user's authorities
-	 * 
+	 *
 	 * @param loginName the login name of the user whose authorities are to be saved
 	 * @param authorities the user's authorities to be saved
 	 * @param currentUser the user performing the save operation
-	 * 
+	 *
 	 * @throws UserNotFoundException when the user does not exist
 	 */
 	public void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities, User currentUser)
 			throws IOException {
-		
+
 		Assert.hasLength(loginName);
 		Assert.notNull(authorities);
 		Assert.notNull(currentUser);
@@ -351,7 +351,7 @@ public class UserStore {
 			// check that user exists by trying to load it
 			getUser(loginName);
 		}
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -365,7 +365,7 @@ public class UserStore {
 
 	private void saveUserAuthorities(String loginName, Set<RoleGrantedAuthority> authorities,
 			ILockedRepository repo, User currentUser, boolean commit) throws IOException, GitAPIException {
-		
+
 		Map<String, Set<String>> authoritiesMap = new HashMap<String, Set<String>>();
 		for (RoleGrantedAuthority rga : authorities) {
 			GrantedAuthorityTarget target = rga.getTarget();
@@ -377,7 +377,7 @@ public class UserStore {
 			}
 			roleNames.add(rga.getRoleName());
 		}
-		
+
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 		String json = gson.toJson(authoritiesMap);
 		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
@@ -398,14 +398,14 @@ public class UserStore {
 
 	/**
 	 * Returns a user's authorities.
-	 * 
+	 *
 	 * @param loginName the login name of the user
-	 * 
+	 *
 	 * @throws UserNotFoundException when the user does not exist
 	 */
 	public List<RoleGrantedAuthority> getUserAuthorities(String loginName) throws IOException {
 		Assert.hasLength(loginName);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -420,7 +420,7 @@ public class UserStore {
 		if (json == null) {
 			throw new UserNotFoundException(loginName);
 		}
-		
+
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 		Map<String, Set<String>> authoritiesMap = gson.fromJson(
 				json, new TypeToken<Map<String, Set<String>>>(){}.getType());
@@ -433,15 +433,15 @@ public class UserStore {
 				authorities.add(new RoleGrantedAuthority(new GrantedAuthorityTarget(targetId, type), roleName));
 			}
 		}
-		
+
 		Collections.sort(authorities, new RoleGrantedAuthorityComparator());
-		
+
 		return authorities;
 	}
 
 	/**
 	 * Returns the user that has an OpenID whose real ID is equal to the specified OpenID.
-	 * 
+	 *
 	 * @throws UserNotFoundException when the user could not be found
 	 */
 	public User getUserByOpenId(String openId) throws IOException {
@@ -465,7 +465,7 @@ public class UserStore {
 					}
 				}
 			}
-			
+
 			throw new OpenIdNotFoundException(openId);
 		} finally {
 			Closeables.closeQuietly(repo);
@@ -494,7 +494,7 @@ public class UserStore {
 	public void deleteUser(String loginName, User currentUser) throws IOException {
 		Assert.hasLength(loginName);
 		Assert.notNull(currentUser);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
@@ -531,7 +531,7 @@ public class UserStore {
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			
+
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File file = new File(workingDir, loginName + USER_SUFFIX);
 			File newFile = new File(workingDir, newLoginName + USER_SUFFIX);
@@ -556,7 +556,7 @@ public class UserStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	public void renameRole(String roleName, String newRoleName, User currentUser) throws IOException {
 		Assert.hasLength(roleName);
 		Assert.hasLength(newRoleName);
@@ -570,15 +570,15 @@ public class UserStore {
 		} catch (RoleNotFoundException e) {
 			// okay
 		}
-		
+
 		log.info("renaming role: {} -> {}", roleName, newRoleName); //$NON-NLS-1$
 
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
-			
+
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			
+
 			File file = new File(workingDir, roleName + ROLE_SUFFIX);
 			File newFile = new File(workingDir, newRoleName + ROLE_SUFFIX);
 			FileUtils.copyFile(file, newFile);
@@ -604,7 +604,7 @@ public class UserStore {
 					saveUserAuthorities(user, Sets.newHashSet(authorities), repo, currentUser, false);
 				}
 			}
-			
+
 			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
 			git.commit()
 				.setAuthor(ident)
@@ -623,12 +623,12 @@ public class UserStore {
 		Assert.notNull(currentUser);
 		// check that role exists by trying to load it
 		getRole(roleName);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			Git git = Git.wrap(repo.r());
-			
+
 			git.rm().addFilepattern(roleName + ROLE_SUFFIX).call();
 
 			// remove role from all users
@@ -648,7 +648,7 @@ public class UserStore {
 					saveUserAuthorities(user, Sets.newHashSet(authorities), repo, currentUser, false);
 				}
 			}
-			
+
 			PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
 			git.commit()
 				.setAuthor(ident)

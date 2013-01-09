@@ -34,7 +34,7 @@ class EventBusBeanPostProcessor implements BeanPostProcessor {
 	EventBusBeanPostProcessor(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-	
+
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		if (isSubscriber(bean)) {

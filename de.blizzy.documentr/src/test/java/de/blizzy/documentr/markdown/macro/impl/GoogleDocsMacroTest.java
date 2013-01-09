@@ -55,7 +55,7 @@ public class GoogleDocsMacroTest extends AbstractDocumentrTest {
 				"\" allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>", //$NON-NLS-1$
 				runnable.getHtml(context));
 	}
-	
+
 	@Test
 	public void getHtmlForPresentation() {
 		when(context.getParameters()).thenReturn("https://docs.google.com/presentation/pub?id=1WzJncZtIcd9up5b_MI2oBceQ2PnTmIUSltp0RKYXqJo&start=false&loop=false&delayms=4000"); //$NON-NLS-1$
@@ -64,7 +64,7 @@ public class GoogleDocsMacroTest extends AbstractDocumentrTest {
 				"\" allowfullscreen=\"true\" mozallowfullscreen=\"true\" webkitallowfullscreen=\"true\"></iframe>", //$NON-NLS-1$
 				runnable.getHtml(context));
 	}
-	
+
 	@Test
 	public void getHtmlForDrawing() {
 		when(context.getParameters()).thenReturn("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196"); //$NON-NLS-1$
@@ -73,7 +73,7 @@ public class GoogleDocsMacroTest extends AbstractDocumentrTest {
 				"\"/>", //$NON-NLS-1$
 				runnable.getHtml(context));
 	}
-	
+
 	@Test
 	public void getHtmlForDrawingWithWidth() {
 		when(context.getParameters()).thenReturn("https://docs.google.com/drawings/pub?id=1ZHG2f0l-NgC52MwW9nWwbnrNIkE4azVhVJ9plMry3ic&w=210&h=196 123"); //$NON-NLS-1$

@@ -21,15 +21,15 @@ import com.google.common.base.Charsets;
 
 public class PageTextData extends PageData {
 	static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
-	
+
 	public PageTextData(String text) {
 		super(text.getBytes(Charsets.UTF_8), CONTENT_TYPE);
 	}
-	
+
 	static PageTextData fromBytes(byte[] data) {
 		return new PageTextData(new String(data, Charsets.UTF_8));
 	}
-	
+
 	public String getText() {
 		return new String(getData(), Charsets.UTF_8);
 	}

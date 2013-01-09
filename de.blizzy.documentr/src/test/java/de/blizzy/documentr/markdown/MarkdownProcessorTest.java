@@ -45,7 +45,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
 	private static final String PARAMS = "params"; //$NON-NLS-1$
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
-	
+
 	@Mock
 	private MacroFactory macroFactory;
 	@Mock
@@ -74,7 +74,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 
 		when(macro.getDescriptor()).thenReturn(descriptor);
 		when(macro.createRunnable()).thenReturn(runnable);
-		
+
 		String macroHtml = "<div>macroHtml</div>"; //$NON-NLS-1$
 		when(runnable.getHtml(any(IMacroContext.class))).thenReturn(macroHtml);
 		String cleanedMacroHtml = "<div>cleanedMacroHtml</div>"; //$NON-NLS-1$
@@ -85,13 +85,13 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
-		
+
 		when(macroFactory.get(MACRO)).thenReturn(macro);
-		
+
 		String markdown = "{{:header:}}*header*{{:/header:}}**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
 				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
-		
+
 		String expectedHtml = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(expectedHtml, removeTextRange(result));
 	}
@@ -99,22 +99,22 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	@Test
 	public void markdownToHtmlMustNotRenderNonCacheableMacros() {
 		when(descriptor.isCacheable()).thenReturn(false);
-		
+
 		when(macro.getDescriptor()).thenReturn(descriptor);
-		
+
 		when(macroFactory.get(MACRO)).thenReturn(macro);
-		
+
 		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String result = markdownProcessor.markdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
 				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
-		
+
 		String expectedHtml = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
 				"__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + PARAMS + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				"__" + MarkdownProcessor.NON_CACHEABLE_MACRO_BODY_MARKER + "__" + //$NON-NLS-1$ //$NON-NLS-2$
 				"__/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + "</p><p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals(expectedHtml, removeTextRange(result));
 	}
-	
+
 	@Test
 	public void processNonCacheableMacros() {
 		when(descriptor.isCacheable()).thenReturn(false);
@@ -132,7 +132,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 				return StringUtils.replace(html, "macroHtml", "cleanedMacroHtml"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
-		
+
 		when(macroFactory.get(MACRO)).thenReturn(macro);
 
 		String html = "<p>__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -148,7 +148,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 		String markdown = "{{:header:}}*header*{{:/header:}}**foo**"; //$NON-NLS-1$
 		String result = markdownProcessor.headerMarkdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
 				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
-		
+
 		String expectedHtml = "<em>header</em>"; //$NON-NLS-1$
 		assertEquals(expectedHtml, removeTextRange(result));
 	}

@@ -36,7 +36,7 @@ public class UnknownMacroMacroRunnableTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new UnknownMacroMacroRunnable();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getMacroName()).thenReturn("nonexistent"); //$NON-NLS-1$

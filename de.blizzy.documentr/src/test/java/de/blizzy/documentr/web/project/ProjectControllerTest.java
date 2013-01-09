@@ -43,7 +43,7 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 public class ProjectControllerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	
+
 	@Mock
 	private GlobalRepositoryManager repoManager;
 	@Mock
@@ -61,12 +61,12 @@ public class ProjectControllerTest extends AbstractDocumentrTest {
 
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
-	
+
 	@Test
 	public void getProject() {
 		String view = projectController.getProject(PROJECT, model);
 		assertEquals("/project/view", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("name", PROJECT); //$NON-NLS-1$
 	}
 
@@ -74,10 +74,10 @@ public class ProjectControllerTest extends AbstractDocumentrTest {
 	public void createProject() {
 		String view = projectController.createProject(model);
 		assertEquals("/project/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("projectForm"), argProjectForm(null)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void saveProject() throws IOException, GitAPIException {
 		ProjectForm projectForm = new ProjectForm(PROJECT);
@@ -85,7 +85,7 @@ public class ProjectControllerTest extends AbstractDocumentrTest {
 		String view = projectController.saveProject(projectForm, bindingResult, authentication);
 		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
-		
+
 		verify(repoManager).createProjectCentralRepository(PROJECT, USER);
 	}
 }

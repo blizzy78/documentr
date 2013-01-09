@@ -58,13 +58,13 @@ public final class DocumentrConstants {
 	/** Blacklist pattern a branch name must not match against. */
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
 			"(?:create|save|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 	/** Pattern a macro name must match against. */
 	public static final String MACRO_NAME_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$
 
 	/** Default content type for binary data. */
 	public static final String DEFAULT_MIME_TYPE = "application/octet-stream"; //$NON-NLS-1$
-	
+
 	/** Page name and path of a branch's home page. */
 	public static final String HOME_PAGE_NAME = "home"; //$NON-NLS-1$
 
@@ -73,7 +73,7 @@ public final class DocumentrConstants {
 
 	/** Name of the cache data directory. */
 	public static final String CACHE_DIR_NAME = "cache"; //$NON-NLS-1$
-	
+
 	/** Number of threads the task executor thread pool uses. */
 	public static final int TASK_EXECUTOR_THREADS = 8;
 

@@ -23,7 +23,7 @@ import org.eclipse.jgit.lib.Repository;
 
 public final class RepositoryUtil {
 	private RepositoryUtil() {}
-	
+
 	public static void closeQuietly(Repository repo) {
 		if (repo != null) {
 			try {
@@ -33,7 +33,7 @@ public final class RepositoryUtil {
 			}
 		}
 	}
-	
+
 	public static File getWorkingDir(Repository repo) {
 		return repo.getDirectory().getParentFile();
 	}

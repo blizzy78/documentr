@@ -45,16 +45,16 @@ import de.blizzy.documentr.web.project.ProjectForm;
 
 public final class DocumentrMatchers {
 	public static final String ANY = DocumentrMatchers.class.getName() + "_ANY"; //$NON-NLS-1$
-	
+
 	private DocumentrMatchers() {}
 
 	public static Page argPage(String title, String text) {
 		return argPage(ANY, title, text, ANY);
 	}
-	
+
 	public static Page argPage(final String parentPagePath, final String title, final String text,
 			final String viewRestrictionRole) {
-		
+
 		Matcher<Page> matcher = new ArgumentMatcher<Page>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -76,7 +76,7 @@ public final class DocumentrMatchers {
 
 	public static PageForm argPageForm(final String projectName, final String branchName, final String path,
 			final String parentPagePath, final String title, final String text, final String commit) {
-		
+
 		Matcher<PageForm> matcher = new ArgumentMatcher<PageForm>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -95,7 +95,7 @@ public final class DocumentrMatchers {
 
 	public static User argUser(final String loginName, final String password, final String email,
 			final boolean disabled) {
-		
+
 		Matcher<User> matcher = new ArgumentMatcher<User>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -108,10 +108,10 @@ public final class DocumentrMatchers {
 		};
 		return argThat(matcher);
 	}
-	
+
 	public static User argUser(final String loginName, final String password, final String email,
 			final boolean disabled, final Set<OpenId> openIds) {
-		
+
 		Matcher<User> matcher = new ArgumentMatcher<User>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -125,10 +125,10 @@ public final class DocumentrMatchers {
 		};
 		return argThat(matcher);
 	}
-	
+
 	public static UserForm argUserForm(final String loginName, final String password1, final String password2,
 			final boolean disabled) {
-		
+
 		Matcher<UserForm> matcher = new ArgumentMatcher<UserForm>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -189,12 +189,12 @@ public final class DocumentrMatchers {
 		};
 		return argThat(matcher);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static String notEq(String s) {
 		return Matchers.<String>argThat(new Not(new Equals(s)));
 	}
-	
+
 	public static MacroForm argMacroForm(final String name, final String code) {
 		Matcher<MacroForm> matcher = new ArgumentMatcher<MacroForm>() {
 			@Override
@@ -206,7 +206,7 @@ public final class DocumentrMatchers {
 		};
 		return argThat(matcher);
 	}
-	
+
 	public static <T> T eqReflection(final T expected) {
 		Matcher<T> matcher = new ArgumentMatcher<T>() {
 			@Override

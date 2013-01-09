@@ -38,7 +38,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 	private HtmlSerializerContext context;
 	@InjectMocks
 	private DocumentrLinkRenderer renderer;
-	
+
 	@Test
 	public void renderWikiLink() {
 		WikiLinkNode node = new WikiLinkNode("foo"); //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("foo", rendering.text); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void renderWikiLinkWithNoFollow() {
 		WikiLinkNode node = new WikiLinkNode("foo | nofollow"); //$NON-NLS-1$
@@ -55,7 +55,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("foo", rendering.text); //$NON-NLS-1$
 		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
 	}
-	
+
 	@Test
 	public void renderWikiLinkWithText() {
 		WikiLinkNode node = new WikiLinkNode("foo link text"); //$NON-NLS-1$
@@ -63,7 +63,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("foo", rendering.href); //$NON-NLS-1$
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void renderWikiLinkWithTextAndNoFollow() {
 		WikiLinkNode node = new WikiLinkNode("foo link text | nofollow"); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
 	}
-	
+
 	@Test
 	public void renderWikiLinkWithAnchor() {
 		String headline = "A Headline"; //$NON-NLS-1$
@@ -81,7 +81,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("#" + Util.simplifyForUrl(headline), rendering.href); //$NON-NLS-1$
 		assertEquals(headline, rendering.text);
 	}
-	
+
 	@Test
 	public void renderWikiLinkToAttachment() {
 		when(context.getAttachmentUri("foo")).thenReturn("fooAttachment"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -90,7 +90,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("fooAttachment", rendering.href); //$NON-NLS-1$
 		assertEquals("foo", rendering.text); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void renderWikiLinkToAttachmentWithNoFollow() {
 		when(context.getAttachmentUri("foo")).thenReturn("fooAttachment"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -100,7 +100,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("foo", rendering.text); //$NON-NLS-1$
 		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
 	}
-	
+
 	@Test
 	public void renderWikiLinkToAttachmentWithText() {
 		when(context.getAttachmentUri("foo")).thenReturn("fooAttachment"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,7 +109,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("fooAttachment", rendering.href); //$NON-NLS-1$
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void renderWikiLinkToAttachmentWithTextAndNoFollow() {
 		when(context.getAttachmentUri("foo")).thenReturn("fooAttachment"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -119,7 +119,7 @@ public class DocumentrLinkRendererTest extends AbstractDocumentrTest {
 		assertEquals("link text", rendering.text); //$NON-NLS-1$
 		assertTrue(rendering.attributes.contains(Attribute.NO_FOLLOW));
 	}
-	
+
 	@Test
 	public void renderExpLinkWithAnchor() {
 		String headline = "A Headline"; //$NON-NLS-1$

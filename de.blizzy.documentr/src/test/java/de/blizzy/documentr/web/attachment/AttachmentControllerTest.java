@@ -87,28 +87,28 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		when(servletContext.getMimeType("test.png")).thenReturn("image/png"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
-		
+
 		when(authentication.isAuthenticated()).thenReturn(true);
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
-	
+
 	@Test
 	public void getAttachments() {
 		String view = attachmentController.getAttachments(PROJECT, BRANCH, PAGE_PATH_URL, model);
 		assertEquals("/project/branch/page/attachments", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("projectName", PROJECT); //$NON-NLS-1$
 		verify(model).addAttribute("branchName", BRANCH); //$NON-NLS-1$
 		verify(model).addAttribute("pagePath", PAGE_PATH); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getAttachment() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		when(request.getSession()).thenReturn(session);
-		
+
 		getAttachment(false, request);
 	}
 
@@ -119,17 +119,17 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2000, Calendar.JANUARY, 1).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
-		
+
 		getAttachment(false, request);
 	}
-	
+
 	@Test
 	public void getAttachmentAsDownload() throws IOException {
 		when(session.getAttribute("authenticationCreationTime")).thenReturn(System.currentTimeMillis()); //$NON-NLS-1$
 
 		when(request.getDateHeader(anyString())).thenReturn(-1L);
 		when(request.getSession()).thenReturn(session);
-		
+
 		getAttachment(true, request);
 	}
 
@@ -141,7 +141,7 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		String contentType = "image/png"; //$NON-NLS-1$
 		Page attachment = Page.fromData(data, contentType);
 		when(pageStore.getAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png")).thenReturn(attachment); //$NON-NLS-1$
-		
+
 		SecurityContextHolder.setContext(createSecurityContext(authentication));
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", download, request); //$NON-NLS-1$
@@ -161,7 +161,7 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenThrow(new PageNotFoundException(PROJECT, BRANCH, PAGE_PATH + "/test.png")); //$NON-NLS-1$
-		
+
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", false, request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
@@ -175,27 +175,27 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		when(request.getDateHeader("If-Modified-Since")).thenReturn( //$NON-NLS-1$
 				new GregorianCalendar(2012, Calendar.JUNE, 9).getTimeInMillis());
 		when(request.getSession()).thenReturn(session);
-		
+
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE_PATH, "test.png")) //$NON-NLS-1$
 			.thenReturn(new PageMetadata("user", new GregorianCalendar(2012, Calendar.JUNE, 1).getTime(), 123, "commit")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		TestPageUtil.clearProjectEditTimes();
-		
+
 		ResponseEntity<byte[]> result = attachmentController.getAttachment(
 				PROJECT, BRANCH, PAGE_PATH_URL, "test.png", false, request); //$NON-NLS-1$
 		assertEquals(HttpStatus.NOT_MODIFIED, result.getStatusCode());
 	}
-	
+
 	@Test
 	public void createAttachment() {
 		String view = attachmentController.createAttachment(PROJECT, BRANCH, PAGE_PATH_URL, model);
 		assertEquals("/project/branch/page/editAttachment", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("projectName", PROJECT); //$NON-NLS-1$
 		verify(model).addAttribute("branchName", BRANCH); //$NON-NLS-1$
 		verify(model).addAttribute("pagePath", PAGE_PATH); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void saveAttachment() throws IOException {
 		byte[] data = { 1, 2, 3 };
@@ -206,7 +206,7 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, multipartFile, authentication);
 		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
-		
+
 		Page attachment = Page.fromData(data, "image/png"); //$NON-NLS-1$
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.png", attachment, USER); //$NON-NLS-1$
 	}
@@ -217,21 +217,21 @@ public class AttachmentControllerTest extends AbstractDocumentrTest {
 		InputStream inputStream = new ByteArrayInputStream(data);
 		when(multipartFile.getInputStream()).thenReturn(inputStream);
 		when(multipartFile.getOriginalFilename()).thenReturn("test.dat"); //$NON-NLS-1$
-		
+
 		String view = attachmentController.saveAttachment(PROJECT, BRANCH, PAGE_PATH_URL, multipartFile, authentication);
 		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
-		
+
 		Page attachment = Page.fromData(data, DocumentrConstants.DEFAULT_MIME_TYPE);
 		verify(pageStore).saveAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", attachment, USER); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void deleteAttachment() throws IOException {
 		String view = attachmentController.deleteAttachment(PROJECT, BRANCH, PAGE_PATH_URL, "test.dat", authentication); //$NON-NLS-1$
 		assertEquals("/attachment/list/" + PROJECT + "/" + BRANCH + "/" + PAGE_PATH_URL, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
-		
+
 		verify(pageStore).deleteAttachment(PROJECT, BRANCH, PAGE_PATH, "test.dat", USER); //$NON-NLS-1$
 	}
 }

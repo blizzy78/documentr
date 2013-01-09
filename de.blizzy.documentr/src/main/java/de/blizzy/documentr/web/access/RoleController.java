@@ -81,7 +81,7 @@ public class RoleController {
 		if (StringUtils.isNotBlank(form.getName()) &&
 			(StringUtils.isBlank(form.getOriginalName()) ||
 					!form.getName().equals(form.getOriginalName()))) {
-			
+
 			try {
 				if (userStore.getRole(form.getName()) != null) {
 					bindingResult.rejectValue("name", "role.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -90,7 +90,7 @@ public class RoleController {
 				// okay
 			}
 		}
-		
+
 		if (bindingResult.hasErrors()) {
 			return "/user/role/edit"; //$NON-NLS-1$
 		}
@@ -106,13 +106,13 @@ public class RoleController {
 		Role role = new Role(newRoleName, permissions);
 		User user = userStore.getUser(authentication.getName());
 		userStore.saveRole(role, user);
-		
+
 		if (StringUtils.isNotBlank(form.getOriginalName()) && StringUtils.isNotBlank(form.getName()) &&
 				!StringUtils.equals(form.getName(), form.getOriginalName())) {
-			
+
 			userStore.renameRole(form.getOriginalName(), form.getName(), user);
 		}
-		
+
 		return "redirect:/roles"; //$NON-NLS-1$
 	}
 
@@ -128,7 +128,7 @@ public class RoleController {
 	public RoleForm createRoleForm(@RequestParam(required=false) String name,
 			@RequestParam(required=false) String originalName,
 			@RequestParam(required=false) Set<String> permissions) {
-		
+
 		if (permissions == null) {
 			permissions = Collections.emptySet();
 		}

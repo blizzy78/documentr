@@ -43,7 +43,7 @@ public class AccessControllerTest extends AbstractDocumentrTest {
 	private Model model;
 	@Mock
 	private HttpSession session;
-	
+
 	@Test
 	public void login() {
 		assertEquals("/login", new AccessController().login()); //$NON-NLS-1$
@@ -53,10 +53,10 @@ public class AccessControllerTest extends AbstractDocumentrTest {
 	public void loginError() {
 		when(authenticationException.getMessage()).thenReturn("message"); //$NON-NLS-1$
 		when(session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).thenReturn(authenticationException);
-		
+
 		String view = new AccessController().loginError(session, model);
 		assertEquals("/login", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("errorMessage", "message"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -64,10 +64,10 @@ public class AccessControllerTest extends AbstractDocumentrTest {
 	public void loginForbidden() {
 		when(accessDeniedException.getMessage()).thenReturn("message"); //$NON-NLS-1$
 		when(request.getAttribute(WebAttributes.ACCESS_DENIED_403)).thenReturn(accessDeniedException);
-		
+
 		String view = new AccessController().loginForbidden(request, model);
 		assertEquals("/login", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("errorMessage", "message"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

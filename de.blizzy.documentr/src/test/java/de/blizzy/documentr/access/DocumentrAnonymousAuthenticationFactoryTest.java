@@ -48,7 +48,7 @@ public class DocumentrAnonymousAuthenticationFactoryTest extends AbstractDocumen
 				new RoleGrantedAuthority(new GrantedAuthorityTarget("project", Type.PROJECT), "admin"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(userStore.getUserAuthorities(UserStore.ANONYMOUS_USER_LOGIN_NAME))
 			.thenReturn(Lists.newArrayList(applicationReaderRoleAuthority, projectAdminRoleAuthority));
-		
+
 		PermissionGrantedAuthority applicationViewAuthority =
 				new PermissionGrantedAuthority(applicationReaderRoleAuthority.getTarget(), Permission.VIEW);
 		PermissionGrantedAuthority projectAdminAuthority =
@@ -57,7 +57,7 @@ public class DocumentrAnonymousAuthenticationFactoryTest extends AbstractDocumen
 			.thenReturn(Collections.singleton(applicationViewAuthority));
 		when(userStore.toPermissionGrantedAuthorities(projectAdminRoleAuthority))
 			.thenReturn(Collections.singleton(projectAdminAuthority));
-		
+
 		String key = "key"; //$NON-NLS-1$
 		AbstractAuthenticationToken authentication = factory.create(key);
 		assertEquals(key.hashCode(), ((AnonymousAuthenticationToken) authentication).getKeyHash());

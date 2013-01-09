@@ -46,7 +46,7 @@ public class CompilationMessage {
 		Assert.isTrue(endLine >= 1);
 		Assert.isTrue(endColumn >= 1);
 		Assert.hasLength(message);
-		
+
 		this.type = type;
 		this.startLine = startLine;
 		this.startColumn = startColumn;

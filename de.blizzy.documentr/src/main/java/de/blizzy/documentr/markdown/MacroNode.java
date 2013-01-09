@@ -34,10 +34,10 @@ public class MacroNode extends SuperNode {
 	public MacroNode(String macroName, String params) {
 		this(macroName, params, Collections.<Node>emptyList());
 	}
-	
+
 	public MacroNode(String macroName, String params, List<Node> children) {
 		super(children);
-		
+
 		this.macroName = macroName;
 		this.params = params;
 	}

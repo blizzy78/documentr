@@ -51,7 +51,7 @@ public class AllDocIdsCollectorTest {
 	@Before
 	public void setUp() throws IOException {
 		directory = new RAMDirectory();
-		
+
 		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
@@ -61,7 +61,7 @@ public class AllDocIdsCollectorTest {
 		writer.addDocument(createDocument());
 		writer.commit();
 		writer.close(true);
-		
+
 		reader = DirectoryReader.open(directory);
 	}
 
@@ -84,7 +84,7 @@ public class AllDocIdsCollectorTest {
 			assertTrue(docIds.get(i));
 		}
 	}
-	
+
 	private Document createDocument() {
 		Document doc = new Document();
 		doc.add(new StringField("text", "text", Store.NO)); //$NON-NLS-1$ //$NON-NLS-2$

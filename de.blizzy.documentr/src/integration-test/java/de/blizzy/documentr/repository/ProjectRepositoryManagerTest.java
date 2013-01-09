@@ -76,7 +76,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			RepositoryUtil.closeQuietly(repo);
 		}
 	}
-	
+
 	@Test
 	public void createCentralRepositoryMustThrowIllegalStateExceptionIfExists() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();
@@ -92,7 +92,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		expectedException.expect(IllegalStateException.class);
 		register(repoManager.createCentralRepository(USER));
 	}
-	
+
 	@Test
 	public void getCentralRepository() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();
@@ -106,7 +106,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		try {
 			repo = repoManager.getCentralRepository();
 			assertEquals(gitDir, repo.r().getDirectory());
@@ -120,11 +120,11 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	public void getCentralRepositoryMustThrowRepositoryNotFoundExceptionIfNonexistent() throws IOException {
 		File reposDir = tempDir.getRoot();
 		ProjectRepositoryManager repoManager = new ProjectRepositoryManager("project", reposDir, lockManager, eventBus); //$NON-NLS-1$
-		
+
 		expectedException.expect(RepositoryNotFoundException.class);
 		register(repoManager.getCentralRepository());
 	}
-	
+
 	@Test
 	public void createBranchRepositoryWithoutStartingBranch() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();
@@ -165,18 +165,18 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		try {
 			repo = repoManager.createBranchRepository("branch", null); //$NON-NLS-1$
 		} finally {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		expectedException.expect(IllegalStateException.class);
 		register(repoManager.createBranchRepository("branch", null)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void createBranchRepositoryWithoutStartingBranchAndExistingBranch() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();
@@ -188,7 +188,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		try {
 			repo = repoManager.createBranchRepository("branch1", null); //$NON-NLS-1$
 		} finally {
@@ -204,7 +204,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = null;
 		}
 	}
-	
+
 	@Test
 	public void createBranchRepository() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();
@@ -217,7 +217,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		try {
 			repo = repoManager.createBranchRepository("branch", "startingBranch"); //$NON-NLS-1$ //$NON-NLS-2$
 			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.r().getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -246,7 +246,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Closeables.closeQuietly(repo);
 			repo = null;
 		}
-		
+
 		try {
 			repo = repoManager.createBranchRepository("branch", null); //$NON-NLS-1$
 		} finally {
@@ -270,7 +270,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		expectedException.expect(RepositoryNotFoundException.class);
 		register(repoManager.getBranchRepository("branch")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void listBranches() throws IOException, GitAPIException {
 		File reposDir = tempDir.getRoot();

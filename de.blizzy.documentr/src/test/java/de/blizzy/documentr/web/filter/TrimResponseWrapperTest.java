@@ -39,7 +39,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 	@Mock
 	private HttpServletResponse response;
-	
+
 	@Test
 	public void setContentLengthMustBeIgnored() {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
@@ -47,14 +47,14 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 		wrapper.setContentLength(123);
 		verify(response, never()).setContentLength(anyInt());
 	}
-	
+
 	@Test
 	public void getOutputStreamAndGetData() throws IOException {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 
 		byte[] data = "hello \u20AC".getBytes(Charsets.UTF_8); //$NON-NLS-1$
-		
+
 		ServletOutputStream out = null;
 		try {
 			out = wrapper.getOutputStream();
@@ -62,7 +62,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 		} finally {
 			Closeables.closeQuietly(out);
 		}
-		
+
 		assertTrue(Arrays.equals(data, wrapper.getData()));
 	}
 
@@ -71,7 +71,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 
 		byte[] data = "hello \u20AC".getBytes(Charsets.UTF_8); //$NON-NLS-1$
-		
+
 		ServletOutputStream out = null;
 		try {
 			out = wrapper.getOutputStream();
@@ -80,14 +80,14 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 		} finally {
 			Closeables.closeQuietly(out);
 		}
-		
+
 		assertTrue(Arrays.equals(data, wrapper.getData()));
 	}
 
 	@Test
 	public void getWriterAndGetData() throws IOException {
 		when(response.getCharacterEncoding()).thenReturn(Charsets.UTF_8.name());
-		
+
 		TrimResponseWrapper wrapper = new TrimResponseWrapper(response);
 		wrapper.setContentType("text/plain"); //$NON-NLS-1$
 
@@ -100,7 +100,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 		} finally {
 			Closeables.closeQuietly(out);
 		}
-		
+
 		assertTrue(Arrays.equals(s.getBytes(Charsets.UTF_8), wrapper.getData()));
 	}
 }

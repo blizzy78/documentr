@@ -45,7 +45,7 @@ public class DocumentrAnonymousAuthenticationFactory {
 		}
 		// must have at least one authority
 		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS")); //$NON-NLS-1$
-		
+
 		return new AnonymousAuthenticationToken(key, UserStore.ANONYMOUS_USER_LOGIN_NAME, authorities);
 	}
 }

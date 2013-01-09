@@ -27,21 +27,21 @@ public class CommitCherryPickConflictResolveTest {
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final String COMMIT = "commit"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
-	
+
 	private CommitCherryPickConflictResolve resolve;
 
 	@Before
 	public void setUp() {
 		resolve = new CommitCherryPickConflictResolve(BRANCH, COMMIT, TEXT);
 	}
-	
+
 	@Test
 	public void isApplicable() {
 		assertTrue(resolve.isApplicable(BRANCH, COMMIT));
 		assertFalse(resolve.isApplicable("branch2", COMMIT)); //$NON-NLS-1$
 		assertFalse(resolve.isApplicable(BRANCH, "commit2")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	@SuppressWarnings("nls")
 	public void testEquals() {

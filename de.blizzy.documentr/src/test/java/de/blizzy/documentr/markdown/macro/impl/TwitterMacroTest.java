@@ -32,12 +32,12 @@ public class TwitterMacroTest extends AbstractDocumentrTest {
 	@Mock
 	private IMacroContext context;
 	private TwitterMacro runnable;
-	
+
 	@Before
 	public void setUp() {
 		runnable = new TwitterMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getParameters()).thenReturn("\"searchParams\""); //$NON-NLS-1$

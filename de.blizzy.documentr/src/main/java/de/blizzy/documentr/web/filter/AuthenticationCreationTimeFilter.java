@@ -51,7 +51,7 @@ public class AuthenticationCreationTimeFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
+
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		int hashCode = getHashCode(authentication);
 
@@ -61,7 +61,7 @@ public class AuthenticationCreationTimeFilter implements Filter {
 			session.setAttribute(AUTHENTICATION_HASH_CODE, hashCode);
 			AuthenticationUtil.setAuthenticationCreationTime(session, System.currentTimeMillis());
 		}
-		
+
 		chain.doFilter(request, response);
 	}
 

@@ -35,11 +35,11 @@ public class ProjectExistsValidatorTest extends AbstractDocumentrTest {
 	private GlobalRepositoryManager repoManager;
 	@InjectMocks
 	private ProjectExistsValidator validator;
-	
+
 	@Test
 	public void isValid() {
 		when(repoManager.listProjects()).thenReturn(Lists.newArrayList("project")); //$NON-NLS-1$
-		
+
 		assertTrue(validator.isValid(null, null));
 		assertTrue(validator.isValid(StringUtils.EMPTY, null));
 		assertTrue(validator.isValid("project", null)); //$NON-NLS-1$

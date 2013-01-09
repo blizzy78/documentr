@@ -35,7 +35,7 @@ import com.google.common.io.Closeables;
 
 public class TrimFilter implements Filter {
 	private TrimWriter writer = new TrimWriter();
-	
+
 	@Override
 	public void init(FilterConfig filterConfig) {
 	}
@@ -47,11 +47,11 @@ public class TrimFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
+
 		HttpServletResponse resp = (HttpServletResponse) response;
 		TrimResponseWrapper trimResponse = new TrimResponseWrapper(resp);
 		chain.doFilter(request, trimResponse);
-		
+
 		Boolean trimmable = trimResponse.isTrimmable();
 		if ((trimmable != null) && trimmable.booleanValue()) {
 			byte[] data = getTrimmedData(trimResponse);

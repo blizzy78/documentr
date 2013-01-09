@@ -30,7 +30,7 @@ public class Role {
 
 	/**
 	 * Constructs a new role.
-	 * 
+	 *
 	 * @param name the role's name
 	 * @param permissions the permissions this role contains
 	 */

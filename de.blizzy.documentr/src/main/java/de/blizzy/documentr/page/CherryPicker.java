@@ -59,7 +59,7 @@ import de.blizzy.documentr.util.Util;
 class CherryPicker implements ICherryPicker {
 	private static final Pattern CONFLICT_MARKERS_RE = Pattern.compile(
 			"^.*?[\\r\\n]<<<<<<< .*?[\\r\\n]=======.*?[\\r\\n]>>>>>>> .*$", Pattern.DOTALL + Pattern.MULTILINE); //$NON-NLS-1$
-	
+
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
@@ -68,7 +68,7 @@ class CherryPicker implements ICherryPicker {
 	private IPageStore pageStore;
 	@Autowired
 	private MessageSource messageSource;
-	
+
 	@Override
 	public SortedMap<String, List<CommitCherryPickResult>> cherryPick(String projectName, String branchName, String path,
 			List<String> commits, Set<String> targetBranches, Set<CommitCherryPickConflictResolve> conflictResolves,
@@ -93,7 +93,7 @@ class CherryPicker implements ICherryPicker {
 				}
 			}
 		}
-		
+
 		try {
 			SortedMap<String, List<CommitCherryPickResult>> results = Maps.newTreeMap();
 			for (String targetBranch : targetBranches) {
@@ -110,22 +110,22 @@ class CherryPicker implements ICherryPicker {
 	private List<CommitCherryPickResult> cherryPick(String projectName, String branchName, String path, List<String> commits,
 			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, boolean dryRun, User user,
 			Locale locale) throws IOException, GitAPIException {
-		
+
 		ILockedRepository repo = null;
 		List<CommitCherryPickResult> cherryPickResults = Lists.newArrayList();
 		boolean hadConflicts = false;
 		boolean failed = false;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, targetBranch);
-			
+
 			String tempBranchName = "_temp_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
 			Git git = Git.wrap(repo.r());
-			
+
 			git.branchCreate()
 				.setName(tempBranchName)
 				.setStartPoint(targetBranch)
 				.call();
-			
+
 			git.checkout()
 				.setName(tempBranchName)
 				.call();
@@ -154,17 +154,17 @@ class CherryPicker implements ICherryPicker {
 					.setMode(ResetCommand.ResetType.HARD)
 					.call();
 			}
-			
+
 			git.checkout()
 				.setName(targetBranch)
 				.call();
-			
+
 			if (!dryRun && !hadConflicts && !failed) {
 				git.merge()
 					.include(repo.r().resolve(tempBranchName))
 					.call();
 			}
-			
+
 			git.branchDelete()
 				.setBranchNames(tempBranchName)
 				.setForce(true)
@@ -183,11 +183,11 @@ class CherryPicker implements ICherryPicker {
 
 		return cherryPickResults;
 	}
-	
+
 	private CommitCherryPickResult cherryPick(ILockedRepository repo, String branchName, String path, PageVersion pageVersion,
 			String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves, User user, Locale locale)
 			throws IOException, GitAPIException {
-		
+
 		CommitCherryPickResult cherryPickResult;
 		CherryPickResult result = Git.wrap(repo.r()).cherryPick()
 				.include(repo.r().resolve(pageVersion.getCommitName()))
@@ -211,7 +211,7 @@ class CherryPicker implements ICherryPicker {
 	private CommitCherryPickResult tryResolveConflict(ILockedRepository repo, String branchName, String path,
 			PageVersion pageVersion, String targetBranch, Set<CommitCherryPickConflictResolve> conflictResolves,
 			User user, Locale locale) throws IOException, GitAPIException {
-		
+
 		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 		File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 		File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
@@ -245,10 +245,10 @@ class CherryPicker implements ICherryPicker {
 		}
 		return result;
 	}
-	
+
 	private String getCherryPickConflictResolveText(Set<CommitCherryPickConflictResolve> conflictResolves,
 			String targetBranch, String commit) {
-		
+
 		for (CommitCherryPickConflictResolve resolve : conflictResolves) {
 			if (resolve.isApplicable(targetBranch, commit)) {
 				return resolve.getText();
@@ -260,7 +260,7 @@ class CherryPicker implements ICherryPicker {
 	@Override
 	public List<String> getCommitsList(String projectName, String branchName, String path,
 			String version1, String version2) throws IOException {
-		
+
 		List<PageVersion> pageVersions = Lists.newArrayList(pageStore.listPageVersions(projectName, branchName, path));
 		boolean foundVersion1 = false;
 		boolean foundVersion2 = false;
@@ -279,7 +279,7 @@ class CherryPicker implements ICherryPicker {
 		if (!foundVersion1 || !foundVersion2) {
 			throw new IllegalArgumentException("one of version1 or version2 not found in version history of page"); //$NON-NLS-1$
 		}
-		
+
 		Collections.reverse(pageVersions);
 		boolean include = false;
 		for (Iterator<PageVersion> iter = pageVersions.iterator(); iter.hasNext();) {
@@ -287,7 +287,7 @@ class CherryPicker implements ICherryPicker {
 			if (!include) {
 				iter.remove();
 			}
-			
+
 			String commit = version.getCommitName();
 			if (commit.equals(version1)) {
 				include = true;

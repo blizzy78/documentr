@@ -57,7 +57,7 @@ import de.blizzy.documentr.util.Util;
 public class SubscriptionStore {
 	private static final String REPOSITORY_NAME = "_subscriptions"; //$NON-NLS-1$
 	private static final String SUBSCRIPTIONS_SUFFIX = ".subscriptions"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
@@ -82,7 +82,7 @@ public class SubscriptionStore {
 				File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 				File file = new File(workingDir, loginName + SUBSCRIPTIONS_SUFFIX);
 				FileUtils.writeStringToFile(file, json, Charsets.UTF_8);
-				
+
 				Git git = Git.wrap(repo.r());
 				git.add()
 					.addFilepattern(loginName + SUBSCRIPTIONS_SUFFIX)
@@ -100,7 +100,7 @@ public class SubscriptionStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	public void unsubscribe(String projectName, String branchName, String path, User user) throws IOException {
 		ILockedRepository repo = null;
 		try {
@@ -126,7 +126,7 @@ public class SubscriptionStore {
 							.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
 							.call();
 					}
-					
+
 					PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 					git.commit()
 						.setAuthor(ident)
@@ -141,7 +141,7 @@ public class SubscriptionStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	public boolean isSubscribed(String projectName, String branchName, String path, User user) throws IOException {
 		ILockedRepository repo = null;
 		try {
@@ -165,7 +165,7 @@ public class SubscriptionStore {
 			return false;
 		}
 	}
-	
+
 	public Set<String> getSubscriberEmails(String projectName, String branchName, String path) throws IOException {
 		ILockedRepository repo = null;
 		try {

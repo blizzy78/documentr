@@ -49,7 +49,7 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 	private static final String TEXT = "  foo  \r\n"; //$NON-NLS-1$
 	private static final String TRIMMED_TEXT = "foo\n"; //$NON-NLS-1$
 	private static final byte[] TRIMMED_TEXT_DATA = TRIMMED_TEXT.getBytes(Charsets.UTF_8);
-	
+
 	@Mock
 	private HttpServletRequest request;
 	@Mock
@@ -86,7 +86,7 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 			}
 		}, CONTENT_TYPE, TRIMMED_TEXT_DATA);
 	}
-	
+
 	@Test
 	public void doFilterWithOutputStreamButNonTrimmableContent() throws IOException, ServletException {
 		final byte[] data = { 1, 2, 3 };
@@ -103,7 +103,7 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 			}
 		}, "image/png", data); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void doFilterWithWriterButNonTrimmableContent() throws IOException, ServletException {
 		doFilter(new Answer<Void>() {
@@ -118,7 +118,7 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 			}
 		}, "image/png", TEXT.getBytes(Charsets.UTF_8)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void doFilterWithUnknownContentType() throws IOException, ServletException {
 		final byte[] data = { 1, 2, 3 };
@@ -132,7 +132,7 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 			}
 		}, null, data);
 	}
-	
+
 	private void doFilter(Answer<Void> doFilterAnswer, String contentType, byte[] expectedData) throws IOException, ServletException {
 		when(response.getCharacterEncoding()).thenReturn(Charsets.UTF_8.name());
 		when(response.getContentType()).thenReturn(contentType);
@@ -145,14 +145,14 @@ public class TrimFilterTest extends AbstractDocumentrTest {
 			}
 		};
 		when(response.getOutputStream()).thenReturn(servletOut);
-		
+
 		PrintWriter writer = new PrintWriter(new OutputStreamWriter(servletOut, Charsets.UTF_8.name()));
 		when(response.getWriter()).thenReturn(writer);
-		
+
 		doAnswer(doFilterAnswer).when(filterChain).doFilter(Matchers.<ServletRequest>any(), Matchers.<ServletResponse>any());
-		
+
 		new TrimFilter().doFilter(request, response, filterChain);
-		
+
 		verify(response).setContentLength(expectedData.length);
 		writer.flush();
 		assertTrue(Arrays.equals(expectedData, out.toByteArray()));

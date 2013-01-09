@@ -39,7 +39,7 @@ public class AbstractMarkdownMacroRunnableTest extends AbstractDocumentrTest {
 	public void setUp() {
 		when(context.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(htmlSerializerContext.markdownToHtml("markdown")).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$

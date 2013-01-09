@@ -37,7 +37,7 @@ public class MacroNameValidator implements ConstraintValidator<ValidMacroName, S
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
+
 		return Pattern.matches("^" + DocumentrConstants.MACRO_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

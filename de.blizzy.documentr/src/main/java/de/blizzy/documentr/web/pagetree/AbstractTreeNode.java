@@ -23,7 +23,7 @@ public abstract class AbstractTreeNode {
 	public static enum Type {
 		PROJECT, BRANCH, PAGE, ATTACHMENT;
 	}
-	
+
 	@Getter
 	private Type type;
 

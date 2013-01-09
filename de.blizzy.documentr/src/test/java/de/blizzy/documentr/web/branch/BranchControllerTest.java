@@ -50,7 +50,7 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	
+
 	@Mock
 	private GlobalRepositoryManager repoManager;
 	@Mock
@@ -70,27 +70,27 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
-	
+
 	@Test
 	public void createBranch() {
 		String view = branchController.createBranch(PROJECT, model);
 		assertEquals("/project/branch/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("branchForm"), //$NON-NLS-1$
 				argBranchForm(PROJECT, null, null));
 	}
-	
+
 	@Test
 	public void saveFirstBranch() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.<String>emptyList());
-		
+
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/page/edit/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(repoManager).createProjectBranchRepository(PROJECT, BRANCH, null);
 		verify(pageStore).savePage(eq(PROJECT), eq(BRANCH), eq(DocumentrConstants.HOME_PAGE_NAME),
 				argPage(null, "Home", StringUtils.EMPTY, null), isNull(String.class), same(USER)); //$NON-NLS-1$
@@ -99,21 +99,21 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 	@Test
 	public void saveBranch() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList("old_branch")); //$NON-NLS-1$
-		
+
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(repoManager).createProjectBranchRepository(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void saveBranchButExists() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList(BRANCH));
-		
+
 		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);

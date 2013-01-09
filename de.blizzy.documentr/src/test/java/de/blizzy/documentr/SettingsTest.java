@@ -37,7 +37,7 @@ public class SettingsTest extends AbstractDocumentrTest {
 	@Test
 	public void init() {
 		when(servletContext.getInitParameter("documentr.dataDir")).thenReturn("dataDir"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		settings.init();
 		assertEquals(new File("dataDir"), settings.getDocumentrDataDir()); //$NON-NLS-1$
 	}
@@ -47,7 +47,7 @@ public class SettingsTest extends AbstractDocumentrTest {
 		System.setProperty("documentr.dataDir", "."); //$NON-NLS-1$ //$NON-NLS-2$
 		settings.init();
 		System.setProperty("documentr.dataDir", "nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		assertEquals(new File("."), settings.getDocumentrDataDir()); //$NON-NLS-1$
 	}
 }

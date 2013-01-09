@@ -43,7 +43,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	@Getter
 	@Setter
 	public HttpServletRequest request;
-	
+
 	private GlobalRepositoryManager repoManager;
 	private Object target;
 	@Getter
@@ -58,7 +58,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 		super(authentication);
 
 		this.repoManager = repoManager;
-		
+
 		setTrustResolver(new AuthenticationTrustResolverImpl());
 	}
 
@@ -69,37 +69,37 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	public boolean hasProjectPermission(String projectName, Permission permission) {
 		return permissionEvaluator.hasProjectPermission(authentication, projectName, permission);
 	}
-	
+
 	public boolean hasAnyProjectPermission(Permission permission) {
 		return permissionEvaluator.hasAnyProjectPermission(authentication, permission);
 	}
-	
+
 	public boolean hasBranchPermission(String projectName, String branchName, Permission permission) {
 		return permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, permission);
 	}
-	
+
 	public boolean hasAnyBranchPermission(String projectName, Permission permission) {
 		return permissionEvaluator.hasAnyBranchPermission(authentication, projectName, permission);
 	}
-	
+
 	public boolean hasPagePermission(String projectName, String branchName, String path, Permission permission) {
 		path = Util.toRealPagePath(path);
 		return permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, permission);
 	}
-	
+
 	public boolean hasPagePermissionInOtherBranches(String projectName, String branchName, String path, Permission permission) {
 		path = Util.toRealPagePath(path);
 		return permissionEvaluator.hasPagePermissionInOtherBranches(authentication, projectName, branchName, path, permission);
 	}
-	
+
 	public boolean isAdmin(String loginName) {
 		return permissionEvaluator.isAdmin(loginName);
 	}
-	
+
 	public boolean isLastAdminRole(String roleName) {
 		return permissionEvaluator.isLastAdminRole(roleName);
 	}
-	
+
 	public boolean projectExists(String projectName) {
 		return repoManager.listProjects().contains(StringUtils.defaultString(projectName));
 	}
@@ -107,7 +107,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	void setThis(Object target) {
 		this.target = target;
 	}
-	
+
 	@Override
 	public Object getThis() {
 		return target;

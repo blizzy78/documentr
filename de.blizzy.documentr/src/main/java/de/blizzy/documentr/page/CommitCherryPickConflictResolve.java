@@ -35,19 +35,19 @@ public class CommitCherryPickConflictResolve {
 		Assert.hasLength(targetBranch);
 		Assert.hasLength(commit);
 		Assert.notNull(text);
-		
+
 		this.targetBranch = targetBranch;
 		this.commit = commit;
 		this.text = text;
 	}
-	
+
 	boolean isApplicable(String targetBranch, String commit) {
 		Assert.hasLength(targetBranch);
 		Assert.hasLength(commit);
 
 		return targetBranch.equals(this.targetBranch) && commit.equals(this.commit);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -62,7 +62,7 @@ public class CommitCherryPickConflictResolve {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

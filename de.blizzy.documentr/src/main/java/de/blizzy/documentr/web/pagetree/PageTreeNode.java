@@ -36,7 +36,7 @@ public class PageTreeNode extends AbstractTreeNode {
 
 	PageTreeNode(String projectName, String branchName, String path, String title) {
 		super(Type.PAGE);
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;

@@ -32,7 +32,7 @@ public class GrantedAuthorityTargetTest {
 				new GrantedAuthorityTarget("project", Type.PROJECT), //$NON-NLS-1$
 				new GrantedAuthorityTarget("project2", Type.PROJECT)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testHashCode() {
 		assertHashCodeContract(

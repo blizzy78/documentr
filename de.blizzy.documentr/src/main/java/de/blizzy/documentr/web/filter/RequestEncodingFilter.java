@@ -40,7 +40,7 @@ public class RequestEncodingFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
+
 		request.setCharacterEncoding(Charsets.UTF_8.name());
 		response.setCharacterEncoding(Charsets.UTF_8.name());
 		chain.doFilter(request, response);

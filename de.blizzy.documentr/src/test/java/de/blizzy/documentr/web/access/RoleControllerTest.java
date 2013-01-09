@@ -62,12 +62,12 @@ public class RoleControllerTest extends AbstractDocumentrTest {
 
 		when(authentication.getName()).thenReturn(USER.getLoginName());
 	}
-	
+
 	@Test
 	public void addRole() {
 		String view = roleController.addRole(model);
 		assertEquals("/user/role/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("roleForm"), DocumentrMatchers.argRoleForm(null, Sets.<String>newHashSet())); //$NON-NLS-1$
 	}
 
@@ -75,14 +75,14 @@ public class RoleControllerTest extends AbstractDocumentrTest {
 	public void editRole() throws IOException {
 		when(userStore.getRole("role")).thenReturn( //$NON-NLS-1$
 			new Role("role", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE))); //$NON-NLS-1$
-		
+
 		String view = roleController.editRole("role", model); //$NON-NLS-1$
 		assertEquals("/user/role/edit", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute(eq("roleForm"), argRoleForm( //$NON-NLS-1$
 			"role", Sets.newHashSet(Permission.EDIT_BRANCH.name(), Permission.EDIT_PAGE.name()))); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void saveRole() throws IOException {
 		RoleForm form = new RoleForm("role", null, Sets.newHashSet( //$NON-NLS-1$
@@ -92,7 +92,7 @@ public class RoleControllerTest extends AbstractDocumentrTest {
 		assertEquals("/roles", removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
-		
+
 		verify(userStore).saveRole(
 			argRole("role", EnumSet.of(Permission.EDIT_BRANCH, Permission.EDIT_PAGE)), //$NON-NLS-1$
 			same(USER));

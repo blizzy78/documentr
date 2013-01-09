@@ -31,7 +31,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class FacadeHostRequestWrapperTest extends AbstractDocumentrTest {
 	@Mock
 	private HttpServletRequest request;
-	
+
 	@Test
 	public void getRequestURL() {
 		when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:38080/documentr/page")); //$NON-NLS-1$
@@ -40,7 +40,7 @@ public class FacadeHostRequestWrapperTest extends AbstractDocumentrTest {
 				request, "https://documentr.org:1234/docs"); //$NON-NLS-1$
 		assertEquals("https://documentr.org:1234/docs/page", requestWrapper.getRequestURL().toString()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	@SuppressWarnings("nls")
 	public void buildFacadeUrl() {

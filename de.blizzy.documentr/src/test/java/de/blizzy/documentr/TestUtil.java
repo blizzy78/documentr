@@ -40,14 +40,14 @@ public final class TestUtil {
 	public static Page createRandomPage() {
 		return createRandomPage(null);
 	}
-	
+
 	public static Page createRandomPage(String parentPagePath) {
 		Page page = Page.fromText(String.valueOf(Math.random() * Long.MAX_VALUE),
 				String.valueOf(Math.random() * Long.MAX_VALUE));
 		TestPageUtil.setParentPagePath(page, parentPagePath);
 		return page;
 	}
-	
+
 	public static <T> void assertEqualsContract(T equal1, T equal2, T equal3, T different) {
 		assertNotSame(equal1, equal2);
 		assertNotSame(equal1, equal3);
@@ -59,30 +59,30 @@ public final class TestUtil {
 
 		// same object
 		assertTrue(equal1.equals(equal1));
-		
+
 		// reflexive
 		assertTrue(equal1.equals(equal2));
-		
+
 		// symmetric
 		if (equal1.equals(equal2)) {
 			assertTrue(equal2.equals(equal1));
 		}
-		
+
 		// transitive
 		if (equal1.equals(equal2) && equal2.equals(equal3)) {
 			assertTrue(equal1.equals(equal3));
 		}
-		
+
 		// consistent
 		if (equal1.equals(equal2)) {
 			assertTrue(equal1.equals(equal2));
 		} else {
 			assertFalse(equal1.equals(equal2));
 		}
-		
+
 		// null
 		assertFalse(equal1.equals(null));
-		
+
 		// difference
 		assertFalse(equal1.equals(different));
 		assertFalse(different.equals(equal1));
@@ -99,27 +99,27 @@ public final class TestUtil {
 		assertEquals(equal1, equal2);
 		Class<? extends Object> clazz = equal1.getClass();
 		assertEquals(clazz, equal2.getClass());
-		
+
 		// consistent
 		int hashCode = equal1.hashCode();
 		assertEquals(hashCode, equal1.hashCode());
-		
+
 		// equal hash code for equal objects
 		assertEquals(equal1.hashCode(), equal2.hashCode());
 	}
-	
+
 	public static String removeViewPrefix(String view) {
 		return view.contains(":") ? StringUtils.substringAfter(view, ":") : view; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	public static void assertRedirect(String view) {
 		assertTrue(view.startsWith("redirect:")); //$NON-NLS-1$
 	}
-	
+
 	public static void assertForward(String view) {
 		assertTrue(view.startsWith("forward:")); //$NON-NLS-1$
 	}
-	
+
 	public static void assertSecondsAgo(Date d, int seconds) {
 		long time = d.getTime();
 		long now = System.currentTimeMillis();
@@ -131,11 +131,11 @@ public final class TestUtil {
 		context.setAuthentication(authentication);
 		return context;
 	}
-	
+
 	public static String removeTextRange(String html) {
 		return html.replaceAll(" data-text-range=\"[0-9]+,[0-9]+\"", StringUtils.EMPTY); //$NON-NLS-1$
 	}
-	
+
 	public static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
@@ -143,11 +143,11 @@ public final class TestUtil {
 			// ignore
 		}
 	}
-	
+
 	public static void assertClean(Repository repo) throws IOException {
 		assertTrue(Git.wrap(repo).status().call().isClean());
 	}
-	
+
 	public static void assertRE(String expectedRegExp, String actual) {
 		@SuppressWarnings("nls")
 		String msg = "text does not match regular expression:\n" +

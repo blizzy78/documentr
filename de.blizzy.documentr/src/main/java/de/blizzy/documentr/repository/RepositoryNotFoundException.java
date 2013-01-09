@@ -37,7 +37,7 @@ public class RepositoryNotFoundException extends NotFoundException {
 	RepositoryNotFoundException(String projectName, String branchName) {
 		this(projectName, branchName, false);
 	}
-	
+
 	static RepositoryNotFoundException forCentralRepository(String projectName) {
 		return new RepositoryNotFoundException(projectName, null, true);
 	}

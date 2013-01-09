@@ -57,7 +57,7 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() throws IOException {
 		directory = new RAMDirectory();
-		
+
 		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
@@ -66,21 +66,21 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 		writer.addDocument(createDocument("project", "branch2", "home")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		writer.commit();
 		writer.close(true);
-		
+
 		reader = DirectoryReader.open(directory);
-		
+
 		BitSet docs = new BitSet();
 		docs.set(1);
 		Bits docIds = new DocIdBitSet(docs);
 		filter = new PagePermissionFilter(docIds);
 	}
-	
+
 	@After
 	public void tearDown() {
 		Closeables.closeQuietly(reader);
 		Closeables.closeQuietly(directory);
 	}
-	
+
 	@Test
 	public void getDocIdSet() throws IOException {
 		IndexSearcher searcher = new IndexSearcher(reader);
@@ -90,7 +90,7 @@ public class PagePermissionFilterTest extends AbstractDocumentrTest {
 		Document doc = reader.document(docs.scoreDocs[0].doc);
 		assertEquals("branch2", doc.get(PageIndex.BRANCH)); //$NON-NLS-1$
 	}
-	
+
 	private Document createDocument(String projectName, String branchName, String path) {
 		Document doc = new Document();
 		doc.add(new StringField(PageIndex.PROJECT, projectName, Store.YES));

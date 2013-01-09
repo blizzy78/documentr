@@ -44,7 +44,7 @@ public class GetInaccessibleDocIdsTaskTest extends AbstractDocumentrTest {
 	private UserStore userStore;
 	@InjectMocks
 	private GetInaccessibleDocIdsTask task;
-	
+
 	@Test
 	public void call() throws IOException {
 		when(userStore.listRoles()).thenReturn(Lists.newArrayList("reader", "editor")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -52,9 +52,9 @@ public class GetInaccessibleDocIdsTaskTest extends AbstractDocumentrTest {
 		BooleanQuery query = new BooleanQuery();
 		query.add(new TermQuery(new Term(PageIndex.VIEW_RESTRICTION_ROLE, "reader")), BooleanClause.Occur.SHOULD); //$NON-NLS-1$
 		query.add(new TermQuery(new Term(PageIndex.VIEW_RESTRICTION_ROLE, "editor")), BooleanClause.Occur.SHOULD); //$NON-NLS-1$
-		
+
 		task.call();
-		
+
 		verify(searcher).search(eq(query), Matchers.any(InaccessibleDocIdsCollector.class));
 	}
 }

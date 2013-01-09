@@ -51,7 +51,7 @@ public class GetVisibleBranchDocIdsTaskTest extends AbstractDocumentrTest {
 	private Authentication authentication;
 	@InjectMocks
 	private GetVisibleBranchDocIdsTask task;
-	
+
 	@Test
 	public void call() throws IOException {
 		List<String> branches = Lists.newArrayList("project1/branch1", "project1/branch2", "project2/branch"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -67,9 +67,9 @@ public class GetVisibleBranchDocIdsTaskTest extends AbstractDocumentrTest {
 			q.add(new TermQuery(new Term(PageIndex.BRANCH, branchName)), BooleanClause.Occur.MUST);
 			query.add(q, BooleanClause.Occur.SHOULD);
 		}
-		
+
 		task.call();
-		
+
 		verify(searcher).search(eq(query), Matchers.any(AllDocIdsCollector.class));
 	}
 }

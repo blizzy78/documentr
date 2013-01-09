@@ -59,14 +59,14 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 	public void getApplicationChildren() {
 		when(repoManager.listProjects()).thenReturn(
 				Lists.newArrayList("project1", "project2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		
+
 		when(permissionEvaluator.hasProjectPermission(
 					same(authentication), notEq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$
 				.thenReturn(true);
 		when(permissionEvaluator.hasProjectPermission(
 					same(authentication), eq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$
 				.thenReturn(false);
-		
+
 		List<ProjectTreeNode> result = pageTreeController.getApplicationChildren(authentication);
 		Function<ProjectTreeNode, String> function = new Function<ProjectTreeNode, String>() {
 			@Override
@@ -82,14 +82,14 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 	public void getProjectChildren() throws IOException {
 		when(repoManager.listProjectBranches("project")).thenReturn( //$NON-NLS-1$
 				Lists.newArrayList("branch1", "branch2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		
+
 		when(permissionEvaluator.hasBranchPermission(
 					same(authentication), eq("project"), notEq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$ //$NON-NLS-2$
 				.thenReturn(true);
 		when(permissionEvaluator.hasBranchPermission(
 					same(authentication), eq("project"), eq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$ //$NON-NLS-2$
 				.thenReturn(false);
-		
+
 		List<BranchTreeNode> result = pageTreeController.getProjectChildren("project", authentication); //$NON-NLS-1$
 		Function<BranchTreeNode, String> function = new Function<BranchTreeNode, String>() {
 			@Override
@@ -100,20 +100,20 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		Set<String> branches = Sets.newHashSet(Lists.transform(result, function));
 		assertEquals(Sets.newHashSet("project/branch1", "project/branch2"), branches); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void getBranchChildren() throws IOException {
 		getBranchChildren(true);
 		getBranchChildren(false);
 	}
-	
+
 	private void getBranchChildren(boolean hasBranchPermission) throws IOException {
 		when(pageStore.getPage("project", "branch", "home", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
-		
+
 		List<PageTreeNode> result = pageTreeController.getBranchChildren(
 				"project", "branch", Sets.newHashSet(Permission.EDIT_PAGE.name()), authentication); //$NON-NLS-1$ //$NON-NLS-2$
 		Function<PageTreeNode, String> function = new Function<PageTreeNode, String>() {
@@ -133,11 +133,11 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		getPageChildren(true);
 		getPageChildren(false);
 	}
-	
+
 	private void getPageChildren(boolean hasBranchPermission) throws IOException {
 		when(pageStore.listChildPagePaths("project", "branch", "home/foo")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Lists.newArrayList("home/foo/page1", "home/foo/page2")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		when(pageStore.getPage("project", "branch", "home/foo/page1", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title1", "text1")); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage("project", "branch", "home/foo/page2", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -36,12 +36,12 @@ public class DocumentrWebSecurityExpressionHandler extends DefaultWebSecurityExp
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private PermissionEvaluator permissionEvaluator;
-	
+
 	@PostConstruct
 	public void init() {
 		setPermissionEvaluator(permissionEvaluator);
 	}
-	
+
 	@Override
 	protected SecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication, FilterInvocation fi) {
 		DocumentrSecurityExpressionRoot root = new DocumentrSecurityExpressionRoot(authentication, repoManager);

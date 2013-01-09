@@ -45,7 +45,7 @@ public class AbstractDocIdsCollectorTest {
 			return true;
 		}
 	}
-	
+
 	@Test
 	public void collect() {
 		TestCollector collector = new TestCollector();

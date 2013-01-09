@@ -27,7 +27,7 @@ public class BranchTreeNode extends AbstractTreeNode {
 
 	BranchTreeNode(String projectName, String name) {
 		super(Type.BRANCH);
-		
+
 		this.projectName = projectName;
 		this.name = name;
 	}

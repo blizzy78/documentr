@@ -30,10 +30,10 @@ public class VerbatimNodeWithType extends VerbatimNode {
 	public VerbatimNodeWithType(String text, String type) {
 		this(text, type, null);
 	}
-	
+
 	public VerbatimNodeWithType(String text, String type, String title) {
 		super(text);
-		
+
 		this.type = type;
 		this.title = title;
 	}

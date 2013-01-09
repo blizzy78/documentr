@@ -57,12 +57,12 @@ public class AccountOpenIdController {
 	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
-	
+
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("isAuthenticated()")
 	public String saveOpenId(@RequestParam(required=false) String openId, HttpServletRequest request)
 			throws OpenIDException, OpenIDConsumerException {
-		
+
 		try {
 			HttpSession session = request.getSession();
 			session.removeAttribute("openIdConsumer"); //$NON-NLS-1$
@@ -95,7 +95,7 @@ public class AccountOpenIdController {
 	@PreAuthorize("isAuthenticated()")
 	public String finishOpenId(HttpServletRequest request, Authentication authentication)
 			throws OpenIDConsumerException, IOException {
-		
+
 		HttpSession session = request.getSession();
 		OpenIDConsumer consumer = (OpenIDConsumer) session.getAttribute("openIdConsumer"); //$NON-NLS-1$
 		session.removeAttribute("openIdConsumer"); //$NON-NLS-1$
@@ -111,7 +111,7 @@ public class AccountOpenIdController {
 			} catch (OpenIdNotFoundException e) {
 				// okay
 			}
-			
+
 			if (!exists) {
 				String loginName = authentication.getName();
 				User user = userStore.getUser(loginName);
@@ -120,7 +120,7 @@ public class AccountOpenIdController {
 				userStore.saveUser(user, user);
 			}
 		}
-		
+
 		return "redirect:/account/openId"; //$NON-NLS-1$
 	}
 }

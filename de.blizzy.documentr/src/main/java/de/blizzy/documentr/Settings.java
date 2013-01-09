@@ -36,7 +36,7 @@ public class Settings {
 	private ServletContext servletContext;
 	@Getter
 	private File documentrDataDir;
-	
+
 	@PostConstruct
 	public void init() {
 		String dataDirParam = getInitParam("documentr.dataDir"); //$NON-NLS-1$

@@ -28,9 +28,9 @@ abstract class SwitchablePrintWriter extends PrintWriter {
 	SwitchablePrintWriter() {
 		super(NullWriter.NULL_WRITER);
 	}
-	
+
 	abstract Writer getWriter() throws IOException;
-	
+
 	private void setWriter() {
 		try {
 			out = getWriter();

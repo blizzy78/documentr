@@ -45,14 +45,14 @@ public class SearchControllerTest extends AbstractDocumentrTest {
 	private Model model;
 	@Mock
 	private SearchResult searchResult;
-	
+
 	@Test
 	public void findPages() throws IOException, ParseException, TimeoutException {
 		when(pageIndex.findPages("text", 1, authentication)).thenReturn(searchResult); //$NON-NLS-1$
-		
+
 		String view = searchController.findPages("text", 1, authentication, model); //$NON-NLS-1$
 		assertEquals("/search/result", view); //$NON-NLS-1$
-		
+
 		verify(model).addAttribute("searchText", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		verify(model).addAttribute("searchResult", searchResult); //$NON-NLS-1$
 		verify(model).addAttribute("page", 1); //$NON-NLS-1$

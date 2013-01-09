@@ -69,7 +69,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PAGE = "page"; //$NON-NLS-1$
 	private static final String CONTEXT = "/context"; //$NON-NLS-1$
 	private static final Locale LOCALE = Locale.US;
-	
+
 	@Mock
 	private GlobalRepositoryManager repoManager;
 	@Mock
@@ -106,13 +106,13 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		Functions.setMarkdownProcessor(markdownProcessor);
 		Functions.setMessageSource(messageSource);
 		Functions.setMacroFactory(macroFactory);
-		
+
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		
+
 		SecurityContextHolder.setContext(securityContext);
 
 		LocaleContextHolder.setLocale(LOCALE);
-		
+
 		ServletRequestAttributes requestAttrs = new ServletRequestAttributes(request);
 		RequestContextHolder.setRequestAttributes(requestAttrs);
 	}
@@ -130,7 +130,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		LocaleContextHolder.resetLocaleContext();
 		RequestContextHolder.resetRequestAttributes();
 	}
-	
+
 	@Test
 	public void listProjects() {
 		List<String> projects = Lists.newArrayList("p1", "p2", "p3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -151,7 +151,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(pageStore.listPageAttachments(PROJECT, BRANCH, PAGE)).thenReturn(attachments);
 		assertEquals(attachments, Functions.listPageAttachments(PROJECT, BRANCH, PAGE));
 	}
-	
+
 	@Test
 	public void getPageTitle() throws IOException {
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -181,7 +181,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(request.getContextPath()).thenReturn(CONTEXT);
 		assertEquals("htmlWithMacros", Functions.getPageHtml(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getPageHeaderHtml() throws IOException {
 		when(pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE, authentication, CONTEXT))
@@ -191,7 +191,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(request.getContextPath()).thenReturn(CONTEXT);
 		assertEquals("headerHtmlWithMacros", Functions.getPageHeaderHtml(PROJECT, BRANCH, PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getPagePathHierarchy() throws IOException {
 		Page page1 = TestUtil.createRandomPage(null);
@@ -200,7 +200,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(pageStore.getPage(PROJECT, BRANCH, "page1", false)).thenReturn(page1); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2", false)).thenReturn(page2); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, "page1/page2/page3", false)).thenReturn(page3); //$NON-NLS-1$
-		
+
 		assertEquals(Lists.newArrayList("page1", "page1/page2", "page1/page2/page3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Functions.getPagePathHierarchy(PROJECT, BRANCH, "page1/page2/page3")); //$NON-NLS-1$
 	}
@@ -210,67 +210,67 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		Date date = new Date();
 		PageMetadata metadata = new PageMetadata("user", date, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(metadata);
-		
+
 		PageMetadata result = Functions.getPageMetadata(PROJECT, BRANCH, PAGE);
 		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
 		assertEquals(metadata.getLastEdited(), result.getLastEdited());
 		assertEquals(metadata.getSize(), result.getSize());
 		assertEquals(metadata.getCommit(), result.getCommit());
 	}
-	
+
 	@Test
 	public void getAttachmentMetadata() throws IOException {
 		Date date = new Date();
 		PageMetadata metadata = new PageMetadata("user", date, 123, "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png")).thenReturn(metadata); //$NON-NLS-1$
-		
+
 		PageMetadata result = Functions.getAttachmentMetadata(PROJECT, BRANCH, PAGE, "test.png"); //$NON-NLS-1$
 		assertEquals(metadata.getLastEditedBy(), result.getLastEditedBy());
 		assertEquals(metadata.getLastEdited(), result.getLastEdited());
 		assertEquals(metadata.getSize(), result.getSize());
 		assertEquals(metadata.getCommit(), result.getCommit());
 	}
-	
+
 	@Test
 	public void listRoles() throws IOException {
 		List<String> roles = Lists.newArrayList("role1", "role2", "role3"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		when(userStore.listRoles()).thenReturn(roles);
-		
+
 		List<String> result = Functions.listRoles();
 		assertTrue(result.containsAll(roles));
 	}
-	
+
 	@Test
 	public void getUserAuthorities() throws IOException {
 		List<RoleGrantedAuthority> authorities = Lists.newArrayList(
 				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "role1"), //$NON-NLS-1$
 				new RoleGrantedAuthority(new GrantedAuthorityTarget("project", Type.PROJECT), "role2")); //$NON-NLS-1$ //$NON-NLS-2$
 		when(userStore.getUserAuthorities("user")).thenReturn(authorities); //$NON-NLS-1$
-		
+
 		List<RoleGrantedAuthority> result = Functions.getUserAuthorities("user"); //$NON-NLS-1$
 		assertEquals(Sets.newHashSet(authorities), Sets.newHashSet(result));
 	}
-	
+
 	@Test
 	public void formatSize() {
 		when(messageSource.getMessage("sizeX.kb", new Object[] { "1.21" }, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn("1.21 KB"); //$NON-NLS-1$
-		
+
 		String result = Functions.formatSize(1234);
 		assertEquals("1.21 KB", result); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void listPageVersions() throws IOException {
 		List<PageVersion> versions = Lists.newArrayList(new PageVersion("commit", "user", new Date())); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.listPageVersions(PROJECT, BRANCH, PAGE)).thenReturn(versions);
 		assertEquals(versions, Functions.listPageVersions(PROJECT, BRANCH, PAGE));
 	}
-	
+
 	@Test
 	public void listMyOpenIds() throws IOException {
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
-		
+
 		User user = new User("user", "p", "email", true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		Set<OpenId> openIds = Sets.newHashSet();
 		openIds.add(new OpenId("openId1", "realOpenId1")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -279,16 +279,16 @@ public class FunctionsTest extends AbstractDocumentrTest {
 			user.addOpenId(openId);
 		}
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
-		
+
 		List<OpenId> result = Functions.listMyOpenIds();
 		assertEquals(openIds, Sets.newHashSet(result));
 	}
-	
+
 	@Test
 	public void floor() {
 		assertEquals(3, Functions.floor(3.141592654d));
 	}
-	
+
 	@Test
 	public void getMacros() {
 		when(descriptor1.getTitle(LOCALE)).thenReturn("title1"); //$NON-NLS-1$
@@ -298,7 +298,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		when(descriptor2.getTitle(LOCALE)).thenReturn("title2"); //$NON-NLS-1$
 		when(descriptor2.getDescription(LOCALE)).thenReturn("description2"); //$NON-NLS-1$
 		when(descriptor2.getInsertText()).thenReturn("insertText2"); //$NON-NLS-1$
-		
+
 		Set<IMacroDescriptor> descs = Sets.newHashSet(descriptor1, descriptor2);
 		when(macroFactory.getDescriptors()).thenReturn(descs);
 
@@ -311,32 +311,32 @@ public class FunctionsTest extends AbstractDocumentrTest {
 		assertEquals(descriptor2.getDescription(LOCALE), result.get(1).getDescription());
 		assertEquals(descriptor2.getInsertText(), result.get(1).getInsertText());
 	}
-	
+
 	@Test
 	public void getLanguage() {
 		assertEquals(LOCALE.getLanguage(), Functions.getLanguage());
 	}
-	
+
 	@Test
 	public void escapeJavaScript() {
 		assertEquals(StringEscapeUtils.escapeEcmaScript("\"'{}"), Functions.escapeJavaScript("\"'{}")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	@SuppressWarnings("unchecked")
 	public void pageExists() throws IOException {
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenReturn(pageMetadata);
 		assertTrue(Functions.pageExists(PROJECT, BRANCH, PAGE));
-		
+
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE)).thenThrow(PageNotFoundException.class);
 		assertFalse(Functions.pageExists(PROJECT, BRANCH, PAGE));
 	}
-	
+
 	@Test
 	public void getGroovyMacros() {
 		List<String> macros = Lists.newArrayList("macro1", "macro2"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(macroFactory.listGroovyMacros()).thenReturn(macros);
-		
+
 		List<String> result = Functions.getGroovyMacros();
 		assertEquals(macros, result);
 	}

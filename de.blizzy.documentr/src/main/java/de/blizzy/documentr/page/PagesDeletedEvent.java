@@ -35,7 +35,7 @@ public class PagesDeletedEvent {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.notEmpty(paths);
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.paths = paths;

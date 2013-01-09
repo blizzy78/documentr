@@ -35,7 +35,7 @@ import de.blizzy.documentr.access.UserStore;
 public class AccountController {
 	@Autowired
 	private UserStore userStore;
-	
+
 	@RequestMapping(value="/myAccount", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	public String getMyAccount() {
@@ -47,7 +47,7 @@ public class AccountController {
 	public String getMyOpenIds() {
 		return "/account/openId"; //$NON-NLS-1$
 	}
-	
+
 	@RequestMapping(value="/removeOpenId", method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	public String removeOpenId(@RequestParam String openId, Authentication authentication) throws IOException {

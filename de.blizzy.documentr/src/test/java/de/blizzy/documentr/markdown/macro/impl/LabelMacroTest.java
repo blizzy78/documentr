@@ -37,7 +37,7 @@ public class LabelMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new LabelMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getParameters()).thenReturn("info label text"); //$NON-NLS-1$

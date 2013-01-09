@@ -27,20 +27,20 @@ import org.springframework.context.MessageSource;
 
 /**
  * Formats a file's length into human-readable text format.
- * 
+ *
  * @see #format(long)
  */
 public class FileLengthFormat extends Format {
 	private static final long KB = 1024;
 	private static final long MB = KB * 1024;
 	private static final long GB = MB * 1024;
-	
+
 	private MessageSource messageSource;
 	private Locale locale;
 
 	/**
 	 * Constructs a new file length formatter.
-	 * 
+	 *
 	 * @param messageSource a source of message texts
 	 * @param locale the locale to use
 	 */
@@ -48,7 +48,7 @@ public class FileLengthFormat extends Format {
 		this.messageSource = messageSource;
 		this.locale = locale;
 	}
-	
+
 	@Override
 	public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
 		if (!(obj instanceof Long)) {
@@ -77,7 +77,7 @@ public class FileLengthFormat extends Format {
 	public String format(long length) {
 		return format(length, new StringBuffer(), null).toString();
 	}
-	
+
 	private String formatNumber(double d) {
 		NumberFormat format = NumberFormat.getNumberInstance(locale);
 		int fractionDigits;
@@ -91,7 +91,7 @@ public class FileLengthFormat extends Format {
 		format.setMaximumFractionDigits(fractionDigits);
 		return format.format(d);
 	}
-	
+
 	private String formatNumber(long l) {
 		return NumberFormat.getNumberInstance().format(l);
 	}

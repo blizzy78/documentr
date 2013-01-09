@@ -51,7 +51,7 @@ import de.blizzy.documentr.page.Page;
 @PrepareForTest(LoginNameUserDetailsService.class)
 public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 	private static final String USER = "user"; //$NON-NLS-1$
-	
+
 	@Mock
 	private IPageStore pageStore;
 	@Mock
@@ -67,7 +67,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		userDetailsService = PowerMockito.mock(LoginNameUserDetailsService.class);
 		Whitebox.setInternalState(permissionEvaluator, LoginNameUserDetailsService.class, userDetailsService);
 	}
-	
+
 	@Test
 	public void hasApplicationPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -83,7 +83,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasApplicationPermission(
 				authentication, Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasProjectPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -91,7 +91,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasProjectPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasProjectPermissionMustCheckApplication() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -99,7 +99,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasProjectPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasProjectPermissionMustHonorAdminPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -107,7 +107,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasProjectPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasAnyProjectPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -115,7 +115,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyProjectPermission(
 				authentication, Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasAnyProjectPermissionMustCheckApplication() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -123,7 +123,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyProjectPermission(
 				authentication, Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasAnyProjectPermissionMustHonorAdminPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -131,7 +131,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyProjectPermission(
 				authentication, Permission.EDIT_PAGE));
 	}
-	
+
 	@Test
 	public void hasBranchPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -147,7 +147,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasBranchPermission(
 				authentication, "project", "branch", Permission.EDIT_PAGE)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void hasBranchPermissionMustHonorAdminPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -155,7 +155,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasBranchPermission(
 				authentication, "project", "branch", Permission.EDIT_PAGE)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void hasAnyBranchPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -163,7 +163,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyBranchPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasAnyBranchPermissionMustCheckProject() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -171,7 +171,7 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyBranchPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasAnyBranchPermissionMustHonorAdminPermission() {
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
@@ -179,12 +179,12 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		assertTrue(permissionEvaluator.hasAnyBranchPermission(
 				authentication, "project", Permission.EDIT_PAGE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void hasPagePermissionMustCheckBranch() throws IOException {
 		when(pageStore.getPage("project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/foo", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
 				new GrantedAuthorityTarget("project/branch", Type.BRANCH), Permission.EDIT_PAGE)); //$NON-NLS-1$
 		assertTrue(permissionEvaluator.hasPagePermission(authentication,
@@ -198,10 +198,10 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
 		when(pageStore.getPage("project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/foo", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(page);
-		
+
 		when(userStore.getUserAuthorities(USER)).thenReturn(Lists.newArrayList(
 				new RoleGrantedAuthority(GrantedAuthorityTarget.APPLICATION, "viewRole"))); //$NON-NLS-1$
-		
+
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, Permission.VIEW));
 		assertTrue(permissionEvaluator.hasPagePermission(authentication,
@@ -214,13 +214,13 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		page.setViewRestrictionRole("viewRole"); //$NON-NLS-1$
 		when(pageStore.getPage("project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/foo", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(page);
-		
+
 		Authentication authentication = mockAuthentication(new PermissionGrantedAuthority(
 				GrantedAuthorityTarget.APPLICATION, Permission.ADMIN));
 		assertTrue(permissionEvaluator.hasPagePermission(authentication,
 				"project", "branch", DocumentrConstants.HOME_PAGE_NAME + "/foo", Permission.VIEW)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	@Test
 	public void isAdmin() {
 		when(userDetailsService.loadUserByUsername(USER)).thenReturn(userDetails);
@@ -240,13 +240,13 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		doReturn(Sets.newHashSet(authority)).when(userDetails).getAuthorities();
 		assertFalse(permissionEvaluator.isAdmin(USER));
 	}
-	
+
 	@Test
 	public void isLastAdminRole() throws IOException {
 		when(userStore.listUsers()).thenReturn(Lists.newArrayList(USER));
 		List<RoleGrantedAuthority> authorities = Lists.newArrayList();
 		when(userStore.getUserAuthorities(USER)).thenReturn(authorities);
-		List<String> roleNames = Lists.newArrayList(); 
+		List<String> roleNames = Lists.newArrayList();
 		when(userStore.listRoles()).thenReturn(roleNames);
 
 		roleNames.add("viewer"); //$NON-NLS-1$
@@ -282,14 +282,14 @@ public class DocumentrPermissionEvaluatorTest extends AbstractDocumentrTest {
 		when(userStore.getRole("admin2")).thenReturn(role); //$NON-NLS-1$
 		assertFalse(permissionEvaluator.isLastAdminRole("admin2")); //$NON-NLS-1$
 	}
-	
+
 	private Authentication mockAuthentication(GrantedAuthority... authorities) {
 		return new AbstractAuthenticationToken(Sets.newHashSet(authorities)) {
 			@Override
 			public Object getPrincipal() {
 				return USER;
 			}
-			
+
 			@Override
 			public Object getCredentials() {
 				return null;

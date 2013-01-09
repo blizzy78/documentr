@@ -31,11 +31,11 @@ public class ProjectRepositoryManagerFactory {
 	private LockManager lockManager;
 	@Autowired
 	private EventBus eventBus;
-	
+
 	ProjectRepositoryManager getManager(File reposDir, String projectName) {
 		Assert.notNull(reposDir);
 		Assert.hasLength(projectName);
-		
+
 		File projectDir = new File(reposDir, projectName);
 		return new ProjectRepositoryManager(projectName, projectDir, lockManager, eventBus);
 	}

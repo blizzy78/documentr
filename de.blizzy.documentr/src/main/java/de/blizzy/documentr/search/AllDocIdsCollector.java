@@ -22,7 +22,7 @@ import org.apache.lucene.search.Scorer;
 
 class AllDocIdsCollector extends AbstractDocIdsCollector {
 	private int docBase;
-	
+
 	@Override
 	public void setScorer(Scorer scorer) {
 	}

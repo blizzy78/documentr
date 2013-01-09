@@ -40,7 +40,7 @@ public class RoleGrantedAuthorityComparatorTest {
 		List<RoleGrantedAuthority> expected = Lists.newArrayList(rga1, rga2, rga3, rga4);
 
 		List<RoleGrantedAuthority> rgas = Lists.newArrayList(expected);
-		
+
 		// make sure the list is random
 		while (rgas.equals(expected)) {
 			Collections.shuffle(rgas);

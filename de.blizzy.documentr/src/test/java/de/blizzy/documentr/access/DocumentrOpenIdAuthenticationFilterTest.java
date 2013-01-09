@@ -54,16 +54,16 @@ public class DocumentrOpenIdAuthenticationFilterTest extends AbstractDocumentrTe
 	private FacadeHostRequestWrapperFactory facadeHostRequestWrapperFactory;
 	@InjectMocks
 	private DocumentrOpenIdAuthenticationFilter filter;
-	
+
 	@Test
 	@SuppressWarnings("unchecked")
 	public void attemptAuthentication() throws AuthenticationException, IOException, OpenIDConsumerException {
 		when(facadeHostRequestWrapperFactory.create(request)).thenReturn(requestWrapper);
 
 		when(requestWrapper.getParameter("openid.identity")).thenReturn("identity"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		when(consumer.endConsumption(requestWrapper)).thenThrow(OpenIDConsumerException.class);
-		
+
 		expectedException.expect(AuthenticationServiceException.class);
 		filter.attemptAuthentication(request, response);
 	}

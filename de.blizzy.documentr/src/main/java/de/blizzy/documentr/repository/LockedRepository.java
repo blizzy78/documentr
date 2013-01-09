@@ -40,7 +40,7 @@ final class LockedRepository implements ILockedRepository {
 		ILock lock = lockManager.lockProjectCentral(projectName);
 		return new LockedRepository(lock, lockManager);
 	}
-	
+
 	static LockedRepository lockProjectBranch(String projectName, String branchName, LockManager lockManager) {
 		ILock lock = lockManager.lockProjectBranch(projectName, branchName);
 		return new LockedRepository(lock, lockManager);
@@ -53,7 +53,7 @@ final class LockedRepository implements ILockedRepository {
 		}
 		return repository;
 	}
-	
+
 	@Override
 	public void close() {
 		try {

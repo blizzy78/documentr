@@ -38,12 +38,12 @@ public class DocumentrMethodSecurityExpressionHandlerTest extends AbstractDocume
 	private Authentication authentication;
 	@InjectMocks
 	private DocumentrMethodSecurityExpressionHandler expressionHandler;
-	
+
 	@Test
 	public void createSecurityExpressionRoot() {
 		Object target = "this"; //$NON-NLS-1$
 		when(methodInvocation.getThis()).thenReturn(target);
-		
+
 		DocumentrSecurityExpressionRoot root =
 				(DocumentrSecurityExpressionRoot) expressionHandler.createSecurityExpressionRoot(
 						authentication, methodInvocation);

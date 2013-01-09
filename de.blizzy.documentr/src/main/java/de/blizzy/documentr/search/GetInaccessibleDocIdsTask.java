@@ -42,7 +42,7 @@ class GetInaccessibleDocIdsTask implements Callable<BitSet> {
 
 	GetInaccessibleDocIdsTask(IndexSearcher searcher, Permission permission, Authentication authentication,
 			UserStore userStore, DocumentrPermissionEvaluator permissionEvaluator) {
-		
+
 		this.searcher = searcher;
 		this.permission = permission;
 		this.authentication = authentication;

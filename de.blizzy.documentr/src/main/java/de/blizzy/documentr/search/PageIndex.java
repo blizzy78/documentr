@@ -140,7 +140,7 @@ public class PageIndex {
 		Replacement.dotAllNoCase("<script.*?>.*?</script>", StringUtils.EMPTY),
 		Replacement.dotAllNoCase("<.*?>", StringUtils.EMPTY)
 	);
-	
+
 	@Autowired
 	private Settings settings;
 	@Autowired
@@ -163,13 +163,13 @@ public class PageIndex {
 	private ReaderManager readerManager;
 	private SearcherManager searcherManager;
 	private AtomicBoolean dirty = new AtomicBoolean();
-	
+
 	@PostConstruct
 	public void init() throws IOException {
 		File indexDir = new File(settings.getDocumentrDataDir(), "index"); //$NON-NLS-1$
 		File pageIndexDir = new File(indexDir, "page"); //$NON-NLS-1$
 		FileUtils.forceMkdir(pageIndexDir);
-		
+
 		directory = FSDirectory.open(pageIndexDir);
 
 		Analyzer defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_40);
@@ -181,16 +181,16 @@ public class PageIndex {
 		config.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		writer = new IndexWriter(directory, config);
 		writer.commit();
-		
+
 		readerManager = new ReaderManager(directory);
 		searcherManager = new SearcherManager(directory, null);
-		
+
 		log.info("checking if index is empty"); //$NON-NLS-1$
 		if (getNumDocuments() == 0) {
 			reindexEverything();
 		}
 	}
-	
+
 	@PreDestroy
 	public void destroy() {
 		Closeables.closeQuietly(searcherManager);
@@ -198,17 +198,17 @@ public class PageIndex {
 		Closeables.closeQuietly(writer);
 		Closeables.closeQuietly(directory);
 	}
-	
+
 	private void reindexEverything() throws IOException {
 		log.info("reindexing everything"); //$NON-NLS-1$
-		
+
 		for (String projectName : repoManager.listProjects()) {
 			for (String branchName : repoManager.listProjectBranches(projectName)) {
 				addPages(projectName, branchName);
 			}
 		}
 	}
-	
+
 	@Subscribe
 	public void addPage(PageChangedEvent event) {
 		String projectName = event.getProjectName();
@@ -216,7 +216,7 @@ public class PageIndex {
 		String path = event.getPath();
 		addPage(projectName, branchName, path);
 	}
-	
+
 	private void addPage(final String projectName, final String branchName, final String path) {
 		Runnable runnable = new Runnable() {
 			@Override
@@ -254,7 +254,7 @@ public class PageIndex {
 	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
 		String fullPath = projectName + "/" + branchName + "/" + Util.toUrlPagePath(path); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("indexing page {}", fullPath); //$NON-NLS-1$
-		
+
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String text = ((PageTextData) page.getData()).getText();
 		Authentication authentication = authenticationFactory.create(UserStore.ANONYMOUS_USER_LOGIN_NAME);
@@ -289,14 +289,14 @@ public class PageIndex {
 		writer.updateDocument(new Term(FULL_PATH, fullPath), doc);
 		dirty.set(true);
 	}
-	
+
 	private String removeHtmlTags(String html) {
 		for (Replacement replacement : REMOVE_HTML_TAGS) {
 			html = replacement.replaceAll(html);
 		}
 		return html;
 	}
-	
+
 	private String replaceHtmlEntities(String html) {
 		for (;;) {
 			int pos = html.indexOf('&');
@@ -319,7 +319,7 @@ public class PageIndex {
 	public void deletePages(PagesDeletedEvent event) {
 		deletePages(event.getProjectName(), event.getBranchName(), event.getPaths());
 	}
-	
+
 	private void deletePages(final String projectName, final String branchName, final Set<String> paths) {
 		Runnable runnable = new Runnable() {
 			@Override
@@ -359,7 +359,7 @@ public class PageIndex {
 
 	public SearchResult findPages(final String searchText, final int page, final Authentication authentication)
 			throws ParseException, IOException, TimeoutException {
-		
+
 		Assert.hasLength(searchText);
 		Assert.isTrue(page >= 1);
 		Assert.notNull(authentication);
@@ -377,7 +377,7 @@ public class PageIndex {
 				}
 			};
 			findFuture = taskExecutor.submit(findCallable);
-			
+
 			SearchTextSuggestion suggestion = getSearchTextSuggestion(searchText, authentication, indexSearcher);
 			SearchResult result = findFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
 			result.setSuggestion(suggestion);
@@ -404,13 +404,13 @@ public class PageIndex {
 			}
 		}
 	}
-	
+
 	private SearchResult findPages(String searchText, int page, Authentication authentication, IndexSearcher searcher)
 			throws ParseException, IOException, TimeoutException {
-		
+
 		Future<Query> queryFuture = taskExecutor.submit(new ParseQueryTask(searchText, analyzer));
 		Bits visibleDocIds = getVisibleDocIds(searcher, authentication);
-		
+
 		Query query;
 		try {
 			query = queryFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
@@ -437,7 +437,7 @@ public class PageIndex {
 					query, reader, docs.scoreDocs[i].doc, analyzer));
 			hitFutures.add(hitFuture);
 		}
-		
+
 		try {
 			ListenableFuture<List<SearchHit>> allHitsFuture = Futures.allAsList(hitFutures);
 			List<SearchHit> hits = allHitsFuture.get(INTERACTIVE_TIMEOUT, TimeUnit.SECONDS);
@@ -460,9 +460,9 @@ public class PageIndex {
 
 	private SearchTextSuggestion getSearchTextSuggestion(String searchText, Authentication authentication,
 			IndexSearcher searcher) throws IOException, ParseException, TimeoutException {
-		
+
 		List<WordPosition> words = Lists.newArrayList();
-		
+
 		TokenStream tokenStream = null;
 		try {
 			tokenStream = analyzer.tokenStream(ALL_TEXT_SUGGESTIONS, new StringReader(searchText));
@@ -482,7 +482,7 @@ public class PageIndex {
 		} finally {
 			Closeables.closeQuietly(tokenStream);
 		}
-		
+
 		Collections.reverse(words);
 
 		StringBuilder suggestedSearchText = new StringBuilder(searchText);
@@ -503,11 +503,11 @@ public class PageIndex {
 				suggestedSearchText.replace(start, end, suggestedWord);
 				suggestedSearchTextHtml.replace(start, end,
 						startMarker + StringEscapeUtils.escapeHtml4(suggestedWord) + endMarker);
-				
+
 				foundSuggestions = true;
 			}
 		}
-		
+
 		if (foundSuggestions) {
 			String suggestion = suggestedSearchText.toString();
 			SearchResult suggestionResult = findPages(suggestion, 1, authentication, searcher);
@@ -550,7 +550,7 @@ public class PageIndex {
 			}
 		}
 	}
-	
+
 	Bits getVisibleDocIds(IndexSearcher searcher, Authentication authentication) throws IOException, TimeoutException {
 		Future<BitSet> branchPagesFuture = taskExecutor.submit(new GetVisibleBranchDocIdsTask(
 				searcher, authentication, permissionEvaluator));
@@ -574,7 +574,7 @@ public class PageIndex {
 			inaccessibleDocsFuture.cancel(false);
 		}
 	}
-	
+
 	@Scheduled(fixedDelay=REFRESH_INTERVAL * 1000)
 	void refresh() {
 		try {
@@ -582,14 +582,14 @@ public class PageIndex {
 		} catch (IOException e) {
 			log.warn(StringUtils.EMPTY, e);
 		}
-		
+
 		try {
 			searcherManager.maybeRefresh();
 		} catch (IOException e) {
 			log.warn(StringUtils.EMPTY, e);
 		}
 	}
-	
+
 	@Scheduled(fixedDelay=REFRESH_INTERVAL * 1000)
 	void commit() {
 		if (dirty.getAndSet(false)) {
@@ -600,7 +600,7 @@ public class PageIndex {
 			}
 		}
 	}
-	
+
 	int getNumDocuments() throws IOException {
 		DirectoryReader reader = null;
 		try {

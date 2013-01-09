@@ -54,29 +54,29 @@ public class GetSearchHitTaskTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() throws IOException {
 		directory = new RAMDirectory();
-		
+
 		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 		writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		IndexWriter writer = new IndexWriter(directory, writerConfig);
 		writer.addDocument(createDocument("project", "branch", "home", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				new String[] { "tag1", "tag2" }, //$NON-NLS-1$ //$NON-NLS-2$
-				"title", "some text")); //$NON-NLS-1$ //$NON-NLS-2$ 
+				"title", "some text")); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.commit();
 		writer.close(true);
-		
+
 		reader = DirectoryReader.open(directory);
-		
+
 		Query query = new TermQuery(new Term("text", "some")); //$NON-NLS-1$ //$NON-NLS-2$
 		task = new GetSearchHitTask(query, reader, 0, analyzer);
 	}
-	
+
 	@After
 	public void tearDown() {
 		Closeables.closeQuietly(reader);
 		Closeables.closeQuietly(directory);
 	}
-	
+
 	@Test
 	public void call() throws IOException {
 		SearchHit hit = task.call();
@@ -87,10 +87,10 @@ public class GetSearchHitTaskTest extends AbstractDocumentrTest {
 		assertEquals("<strong>some</strong> text", hit.getTextHtml()); //$NON-NLS-1$
 		assertEquals(Lists.newArrayList("tag1", "tag2"), hit.getTags()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	private Document createDocument(String projectName, String branchName, String path, String[] tags,
 			String title, String text) {
-		
+
 		Document doc = new Document();
 		doc.add(new StringField(PageIndex.PROJECT, projectName, Store.YES));
 		doc.add(new StringField(PageIndex.BRANCH, branchName, Store.YES));

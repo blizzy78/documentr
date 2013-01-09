@@ -36,7 +36,7 @@ public class ReplacementTest {
 		Replacement replacement = new Replacement(pattern, "_"); //$NON-NLS-1$
 		assertEquals("__", replacement.replaceAll("xY")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void dotAllNoCase() {
 		Replacement replacement = Replacement.dotAllNoCase("[a-z]", "_"); //$NON-NLS-1$ //$NON-NLS-2$

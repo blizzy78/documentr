@@ -30,12 +30,12 @@ public class MacroInvocationTest {
 	public void setUp() {
 		invocation = new MacroInvocation("macro", "params"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void getStartMarker() {
 		assertTrue(StringUtils.isNotBlank(invocation.getStartMarker()));
 	}
-	
+
 	@Test
 	public void getEndMarker() {
 		assertTrue(StringUtils.isNotBlank(invocation.getEndMarker()));

@@ -27,14 +27,14 @@ import org.junit.rules.ExpectedException;
 public class LockManagerTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
-	
+
 	private LockManager lockManager;
 
 	@Before
 	public void setUp() {
 		lockManager = new LockManager();
 	}
-	
+
 	@Test
 	public void lockAndUnlock() {
 		ILock lock = lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -63,11 +63,11 @@ public class LockManagerTest {
 		lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
 		lockManager.lockAll();
 	}
-	
+
 	@Test
 	public void unlockWithUnknownLock() {
 		Lock lock = new Lock(Thread.currentThread());
-		
+
 		expectedException.expect(IllegalStateException.class);
 		lockManager.unlock(lock);
 	}
@@ -76,7 +76,7 @@ public class LockManagerTest {
 	public void unlockTooOften() {
 		ILock lock = lockManager.lockProjectBranch("project", "branch"); //$NON-NLS-1$ //$NON-NLS-2$
 		lockManager.unlock(lock);
-		
+
 		expectedException.expect(IllegalStateException.class);
 		lockManager.unlock(lock);
 	}

@@ -76,7 +76,7 @@ public class PageForm {
 
 	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
 			String viewRestrictionRole, String commit, String[] tags) {
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
@@ -87,7 +87,7 @@ public class PageForm {
 		this.commit = commit;
 		this.tags = ArrayUtils.clone(tags);
 	}
-	
+
 	public String[] getTags() {
 		return ArrayUtils.clone(tags);
 	}

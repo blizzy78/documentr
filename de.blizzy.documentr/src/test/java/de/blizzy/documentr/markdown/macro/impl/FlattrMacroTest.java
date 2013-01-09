@@ -53,7 +53,7 @@ public class FlattrMacroTest extends AbstractDocumentrTest {
 	private static final String TAG_2 = "tag2"; //$NON-NLS-1$
 	private static final String PAGE_URI = "pageUri"; //$NON-NLS-1$
 	private static final String PAGE_URL = "pageUrl"; //$NON-NLS-1$
-	
+
 	@Mock
 	private IMacroContext macroContext;
 	@Mock
@@ -71,18 +71,18 @@ public class FlattrMacroTest extends AbstractDocumentrTest {
 		when(macroContext.getHtmlSerializerContext()).thenReturn(htmlSerializerContext);
 		when(macroContext.getSettings()).thenReturn(macroSettings);
 		when(macroSettings.getSetting("userId")).thenReturn(FLATTR_USER_ID); //$NON-NLS-1$
-		
+
 		when(htmlSerializerContext.getProjectName()).thenReturn(PROJECT);
 		when(htmlSerializerContext.getBranchName()).thenReturn(BRANCH);
 		when(htmlSerializerContext.getPagePath()).thenReturn(PAGE);
 		when(htmlSerializerContext.getPageUri(PAGE)).thenReturn(PAGE_URI);
 		when(htmlSerializerContext.getUrl(PAGE_URI)).thenReturn(PAGE_URL);
-		
+
 		Page page = Page.fromText(PAGE_TITLE, "text"); //$NON-NLS-1$
 		page.setTags(Sets.newHashSet(TAG_1, TAG_2));
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE, false)).thenReturn(page);
 	}
-	
+
 	@Test
 	public void getHtml() {
 		String html = macro.getHtml(macroContext);

@@ -30,7 +30,7 @@ public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
 		super(request);
 		this.documentrHost = documentrHost;
 	}
-	
+
 	@Override
 	public StringBuffer getRequestURL() {
 		StringBuffer urlBuf = super.getRequestURL();
@@ -49,7 +49,7 @@ public class FacadeHostRequestWrapper extends HttpServletRequestWrapper {
 		if (contextPath.equals("/")) { //$NON-NLS-1$
 			contextPath = StringUtils.EMPTY;
 		}
-		
+
 		String newUrl;
 		if (StringUtils.isNotBlank(contextPath)) {
 			int pos = url.indexOf(contextPath);

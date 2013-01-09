@@ -37,7 +37,7 @@ public class RoleNameValidator implements ConstraintValidator<ValidRoleName, Str
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		
+
 		return Pattern.matches("^" + DocumentrConstants.ROLE_NAME_PATTERN + "$", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

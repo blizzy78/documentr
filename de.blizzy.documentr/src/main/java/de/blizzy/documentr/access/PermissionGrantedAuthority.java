@@ -29,7 +29,7 @@ import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 /** An authority that grants a permission on a target object. */
 class PermissionGrantedAuthority implements GrantedAuthority {
 	private static final long serialVersionUID = 4837778771482591248L;
-	
+
 	@Getter
 	private GrantedAuthorityTarget target;
 	@Getter
@@ -37,7 +37,7 @@ class PermissionGrantedAuthority implements GrantedAuthority {
 
 	/**
 	 * Constructs a new permission granted authority.
-	 * 
+	 *
 	 * @param target the target object
 	 * @param permission the permission being granted
 	 */
@@ -45,16 +45,16 @@ class PermissionGrantedAuthority implements GrantedAuthority {
 		Assert.notNull(target);
 		Assert.isTrue(target.getType() != Type.PAGE);
 		Assert.notNull(permission);
-		
+
 		this.target = target;
 		this.permission = permission;
 	}
-	
+
 	@Override
 	public String getAuthority() {
 		return null;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -68,7 +68,7 @@ class PermissionGrantedAuthority implements GrantedAuthority {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

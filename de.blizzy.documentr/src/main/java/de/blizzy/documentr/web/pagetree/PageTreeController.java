@@ -65,14 +65,14 @@ public class PageTreeController {
 		}
 		return result;
 	}
-	
+
 	@RequestMapping(value="/project/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json",
 			method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	@PreAuthorize("hasAnyBranchPermission(#name, VIEW)")
 	public List<BranchTreeNode> getProjectChildren(@PathVariable String name, Authentication authentication)
 			throws IOException {
-		
+
 		List<String> branches = globalRepositoryManager.listProjectBranches(name);
 		List<BranchTreeNode> result = Lists.newArrayList();
 		for (String branch : branches) {
@@ -98,7 +98,7 @@ public class PageTreeController {
 				checkBranchPermissions));
 		return Collections.singletonList(node);
 	}
-	
+
 	@RequestMapping(value="/page/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
 			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
 			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json",
@@ -111,7 +111,7 @@ public class PageTreeController {
 			Authentication authentication) throws IOException {
 
 		List<AbstractTreeNode> result = Lists.newArrayList();
-		
+
 		if (pages) {
 			List<String> childPagePaths = pageStore.listChildPagePaths(projectName, branchName, Util.toRealPagePath(path));
 			for (String childPagePath : childPagePaths) {
@@ -122,20 +122,20 @@ public class PageTreeController {
 				result.add(node);
 			}
 		}
-		
+
 		if (attachments) {
 			List<String> pageAttachments = pageStore.listPageAttachments(projectName, branchName, Util.toRealPagePath(path));
 			for (String attachment : pageAttachments) {
 				result.add(new AttachmentTreeNode(projectName, branchName, path, attachment));
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	private boolean hasBranchPermissions(Authentication authentication, String projectName,
 			String branchName, Set<String> checkBranchPermissions) {
-		
+
 		boolean result = false;
 		if (checkBranchPermissions != null) {
 			result = true;

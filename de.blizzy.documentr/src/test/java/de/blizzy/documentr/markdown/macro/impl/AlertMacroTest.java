@@ -37,13 +37,13 @@ public class AlertMacroTest extends AbstractDocumentrTest {
 	public void setUp() {
 		runnable = new AlertMacro();
 	}
-	
+
 	@Test
 	public void getHtml() {
 		when(context.getBody()).thenReturn("body"); //$NON-NLS-1$
 		assertEquals("<div class=\"alert\">body</div>", runnable.getHtml(context)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getHtmlWithErrorType() {
 		when(context.getParameters()).thenReturn("error"); //$NON-NLS-1$

@@ -28,11 +28,11 @@ class Lock implements ILock {
 	Lock(Thread lockingThread) {
 		this.lockingThread = lockingThread;
 	}
-	
+
 	void increaseUseCount() {
 		useCount++;
 	}
-	
+
 	int decreaseUseCount() {
 		return --useCount;
 	}

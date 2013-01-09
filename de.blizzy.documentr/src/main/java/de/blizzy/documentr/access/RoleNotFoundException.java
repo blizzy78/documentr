@@ -27,7 +27,7 @@ public class RoleNotFoundException extends NotFoundException {
 
 	RoleNotFoundException(String roleName) {
 		super("role not found: " + roleName); //$NON-NLS-1$
-		
+
 		this.roleName = roleName;
 	}
 }

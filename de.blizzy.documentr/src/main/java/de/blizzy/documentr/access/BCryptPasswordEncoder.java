@@ -72,7 +72,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		}
 		return valid;
 	}
-	
+
 	@Subscribe
 	public void systemSettingsChanged(@SuppressWarnings("unused") SystemSettingsChangedEvent event) {
 		encoder = createEncoder();

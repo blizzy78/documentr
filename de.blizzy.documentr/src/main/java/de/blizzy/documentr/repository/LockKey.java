@@ -30,7 +30,7 @@ class LockKey {
 		this.branchName = branchName;
 		this.central = central;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -45,7 +45,7 @@ class LockKey {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

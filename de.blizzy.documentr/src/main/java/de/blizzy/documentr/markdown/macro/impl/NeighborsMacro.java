@@ -49,12 +49,12 @@ public class NeighborsMacro implements IMacroRunnable {
 		htmlSerializerContext = macroContext.getHtmlSerializerContext();
 		pageStore = macroContext.getPageStore();
 		permissionEvaluator = macroContext.getPermissionEvaluator();
-		
+
 		path = htmlSerializerContext.getPagePath();
 		if (path != null) {
 			projectName = htmlSerializerContext.getProjectName();
 			branchName = htmlSerializerContext.getBranchName();
-			
+
 			if (log.isInfoEnabled()) {
 				log.info("rendering neighbors for page: {}/{}/{}, user: {}", //$NON-NLS-1$
 						projectName, branchName, Util.toUrlPagePath(path), htmlSerializerContext.getAuthentication().getName());
@@ -73,7 +73,7 @@ public class NeighborsMacro implements IMacroRunnable {
 			return null;
 		}
 	}
-	
+
 	private CharSequence printParent(CharSequence inner, String path) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		Page page = pageStore.getPage(projectName, branchName, path, false);
@@ -86,7 +86,7 @@ public class NeighborsMacro implements IMacroRunnable {
 					.append(parentPage.getTitle())
 					.append("</a>") //$NON-NLS-1$
 					.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
-				
+
 				if (path.equals(this.path)) {
 					List<String> siblingPaths = pageStore.listChildPagePaths(
 							projectName, branchName, page.getParentPagePath());
@@ -100,7 +100,7 @@ public class NeighborsMacro implements IMacroRunnable {
 				}
 				parentBuf.append("</ul>") //$NON-NLS-1$
 					.append("</li>"); //$NON-NLS-1$
-				
+
 				buf.append(printParent(parentBuf, page.getParentPagePath()));
 			}
 		} else {
@@ -155,12 +155,12 @@ public class NeighborsMacro implements IMacroRunnable {
 		}
 		return buf;
 	}
-	
+
 	private boolean hasViewPermission(String path) {
 		Authentication authentication = htmlSerializerContext.getAuthentication();
 		return permissionEvaluator.hasPagePermission(authentication, projectName, branchName, path, Permission.VIEW);
 	}
-	
+
 	@Override
 	public String cleanupHtml(String html) {
 		return null;

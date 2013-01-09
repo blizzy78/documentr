@@ -61,11 +61,11 @@ public class DocumentrParser extends Parser {
 				push(new MacroNode(getSimpleMacroName(macroName.get()), params.get())),
 				"/}}"); //$NON-NLS-1$
 	}
-	
+
 	String getSimpleMacroName(String macroName) {
 		return StringUtils.substringBefore(macroName, ":"); //$NON-NLS-1$
 	}
-	
+
 	public Rule BodyMacro() {
 		StringVar macroName = new StringVar();
 		StringVar params = new StringVar();
@@ -82,7 +82,7 @@ public class DocumentrParser extends Parser {
 				push(new MacroNode(getSimpleMacroName(macroName.get()), params.get(),
 						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
-	
+
 	public Rule BodyMacroBody(StringBuilderVar inner, StringVar macroName) {
 		return Sequence(
 				ZeroOrMore(BlankLine()),
@@ -92,7 +92,7 @@ public class DocumentrParser extends Parser {
 						inner.append(match())),
 				ZeroOrMore(BlankLine()));
 	}
-	
+
 	public Rule MacroNameAndParameters(StringVar macroName, StringVar params, boolean standalone) {
 		return Sequence(
 				MacroName(macroName),
@@ -114,7 +114,7 @@ public class DocumentrParser extends Parser {
 				macroName.isSet() && match().equals(macroName.get()) ||
 					macroName.isNotSet() && macroName.set(match()));
 	}
-	
+
 	public Rule MacroParameters(StringVar params, boolean standalone) {
 		return Sequence(
 				OneOrMore(
@@ -136,7 +136,7 @@ public class DocumentrParser extends Parser {
 				push(StringUtils.EMPTY)
 		);
 	}
-	
+
 	public Rule AnchorName(StringBuilderVar url) {
 		return Sequence(AnchorNameChars(url), push("#" + url.getString())); //$NON-NLS-1$
 	}
@@ -144,7 +144,7 @@ public class DocumentrParser extends Parser {
 	public Rule Url(StringBuilderVar url) {
 		return Sequence(UrlChars(url), push(url.getString()));
 	}
-	
+
 	public Rule AnchorNameChars(StringBuilderVar url) {
 		return OneOrMore(
 				Sequence(NoneOf("()<>[]#"), url.append(matchedChar())) //$NON-NLS-1$
@@ -173,7 +173,7 @@ public class DocumentrParser extends Parser {
 				push(new PageHeaderNode(
 						withIndicesShifted(parseInternal(inner.appended("\n\n")), (Integer) pop()).getChildren()))); //$NON-NLS-1$
 	}
-	
+
 	public Rule PageHeaderBody(StringBuilderVar inner) {
 		return Sequence(
 				ZeroOrMore(BlankLine()),
@@ -202,7 +202,7 @@ public class DocumentrParser extends Parser {
 				CodeFence(markerLength)
 		);
 	}
-	
+
 	@Cached
 	public Rule CodeFenceWithTypeAndTitle(Var<Integer> markerLength, StringBuilderVar codeType, StringBuilderVar title) {
 		return Sequence(
@@ -223,21 +223,21 @@ public class DocumentrParser extends Parser {
 				Newline()
 		);
 	}
-	
+
 	public Rule CodeType(StringBuilderVar codeType) {
 		return OneOrMore(
 				TestNot(FirstOf(Newline(), ':')),
 				ANY, codeType.append(matchedChar())
 		);
 	}
-	
+
 	public Rule CodeTitle(StringBuilderVar title) {
 		return OneOrMore(
 				TestNot(Newline()),
 				ANY, title.append(matchedChar())
 		);
 	}
-	
+
 	@Override
 	public Rule CodeFence(Var<Integer> markerLength) {
 		return CodeFenceWithTypeAndTitle(markerLength, new StringBuilderVar(), new StringBuilderVar());

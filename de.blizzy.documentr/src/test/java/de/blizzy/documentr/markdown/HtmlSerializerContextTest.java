@@ -62,22 +62,22 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	public void setUp() {
 		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, authentication,
 				pageStore, systemSettingsStore, CONTEXT);
-		
+
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
 		when(request.getScheme()).thenReturn("http"); //$NON-NLS-1$
 		when(request.getContextPath()).thenReturn(CONTEXT);
-		
+
 		when(systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST)).thenReturn(DOCUMENTR_HOST);
-		
+
 		ServletRequestAttributes attrs = new ServletRequestAttributes(request);
 		RequestContextHolder.setRequestAttributes(attrs);
 	}
-	
+
 	@After
 	public void tearDown() {
 		RequestContextHolder.resetRequestAttributes();
 	}
-	
+
 	@Test
 	public void getAttachmentUri() {
 		String uri = htmlSerializerContext.getAttachmentUri("test.png"); //$NON-NLS-1$
@@ -94,19 +94,19 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 				Util.toUrlPagePath(page),
 				uri);
 	}
-	
+
 	@Test
 	public void getUrl() {
 		String result = htmlSerializerContext.getUrl(CONTEXT + "/foo/bar"); //$NON-NLS-1$
 		assertEquals(DOCUMENTR_HOST + "/foo/bar", result); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void markdownToHtml() {
 		when(markdownProcessor.markdownToHtml("md", PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("html", htmlSerializerContext.markdownToHtml("md")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void addAndGetHeaders() {
 		Header[] headers = {
@@ -117,13 +117,13 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 		for (Header header : headers) {
 			htmlSerializerContext.addHeader(header.getText(), header.getLevel());
 		}
-		
+
 		List<Header> result = htmlSerializerContext.getHeaders();
 		for (int i = 0; i < result.size(); i++) {
 			assertTrue(EqualsBuilder.reflectionEquals(result.get(i), headers[i], true));
 		}
 	}
-	
+
 	@Test
 	public void addAndGetMacroInvocations() {
 		MacroInvocation invocation = htmlSerializerContext.addMacroInvocation("foo", "params"); //$NON-NLS-1$ //$NON-NLS-2$

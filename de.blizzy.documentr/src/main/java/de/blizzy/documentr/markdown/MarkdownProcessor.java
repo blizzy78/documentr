@@ -58,14 +58,14 @@ public class MarkdownProcessor {
 			Replacement.dotAllNoCase("<p>(<div.*?</div>)</p>", "$1"),
 			Replacement.dotAllNoCase("<p>(<ul.*?</ul>)</p>", "$1"),
 			Replacement.dotAllNoCase("<p>(<ol.*?</ol>)</p>", "$1"),
-			
+
 			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", "<div $1$2"),
 			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", "<ul $1$2"),
 			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", "<ol $1$2"),
-			
+
 			Replacement.dotAllNoCase("<p></p>", StringUtils.EMPTY),
 			Replacement.dotAllNoCase("(<br/>)+</p>", "</p>"),
-			
+
 			Replacement.dotAllNoCase(
 					"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
 					"<img (?:[^>]+)/></a></li>)</ul>(?:[ \t]|<br/>)*" +
@@ -73,7 +73,7 @@ public class MarkdownProcessor {
 					"<a class=\"thumbnail\" (?:[^>]+)>)",
 					"$1$2")
 	);
-	
+
 	@Autowired
 	private MacroFactory macroFactory;
 	@Autowired
@@ -85,10 +85,10 @@ public class MarkdownProcessor {
 
 	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, String contextPath) {
-		
+
 		return markdownToHtml(markdown, projectName, branchName, path, authentication, true, contextPath);
 	}
-	
+
 	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
 
@@ -96,7 +96,7 @@ public class MarkdownProcessor {
 		removeHeader(rootNode);
 		return markdownToHtml(rootNode, projectName, branchName, path, authentication, nonCacheableMacros, contextPath);
 	}
-	
+
 	public String headerMarkdownToHtml(String markdown, String projectName, String branchName, String path,
 			Authentication authentication, String contextPath) {
 
@@ -112,15 +112,15 @@ public class MarkdownProcessor {
 		fixParaNodes(rootNode);
 		return rootNode;
 	}
-	
+
 	private String markdownToHtml(RootNode rootNode, String projectName, String branchName, String path,
 			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
-		
+
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
 				pageStore, systemSettingsStore, contextPath);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
-		
+
 		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
 		int nonCacheableMacroIdx = 1;
 		for (MacroInvocation invocation : macroInvocations) {
@@ -155,7 +155,7 @@ public class MarkdownProcessor {
 		html = cleanupHtml(html, macroInvocations, true);
 		return html;
 	}
-	
+
 	private void fixParaNodes(Node node) {
 		if ((node instanceof MacroNode) || (node instanceof PageHeaderNode)) {
 			List<Node> children = ((SuperNode) node).getChildren();
@@ -165,14 +165,14 @@ public class MarkdownProcessor {
 				children.addAll(newChildren);
 			}
 		}
-		
+
 		if (node instanceof SuperNode) {
 			for (Node child : ((SuperNode) node).getChildren()) {
 				fixParaNodes(child);
 			}
 		}
 	}
-	
+
 	private void extractHeader(RootNode rootNode) {
 		List<Node> children = rootNode.getChildren();
 		PageHeaderNode headerNode = findHeaderNode(rootNode);
@@ -181,12 +181,12 @@ public class MarkdownProcessor {
 			children.addAll(headerNode.getChildren());
 		}
 	}
-	
+
 	private PageHeaderNode findHeaderNode(Node node) {
 		if (node instanceof PageHeaderNode) {
 			return (PageHeaderNode) node;
 		}
-		
+
 		if (node instanceof SuperNode) {
 			for (Node child : ((SuperNode) node).getChildren()) {
 				PageHeaderNode headerNode = findHeaderNode(child);
@@ -195,10 +195,10 @@ public class MarkdownProcessor {
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private void removeHeader(Node node) {
 		if (node instanceof SuperNode) {
 			List<Node> children = ((SuperNode) node).getChildren();
@@ -208,7 +208,7 @@ public class MarkdownProcessor {
 					iter.remove();
 				}
 			}
-			
+
 			for (Node child : children) {
 				removeHeader(child);
 			}
@@ -217,7 +217,7 @@ public class MarkdownProcessor {
 
 	public String processNonCacheableMacros(String html, String projectName, String branchName, String path,
 			Authentication authentication, String contextPath) {
-		
+
 		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
 				pageStore, systemSettingsStore, contextPath);
 		String startMarkerPrefix = "__" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -229,7 +229,7 @@ public class MarkdownProcessor {
 				break;
 			}
 			start += startMarkerPrefix.length();
-			
+
 			int end = html.indexOf('_', start);
 			if (end < 0) {
 				break;
@@ -241,7 +241,7 @@ public class MarkdownProcessor {
 				break;
 			}
 			start += 2;
-			
+
 			end = html.indexOf(endMarkerPrefix + idx + "__", start); //$NON-NLS-1$
 			if (end < 0) {
 				break;
@@ -282,11 +282,11 @@ public class MarkdownProcessor {
 					}
 				}
 			}
-			
+
 			if (newHtml.equals(html)) {
 				break;
 			}
-			
+
 			html = newHtml;
 		}
 		return html;

@@ -31,7 +31,7 @@ public class YoutubeMacro implements IMacroRunnable {
 		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getQueryParams().get("v").get(0); //$NON-NLS-1$
 		}
-		
+
 		return "<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/" + videoId + //$NON-NLS-1$
 				"?rel=0\" frameborder=\"0\" allowfullscreen></iframe>"; //$NON-NLS-1$
 	}

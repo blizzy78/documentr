@@ -28,7 +28,7 @@ import de.blizzy.documentr.system.SystemSettingsStore;
 public class FacadeHostRequestWrapperFactory {
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
-	
+
 	public HttpServletRequest create(HttpServletRequest request) {
 		String documentrHost = systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST);
 		return new FacadeHostRequestWrapper(request, documentrHost);

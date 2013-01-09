@@ -36,7 +36,7 @@ public class UnknownMacroMacro implements IMacro {
 				// not used
 				return null;
 			}
-			
+
 			@Override
 			public String getTitle(Locale locale) {
 				// not used
@@ -59,7 +59,7 @@ public class UnknownMacroMacro implements IMacro {
 			public boolean isCacheable() {
 				return true;
 			}
-			
+
 			@Override
 			public Set<MacroSetting> getSettings() {
 				return Collections.emptySet();

@@ -43,37 +43,37 @@ import de.blizzy.documentr.markdown.macro.MacroFactory;
 public class MacroControllerTest extends AbstractDocumentrTest {
 	private static final String MACRO = "macro"; //$NON-NLS-1$
 	private static final String CODE = "code"; //$NON-NLS-1$
-	
+
 	@Mock
 	private Model model;
 	@Mock
 	private MacroFactory macroFactory;
 	@InjectMocks
 	private MacroController controller;
-	
+
 	@Test
 	public void createMacro() {
 		String result = controller.createMacro(model);
 		assertEquals("/macro/edit", result); //$NON-NLS-1$
 		verify(model).addAttribute(eq("macroForm"), argMacroForm(StringUtils.EMPTY, StringUtils.EMPTY)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void editMacro() throws IOException {
 		when(macroFactory.getGroovyMacroCode(MACRO)).thenReturn(CODE);
-		
+
 		String result = controller.editMacro(MACRO, model);
 		assertEquals("/macro/edit", result); //$NON-NLS-1$
 		verify(model).addAttribute(eq("macroForm"), argMacroForm(MACRO, CODE)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void verifyMacro() {
 		List<CompilationMessage> errors = Lists.newArrayList(
 				new CompilationMessage(CompilationMessage.Type.ERROR, 1, 2, 3, 4, "message1"), //$NON-NLS-1$
 				new CompilationMessage(CompilationMessage.Type.WARNING, 5, 6, 7, 8, "message2")); //$NON-NLS-1$
 		when(macroFactory.verifyGroovyMacro(CODE)).thenReturn(errors);
-		
+
 		Map<String, Object> result = controller.verifyMacro(CODE);
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> messages = (List<Map<String, Object>>) result.get("messages"); //$NON-NLS-1$
@@ -92,14 +92,14 @@ public class MacroControllerTest extends AbstractDocumentrTest {
 		assertEquals(8, (int) ((Integer) message.get("endColumn"))); //$NON-NLS-1$
 		assertEquals("message2", message.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void saveMacro() throws IOException {
 		BindingResult bindingResult = mock(BindingResult.class);
 		String result = controller.saveMacro(new MacroForm(MACRO, CODE), bindingResult);
 		assertEquals("/macros", removeViewPrefix(result)); //$NON-NLS-1$
 		assertRedirect(result);
-		
+
 		verify(macroFactory).saveGroovyMacro(MACRO, CODE);
 	}
 
@@ -108,10 +108,10 @@ public class MacroControllerTest extends AbstractDocumentrTest {
 		String result = controller.deleteMacro(MACRO);
 		assertEquals("/macros", removeViewPrefix(result)); //$NON-NLS-1$
 		assertRedirect(result);
-		
+
 		verify(macroFactory).deleteGroovyMacro(MACRO);
 	}
-	
+
 	@Test
 	public void createMacroForm() {
 		MacroForm result = controller.createMacroForm(MACRO, CODE);

@@ -39,7 +39,7 @@ public class MacroBeanPostProcessorTest extends AbstractDocumentrTest {
 			return null;
 		}
 	}
-	
+
 	static final String MACRO = "testMacro"; //$NON-NLS-1$
 	static final String INSERT_TEXT = "insertText"; //$NON-NLS-1$
 
@@ -48,7 +48,7 @@ public class MacroBeanPostProcessorTest extends AbstractDocumentrTest {
 	@InjectMocks
 	private MacroBeanPostProcessor processor;
 	private TestMacro macro;
-	
+
 	@Before
 	public void setUp() {
 		when(beanFactory.getBean(MessageSourceMacroDescriptor.ID, MACRO))
@@ -56,7 +56,7 @@ public class MacroBeanPostProcessorTest extends AbstractDocumentrTest {
 
 		macro = new TestMacro();
 	}
-	
+
 	@Test
 	public void foo() {
 		SimpleMacroMacro result = (SimpleMacroMacro) processor.postProcessAfterInitialization(macro, "macroBean"); //$NON-NLS-1$

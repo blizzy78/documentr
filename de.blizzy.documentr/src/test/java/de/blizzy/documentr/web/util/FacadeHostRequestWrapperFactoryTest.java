@@ -40,14 +40,14 @@ public class FacadeHostRequestWrapperFactoryTest extends AbstractDocumentrTest {
 	private SystemSettingsStore systemSettingsStore;
 	@Mock
 	private HttpServletRequest request;
-	
+
 	@Before
 	public void setUp() {
 		when(systemSettingsStore.getSetting(SystemSettingsStore.DOCUMENTR_HOST)).thenReturn(DOCUMENTR_HOST);
 
 		when(request.getRequestURL()).thenReturn(new StringBuffer("http://www.example.com:8080" + URI)); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void create() {
 		HttpServletRequest requestWrapper = factory.create(request);

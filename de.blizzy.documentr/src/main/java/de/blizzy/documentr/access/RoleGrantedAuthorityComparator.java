@@ -32,14 +32,14 @@ class RoleGrantedAuthorityComparator implements Comparator<RoleGrantedAuthority>
 		if (result != 0) {
 			return result;
 		}
-		
+
 		String targetId1 = target1.getTargetId();
 		String targetId2 = target2.getTargetId();
 		result = targetId1.compareToIgnoreCase(targetId2);
 		if (result != 0) {
 			return result;
 		}
-		
+
 		return rga1.getRoleName().compareToIgnoreCase(rga2.getRoleName());
 	}
 }

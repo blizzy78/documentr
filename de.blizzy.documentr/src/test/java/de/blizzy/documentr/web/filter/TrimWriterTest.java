@@ -55,7 +55,7 @@ public class TrimWriterTest {
 		} finally {
 			Closeables.closeQuietly(out);
 		}
-		
+
 		String result = new String(out.toByteArray(), Charsets.UTF_8);
 		@SuppressWarnings("nls")
 		String expected =

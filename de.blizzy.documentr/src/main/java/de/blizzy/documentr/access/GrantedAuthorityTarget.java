@@ -35,33 +35,33 @@ public class GrantedAuthorityTarget implements Serializable {
 		 */
 		@SuppressWarnings("hiding")
 		APPLICATION,
-		
+
 		/**
 		 * A project. Granting permissions on a project implies granting those permissions to all
 		 * branches and pages of that project.
 		 */
 		PROJECT,
-		
+
 		/**
 		 * A branch. Granting permissions on a branch implies granting those permissions to all
 		 * pages of that branch.
 		 */
 		BRANCH,
-		
+
 		/** A page. Permissions cannot be granted on pages directly. */
 		PAGE;
 	}
-	
+
 	/** The &quot;application object's&quot; target ID. */
 	public static final String APPLICATION_TARGET_ID = "application"; //$NON-NLS-1$
-	
+
 	/** The &quot;application object&quot; target. */
 	public static final GrantedAuthorityTarget APPLICATION =
 			new GrantedAuthorityTarget(APPLICATION_TARGET_ID, Type.APPLICATION);
 
 	/**
 	 * Target ID component representing &quot;any&quot;. This cannot be used directly for target IDs.
-	 * 
+	 *
 	 * @see DocumentrPermissionEvaluator#hasAnyProjectPermission
 	 * @see DocumentrPermissionEvaluator#hasAnyBranchPermission
 	 */
@@ -76,7 +76,7 @@ public class GrantedAuthorityTarget implements Serializable {
 
 	/**
 	 * Constructs a new target object.
-	 * 
+	 *
 	 * @param targetId the ID of the target object
 	 * @param type the type of the target object
 	 */
@@ -89,7 +89,7 @@ public class GrantedAuthorityTarget implements Serializable {
 		this.targetId = targetId;
 		this.type = type;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -103,7 +103,7 @@ public class GrantedAuthorityTarget implements Serializable {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

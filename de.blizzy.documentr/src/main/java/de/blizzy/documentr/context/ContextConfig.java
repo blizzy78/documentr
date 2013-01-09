@@ -83,7 +83,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 		resolver.setSuffix(".jsp"); //$NON-NLS-1$
 		return resolver;
 	}
-	
+
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -94,17 +94,17 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 		});
 		return messageSource;
 	}
-	
+
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
-	
+
 	@Bean
 	public MultipartResolver multipartResolver() {
 		return new CommonsMultipartResolver();
 	}
-	
+
 	@Bean(destroyMethod="shutdown")
 	@SuppressWarnings("deprecation")
 	public net.sf.ehcache.CacheManager ehCacheManager(Settings settings) throws IOException {
@@ -147,7 +147,7 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 			.timeToIdleSeconds(TimeUnit.SECONDS.convert(30, TimeUnit.DAYS))));
 		return ehCacheManager;
 	}
-	
+
 	@Bean
 	public CacheManager cacheManager(net.sf.ehcache.CacheManager ehCacheManager) {
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
@@ -165,19 +165,19 @@ public class ContextConfig extends WebMvcConfigurerAdapter implements Scheduling
 		filter.setRememberMeServices(rememberMeServices);
 		return filter;
 	}
-	
+
 	@Bean
 	public AuthenticationProvider openIdAuthProvider(OpenIdUserDetailsService userDetailsService) {
 		OpenIDAuthenticationProvider authProvider = new OpenIDAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailsService);
 		return authProvider;
 	}
-	
+
 	@Bean
 	public EventBus eventBus() {
 		return new EventBus();
 	}
-	
+
 	@Bean(destroyMethod="shutdown")
 	public ListeningExecutorService taskExecutor() {
 		ThreadFactory threadFactory = new ThreadFactoryBuilder()

@@ -51,14 +51,14 @@ import de.blizzy.documentr.system.SystemSettingsStore;
 @RequestMapping("/system")
 public class SystemController {
 	private static final String MACRO_KEY_PREFIX = "macro."; //$NON-NLS-1$
-	
+
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
 	@Autowired
 	private UserStore userStore;
 	@Autowired
 	private MacroFactory macroFactory;
-	
+
 	@RequestMapping(value="/edit", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String editSettings(Model model) {
@@ -99,7 +99,7 @@ public class SystemController {
 		}
 		return allMacroSettings;
 	}
-	
+
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@PreAuthorize("hasApplicationPermission(ADMIN)")
 	public String saveSettings(@ModelAttribute @Valid SystemSettingsForm form, BindingResult bindingResult,
@@ -110,12 +110,12 @@ public class SystemController {
 		}
 
 		User user = userStore.getUser(authentication.getName());
-		
+
 		Map<String, String> settings = Maps.newHashMap();
 		String documentrHost = form.getDocumentrHost();
 		// remove trailing slash
 		documentrHost = StringUtils.removeEnd(documentrHost, "/"); //$NON-NLS-1$
-		
+
 		settings.put(SystemSettingsStore.DOCUMENTR_HOST, documentrHost);
 		settings.put(SystemSettingsStore.SITE_NOTICE, form.getSiteNotice());
 		settings.put(SystemSettingsStore.MAIL_HOST_NAME, form.getMailHostName());
@@ -128,11 +128,11 @@ public class SystemController {
 		settings.put(SystemSettingsStore.PAGE_FOOTER_HTML, form.getPageFooterHtml());
 		settings.put(SystemSettingsStore.UPDATE_CHECK_INTERVAL, form.getUpdateCheckInterval());
 		systemSettingsStore.saveSettings(settings, user);
-		
+
 		for (Map.Entry<String, SortedMap<String, String>> entry : form.getMacroSettings().entrySet()) {
 			systemSettingsStore.setMacroSetting(entry.getKey(), entry.getValue(), user);
 		}
-		
+
 		return "redirect:/system/edit"; //$NON-NLS-1$
 	}
 
@@ -150,7 +150,7 @@ public class SystemController {
 			@RequestParam(required=false) String pageFooterHtml,
 			@RequestParam(required=false) String updateCheckInterval,
 			WebRequest webRequest) {
-		
+
 		SortedMap<String, SortedMap<String, String>> allMacroSettings = getMacroSettingsFromRequest(webRequest);
 		return new SystemSettingsForm(
 				Strings.emptyToNull(documentrHost),

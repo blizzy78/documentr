@@ -43,15 +43,15 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 
 /**
  * <p>documentr's {@link PermissionEvaluator}.</p>
- * 
+ *
  * <p>Permissions are handled recursively. For example, if asked if a user has a permission on a specific page,
  * and they don't, lookup continues on the page's branch. If the user does not have the permission on the branch,
  * lookup continues on the branch's project. If they don't have the permission on the project, lookup continues
  * on the &quot;application object.&quot;</p>
- * 
+ *
  * <p>Granting the {@link Permission#ADMIN ADMIN} permission on an object implies granting all other permissions
  * on the same object.</p>
- * 
+ *
  * <p>It is not possible to grant permissions on a higher-level object, then deny those permissions on any
  * of their children. For example, having granted the {@link Permission#VIEW VIEW} permission on a project
  * allows view access to all branches and pages of that project. In that case it is not possible to deny
@@ -86,18 +86,18 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		Assert.notNull(targetId);
 		Assert.hasLength(targetType);
 		Assert.notNull(permission);
-		
+
 		// not used
 		return false;
 	}
-	
+
 	public boolean hasApplicationPermission(Authentication authentication, Permission permission) {
 		return hasApplicationPermission(authentication.getAuthorities(), permission);
 	}
 
 	private boolean hasApplicationPermission(Collection<? extends GrantedAuthority> authorities,
 			Permission permission) {
-		
+
 		for (GrantedAuthority authority : authorities) {
 			if (authority instanceof PermissionGrantedAuthority) {
 				PermissionGrantedAuthority pga = (PermissionGrantedAuthority) authority;
@@ -105,7 +105,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				Type type = target.getType();
 				if ((type == Type.APPLICATION) &&
 					hasPermission(pga, permission)) {
-					
+
 					return true;
 				}
 			}
@@ -123,14 +123,14 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				if ((type == Type.PROJECT) &&
 					id.equals(projectName) &&
 					hasPermission(pga, permission)) {
-					
+
 					return true;
 				}
 			}
 		}
 		return hasApplicationPermission(authentication, permission);
 	}
-	
+
 	public boolean hasAnyProjectPermission(Authentication authentication, Permission permission) {
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
 			if (authority instanceof PermissionGrantedAuthority) {
@@ -139,14 +139,14 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				Type type = target.getType();
 				if ((type == Type.PROJECT) &&
 					hasPermission(pga, permission)) {
-					
+
 					return true;
 				}
 			}
 		}
 		return hasApplicationPermission(authentication, permission);
 	}
-	
+
 	public boolean hasBranchPermission(Authentication authentication, String projectName, String branchName,
 			Permission permission) {
 
@@ -160,14 +160,14 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				if ((type == Type.BRANCH) &&
 					id.equals(targetId) &&
 					hasPermission(pga, permission)) {
-					
+
 					return true;
 				}
 			}
 		}
 		return hasProjectPermission(authentication, projectName, permission);
 	}
-	
+
 	public boolean hasAnyBranchPermission(Authentication authentication, String projectName, Permission permission) {
 		String targetIdPrefix = projectName + "/"; //$NON-NLS-1$
 		for (GrantedAuthority authority : authentication.getAuthorities()) {
@@ -179,14 +179,14 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 				if ((type == Type.BRANCH) &&
 					id.startsWith(targetIdPrefix) &&
 					hasPermission(pga, permission)) {
-					
+
 					return true;
 				}
 			}
 		}
 		return hasProjectPermission(authentication, projectName, permission);
 	}
-	
+
 	public boolean hasPagePermission(Authentication authentication, String projectName, String branchName,
 			String path, Permission permission) {
 
@@ -205,10 +205,10 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
-	
+
 	public boolean hasPagePermissionInOtherBranches(Authentication authentication, String projectName,
 			String branchName, String path, Permission permission) {
-	
+
 		try {
 			List<String> branches = repoManager.listProjectBranches(projectName);
 			for (String branch : branches) {
@@ -224,7 +224,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
-	
+
 	public Set<String> getBranchesForPermission(Authentication authentication, Permission permission) {
 		try {
 			Set<String> branches = Sets.newHashSet();
@@ -240,7 +240,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 			throw new AuthenticationServiceException(e.getMessage(), e);
 		}
 	}
-	
+
 	public boolean isAdmin(String loginName) {
 		try {
 			UserDetails user = userDetailsService.loadUserByUsername(loginName);
@@ -250,13 +250,13 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
-	
+
 	public boolean isLastAdminRole(String roleName) {
 		try {
 			if (userStore.getRole(roleName).getPermissions().contains(Permission.ADMIN)) {
 				Set<String> roles = Sets.newHashSet(userStore.listRoles());
 				roles.remove(roleName);
-				
+
 				// find all roles containing the ADMIN permission
 				Set<String> adminRoles = Sets.newHashSet();
 				for (String role : roles) {
@@ -265,7 +265,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 						adminRoles.add(role);
 					}
 				}
-				
+
 				// check whether any of the admin roles is granted to any user on the "application" object
 				if (!adminRoles.isEmpty()) {
 					List<String> users = userStore.listUsers();
@@ -275,14 +275,14 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 							for (String role : adminRoles) {
 								if (rga.getRoleName().equals(role) &&
 									rga.getTarget().equals(GrantedAuthorityTarget.APPLICATION)) {
-									
+
 									return false;
 								}
 							}
 						}
 					}
 				}
-				
+
 				return true;
 			}
 		} catch (IOException e) {
@@ -318,7 +318,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 		}
 		return false;
 	}
-	
+
 	private boolean hasPermission(PermissionGrantedAuthority authority, Permission permission) {
 		Permission p = authority.getPermission();
 		return (p == Permission.ADMIN) || (p == permission);

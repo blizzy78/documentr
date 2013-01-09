@@ -41,7 +41,7 @@ public class RequestEncodingFilterTest extends AbstractDocumentrTest {
 	private HttpServletResponse response;
 	@Mock
 	private FilterChain filterChain;
-	
+
 	@Test
 	public void foo() throws IOException, ServletException {
 		RequestEncodingFilter filter = new RequestEncodingFilter();

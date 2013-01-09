@@ -50,7 +50,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class DownloaderTest extends AbstractDocumentrTest {
 	private static final String URL = "http://www.example.com/foo.txt"; //$NON-NLS-1$
 	private static final String TEXT = "text"; //$NON-NLS-1$
-	
+
 	@Mock
 	private SimpleClientHttpRequestFactory requestFactory;
 	@Mock
@@ -58,14 +58,14 @@ public class DownloaderTest extends AbstractDocumentrTest {
 	@Mock
 	private ClientHttpResponse response;
 	private Downloader downloader;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		downloader = new Downloader();
-		
+
 		PowerMockito.whenNew(SimpleClientHttpRequestFactory.class).withNoArguments().thenReturn(requestFactory);
 	}
-	
+
 	@Test
 	public void getTextFromUrl() throws IOException {
 		when(requestFactory.createRequest(URI.create(URL), HttpMethod.GET)).thenReturn(request);
@@ -81,7 +81,7 @@ public class DownloaderTest extends AbstractDocumentrTest {
 
 		String result = downloader.getTextFromUrl(URL, Charsets.UTF_8);
 		assertEquals(TEXT, result);
-		
+
 		ArgumentCaptor<Integer> connectTimeoutCaptor = ArgumentCaptor.forClass(Integer.class);
 		verify(requestFactory).setConnectTimeout(connectTimeoutCaptor.capture());
 		assertTrue(connectTimeoutCaptor.getValue() > 0);

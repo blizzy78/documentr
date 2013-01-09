@@ -37,11 +37,11 @@ public class DocumentrAnonymousAuthenticationFilter extends AnonymousAuthenticat
 
 	@Autowired
 	private DocumentrAnonymousAuthenticationFactory anonymousAuthenticationFactory;
-	
+
 	public DocumentrAnonymousAuthenticationFilter() {
 		super(authKey);
 	}
-	
+
 	@Override
 	protected Authentication createAuthentication(HttpServletRequest request) {
 		try {

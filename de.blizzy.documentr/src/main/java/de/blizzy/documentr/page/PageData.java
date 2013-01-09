@@ -27,16 +27,16 @@ public class PageData {
 	private byte[] data;
 	@Getter
 	private String contentType;
-	
+
 	public PageData(byte[] data, String contentType) {
 		this.data = ArrayUtils.clone(data);
 		this.contentType = contentType;
 	}
-	
+
 	public byte[] getData() {
 		return ArrayUtils.clone(data);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -50,7 +50,7 @@ public class PageData {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(data).append(contentType).toHashCode();

@@ -79,7 +79,7 @@ public class SubscriptionMailerTest extends AbstractDocumentrTest {
 	private MessageSource messageSource;
 	@InjectMocks
 	private SubscriptionMailer mailer;
-	
+
 	@Before
 	public void setUp() throws IOException {
 		Whitebox.setInternalState(mailer, MoreExecutors.sameThreadExecutor());
@@ -94,9 +94,9 @@ public class SubscriptionMailerTest extends AbstractDocumentrTest {
 
 		when(subscriptionStore.getSubscriberEmails(PROJECT, BRANCH, PAGE))
 			.thenReturn(Collections.singleton(SUBSCRIBER_EMAIL));
-		
+
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE, false)).thenReturn(Page.fromText(PAGE_TITLE, PAGE_TEXT));
-		
+
 		when(messageSource.getMessage("mail.pageChanged.subject", new Object[] { PAGE_TITLE }, LOCALE)) //$NON-NLS-1$
 			.thenReturn(MAIL_SUBJECT);
 		when(messageSource.getMessage("mail.pageChanged.text", new Object[] { //$NON-NLS-1$
@@ -105,12 +105,12 @@ public class SubscriptionMailerTest extends AbstractDocumentrTest {
 				DOCUMENTR_HOST + "/page/" + PROJECT + "/" + BRANCH + "/" + PAGE + "#changes" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}, LOCALE))
 			.thenReturn(MAIL_TEXT);
-		
+
 		when(mailSenderFactory.createSender()).thenReturn(sender);
-		
+
 		when(sender.createMimeMessage()).thenReturn(message);
 	}
-	
+
 	@Test
 	public void pageChanged() throws IOException, MessagingException {
 		mailer.pageChanged(new PageChangedEvent(PROJECT, BRANCH, PAGE));

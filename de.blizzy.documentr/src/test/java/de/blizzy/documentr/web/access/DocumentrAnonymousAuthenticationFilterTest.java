@@ -43,11 +43,11 @@ public class DocumentrAnonymousAuthenticationFilterTest extends AbstractDocument
 	private HttpServletRequest request;
 	@InjectMocks
 	private DocumentrAnonymousAuthenticationFilter filter;
-	
+
 	@Test
 	public void createAuthentication() throws IOException {
 		when(authenticationFactory.create(anyString())).thenReturn(authentication);
-		
+
 		Authentication result = filter.createAuthentication(request);
 		assertSame(authentication, result);
 	}

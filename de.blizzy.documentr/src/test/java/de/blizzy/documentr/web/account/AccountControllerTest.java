@@ -48,22 +48,22 @@ public class AccountControllerTest extends AbstractDocumentrTest {
 	public void getMyAccount() {
 		assertEquals("/account/index", accountController.getMyAccount()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getMyOpenIds() {
 		assertEquals("/account/openId", accountController.getMyOpenIds()); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void removeOpenId() throws IOException {
 		when(userStore.getUser("user")).thenReturn(user); //$NON-NLS-1$
 
 		when(authentication.getName()).thenReturn("user"); //$NON-NLS-1$
-		
+
 		String view = accountController.removeOpenId("openId", authentication); //$NON-NLS-1$
 		assertEquals("/account/openId", removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
-		
+
 		InOrder inOrder = inOrder(user, userStore);
 		inOrder.verify(user).removeOpenId("openId"); //$NON-NLS-1$
 		inOrder.verify(userStore).saveUser(same(user), same(user));

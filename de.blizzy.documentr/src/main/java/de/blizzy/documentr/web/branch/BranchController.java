@@ -63,29 +63,29 @@ public class BranchController {
 		model.addAttribute("branchForm", form); //$NON-NLS-1$
 		return "/project/branch/edit"; //$NON-NLS-1$
 	}
-	
+
 	@RequestMapping(value="/save/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.POST)
 	@PreAuthorize("hasBranchPermission(#form.projectName, #form.name, EDIT_BRANCH)")
 	public String saveBranch(@ModelAttribute @Valid BranchForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
-		
+
 		List<String> branches = globalRepositoryManager.listProjectBranches(form.getProjectName());
 		boolean firstBranch = branches.isEmpty();
 		if (branches.contains(form.getName())) {
 			bindingResult.rejectValue("name", "branch.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		if (bindingResult.hasErrors()) {
 			return "/project/branch/edit"; //$NON-NLS-1$
 		}
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.createProjectBranchRepository(form.getProjectName(), form.getName(), form.getStartingBranch());
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
-		
+
 		if (firstBranch) {
 			Page page = Page.fromText("Home", StringUtils.EMPTY); //$NON-NLS-1$
 			User user = userStore.getUser(authentication.getName());
@@ -94,15 +94,15 @@ public class BranchController {
 			return "redirect:/page/edit/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 					"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 		}
-		
+
 		return "redirect:/page/" + form.getProjectName() + "/" + form.getName() + //$NON-NLS-1$ //$NON-NLS-2$
 				"/" + DocumentrConstants.HOME_PAGE_NAME; //$NON-NLS-1$
 	}
-	
+
 	@ModelAttribute
 	public BranchForm createBranchForm(@PathVariable String projectName, @RequestParam(required=false) String name,
 			@RequestParam(required=false) String startingBranch) {
-		
+
 		return (name != null) ? new BranchForm(projectName, name, startingBranch) : null;
 	}
 }

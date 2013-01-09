@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableSet;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	static final String ID = "messageSourceMacroDescriptor"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private MessageSource messageSource;
 	@Getter
@@ -54,19 +54,19 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	MessageSourceMacroDescriptor(String macroName) {
 		Assert.hasLength(macroName);
 		Assert.isTrue(macroName.indexOf('.') < 0, "macro name contains dots: " + macroName); //$NON-NLS-1$
-		
+
 		this.macroName = macroName;
 	}
-	
+
 	static MessageSourceMacroDescriptor create(String macroName, BeanFactory beanFactory) {
 		return (MessageSourceMacroDescriptor) beanFactory.getBean(ID, macroName);
 	}
-	
+
 	MessageSourceMacroDescriptor insertText(String insertText) {
 		this.insertText = insertText;
 		return this;
 	}
-	
+
 	@Override
 	public String getTitle(Locale locale) {
 		try {
@@ -84,12 +84,12 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 			return StringUtils.EMPTY;
 		}
 	}
-	
+
 	MessageSourceMacroDescriptor cacheable(boolean cacheable) {
 		this.cacheable = cacheable;
 		return this;
 	}
-	
+
 	MessageSourceMacroDescriptor settings(Set<MacroSetting> settings) {
 		this.settings = ImmutableSet.copyOf(settings);
 		return this;

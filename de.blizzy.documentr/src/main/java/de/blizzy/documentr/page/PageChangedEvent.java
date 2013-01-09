@@ -35,12 +35,12 @@ public class PageChangedEvent {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
-		
+
 		this.projectName = projectName;
 		this.branchName = branchName;
 		this.path = path;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -55,7 +55,7 @@ public class PageChangedEvent {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

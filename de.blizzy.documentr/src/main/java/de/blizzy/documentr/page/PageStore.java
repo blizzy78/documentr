@@ -85,7 +85,7 @@ class PageStore implements IPageStore {
 	private static final String VERSION_PREVIOUS = "previous"; //$NON-NLS-1$
 	private static final String TAGS = "tags"; //$NON-NLS-1$
 	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
-	
+
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
 	@Autowired
@@ -94,12 +94,12 @@ class PageStore implements IPageStore {
 	@Override
 	public MergeConflict savePage(String projectName, String branchName, String path, Page page, String baseCommit,
 			User user) throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		Assert.notNull(user);
-		
+
 		try {
 			MergeConflict conflict = savePageInternal(projectName, branchName, path, DocumentrConstants.PAGE_SUFFIX, page,
 					baseCommit, DocumentrConstants.PAGES_DIR_NAME, user);
@@ -115,7 +115,7 @@ class PageStore implements IPageStore {
 	@Override
 	public void saveAttachment(String projectName, String branchName, String pagePath, String name,
 			Page attachment, User user) throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
@@ -124,7 +124,7 @@ class PageStore implements IPageStore {
 		Assert.notNull(user);
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, pagePath, false);
-		
+
 		try {
 			savePageInternal(projectName, branchName, pagePath + "/" + name, DocumentrConstants.PAGE_SUFFIX, attachment, //$NON-NLS-1$
 					null, DocumentrConstants.ATTACHMENTS_DIR_NAME, user);
@@ -148,14 +148,14 @@ class PageStore implements IPageStore {
 	private MergeConflict savePageInternal(String projectName, String branchName, String path, String suffix, Page page,
 			String baseCommit, String rootDir, User user, ILockedRepository repo, boolean push)
 			throws IOException, GitAPIException {
-		
+
 		Git git = Git.wrap(repo.r());
 
 		String headCommit = CommitUtils.getHead(repo.r()).getName();
 		if ((baseCommit != null) && headCommit.equals(baseCommit)) {
 			baseCommit = null;
 		}
-		
+
 		String editBranchName = "_edit_" + String.valueOf((long) (Math.random() * Long.MAX_VALUE)); //$NON-NLS-1$
 		if (baseCommit != null) {
 			git.branchCreate()
@@ -167,7 +167,7 @@ class PageStore implements IPageStore {
 				.setName(editBranchName)
 				.call();
 		}
-		
+
 		Map<String, Object> metaMap = new HashMap<String, Object>();
 		metaMap.put(TITLE, page.getTitle());
 		metaMap.put(CONTENT_TYPE, page.getContentType());
@@ -187,7 +187,7 @@ class PageStore implements IPageStore {
 			workingFile = Util.toFile(pagesDir, path + suffix);
 			FileUtils.writeByteArrayToFile(workingFile, pageData.getData());
 		}
-		
+
 		AddCommand addCommand = git.add()
 			.addFilepattern(rootDir + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
 		if (pageData != null) {
@@ -202,7 +202,7 @@ class PageStore implements IPageStore {
 			.setMessage(rootDir + "/" + path + suffix).call(); //$NON-NLS-1$
 
 		MergeConflict conflict = null;
-		
+
 		if (baseCommit != null) {
 			git.rebase()
 				.setUpstream(branchName)
@@ -211,12 +211,12 @@ class PageStore implements IPageStore {
 			if (repo.r().getRepositoryState() != RepositoryState.SAFE) {
 				String text = FileUtils.readFileToString(workingFile, Charsets.UTF_8);
 				conflict = new MergeConflict(text, headCommit);
-				
+
 				git.rebase()
 					.setOperation(RebaseCommand.Operation.ABORT)
 					.call();
 			}
-			
+
 			git.checkout()
 				.setName(branchName)
 				.call();
@@ -226,31 +226,31 @@ class PageStore implements IPageStore {
 					.include(repo.r().resolve(editBranchName))
 					.call();
 			}
-			
+
 			git.branchDelete()
 				.setBranchNames(editBranchName)
 				.setForce(true)
 				.call();
 		}
-		
+
 		if (push && (conflict == null)) {
 			git.push().call();
 		}
-		
+
 		page.setParentPagePath(getParentPagePath(path, repo.r()));
 
 		if (conflict == null) {
 			PageUtil.updateProjectEditTime(projectName);
 		}
-		
+
 		return conflict;
 	}
-	
+
 	@Override
 	public Page getPage(String projectName, String branchName, String path, boolean loadData) throws IOException {
 		return getPage(projectName, branchName, path, null, loadData);
 	}
-	
+
 	@Override
 	public Page getPage(String projectName, String branchName, String path, String commit, boolean loadData) throws IOException {
 		Assert.hasLength(projectName);
@@ -291,18 +291,18 @@ class PageStore implements IPageStore {
 
 	private Map<String, Object> getPageData(String projectName, String branchName, String path, String rootDir,
 			String commit, boolean loadData) throws IOException, GitAPIException {
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
-			
+
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File pagesDir = new File(workingDir, rootDir);
 			File workingFile = Util.toFile(pagesDir, path + DocumentrConstants.META_SUFFIX);
 			if (!workingFile.isFile()) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
-			
+
 			String json;
 			if (commit != null) {
 				json = BlobUtils.getContent(repo.r(), commit, DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.META_SUFFIX); //$NON-NLS-1$
@@ -311,7 +311,7 @@ class PageStore implements IPageStore {
 			}
 			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 			Map<String, Object> pageMap = gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
-			
+
 			if (loadData) {
 				workingFile = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 				byte[] data;
@@ -329,18 +329,18 @@ class PageStore implements IPageStore {
 				}
 				pageMap.put(PAGE_DATA, pageData);
 			}
-			
+
 			String parentPagePath = getParentPagePath(path, repo.r());
 			if (parentPagePath != null) {
 				pageMap.put(PARENT_PAGE_PATH, parentPagePath);
 			}
-			
+
 			return pageMap;
 		} finally {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	private String getParentPagePath(String path, Repository repo) {
 		File workingDir = RepositoryUtil.getWorkingDir(repo);
 		File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
@@ -360,7 +360,7 @@ class PageStore implements IPageStore {
 	@Override
 	public Page getAttachment(String projectName, String branchName, String pagePath, String name)
 			throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
@@ -379,17 +379,17 @@ class PageStore implements IPageStore {
 			throw new IOException(e);
 		}
 	}
-	
+
 	@Override
 	public List<String> listPageAttachments(String projectName, String branchName, String pagePath)
 			throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, pagePath, false);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
@@ -421,12 +421,12 @@ class PageStore implements IPageStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	@Override
 	public List<String> listAllPagePaths(String projectName, String branchName) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
@@ -439,7 +439,7 @@ class PageStore implements IPageStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	private List<String> listPagePaths(File pagesDir, boolean recursive) {
 		List<File> paths = listPageFilesInDir(pagesDir, recursive);
 		String prefix = pagesDir.getAbsolutePath() + File.separator;
@@ -482,13 +482,13 @@ class PageStore implements IPageStore {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public boolean isPageSharedWithOtherBranches(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
-		
+
 		List<String> branches = getBranchesPageIsSharedWith(projectName, branchName, path);
 		return branches.size() >= 2;
 	}
@@ -525,7 +525,7 @@ class PageStore implements IPageStore {
 		} finally {
 			Closeables.closeQuietly(centralRepo);
 		}
-		
+
 		List<String> branches = Lists.newArrayList(branchesWithCommit);
 		if (!branches.contains(branchName)) {
 			branches.add(branchName);
@@ -533,7 +533,7 @@ class PageStore implements IPageStore {
 		Collections.sort(branches);
 		return branches;
 	}
-	
+
 	private Set<String> getBranchesWithCommit(final RevCommit commit, List<String> allBranches, Repository centralRepo) {
 		final Set<String> result = Sets.newHashSet();
 		for (final String branch : allBranches) {
@@ -553,7 +553,7 @@ class PageStore implements IPageStore {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public List<String> listChildPagePaths(String projectName, String branchName, final String path) throws IOException {
 		Assert.hasLength(projectName);
@@ -587,14 +587,14 @@ class PageStore implements IPageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		Assert.notNull(user);
-		
+
 		ILockedRepository repo = null;
 		List<String> oldPagePaths;
 		boolean deleted = false;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			
+
 			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 
 			File oldSubPagesDir = Util.toFile(pagesDir, path);
@@ -630,7 +630,7 @@ class PageStore implements IPageStore {
 					.call();
 				deleted = true;
 			}
-			
+
 			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
 			file = Util.toFile(attachmentsDir, path);
 			if (file.isDirectory()) {
@@ -639,7 +639,7 @@ class PageStore implements IPageStore {
 					.call();
 				deleted = true;
 			}
-			
+
 			if (deleted) {
 				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 				git.commit()
@@ -661,13 +661,13 @@ class PageStore implements IPageStore {
 			eventBus.post(new PagesDeletedEvent(projectName, branchName, Sets.newHashSet(oldPagePaths)));
 		}
 	}
-	
+
 	@Override
 	public PageMetadata getPageMetadata(String projectName, String branchName, String path) throws IOException {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
-		
+
 		return getPageMetadataInternal(projectName, branchName, path, DocumentrConstants.PAGES_DIR_NAME);
 	}
 
@@ -679,13 +679,13 @@ class PageStore implements IPageStore {
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		Assert.hasLength(name);
-		
+
 		return getPageMetadataInternal(projectName, branchName, path + "/" + name, DocumentrConstants.ATTACHMENTS_DIR_NAME); //$NON-NLS-1$
 	}
-	
+
 	private PageMetadata getPageMetadataInternal(String projectName, String branchName, String path, String rootDir)
 			throws IOException {
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
@@ -695,9 +695,9 @@ class PageStore implements IPageStore {
 			if ((metaCommit == null) && (pageCommit == null)) {
 				throw new PageNotFoundException(projectName, branchName, path);
 			}
-			
+
 			RevCommit commit = getNewestCommit(metaCommit, pageCommit);
-			
+
 			PersonIdent committer = commit.getAuthorIdent();
 			String lastEditedBy = null;
 			if (committer != null) {
@@ -709,7 +709,7 @@ class PageStore implements IPageStore {
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
 			File rootDirFile = new File(workingDir, rootDir);
 			File file = Util.toFile(rootDirFile, path + DocumentrConstants.PAGE_SUFFIX);
-			
+
 			return new PageMetadata(lastEditedBy, lastEdited, file.length(), commit.getName());
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -717,7 +717,7 @@ class PageStore implements IPageStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	private RevCommit getNewestCommit(RevCommit... commits) {
 		RevCommit newestCommit = null;
 		int newestCommitTime = Integer.MIN_VALUE;
@@ -732,11 +732,11 @@ class PageStore implements IPageStore {
 		}
 		return newestCommit;
 	}
-	
+
 	@Override
 	public void relocatePage(final String projectName, final String branchName, final String path, String newParentPagePath,
 			User user) throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -745,7 +745,7 @@ class PageStore implements IPageStore {
 		// check if pages exist by trying to load them
 		getPage(projectName, branchName, path, false);
 		getPage(projectName, branchName, newParentPagePath, false);
-		
+
 		ILockedRepository repo = null;
 		List<String> oldPagePaths;
 		List<String> deletedPagePaths;
@@ -757,7 +757,7 @@ class PageStore implements IPageStore {
 			final String newPagePath = newParentPagePath + "/" + pageName; //$NON-NLS-1$
 
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			
+
 			File oldSubPagesDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), path);
 			oldPagePaths = listPagePaths(oldSubPagesDir, true);
 			oldPagePaths = Lists.newArrayList(Lists.transform(oldPagePaths, new Function<String, String>() {
@@ -783,7 +783,7 @@ class PageStore implements IPageStore {
 
 			for (String dirName : Sets.newHashSet(DocumentrConstants.PAGES_DIR_NAME, DocumentrConstants.ATTACHMENTS_DIR_NAME)) {
 				File dir = new File(workingDir, dirName);
-				
+
 				File newSubPagesDir = Util.toFile(dir, newPagePath);
 				if (newSubPagesDir.exists()) {
 					git.rm().addFilepattern(dirName + "/" + newPagePath).call(); //$NON-NLS-1$
@@ -796,7 +796,7 @@ class PageStore implements IPageStore {
 				if (newMetaFile.exists()) {
 					git.rm().addFilepattern(dirName + "/" + newPagePath + DocumentrConstants.META_SUFFIX).call(); //$NON-NLS-1$
 				}
-				
+
 				File newParentPageDir = Util.toFile(dir, newParentPagePath);
 				File subPagesDir = Util.toFile(dir, path);
 				if (subPagesDir.exists()) {
@@ -852,20 +852,20 @@ class PageStore implements IPageStore {
 		Set<String> allDeletedPagePaths = Sets.newHashSet(oldPagePaths);
 		allDeletedPagePaths.addAll(deletedPagePaths);
 		eventBus.post(new PagesDeletedEvent(projectName, branchName, allDeletedPagePaths));
-		
+
 		for (String newPath : newPagePaths) {
 			eventBus.post(new PageChangedEvent(projectName, branchName, newPath));
 		}
-		
+
 		for (PagePathChangedEvent event : pagePathChangedEvents) {
 			eventBus.post(event);
 		}
 	}
-	
+
 	@Override
 	public Map<String, String> getMarkdown(String projectName, String branchName, String path, Set<String> versions)
 			throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
@@ -878,7 +878,7 @@ class PageStore implements IPageStore {
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			String filePath = DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX; //$NON-NLS-1$
-			
+
 			Set<String> realVersions = Sets.newHashSet();
 			for (String version : versions) {
 				if (version.equals(VERSION_LATEST)) {
@@ -901,7 +901,7 @@ class PageStore implements IPageStore {
 					realVersions.add(version);
 				}
 			}
-			
+
 			for (String version : realVersions) {
 				String markdown = BlobUtils.getContent(repo.r(), version, filePath);
 				if (markdown != null) {
@@ -923,7 +923,7 @@ class PageStore implements IPageStore {
 		Assert.hasLength(path);
 		// check if page exists by trying to load it
 		getPage(projectName, branchName, path, false);
-		
+
 		ILockedRepository repo = null;
 		List<PageVersion> result = Lists.newArrayList();
 		try {
@@ -935,7 +935,7 @@ class PageStore implements IPageStore {
 			CommitListFilter commits = new CommitListFilter();
 			finder.setMatcher(new AndCommitFilter(new CommitLimitFilter(50), commits));
 			finder.find();
-			
+
 			for (RevCommit commit : commits.getCommits()) {
 				result.add(PageUtil.toPageVersion(commit));
 			}
@@ -946,22 +946,22 @@ class PageStore implements IPageStore {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public void deleteAttachment(String projectName, String branchName, String pagePath, String name, User user)
 			throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(pagePath);
 		Assert.hasLength(name);
 		Assert.notNull(user);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
 			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-			
+
 			Git git = Git.wrap(repo.r());
 
 			File attachmentsDir = new File(workingDir, DocumentrConstants.ATTACHMENTS_DIR_NAME);
@@ -984,7 +984,7 @@ class PageStore implements IPageStore {
 					.call();
 				deleted = true;
 			}
-			
+
 			if (deleted) {
 				PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
 				git.commit()
@@ -1002,16 +1002,16 @@ class PageStore implements IPageStore {
 			Closeables.closeQuietly(repo);
 		}
 	}
-	
+
 	@Override
 	public void restorePageVersion(String projectName, String branchName, String path, String version, User user)
 			throws IOException {
-		
+
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
 		Assert.hasLength(path);
 		Assert.hasLength(version);
-		
+
 		ILockedRepository repo = null;
 		try {
 			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
@@ -1020,7 +1020,7 @@ class PageStore implements IPageStore {
 			File pagesDir = new File(workingDir, DocumentrConstants.PAGES_DIR_NAME);
 			File file = Util.toFile(pagesDir, path + DocumentrConstants.PAGE_SUFFIX);
 			FileUtils.writeStringToFile(file, text, Charsets.UTF_8.name());
-			
+
 			Git git = Git.wrap(repo.r());
 			git.add()
 				.addFilepattern(DocumentrConstants.PAGES_DIR_NAME + "/" + path + DocumentrConstants.PAGE_SUFFIX) //$NON-NLS-1$
@@ -1040,7 +1040,7 @@ class PageStore implements IPageStore {
 
 		eventBus.post(new PageChangedEvent(projectName, branchName, path));
 	}
-	
+
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();

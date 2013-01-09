@@ -35,7 +35,7 @@ import de.blizzy.documentr.validation.PagePathValidator;
 @Slf4j
 public final class Util {
 	private static final String CHARS_TO_DASH = " .,:;/()[]<>"; //$NON-NLS-1$
-	
+
 	private Util() {}
 
 	/** Converts a page path from URL format to real format. */
@@ -81,13 +81,13 @@ public final class Util {
 	/**
 	 * <p>Joins a list of objects into a string using a delimiter. This works for different types
 	 * of <code>o</code>:</p>
-	 * 
+	 *
 	 * <ul>
 	 *   <li>If <code>o</code> is a {@link Collection}, all elements are joined together.</li>
 	 *   <li>If <code>o</code> is an array, all elements are joined together.</li>
 	 *   <li>Otherwise, <code>o</code> is used directly.</li>
 	 * </ul>
-	 * 
+	 *
 	 * <p>For each element in <code>o</code> its respective {@link Object#toString()} method is invoked.</p>
 	 */
 	public static String join(Object o, String delimiter) {
@@ -112,7 +112,7 @@ public final class Util {
 			}
 		}
 	}
-	
+
 	public static RuntimeException toRuntimeException(Throwable t) {
 		if (t instanceof RuntimeException) {
 			return (RuntimeException) t;

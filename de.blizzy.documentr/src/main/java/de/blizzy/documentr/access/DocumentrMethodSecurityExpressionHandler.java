@@ -36,7 +36,7 @@ public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecur
 	private GlobalRepositoryManager repoManager;
 	@Autowired
 	private PermissionEvaluator permissionEvaluator;
-	
+
 	@PostConstruct
 	public void init() {
 		setPermissionEvaluator(permissionEvaluator);
@@ -45,7 +45,7 @@ public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecur
 	@Override
 	protected MethodSecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication,
 			MethodInvocation invocation) {
-		
+
 		DocumentrSecurityExpressionRoot root =
 				new DocumentrSecurityExpressionRoot(authentication, repoManager);
 		root.setThis(invocation.getThis());

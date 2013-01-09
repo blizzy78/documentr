@@ -30,7 +30,7 @@ public class OpenIdTest {
 				new OpenId("delegateId", "realId"), //$NON-NLS-1$ //$NON-NLS-2$
 				new OpenId("delegateId", "differentRealId")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Test
 	public void testHashCode() {
 		assertHashCodeContract(

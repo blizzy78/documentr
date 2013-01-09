@@ -62,7 +62,7 @@ public class AccessController {
 		}
 		return "/login"; //$NON-NLS-1$
 	}
-	
+
 	private String getMessage(Exception exception) {
 		String msg = null;
 		if (exception != null) {

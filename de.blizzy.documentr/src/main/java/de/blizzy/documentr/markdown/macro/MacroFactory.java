@@ -63,7 +63,7 @@ public class MacroFactory implements Lifecycle {
 	public boolean isRunning() {
 		return running.get();
 	}
-	
+
 	private void waitForRunning() {
 		while (!running.get()) {
 			log.trace("wait for running"); //$NON-NLS-1$
@@ -106,12 +106,12 @@ public class MacroFactory implements Lifecycle {
 			log.warn("duplicate macro: {}", macroName); //$NON-NLS-1$
 		}
 	}
-	
+
 	public IMacro get(String macroName) {
 		waitForRunning();
 		return macros.get(macroName);
 	}
-	
+
 	public Set<IMacroDescriptor> getDescriptors() {
 		waitForRunning();
 		Function<IMacro, IMacroDescriptor> function = new Function<IMacro, IMacroDescriptor>() {

@@ -36,21 +36,21 @@ public class ErrorController {
 		model.addAttribute("messageKey", messageKey); //$NON-NLS-1$
 		return "/sendError"; //$NON-NLS-1$
 	}
-	
+
 	public static String timeout() {
 		return "forward:/error/" + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "/timeout"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	public static String notFound(String messageKey) {
 		Assert.hasLength(messageKey);
-		
+
 		return "forward:/error/" + HttpServletResponse.SC_NOT_FOUND + "/" + messageKey; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static String notModified() {
 		return "forward:/error/" + HttpServletResponse.SC_NOT_MODIFIED + "/dummy"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	public static String forbidden() {
 		return "forward:/error/" + HttpServletResponse.SC_FORBIDDEN + "/dummy"; //$NON-NLS-1$ //$NON-NLS-2$
 	}

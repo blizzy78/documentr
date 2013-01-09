@@ -56,7 +56,7 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 
 	@Rule
 	public TemporaryFolder tempDir = new TemporaryFolder();
-	
+
 	@Mock
 	private UserStore userStore;
 	@Mock
@@ -75,28 +75,28 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	@InjectMocks
 	private ProjectRepositoryManagerFactory repoManagerFactory;
 	private GlobalRepositoryManager globalRepoManager;
-	
+
 	@Before
 	public void setUp() throws IOException {
 		File dataDir = tempDir.getRoot();
-		
+
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 
 		when(user.getLoginName()).thenReturn(USER);
 		when(user.getEmail()).thenReturn(EMAIL);
 		when(user2.getLoginName()).thenReturn(USER_2);
 		when(user2.getEmail()).thenReturn(EMAIL_2);
-		
+
 		when(userStore.getUser(USER)).thenReturn(user);
 		when(userStore.getUser(USER_2)).thenReturn(user2);
-		
+
 		globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus); 
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus);
 		globalRepoManager.init();
-		
+
 		Whitebox.setInternalState(subscriptionStore, globalRepoManager);
 	}
-	
+
 	@Test
 	public void subscribeAndIsSubscribed() throws IOException, GitAPIException {
 		ILockedRepository repo = globalRepoManager.createProjectCentralRepository("_subscriptions", false, user); //$NON-NLS-1$
@@ -113,7 +113,7 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 		register(repo);
 		subscriptionStore.subscribe(PROJECT, BRANCH, PAGE, user);
 		assertTrue(subscriptionStore.isSubscribed(PROJECT, BRANCH, PAGE, user));
-		
+
 		subscriptionStore.unsubscribe(PROJECT, BRANCH, PAGE, user);
 		assertFalse(subscriptionStore.isSubscribed(PROJECT, BRANCH, PAGE, user));
 
@@ -126,7 +126,7 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 		register(repo);
 		subscriptionStore.subscribe(PROJECT, BRANCH, PAGE, user);
 		subscriptionStore.subscribe(PROJECT, BRANCH, PAGE, user2);
-		
+
 		assertEquals(Sets.newHashSet(EMAIL, EMAIL_2), subscriptionStore.getSubscriberEmails(PROJECT, BRANCH, PAGE));
 	}
 }

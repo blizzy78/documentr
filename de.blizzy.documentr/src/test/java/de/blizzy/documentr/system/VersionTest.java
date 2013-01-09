@@ -34,7 +34,7 @@ public class VersionTest {
 		assertEquals(3, version.getMinor());
 		assertEquals(4, version.getMaintenance());
 	}
-	
+
 	@Test
 	public void compareTo() {
 		Version version = Version.fromString("1.2.3-SNAPSHOT"); //$NON-NLS-1$

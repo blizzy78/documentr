@@ -36,7 +36,7 @@ class SimpleMacroMacro implements IMacro {
 		Assert.hasLength(annotation.name());
 		Assert.hasLength(annotation.insertText());
 		Assert.notNull(beanFactory);
-		
+
 		this.simpleMacro = simpleMacro;
 		this.annotation = annotation;
 		this.beanFactory = beanFactory;

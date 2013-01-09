@@ -33,10 +33,10 @@ public class LockManager {
 		LockKey key = new LockKey(null, null, false);
 		return lock(key, true);
 	}
-	
+
 	ILock lockProjectCentral(String projectName) {
 		Assert.hasLength(projectName);
-		
+
 		LockKey key = new LockKey(projectName, null, true);
 		return lock(key, false);
 	}
@@ -44,7 +44,7 @@ public class LockManager {
 	ILock lockProjectBranch(String projectName, String branchName) {
 		Assert.hasLength(projectName);
 		Assert.hasLength(branchName);
-		
+
 		LockKey key = new LockKey(projectName, branchName, false);
 		return lock(key, false);
 	}
@@ -57,7 +57,7 @@ public class LockManager {
 		}
 		return lock;
 	}
-	
+
 	private Lock lockAllInternal() {
 		Lock lock;
 		Thread thread = Thread.currentThread();
@@ -65,7 +65,7 @@ public class LockManager {
 			lock = allLock;
 			if (((lock == null) || (lock.getLockingThread() == thread)) &&
 				areAllLocksHeldByCurrentThread()) {
-				
+
 				break;
 			}
 
@@ -75,15 +75,15 @@ public class LockManager {
 				// ignore
 			}
 		}
-		
+
 		if (lock == null) {
 			lock = new Lock(thread);
 			allLock = lock;
 		}
-		
+
 		return lock;
 	}
-	
+
 	private Lock lockInternal(LockKey key) {
 		Lock lock;
 		Thread thread = Thread.currentThread();
@@ -91,10 +91,10 @@ public class LockManager {
 			lock = locks.get(key);
 			if (((allLock == null) || (allLock.getLockingThread() == thread)) &&
 				((lock == null) || (lock.getLockingThread() == thread))) {
-				
+
 				break;
 			}
-			
+
 			try {
 				locks.wait();
 			} catch (InterruptedException e) {
@@ -106,10 +106,10 @@ public class LockManager {
 			lock = new Lock(thread);
 			locks.put(key, lock);
 		}
-		
+
 		return lock;
 	}
-	
+
 	private boolean areAllLocksHeldByCurrentThread() {
 		Thread thread = Thread.currentThread();
 		if (!locks.isEmpty()) {
@@ -121,11 +121,11 @@ public class LockManager {
 		}
 		return true;
 	}
-	
+
 	void unlock(ILock lock) {
 		Assert.notNull(lock);
 		Assert.isInstanceOf(Lock.class, lock);
-		
+
 		Lock l = (Lock) lock;
 
 		if (l.getLockingThread() != Thread.currentThread()) {
@@ -135,11 +135,11 @@ public class LockManager {
 		synchronized (locks) {
 			boolean isRegular = locks.values().contains(l);
 			boolean isAll = l == allLock;
-			
+
 			if (!isRegular && !isAll) {
 				throw new IllegalStateException("unknown lock"); //$NON-NLS-1$
 			}
-			
+
 			int newUseCount = l.decreaseUseCount();
 			if (newUseCount == 0) {
 				if (isRegular) {
@@ -148,7 +148,7 @@ public class LockManager {
 					allLock = null;
 				}
 			}
-			
+
 			locks.notifyAll();
 		}
 	}

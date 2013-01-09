@@ -33,13 +33,13 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class AuthenticationUtilTest extends AbstractDocumentrTest {
 	@Mock
 	private HttpSession session;
-	
+
 	@Test
 	public void setAuthenticationCreationTime() {
 		AuthenticationUtil.setAuthenticationCreationTime(session, 123);
 		verify(session).setAttribute("authenticationCreationTime", 123L); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void getAuthenticationCreationTime() {
 		Calendar c = new GregorianCalendar(2012, Calendar.JUNE, 17);

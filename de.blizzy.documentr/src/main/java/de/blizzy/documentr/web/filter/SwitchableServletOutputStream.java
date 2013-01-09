@@ -27,6 +27,6 @@ abstract class SwitchableServletOutputStream extends ServletOutputStream {
 	public void write(int b) throws IOException {
 		getOutputStream().write(b);
 	}
-	
+
 	abstract OutputStream getOutputStream() throws IOException;
 }

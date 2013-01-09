@@ -27,7 +27,7 @@ import de.blizzy.documentr.AbstractDocumentrTest;
 public class CommitCherryPickResultTest extends AbstractDocumentrTest {
 	@Mock
 	private PageVersion pageVersion;
-	
+
 	@Test
 	public void getStatusForConflict() {
 		CommitCherryPickResult result = new CommitCherryPickResult(pageVersion, "conflictText"); //$NON-NLS-1$

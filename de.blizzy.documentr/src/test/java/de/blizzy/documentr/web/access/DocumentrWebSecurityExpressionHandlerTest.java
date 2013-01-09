@@ -36,12 +36,12 @@ public class DocumentrWebSecurityExpressionHandlerTest extends AbstractDocumentr
 	private Authentication authentication;
 	@Mock
 	private FilterInvocation filterInvocation;
-	
+
 	@Test
 	public void createSecurityExpressionRootMustCreateDocumentrSecurityExpressionRoot() {
 		DocumentrWebSecurityExpressionHandler expressionHandler = new DocumentrWebSecurityExpressionHandler();
 		expressionHandler.setPermissionEvaluator(permissionEvaluator);
-		
+
 		SecurityExpressionOperations root = expressionHandler.createSecurityExpressionRoot(
 				authentication, filterInvocation);
 		assertTrue(root instanceof DocumentrSecurityExpressionRoot);

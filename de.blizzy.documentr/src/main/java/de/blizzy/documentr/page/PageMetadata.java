@@ -24,7 +24,7 @@ import lombok.Getter;
 
 public class PageMetadata implements Serializable {
 	private static final long serialVersionUID = -3763833054250717367L;
-	
+
 	@Getter
 	private String lastEditedBy;
 	@Getter

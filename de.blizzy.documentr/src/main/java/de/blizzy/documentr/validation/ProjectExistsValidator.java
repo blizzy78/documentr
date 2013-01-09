@@ -29,7 +29,7 @@ import de.blizzy.documentr.validation.annotation.ProjectExists;
 public class ProjectExistsValidator implements ConstraintValidator<ProjectExists, String> {
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
-	
+
 	@Override
 	public void initialize(ProjectExists annotation) {
 	}

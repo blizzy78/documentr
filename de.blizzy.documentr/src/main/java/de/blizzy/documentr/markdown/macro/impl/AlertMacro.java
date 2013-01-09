@@ -29,7 +29,7 @@ public class AlertMacro implements IMacroRunnable {
 	@Override
 	public String getHtml(IMacroContext macroContext) {
 		String body = StringUtils.defaultString(macroContext.getBody());
-		
+
 		String type = macroContext.getParameters();
 		String typeClass = StringUtils.EMPTY;
 		if (StringUtils.isNotBlank(type)) {

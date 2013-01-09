@@ -35,7 +35,7 @@ abstract class AbstractMarkdownMacroRunnable implements IMacroRunnable {
 	}
 
 	abstract String getMarkdown(IMacroContext macroContext);
-	
+
 	@Override
 	public final String cleanupHtml(String html) {
 		return null;

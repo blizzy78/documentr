@@ -31,7 +31,7 @@ public class VimeoMacro implements IMacroRunnable {
 		if (videoId.startsWith("http://") || videoId.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 			videoId = UriComponentsBuilder.fromHttpUrl(videoId).build().getPath().substring(1);
 		}
-		
+
 		return "<iframe src=\"http://player.vimeo.com/video/" + videoId + "\" " + //$NON-NLS-1$ //$NON-NLS-2$
 				"width=\"500\" height=\"281\" frameborder=\"0\" " + //$NON-NLS-1$
 				"webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"; //$NON-NLS-1$
