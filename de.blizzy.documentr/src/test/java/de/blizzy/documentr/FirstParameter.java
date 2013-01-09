@@ -22,7 +22,7 @@ import org.mockito.stubbing.Answer;
 
 public class FirstParameter<T> implements Answer<T> {
 	@Override
-	public T answer(InvocationOnMock invocation) throws Throwable {
+	public T answer(InvocationOnMock invocation) {
 		@SuppressWarnings("unchecked")
 		T result = (T) invocation.getArguments()[0];
 		return result;
