@@ -52,8 +52,8 @@ public class AllDocIdsCollectorTest {
 	public void setUp() throws IOException {
 		directory = new RAMDirectory();
 
-		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_41);
+		IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_41, analyzer);
 		writerConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		IndexWriter writer = new IndexWriter(directory, writerConfig);
 		writer.addDocument(createDocument());

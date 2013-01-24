@@ -31,7 +31,7 @@ var require = {
 			slimbox: 'slimbox-2.04',
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-2/jquery.jstree',
 			ace: 'ace-20121217/ace',
-			zxcvbn: 'zxcvbn-20120416',
+			zxcvbn: 'zxcvbn-20130122',
 			'jquery.select2': 'select2-3.2.min'
 		}
 	},
@@ -42,7 +42,7 @@ var require = {
 		'ace-20121217/ace': {
 			exports: 'ace'
 		},
-		'zxcvbn-20120416': {
+		'zxcvbn-20130122': {
 			exports: 'zxcvbn'
 		}
 	}<sec:authorize access="isAuthenticated()">,
