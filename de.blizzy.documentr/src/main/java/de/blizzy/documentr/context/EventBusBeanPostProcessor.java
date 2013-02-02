@@ -19,7 +19,6 @@ package de.blizzy.documentr.context;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
@@ -52,7 +51,7 @@ class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 	}
 
 	@Override
-	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+	public void postProcessBeforeDestruction(Object bean, String beanName) {
 		EventBus eventBus = beanFactory.getBean(EventBus.class);
 		eventBus.unregister(bean);
 	}
