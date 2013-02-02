@@ -39,8 +39,8 @@ function importSampleContents() {
 					text: '<spring:message code="button.import"/>',
 					type: 'primary',
 					onclick: function() {
-						dlg.setText('<spring:message code="importingContents"/>');
-						dlg.setAllButtonsDisabled();
+						this.setText('<spring:message code="importingContents"/>');
+						this.setAllButtonsDisabled();
 	
 						$.ajax({
 							url: '<c:url value="/project/importSample/${name}/json"/>',
