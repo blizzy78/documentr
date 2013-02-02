@@ -46,7 +46,7 @@ function importSampleContents() {
 							url: '<c:url value="/project/importSample/${name}/json"/>',
 							type: 'GET',
 							dataType: 'json',
-							success: function(result) {
+							success: function() {
 								window.location.reload(true);
 							}
 						});
