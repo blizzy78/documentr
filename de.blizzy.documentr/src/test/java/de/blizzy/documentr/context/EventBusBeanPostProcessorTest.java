@@ -38,8 +38,6 @@ public class EventBusBeanPostProcessorTest extends AbstractDocumentrTest {
 		public void foo() {}
 	}
 
-	private static final class NonSubscriber {}
-
 	@Mock
 	private BeanFactory beanFactory;
 	@Mock
@@ -63,12 +61,11 @@ public class EventBusBeanPostProcessorTest extends AbstractDocumentrTest {
 	}
 
 	@Test
-	public void postProcessBeforeInitializationWithNonSubscriber() {
-		NonSubscriber nonSubscriber = new NonSubscriber();
+	public void postProcessBeforeDestruction() {
+		Subscriber subscriber = new Subscriber();
 
-		Object result = beanPostProcessor.postProcessBeforeInitialization(nonSubscriber, "nonSubscriber"); //$NON-NLS-1$
-		assertSame(nonSubscriber, result);
+		beanPostProcessor.postProcessBeforeDestruction(subscriber, "subscriber"); //$NON-NLS-1$
 
-		verify(eventBus, never()).register(nonSubscriber);
+		verify(eventBus).unregister(subscriber);
 	}
 }

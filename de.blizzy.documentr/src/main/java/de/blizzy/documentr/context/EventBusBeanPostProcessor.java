@@ -17,18 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.context;
 
-import java.lang.reflect.Method;
-
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 
 @Slf4j
-class EventBusBeanPostProcessor implements BeanPostProcessor {
+class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 	private BeanFactory beanFactory;
 
 	EventBusBeanPostProcessor(BeanFactory beanFactory) {
@@ -37,26 +35,20 @@ class EventBusBeanPostProcessor implements BeanPostProcessor {
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
-		if (isSubscriber(bean)) {
-			log.info("registering event bus subscriber: {}", beanName); //$NON-NLS-1$
-			EventBus eventBus = beanFactory.getBean(EventBus.class);
-			eventBus.register(bean);
-		}
+		log.debug("registering potential event bus subscriber: {}", beanName); //$NON-NLS-1$
+		EventBus eventBus = beanFactory.getBean(EventBus.class);
+		eventBus.register(bean);
 		return bean;
-	}
-
-	private boolean isSubscriber(Object bean) {
-		for (Method method : bean.getClass().getMethods()) {
-			Subscribe annotation = method.getAnnotation(Subscribe.class);
-			if (annotation != null) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
+	}
+
+	@Override
+	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+		EventBus eventBus = beanFactory.getBean(EventBus.class);
+		eventBus.unregister(bean);
 	}
 }
