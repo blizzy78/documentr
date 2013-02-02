@@ -489,11 +489,12 @@ public class PageController {
 			method=RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)")
-	public void restoreVersion(@PathVariable String projectName, @PathVariable String branchName,
+	public Map<String, Object> restoreVersion(@PathVariable String projectName, @PathVariable String branchName,
 			@PathVariable String path, @RequestParam String version, Authentication authentication) throws IOException {
 
 		User user = userStore.getUser(authentication.getName());
 		pageStore.restorePageVersion(projectName, branchName, Util.toRealPagePath(path), version, user);
+		return Collections.emptyMap();
 	}
 
 	@RequestMapping(value="/cherryPick/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +

@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.account;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,11 +50,12 @@ public class SubscriptionController {
 			method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	@ResponseBody
-	public void subscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
+	public Map<String, Object> subscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
 			Authentication authentication) throws IOException {
 
 		User user = userStore.getUser(authentication.getName());
 		subscriptionStore.subscribe(projectName, branchName, Util.toRealPagePath(path), user);
+		return Collections.emptyMap();
 	}
 
 	@RequestMapping(value="/unsubscribe/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
@@ -61,10 +64,11 @@ public class SubscriptionController {
 			method=RequestMethod.GET)
 	@PreAuthorize("isAuthenticated()")
 	@ResponseBody
-	public void unsubscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
+	public Map<String, Object> unsubscribe(@PathVariable String projectName, @PathVariable String branchName, @PathVariable String path,
 			Authentication authentication) throws IOException {
 
 		User user = userStore.getUser(authentication.getName());
 		subscriptionStore.unsubscribe(projectName, branchName, Util.toRealPagePath(path), user);
+		return Collections.emptyMap();
 	}
 }

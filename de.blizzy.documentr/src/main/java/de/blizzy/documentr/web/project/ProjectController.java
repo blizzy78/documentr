@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.project;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -90,8 +92,9 @@ public class ProjectController {
 	@RequestMapping(value="/importSample/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json", method=RequestMethod.GET)
 	@PreAuthorize("hasProjectPermission(#name, ADMIN)")
 	@ResponseBody
-	public void importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
+	public Map<String, Object> importSampleContents(@PathVariable String name) throws IOException, GitAPIException {
 		globalRepositoryManager.importSampleContents(name);
+		return Collections.emptyMap();
 	}
 
 	@ModelAttribute
