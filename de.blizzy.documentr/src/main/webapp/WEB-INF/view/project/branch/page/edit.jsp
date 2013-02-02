@@ -514,26 +514,20 @@ $(function() {
 	});
 
 	require(['jquery.select2']);
-	var tags = null;
 	$.ajax({
 		url: '<c:url value="/search/tags/json"/>',
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
-			tags = result;
-		}
-	});
-	documentr.waitFor(function() {
-		return documentr.isSomething(tags);
-	}, function() {
-		require(['jquery.select2'], function() {
-			$('#tags').select2({
-				tags: tags,
-				tokenSeparators: [','],
-				containerCssClass: 'input-xxlarge',
-				placeholder: '<spring:message code="enterNewTag"/>'
+			require(['jquery.select2'], function() {
+				$('#tags').select2({
+					tags: result,
+					tokenSeparators: [','],
+					containerCssClass: 'input-xxlarge',
+					placeholder: '<spring:message code="enterNewTag"/>'
+				});
 			});
-		});
+		}
 	});
 	
 	require(['ace'], function(ace) {
