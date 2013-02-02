@@ -36,9 +36,9 @@ class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
-		log.debug("registering potential event bus subscriber: {}", beanName); //$NON-NLS-1$
 		try {
 			EventBus eventBus = beanFactory.getBean(EventBus.class);
+			log.trace("registering potential event bus subscriber: {}", beanName); //$NON-NLS-1$
 			eventBus.register(bean);
 		} catch (BeanCurrentlyInCreationException e) {
 			// ignore beans that are currently in creation (ie. context config)
