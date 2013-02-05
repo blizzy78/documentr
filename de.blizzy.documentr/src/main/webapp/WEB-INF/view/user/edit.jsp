@@ -207,27 +207,22 @@ function removeRole(type, targetId, roleName) {
 function showDeleteDialog() {
 	require(['documentr/dialog'], function(dialog) {
 		<sec:authorize access="isAdmin('${userForm.originalLoginName}')">
-			dialog.openMessageDialog('<spring:message code="title.deleteUser"/>',
-				"<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
-				{
-					text: '<spring:message code="button.close"/>',
-					cancel: true
-				}
-			]);
+			new dialog.Dialog()
+				.title('<spring:message code="title.deleteUser"/>')
+				.message("<spring:message code="cannotDeleteUserXBecauseIsAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'))
+				.button(new dialog.DialogButton().close(true))
+				.show();
 		</sec:authorize>
 		<sec:authorize access="!isAdmin('${userForm.originalLoginName}')">
-			dialog.openMessageDialog('<spring:message code="title.deleteUser"/>',
-				"<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'), [
-				{
-					text: '<spring:message code="button.delete"/>',
-					href: '<c:url value="/user/delete/${userForm.originalLoginName}"/>',
-					type: 'danger'
-				},
-				{
-					text: '<spring:message code="button.cancel"/>',
-					cancel: true
-				}
-			]);
+			new dialog.Dialog()
+				.title('<spring:message code="title.deleteUser"/>')
+				.message("<spring:message code="deleteUserX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${userForm.originalLoginName}"/>'))
+				.button(new dialog.DialogButton()
+					.text('<spring:message code="button.delete"/>')
+					.href('<c:url value="/user/delete/${userForm.originalLoginName}"/>')
+					.danger())
+				.button(new dialog.DialogButton().cancel())
+				.show();
 		</sec:authorize>
 	});
 }

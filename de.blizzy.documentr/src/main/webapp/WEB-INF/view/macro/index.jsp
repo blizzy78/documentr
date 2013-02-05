@@ -28,18 +28,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function deleteMacro(name) {
 	require(['documentr/dialog'], function(dialog) {
-		dialog.openMessageDialog('<spring:message code="title.deleteMacro"/>',
-			"<spring:message code="deleteMacroX" arguments="_NAME_"/>".replace(/_NAME_/, name), [
-			{
-				text: '<spring:message code="button.delete"/>',
-				type: 'danger',
-				href: '<c:url value="/macro/delete/"/>' + name
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
+		new dialog.Dialog()
+			.title('<spring:message code="title.deleteMacro"/>')
+			.message("<spring:message code="deleteMacroX" arguments="_NAME_"/>".replace(/_NAME_/, name))
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.delete"/>')
+				.href('<c:url value="/macro/delete/"/>' + name)
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
 	});
 }
 

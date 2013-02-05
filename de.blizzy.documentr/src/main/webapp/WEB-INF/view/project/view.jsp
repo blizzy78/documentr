@@ -33,30 +33,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function importSampleContents() {
 	require(['documentr/dialog'], function(dialog) {
-		dialog.openMessageDialog('<spring:message code="title.importSampleContents"/>',
-			"<spring:message code="importSampleContents" arguments="${name}"/>", [
-				{
-					text: '<spring:message code="button.import"/>',
-					type: 'primary',
-					onclick: function() {
-						this.setText('<spring:message code="importingContents"/>');
-						this.setAllButtonsDisabled();
-	
-						$.ajax({
-							url: '<c:url value="/project/importSample/${name}/json"/>',
-							type: 'GET',
-							dataType: 'json',
-							success: function() {
-								window.location.reload(true);
-							}
-						});
-					}
-				},
-				{
-					text: '<spring:message code="button.cancel"/>',
-					cancel: true
-				}
-			]);
+		new dialog.Dialog()
+			.title('<spring:message code="title.importSampleContents"/>')
+			.message("<spring:message code="importSampleContents" arguments="${name}"/>")
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.import"/>')
+				.click(function(button, dlg) {
+					dlg.message('<spring:message code="importingContents"/>');
+					dlg.allButtonsDisabled(true);
+
+					$.ajax({
+						url: '<c:url value="/project/importSample/${name}/json"/>',
+						type: 'GET',
+						dataType: 'json',
+						success: function() {
+							window.location.reload(true);
+						}
+					});
+				})
+				.primary())
+			.button(new dialog.DialogButton().cancel())
+			.show();
 	});
 }
 

@@ -34,18 +34,15 @@ var jqXHRs = [];
 
 function showDeleteDialog(name) {
 	require(['documentr/dialog'], function(dialog) {
-		var text = "<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\'');
-		dialog.openMessageDialog('<spring:message code="title.deleteAttachment"/>', text, [
-			{
-				text: '<spring:message code="button.delete"/>',
-				type: 'danger',
-				href: '<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/"/>' + name
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
+		new dialog.Dialog()
+			.title('<spring:message code="title.deleteAttachment"/>')
+			.message("<spring:message code="deleteAttachmentX" arguments=" "/>".replace(/' '/, '\'' + name + '\''))
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.delete"/>')
+				.href('<c:url value="/attachment/delete/${projectName}/${branchName}/${d:toUrlPagePath(pagePath)}/"/>' + name)
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
 	});
 }
 

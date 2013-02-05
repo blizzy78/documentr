@@ -34,18 +34,15 @@ function showAddDialog() {
 
 function showRemoveDialog(openId) {
 	require(['documentr/dialog'], function(dialog) {
-		dialog.openMessageDialog('<spring:message code="title.removeOpenId"/>',
-			"<spring:message code="removeOpenIdX" arguments=" "/>".replace(/' '/, '\'' + openId + '\''), [
-			{
-				text: '<spring:message code="button.remove"/>',
-				href: '<c:url value="/account/removeOpenId"/>?openId=' + encodeURIComponent(openId),
-				type: 'primary'
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		]);
+		new dialog.Dialog()
+			.title('<spring:message code="title.removeOpenId"/>')
+			.message("<spring:message code="removeOpenIdX" arguments=" "/>".replace(/' '/, '\'' + openId + '\''))
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.remove"/>')
+				.href('<c:url value="/account/removeOpenId"/>?openId=' + encodeURIComponent(openId))
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
 	});
 }
 

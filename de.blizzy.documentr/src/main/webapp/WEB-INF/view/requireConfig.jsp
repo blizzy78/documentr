@@ -45,22 +45,29 @@ var require = {
 		'zxcvbn-20130122': {
 			exports: 'zxcvbn'
 		}
-	}<sec:authorize access="isAuthenticated()">,
+	},
 	config: {
-		'documentr/pageTree': {
-			applicationUrl: '<c:url value="/pageTree/application/json"/>',
-			projectUrl: '<c:url value="/pageTree/project/_PROJECTNAME_/json"/>',
-			branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
-			pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
-			projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
-			branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>",
-			iconUrls: {
-				project: '<c:url value="/img/project.png"/>',
-				branch: '<c:url value="/img/branch.png"/>',
-				page: '<c:url value="/img/page.png"/>',
-				attachment: '<c:url value="/img/attachment.png"/>'
+		'documentr/dialog': {
+			cancelText: '<spring:message code="button.cancel"/>',
+			closeText: '<spring:message code="button.close"/>'
+		},
+		
+		<sec:authorize access="isAuthenticated()">
+			'documentr/pageTree': {
+				applicationUrl: '<c:url value="/pageTree/application/json"/>',
+				projectUrl: '<c:url value="/pageTree/project/_PROJECTNAME_/json"/>',
+				branchUrl: '<c:url value="/pageTree/branch/_PROJECTNAME_/_BRANCHNAME_/json"/>',
+				pageUrl: '<c:url value="/pageTree/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
+				projectTitle: "<spring:message code="label.projectX" arguments="_PROJECTNAME_"/>",
+				branchTitle: "<spring:message code="label.branchX" arguments="_BRANCHNAME_"/>",
+				iconUrls: {
+					project: '<c:url value="/img/project.png"/>',
+					branch: '<c:url value="/img/branch.png"/>',
+					page: '<c:url value="/img/page.png"/>',
+					attachment: '<c:url value="/img/attachment.png"/>'
+				}
 			}
-		}
-	}</sec:authorize>
+		</sec:authorize>
+	}
 };
 </script>

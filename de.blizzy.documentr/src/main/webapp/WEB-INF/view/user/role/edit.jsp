@@ -49,27 +49,22 @@ function showDeleteDialog() {
 	require(['documentr/dialog'], function(dialog) {
 		<c:choose>
 			<c:when test="${lastAdminRole}">
-				dialog.openMessageDialog('<spring:message code="title.deleteRole"/>',
-					"<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
-						{
-							text: '<spring:message code="button.close"/>',
-							cancel: true
-						}
-					]);
+				new dialog.Dialog()
+					.title('<spring:message code="title.deleteRole"/>')
+					.message("<spring:message code="cannotDeleteRoleXBecauseIsLastAdmin" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'))
+					.button(new dialog.DialogButton().close(true))
+					.show();
 			</c:when>
 			<c:otherwise>
-				dialog.openMessageDialog('<spring:message code="title.deleteRole"/>',
-					"<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'), [
-						{
-							text: '<spring:message code="button.delete"/>',
-							href: '<c:url value="/role/delete/${roleForm.originalName}"/>',
-							type: 'danger'
-						},
-						{
-							text: '<spring:message code="button.cancel"/>',
-							cancel: true
-						}
-					]);
+				new dialog.Dialog()
+					.title('<spring:message code="title.deleteRole"/>')
+					.message("<spring:message code="deleteRoleX" arguments="__DUMMY__"/>".replace(/__DUMMY__/, '<c:out value="${roleForm.originalName}"/>'))
+					.button(new dialog.DialogButton()
+						.text('<spring:message code="button.delete"/>')
+						.href('<c:url value="/role/delete/${roleForm.originalName}"/>')
+						.danger())
+					.button(new dialog.DialogButton().cancel())
+					.show();
 			</c:otherwise>
 		</c:choose>
 	});

@@ -91,21 +91,16 @@ function toggleHideFloatingElements(hide) {
 
 function showDeleteDialog() {
 	require(['documentr/dialog'], function(dialog) {
-		dialog.openMessageDialog('<spring:message code="title.deletePage"/>',
+		new dialog.Dialog()
+			.title('<spring:message code="title.deletePage"/>')
 			<c:set var="text"><spring:message code="deletePageX.html" arguments="${title}" argumentSeparator="__DUMMY__SEPARATOR__"/></c:set>
-			'<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>', [
-			{
-				text: '<spring:message code="button.delete"/>',
-				type: 'danger',
-				href: '<c:url value="/page/delete/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>'
-			},
-			{
-				text: '<spring:message code="button.cancel"/>',
-				cancel: true
-			}
-		], {
-			messageAsHtml: true
-		});
+			.htmlMessage('<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>')
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.delete"/>')
+				.href('<c:url value="/page/delete/${projectName}/${branchName}/${d:toUrlPagePath(path)}"/>')
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
 	});
 }
 
@@ -630,13 +625,11 @@ function subscribe() {
 		type: 'GET',
 		success: function() {
 			require(['documentr/dialog'], function(dialog) {
-				dialog.openMessageDialog('<spring:message code="title.subscribe"/>',
-					'<spring:message code="subscribedSuccessfully"/>', [
-						{
-							text: '<spring:message code="button.close"/>',
-							cancel: true
-						}
-					]);
+				new dialog.Dialog()
+					.title('<spring:message code="title.subscribe"/>')
+					.message('<spring:message code="subscribedSuccessfully"/>')
+					.button(new dialog.DialogButton().close(true))
+					.show();
 			});
 		}
 	});
@@ -649,13 +642,11 @@ function unsubscribe() {
 		type: 'GET',
 		success: function() {
 			require(['documentr/dialog'], function(dialog) {
-				dialog.openMessageDialog('<spring:message code="title.unsubscribe"/>',
-					'<spring:message code="unsubscribedSuccessfully"/>', [
-						{
-							text: '<spring:message code="button.close"/>',
-							cancel: true
-						}
-					]);
+				new dialog.Dialog()
+					.title('<spring:message code="title.unsubscribe"/>')
+					.message('<spring:message code="unsubscribedSuccessfully"/>')
+					.button(new dialog.DialogButton().close(true))
+					.show();
 			});
 		}
 	});
