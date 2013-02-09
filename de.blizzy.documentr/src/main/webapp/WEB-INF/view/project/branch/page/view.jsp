@@ -416,10 +416,10 @@ function hookupInlineEditorToolbar() {
 		var float = textEl.css('float');
 		if ((float !== 'left') && (float !== 'right')) {
 			var toolbarEl = $('#inlineEditorToolbar');
-			toolbarEl
-				.css('left', textEl.offset().left - toolbarEl.width() - 10)
-				.css('top', textEl.offset().top)
-				.fadeTo(0, 0.5);
+			toolbarEl.css({
+				left: textEl.offset().left - toolbarEl.width() - 10,
+				top: textEl.offset().top
+			}).fadeTo(0, 0.5);
 			var buttonEl = $('#inlineEditorToolbar button');
 			buttonEl.off('click');
 			buttonEl.click(

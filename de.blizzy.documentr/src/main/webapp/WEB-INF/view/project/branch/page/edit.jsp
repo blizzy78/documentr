@@ -62,12 +62,12 @@ function togglePreview() {
 				$(document.body).append(previewEl);
 				documentr.setupCodeViews();
 				documentr.setupLightbox();
-				previewEl
-					.css('left', el.offset().left)
-					.css('top', el.offset().top)
-					.css('width', el.outerWidth() - (previewEl.outerWidth() - previewEl.width()))
-					.css('height', el.outerHeight() - (previewEl.outerHeight() - previewEl.height()))
-					.slideToggle('fast');
+				previewEl.css({
+					left: el.offset().left,
+					top: el.offset().top,
+					width: el.outerWidth() - (previewEl.outerWidth() - previewEl.width()),
+					height: el.outerHeight() - (previewEl.outerHeight() - previewEl.height())
+				}).slideToggle('fast');
 			}
 		});
 	} else {
