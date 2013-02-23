@@ -32,7 +32,7 @@ var require = {
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-2/jquery.jstree',
 			ace: 'ace-20130207/ace',
 			zxcvbn: 'zxcvbn-20130122',
-			'jquery.select2': 'select2-3.2.min',
+			'jquery.select2': 'select2-3.4.0/select2.min',
 			'jquery.ui': 'jquery-ui-1.10.2.custom.min'
 		}
 	},
