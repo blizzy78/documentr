@@ -38,14 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <script type="text/javascript" src="<c:url value="/js/require-2.1.4.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.9.1.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.2.2.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-2.3.1.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
-
-<c:if test="${!empty requestScope._headerJSFiles}">
-	<c:forTokens var="uri" items="${requestScope._headerJSFiles}" delims="|">
-		<script type="text/javascript" src="<c:url value="${uri}"/>"></script>
-	</c:forTokens> 
-</c:if>
 
 <c:out value="${requestScope._headerHTML}" escapeXml="false"/>
 

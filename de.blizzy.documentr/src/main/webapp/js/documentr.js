@@ -106,8 +106,9 @@ var documentr = {};
 		documentr.setupCodeViews();
 		documentr.setupLightbox();
 
-		$('body').tooltip({
-			selector: '[rel="tooltip"]'
+		$(document.body).tooltip({
+			selector: '[rel="tooltip"]',
+			container: 'body'
 		});
 
 		$('#siteSearch input').bind('webkitspeechchange', function() {

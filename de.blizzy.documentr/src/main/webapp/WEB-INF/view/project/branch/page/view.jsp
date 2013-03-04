@@ -565,7 +565,7 @@ function compareWithBranchSelected() {
 
 	require(['documentr/diffMarkdown', 'documentr/dialog']);
 	
-	markdown.current = $('body').data('currentMarkdown');
+	markdown.current = $(document.body).data('currentMarkdown');
 	if (!documentr.isSomething(markdown.current)) {
 		$.ajax({
 			url: '<c:url value="/page/markdown/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json?versions=latest"/>',
@@ -573,7 +573,7 @@ function compareWithBranchSelected() {
 			dataType: 'json',
 			success: function(result) {
 				markdown.current = result[result.latest];
-				$('body').data('currentMarkdown', markdown.current);
+				$(document.body).data('currentMarkdown', markdown.current);
 			}
 		});
 	}
