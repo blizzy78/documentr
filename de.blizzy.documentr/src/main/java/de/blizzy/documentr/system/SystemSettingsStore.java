@@ -39,7 +39,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -50,6 +49,7 @@ import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryNotFoundException;
 import de.blizzy.documentr.repository.RepositoryUtil;
+import de.blizzy.documentr.util.Util;
 
 /** Manages storage of system settings. */
 @Component
@@ -97,7 +97,7 @@ public class SystemSettingsStore implements Lifecycle {
 		try {
 			User adminUser = userStore.getUser("admin"); //$NON-NLS-1$
 			ILockedRepository repo = globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, adminUser);
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 
 			// repository has just been created, store settings for the first time
 			Map<String, String> settingsToStore;
@@ -187,7 +187,7 @@ public class SystemSettingsStore implements Lifecycle {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -212,7 +212,7 @@ public class SystemSettingsStore implements Lifecycle {
 		} catch (RepositoryNotFoundException e) {
 			// okay
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 		return settingsMap;
 	}

@@ -45,11 +45,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
 
-import com.google.common.io.Closeables;
-
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
+import de.blizzy.documentr.util.Util;
 
 public class InaccessibleDocIdsCollectorTest extends AbstractDocumentrTest {
 	@Mock
@@ -80,8 +79,8 @@ public class InaccessibleDocIdsCollectorTest extends AbstractDocumentrTest {
 
 	@After
 	public void tearDown() {
-		Closeables.closeQuietly(reader);
-		Closeables.closeQuietly(directory);
+		Util.closeQuietly(reader);
+		Util.closeQuietly(directory);
 	}
 
 	@Test

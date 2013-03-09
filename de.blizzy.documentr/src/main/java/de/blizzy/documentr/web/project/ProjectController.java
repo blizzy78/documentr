@@ -37,13 +37,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.io.Closeables;
-
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.util.Util;
 
 @Controller
 @RequestMapping("/project")
@@ -84,7 +83,7 @@ public class ProjectController {
 			User user = userStore.getUser(authentication.getName());
 			repo = globalRepositoryManager.createProjectCentralRepository(form.getName(), user);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 		return "redirect:/project/" + form.getName(); //$NON-NLS-1$
 	}

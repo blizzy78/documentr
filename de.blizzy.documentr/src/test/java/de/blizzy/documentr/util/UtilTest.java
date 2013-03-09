@@ -30,7 +30,6 @@ import org.junit.Test.None;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 
@@ -95,7 +94,7 @@ public class UtilTest extends AbstractDocumentrTest {
 
 		Util.deleteQuietly(dir);
 
-		Closeables.closeQuietly(out);
+		Util.closeQuietly(out);
 	}
 
 	@Test

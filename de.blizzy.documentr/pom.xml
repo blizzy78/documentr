@@ -154,7 +154,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>13.0.1</version>
+			<version>14.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gitective</groupId>
@@ -195,7 +195,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>net.sourceforge.nekohtml</groupId>
 			<artifactId>nekohtml</artifactId>
-			<version>1.9.17</version>
+			<version>1.9.18</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
@@ -245,7 +245,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
-			<version>1.4.6</version>
+			<version>1.4.7</version>
 		</dependency>
 	</dependencies>
 

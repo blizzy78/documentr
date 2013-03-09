@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.util;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -127,5 +128,15 @@ public final class Util {
 			result = new File(result, part);
 		}
 		return result;
+	}
+
+	public static void closeQuietly(Closeable c) {
+		if (c != null) {
+			try {
+				c.close();
+			} catch (IOException e) {
+				// ignore
+			}
+		}
 	}
 }

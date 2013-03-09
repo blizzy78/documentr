@@ -42,7 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.io.Closeables;
+import de.blizzy.documentr.util.Util;
 
 public class AllDocIdsCollectorTest {
 	private Directory directory;
@@ -67,8 +67,8 @@ public class AllDocIdsCollectorTest {
 
 	@After
 	public void tearDown() {
-		Closeables.closeQuietly(reader);
-		Closeables.closeQuietly(directory);
+		Util.closeQuietly(reader);
+		Util.closeQuietly(directory);
 	}
 
 	@Test

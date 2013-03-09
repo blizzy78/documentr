@@ -24,9 +24,9 @@ import org.junit.Before;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.util.Util;
 
 public abstract class AbstractDocumentrTest {
 	private Set<ILockedRepository> repositories = Sets.newHashSet();
@@ -39,7 +39,7 @@ public abstract class AbstractDocumentrTest {
 	@After
 	public void closeRepositories() {
 		for (ILockedRepository repo : repositories) {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 		repositories.clear();
 	}

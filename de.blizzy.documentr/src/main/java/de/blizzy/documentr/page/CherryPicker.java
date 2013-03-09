@@ -46,7 +46,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
@@ -174,7 +173,7 @@ class CherryPicker implements ICherryPicker {
 				throw new IOException("cherry-picking failed"); //$NON-NLS-1$
 			}
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 
 		if (!dryRun && !hadConflicts && !failed) {

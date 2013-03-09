@@ -88,7 +88,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -193,10 +192,10 @@ public class PageIndex {
 
 	@PreDestroy
 	public void destroy() {
-		Closeables.closeQuietly(searcherManager);
-		Closeables.closeQuietly(readerManager);
-		Closeables.closeQuietly(writer);
-		Closeables.closeQuietly(directory);
+		Util.closeQuietly(searcherManager);
+		Util.closeQuietly(readerManager);
+		Util.closeQuietly(writer);
+		Util.closeQuietly(directory);
 	}
 
 	private void reindexEverything() throws IOException {
@@ -480,7 +479,7 @@ public class PageIndex {
 			}
 			tokenStream.end();
 		} finally {
-			Closeables.closeQuietly(tokenStream);
+			Util.closeQuietly(tokenStream);
 		}
 
 		Collections.reverse(words);

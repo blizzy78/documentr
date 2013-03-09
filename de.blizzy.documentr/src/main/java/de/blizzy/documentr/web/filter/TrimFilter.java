@@ -31,7 +31,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.io.Closeables;
+import de.blizzy.documentr.util.Util;
 
 public class TrimFilter implements Filter {
 	private TrimWriter writer = new TrimWriter();
@@ -70,8 +70,8 @@ public class TrimFilter implements Filter {
 			out = new ByteArrayOutputStream();
 			writer.write(text, out, charset);
 		} finally {
-			Closeables.closeQuietly(in);
-			Closeables.closeQuietly(out);
+			Util.closeQuietly(in);
+			Util.closeQuietly(out);
 		}
 		return out.toByteArray();
 	}

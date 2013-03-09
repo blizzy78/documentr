@@ -48,7 +48,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.StringMap;
@@ -58,6 +57,7 @@ import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
+import de.blizzy.documentr.util.Util;
 
 /** Manages storage of user account data. */
 @Component
@@ -89,7 +89,7 @@ public class UserStore {
 		} catch (IllegalStateException e) {
 			// okay
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 
 		if (created) {
@@ -155,7 +155,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -177,7 +177,7 @@ public class UserStore {
 
 			return getUser(loginName, json);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class UserStore {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			return listUsers(repo);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -270,7 +270,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -297,7 +297,7 @@ public class UserStore {
 			Collections.sort(users);
 			return users;
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -328,7 +328,7 @@ public class UserStore {
 			Role role = new Role(roleName, rolePermissions);
 			return role;
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -359,7 +359,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -411,7 +411,7 @@ public class UserStore {
 			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 			return getUserAuthorities(loginName, repo);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -468,7 +468,7 @@ public class UserStore {
 
 			throw new OpenIdNotFoundException(openId);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -510,7 +510,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -553,7 +553,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -614,7 +614,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -658,7 +658,7 @@ public class UserStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 }

@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +58,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		String encPass = encoder.encode(rawPass);
 		stopwatch.stop();
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to encode password: {} ms", stopwatch.elapsedMillis()); //$NON-NLS-1$
+			log.trace("time taken to encode password: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 		}
 		return encPass;
 	}
@@ -68,7 +70,7 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		boolean valid = encoder.matches(rawPass, encPass);
 		stopwatch.stop();
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to verify password: {} ms", stopwatch.elapsedMillis()); //$NON-NLS-1$
+			log.trace("time taken to verify password: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 		}
 		return valid;
 	}

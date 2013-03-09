@@ -37,10 +37,10 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.util.Util;
 
 public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	private static final User USER = new User("currentUser", "pw", "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -63,7 +63,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			lockedRepo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(lockedRepo);
+			Util.closeQuietly(lockedRepo);
 			lockedRepo = null;
 		}
 
@@ -85,7 +85,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			lockedRepo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(lockedRepo);
+			Util.closeQuietly(lockedRepo);
 			lockedRepo = null;
 		}
 
@@ -103,7 +103,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = repoManager.createCentralRepository(USER);
 			gitDir = repo.r().getDirectory();
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -112,7 +112,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			assertEquals(gitDir, repo.r().getDirectory());
 			assertTrue(repo.r().isBare());
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -133,7 +133,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			repo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -142,7 +142,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.r().getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
 			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -150,7 +150,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = repoManager.getCentralRepository();
 			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -162,14 +162,14 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			repo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
 		try {
 			repo = repoManager.createBranchRepository("branch", null); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -185,14 +185,14 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			repo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
 		try {
 			repo = repoManager.createBranchRepository("branch1", null); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -200,7 +200,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			expectedException.expect(IllegalArgumentException.class);
 			repo = repoManager.createBranchRepository("branch2", null); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 	}
@@ -214,7 +214,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = repoManager.createCentralRepository(USER);
 			Git.wrap(repo.r()).branchCreate().setName("startingBranch").call(); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -223,7 +223,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			assertEquals(new File(new File(reposDir, "branch"), ".git"), repo.r().getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
 			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -231,7 +231,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = repoManager.getCentralRepository();
 			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -243,14 +243,14 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		try {
 			repo = repoManager.createCentralRepository(USER);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
 		try {
 			repo = repoManager.createBranchRepository("branch", null); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 
@@ -258,7 +258,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			repo = repoManager.getBranchRepository("branch"); //$NON-NLS-1$
 			assertTrue(RepositoryUtils.getBranches(repo.r()).contains("refs/heads/branch")); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -281,7 +281,7 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 			Git.wrap(repo.r()).branchCreate().setName("branch1").call(); //$NON-NLS-1$
 			Git.wrap(repo.r()).branchCreate().setName("branch2").call(); //$NON-NLS-1$
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 			repo = null;
 		}
 

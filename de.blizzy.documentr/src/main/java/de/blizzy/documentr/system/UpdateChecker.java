@@ -24,7 +24,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
+
+import de.blizzy.documentr.util.Util;
 
 @Component
 @Slf4j
@@ -105,7 +106,7 @@ public class UpdateChecker {
 		} catch (IOException e) {
 			log.error(StringUtils.EMPTY, e);
 		} finally {
-			Closeables.closeQuietly(in);
+			Util.closeQuietly(in);
 		}
 		return null;
 	}

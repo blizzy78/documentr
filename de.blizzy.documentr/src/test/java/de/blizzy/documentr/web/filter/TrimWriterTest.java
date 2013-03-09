@@ -25,7 +25,8 @@ import java.io.IOException;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
+
+import de.blizzy.documentr.util.Util;
 
 public class TrimWriterTest {
 	@Test
@@ -53,7 +54,7 @@ public class TrimWriterTest {
 					"  c   </div><!--__/NOTRIM__--></div>\t\r\n";
 			writer.write(text, out, Charsets.UTF_8);
 		} finally {
-			Closeables.closeQuietly(out);
+			Util.closeQuietly(out);
 		}
 
 		String result = new String(out.toByteArray(), Charsets.UTF_8);

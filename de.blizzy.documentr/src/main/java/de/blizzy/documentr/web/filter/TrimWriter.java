@@ -25,9 +25,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.io.Closeables;
-
 import de.blizzy.documentr.util.Replacement;
+import de.blizzy.documentr.util.Util;
 
 class TrimWriter {
 	private static final Replacement REMOVE_COMMENT = new Replacement("<!--.*?-->", StringUtils.EMPTY); //$NON-NLS-1$
@@ -90,7 +89,7 @@ class TrimWriter {
 				}
 			}
 		} finally {
-			Closeables.closeQuietly(in);
+			Util.closeQuietly(in);
 		}
 	}
 

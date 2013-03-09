@@ -32,9 +32,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.util.Util;
 
 public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 	@Mock
@@ -60,7 +60,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 			out = wrapper.getOutputStream();
 			out.write(data);
 		} finally {
-			Closeables.closeQuietly(out);
+			Util.closeQuietly(out);
 		}
 
 		assertTrue(Arrays.equals(data, wrapper.getData()));
@@ -78,7 +78,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 			wrapper.setContentType("text/plain"); //$NON-NLS-1$
 			out.write(data);
 		} finally {
-			Closeables.closeQuietly(out);
+			Util.closeQuietly(out);
 		}
 
 		assertTrue(Arrays.equals(data, wrapper.getData()));
@@ -98,7 +98,7 @@ public class TrimResponseWrapperTest extends AbstractDocumentrTest {
 			out = wrapper.getWriter();
 			out.write(s);
 		} finally {
-			Closeables.closeQuietly(out);
+			Util.closeQuietly(out);
 		}
 
 		assertTrue(Arrays.equals(s.getBytes(Charsets.UTF_8), wrapper.getData()));

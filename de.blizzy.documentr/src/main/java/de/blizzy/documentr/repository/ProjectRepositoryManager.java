@@ -38,10 +38,10 @@ import org.springframework.util.Assert;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.Closeables;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.util.Util;
 
 class ProjectRepositoryManager {
 	private static final String CENTRAL_REPO_NAME = "_central"; //$NON-NLS-1$
@@ -233,7 +233,7 @@ class ProjectRepositoryManager {
 			Collections.sort(result);
 			return result;
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 

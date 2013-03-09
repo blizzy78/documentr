@@ -39,7 +39,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -97,7 +96,7 @@ public class SubscriptionStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -138,7 +137,7 @@ public class SubscriptionStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -150,7 +149,7 @@ public class SubscriptionStore {
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 
@@ -196,7 +195,7 @@ public class SubscriptionStore {
 			log.debug("emails subscribed to {}/{}/{}: {}", projectName, branchName, Util.toUrlPagePath(path), emails); //$NON-NLS-1$
 			return emails;
 		} finally {
-			Closeables.closeQuietly(repo);
+			Util.closeQuietly(repo);
 		}
 	}
 

@@ -24,9 +24,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 
-import com.google.common.io.Closeables;
-
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.util.Util;
 
 public class LockedRepositoryTest extends AbstractDocumentrTest {
 	@Rule
@@ -41,7 +40,7 @@ public class LockedRepositoryTest extends AbstractDocumentrTest {
 		when(lockManager.lockProjectCentral("project")).thenReturn(lock); //$NON-NLS-1$
 
 		ILockedRepository repo = LockedRepository.lockProjectCentral("project", lockManager); //$NON-NLS-1$
-		Closeables.closeQuietly(repo);
+		Util.closeQuietly(repo);
 
 		verify(lockManager).unlock(lock);
 	}
@@ -52,7 +51,7 @@ public class LockedRepositoryTest extends AbstractDocumentrTest {
 		when(lockManager.lockProjectBranch("project", "branch")).thenReturn(lock); //$NON-NLS-1$ //$NON-NLS-2$
 
 		ILockedRepository repo = LockedRepository.lockProjectBranch("project", "branch", lockManager); //$NON-NLS-1$ //$NON-NLS-2$
-		Closeables.closeQuietly(repo);
+		Util.closeQuietly(repo);
 
 		verify(lockManager).unlock(lock);
 	}
