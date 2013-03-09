@@ -92,6 +92,9 @@ public final class DocumentrConstants {
 	/** Number of iterations the bcrypt password encoder must perform. */
 	public static final int PASSWORD_ENCODER_BCRYPT_ITERATIONS = 12;
 
+	/** Timeout (in seconds) an interactive job must complete within. */
+	public static final int INTERACTIVE_TIMEOUT = 5; // seconds
+
 	/** Default imports for Groovy scripts. */
 	@SuppressWarnings("nls")
 	public static final List<String> GROOVY_DEFAULT_IMPORTS = ImmutableList.of(
