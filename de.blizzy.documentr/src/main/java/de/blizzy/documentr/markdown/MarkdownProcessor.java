@@ -20,6 +20,7 @@ package de.blizzy.documentr.markdown;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.Parboiled;
@@ -54,17 +55,18 @@ public class MarkdownProcessor {
 	private static final String TEXT_RANGE_RE = "data-text-range=\"[0-9]+,[0-9]+\""; //$NON-NLS-1$
 	@SuppressWarnings("nls")
 	private static final List<Replacement> CLEANUP = Lists.newArrayList(
-			Replacement.dotAllNoCase("<p>(<p(?!re).*?</p>)</p>", "$1"),
-			Replacement.dotAllNoCase("<p>(<div.*?</div>)</p>", "$1"),
-			Replacement.dotAllNoCase("<p>(<ul.*?</ul>)</p>", "$1"),
-			Replacement.dotAllNoCase("<p>(<ol.*?</ol>)</p>", "$1"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><div(.*?</div>.*?)</p>", "<div$1$2"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><ul(.*?</ul>.*?)</p>", "<ul$1$2"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><ol(.*?</ol>.*?)</p>", "<ol$1$2"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><pre(.*?</pre>.*?)</p>", "<pre$1$2"),
 
-			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><div(.*?</div>)</p>", "<div $1$2"),
-			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ul(.*?</ul>)</p>", "<ul $1$2"),
-			Replacement.dotAllNoCase("<p (" + TEXT_RANGE_RE + ")><ol(.*?</ol>)</p>", "<ol $1$2"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><span(.*?)><div(.*?</div>.*?</span>)</p>", "<span$2><div$1$3"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><span(.*?)><ul(.*?</ul>.*?</span>)</p>", "<span$2><ul$1$3"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><span(.*?)><ol(.*?</ol>.*?</span>)</p>", "<span$2><ol$1$3"),
+			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><span(.*?)><pre(.*?</pre>.*?</span>)</p>", "<span$2><pre$1$3"),
 
-			Replacement.dotAllNoCase("<p></p>", StringUtils.EMPTY),
-			Replacement.dotAllNoCase("(<br/>)+</p>", "</p>"),
+			Replacement.dotAllNoCase("<p[^>]*>[ \\t\\r\\n]*</p>", StringUtils.EMPTY),
+			Replacement.dotAllNoCase("(?:<br/>)+</p>", "</p>"),
 
 			Replacement.dotAllNoCase(
 					"(<li class=\"span3\"><a class=\"thumbnail\" (?:[^>]+)>" +
@@ -84,25 +86,25 @@ public class MarkdownProcessor {
 	private SystemSettingsStore systemSettingsStore;
 
 	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
-			Authentication authentication, String contextPath) {
+			Authentication authentication, Locale locale, String contextPath) {
 
-		return markdownToHtml(markdown, projectName, branchName, path, authentication, true, contextPath);
+		return markdownToHtml(markdown, projectName, branchName, path, authentication, locale, true, contextPath);
 	}
 
 	public String markdownToHtml(String markdown, String projectName, String branchName, String path,
-			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
+			Authentication authentication, Locale locale, boolean nonCacheableMacros, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		removeHeader(rootNode);
-		return markdownToHtml(rootNode, projectName, branchName, path, authentication, nonCacheableMacros, contextPath);
+		return markdownToHtml(rootNode, projectName, branchName, path, authentication, locale, nonCacheableMacros, contextPath);
 	}
 
 	public String headerMarkdownToHtml(String markdown, String projectName, String branchName, String path,
-			Authentication authentication, String contextPath) {
+			Authentication authentication, Locale locale, String contextPath) {
 
 		RootNode rootNode = parse(markdown);
 		extractHeader(rootNode);
-		return markdownToHtml(rootNode, projectName, branchName, path, authentication, true, contextPath);
+		return markdownToHtml(rootNode, projectName, branchName, path, authentication, locale, true, contextPath);
 	}
 
 	private RootNode parse(String markdown) {
@@ -114,9 +116,9 @@ public class MarkdownProcessor {
 	}
 
 	private String markdownToHtml(RootNode rootNode, String projectName, String branchName, String path,
-			Authentication authentication, boolean nonCacheableMacros, String contextPath) {
+			Authentication authentication, Locale locale, boolean nonCacheableMacros, String contextPath) {
 
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication, locale,
 				pageStore, systemSettingsStore, contextPath);
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
@@ -134,7 +136,7 @@ public class MarkdownProcessor {
 			String body = StringUtils.substringBetween(html, startMarker, endMarker);
 			if (macroDescriptor.isCacheable()) {
 				MacroContext macroContext = MacroContext.create(invocation.getMacroName(), invocation.getParameters(),
-						body, context, beanFactory);
+						body, context, locale, beanFactory);
 				IMacroRunnable macroRunnable = macro.createRunnable();
 				String macroHtml = StringUtils.defaultString(macroRunnable.getHtml(macroContext));
 				html = StringUtils.replace(html, startMarker + body + endMarker, macroHtml);
@@ -216,9 +218,9 @@ public class MarkdownProcessor {
 	}
 
 	public String processNonCacheableMacros(String html, String projectName, String branchName, String path,
-			Authentication authentication, String contextPath) {
+			Authentication authentication, Locale locale, String contextPath) {
 
-		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication,
+		HtmlSerializerContext context = new HtmlSerializerContext(projectName, branchName, path, this, authentication, locale,
 				pageStore, systemSettingsStore, contextPath);
 		String startMarkerPrefix = "__" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
 		String endMarkerPrefix = "__/" + NON_CACHEABLE_MACRO_MARKER + "_"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -253,7 +255,7 @@ public class MarkdownProcessor {
 			String macroName = StringUtils.substringBefore(macroCall, " "); //$NON-NLS-1$
 			String params = StringUtils.substringAfter(macroCall, " "); //$NON-NLS-1$
 			IMacro macro = macroFactory.get(macroName);
-			MacroContext macroContext = MacroContext.create(macroName, params, body, context, beanFactory);
+			MacroContext macroContext = MacroContext.create(macroName, params, body, context, locale, beanFactory);
 			IMacroRunnable macroRunnable = macro.createRunnable();
 
 			html = StringUtils.replace(html,
