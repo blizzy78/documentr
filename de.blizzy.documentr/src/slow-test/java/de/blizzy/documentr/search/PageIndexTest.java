@@ -105,7 +105,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 	@Test
 	public void addAndFindPage() throws ParseException, IOException, TimeoutException {
-		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
+		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, null, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -126,7 +126,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 	@Test
 	public void findPagesAndSuggestion() throws ParseException, IOException, TimeoutException {
-		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
+		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, null, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -150,7 +150,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 	@Test
 	public void deletePages() throws IOException {
-		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
+		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, null, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true))
 			.thenReturn(Page.fromText("title", "markdown")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -169,9 +169,9 @@ public class PageIndexTest extends AbstractDocumentrTest {
 
 	@Test
 	public void getAllTags() throws IOException, TimeoutException {
-		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, false, null)) //$NON-NLS-1$
+		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, authentication, null, false, null)) //$NON-NLS-1$
 			.thenReturn("html"); //$NON-NLS-1$
-		when(markdownProcessor.markdownToHtml("markdown2", PROJECT, "branch2", PAGE_PATH, authentication, false, null)) //$NON-NLS-1$ //$NON-NLS-2$
+		when(markdownProcessor.markdownToHtml("markdown2", PROJECT, "branch2", PAGE_PATH, authentication, null, false, null)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn("html2"); //$NON-NLS-1$
 
 		Page page = Page.fromText("title", "markdown"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -367,14 +367,14 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	@Test
 	public void markdownToHtml() {
 		when(markdownProcessor.markdownToHtml("markdown", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
-				authenticatedAuthentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
+				authenticatedAuthentication, Locale.US, CONTEXT)).thenReturn("html"); //$NON-NLS-1$
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
-				authenticatedAuthentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
+				authenticatedAuthentication, Locale.US, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
 
 		when(request.getContextPath()).thenReturn(CONTEXT);
 
 		Map<String, String> result = pageController.markdownToHtml(
-				PROJECT, BRANCH, "markdown", PAGE_PATH, authenticatedAuthentication, request); //$NON-NLS-1$
+				PROJECT, BRANCH, "markdown", PAGE_PATH, authenticatedAuthentication, Locale.US, request); //$NON-NLS-1$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -438,11 +438,11 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		Page page = Page.fromText("title", "x\ny\nz\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, "commit", true)).thenReturn(page); //$NON-NLS-1$
 
-		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication, CONTEXT))
+		when(pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authenticatedAuthentication, Locale.US, CONTEXT))
 			.thenReturn("html"); //$NON-NLS-1$
 
 		when(markdownProcessor.processNonCacheableMacros("html", PROJECT, BRANCH, PAGE_PATH, //$NON-NLS-1$
-				authenticatedAuthentication, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
+				authenticatedAuthentication, Locale.US, CONTEXT)).thenReturn("htmlWithMacros"); //$NON-NLS-1$
 
 		when(request.getContextPath()).thenReturn(CONTEXT);
 
@@ -450,7 +450,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(pageStore.getPageMetadata(PROJECT, BRANCH, PAGE_PATH)).thenReturn(pageMetadata);
 
 		Map<String, Object> result = pageController.savePageRange(PROJECT, BRANCH, PAGE_PATH_URL,
-				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, request); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"a\nb\nc\n", "2,4", "commit", authenticatedAuthentication, Locale.US, request); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals("htmlWithMacros", result.get("html")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("newCommit", result.get("commit")); //$NON-NLS-1$ //$NON-NLS-2$
 

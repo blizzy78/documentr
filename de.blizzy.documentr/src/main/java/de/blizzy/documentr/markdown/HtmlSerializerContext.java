@@ -19,6 +19,7 @@ package de.blizzy.documentr.markdown;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -50,13 +51,14 @@ public class HtmlSerializerContext {
 	private List<MacroInvocation> macroInvocations = Lists.newArrayList();
 	@Getter
 	private Authentication authentication;
+	private Locale locale;
 	private SystemSettingsStore systemSettingsStore;
 	@Getter
 	private IPageStore pageStore;
 	private String contextPath;
 
 	public HtmlSerializerContext(String projectName, String branchName, String pagePath,
-			MarkdownProcessor markdownProcessor, Authentication authentication, IPageStore pageStore,
+			MarkdownProcessor markdownProcessor, Authentication authentication, Locale locale, IPageStore pageStore,
 			SystemSettingsStore systemSettingsStore, String contextPath) {
 
 		Assert.hasLength(projectName);
@@ -64,6 +66,7 @@ public class HtmlSerializerContext {
 		// pagePath can be null for new pages
 		Assert.notNull(markdownProcessor);
 		Assert.notNull(authentication);
+		// locale can be null for search index
 		Assert.notNull(pageStore);
 		Assert.notNull(systemSettingsStore);
 
@@ -72,6 +75,7 @@ public class HtmlSerializerContext {
 		this.pagePath = pagePath;
 		this.markdownProcessor = markdownProcessor;
 		this.authentication = authentication;
+		this.locale = locale;
 		this.pageStore = pageStore;
 		this.systemSettingsStore = systemSettingsStore;
 		this.contextPath = contextPath;
@@ -116,7 +120,7 @@ public class HtmlSerializerContext {
 	}
 
 	public String markdownToHtml(String markdown) {
-		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, pagePath, authentication, contextPath);
+		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, pagePath, authentication, locale, contextPath);
 	}
 
 	void addHeader(String text, int level) {

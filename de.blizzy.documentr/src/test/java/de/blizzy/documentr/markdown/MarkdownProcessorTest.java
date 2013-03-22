@@ -22,6 +22,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Locale;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -90,7 +92,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 
 		String markdown = "{{:header:}}*header*{{:/header:}}**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, Locale.US, CONTEXT); //$NON-NLS-1$
 
 		String expectedHtml = "<p><strong>foo</strong></p>" + cleanedMacroHtml + "<p>bar</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(expectedHtml, removeTextRange(result));
@@ -106,7 +108,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 
 		String markdown = "**foo**\n\n{{" + MACRO + " " + PARAMS + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String result = markdownProcessor.markdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, Locale.US, CONTEXT); //$NON-NLS-1$
 
 		String expectedHtml = "<p><strong>foo</strong></p><p>" + //$NON-NLS-1$
 				"__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + PARAMS + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -138,7 +140,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 		String html = "<p>__" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__" + MACRO + " " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				PARAMS + "__/" + MarkdownProcessor.NON_CACHEABLE_MACRO_MARKER + "_1__</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.processNonCacheableMacros(html, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, Locale.US, CONTEXT); //$NON-NLS-1$
 		String expectedHtml = cleanedMacroHtml;
 		assertEquals(expectedHtml, result);
 	}
@@ -147,7 +149,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 	public void headerMarkdownToHtml() {
 		String markdown = "{{:header:}}*header*{{:/header:}}**foo**"; //$NON-NLS-1$
 		String result = markdownProcessor.headerMarkdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
-				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, CONTEXT); //$NON-NLS-1$
+				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, Locale.US, CONTEXT); //$NON-NLS-1$
 
 		String expectedHtml = "<em>header</em>"; //$NON-NLS-1$
 		assertEquals(expectedHtml, removeTextRange(result));

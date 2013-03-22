@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,19 +58,19 @@ public class PageRendererTest extends AbstractDocumentrTest {
 
 	@Test
 	public void getHtml() throws IOException {
-		when(markdownProcessor.markdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
+		when(markdownProcessor.markdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, Locale.US, CONTEXT))
 			.thenReturn(HTML);
 
-		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
+		String result = pageRenderer.getHtml(PROJECT, BRANCH, PAGE_PATH, authentication, Locale.US, CONTEXT);
 		assertEquals(HTML, result);
 	}
 
 	@Test
 	public void getHeaderHtml() throws IOException {
-		when(markdownProcessor.headerMarkdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT))
+		when(markdownProcessor.headerMarkdownToHtml(MARKDOWN, PROJECT, BRANCH, PAGE_PATH, authentication, Locale.US, CONTEXT))
 			.thenReturn(HTML);
 
-		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication, CONTEXT);
+		String result = pageRenderer.getHeaderHtml(PROJECT, BRANCH, PAGE_PATH, authentication, Locale.US, CONTEXT);
 		assertEquals(HTML, result);
 	}
 }

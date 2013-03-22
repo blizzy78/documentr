@@ -20,6 +20,8 @@ package de.blizzy.documentr.markdown;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -48,13 +50,13 @@ public class MacroContextTest extends AbstractDocumentrTest {
 
 	@Before
 	public void setUp() {
-		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext); //$NON-NLS-1$ //$NON-NLS-2$
+		MacroContext ctx = new MacroContext(MACRO, "params", "body", htmlSerializerContext, Locale.US); //$NON-NLS-1$ //$NON-NLS-2$
 		Whitebox.setInternalState(ctx, pageStore, permissionEvaluator, systemSettingsStore);
 
-		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext)) //$NON-NLS-1$ //$NON-NLS-2$
+		when(beanFactory.getBean(MacroContext.ID, MACRO, "params", "body", htmlSerializerContext, Locale.US)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(ctx);
 
-		context = MacroContext.create(MACRO, "params", "body", htmlSerializerContext, beanFactory); //$NON-NLS-1$ //$NON-NLS-2$
+		context = MacroContext.create(MACRO, "params", "body", htmlSerializerContext, Locale.US, beanFactory); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Test

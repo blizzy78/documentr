@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -61,7 +62,7 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 	@Before
 	public void setUp() {
 		htmlSerializerContext = new HtmlSerializerContext(PROJECT, BRANCH, PAGE, markdownProcessor, authentication,
-				pageStore, systemSettingsStore, CONTEXT);
+				Locale.US, pageStore, systemSettingsStore, CONTEXT);
 
 		when(request.getServerName()).thenReturn("www.example.com"); //$NON-NLS-1$
 		when(request.getScheme()).thenReturn("http"); //$NON-NLS-1$
@@ -103,7 +104,7 @@ public class HtmlSerializerContextTest extends AbstractDocumentrTest {
 
 	@Test
 	public void markdownToHtml() {
-		when(markdownProcessor.markdownToHtml("md", PROJECT, BRANCH, PAGE, authentication, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
+		when(markdownProcessor.markdownToHtml("md", PROJECT, BRANCH, PAGE, authentication, Locale.US, CONTEXT)).thenReturn("html"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals("html", htmlSerializerContext.markdownToHtml("md")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

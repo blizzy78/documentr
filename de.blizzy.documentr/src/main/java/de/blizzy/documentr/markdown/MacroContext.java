@@ -17,11 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown;
 
+import java.util.Locale;
+
 import lombok.Getter;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -43,6 +46,9 @@ class MacroContext implements IMacroContext {
 	@Autowired
 	@Getter
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	@Autowired
+	@Getter
+	private MessageSource messageSource;
 	@Getter
 	private String macroName;
 	@Getter
@@ -53,14 +59,17 @@ class MacroContext implements IMacroContext {
 	private HtmlSerializerContext htmlSerializerContext;
 	@Autowired
 	private SystemSettingsStore systemSettingsStore;
+	@Getter
+	private Locale locale;
 
-	MacroContext(String macroName, String parameters, String body, HtmlSerializerContext htmlSerializerContext) {
+	MacroContext(String macroName, String parameters, String body, HtmlSerializerContext htmlSerializerContext, Locale locale) {
 		Assert.hasLength(macroName);
 
 		this.macroName = macroName;
 		this.parameters = parameters;
 		this.body = body;
 		this.htmlSerializerContext = htmlSerializerContext;
+		this.locale = locale;
 	}
 
 	@Override
@@ -74,8 +83,8 @@ class MacroContext implements IMacroContext {
 	}
 
 	static MacroContext create(String macroName, String parameters, String body,
-			HtmlSerializerContext htmlSerializerContext, BeanFactory beanFactory) {
+			HtmlSerializerContext htmlSerializerContext, Locale locale, BeanFactory beanFactory) {
 
-		return (MacroContext) beanFactory.getBean(ID, macroName, parameters, body, htmlSerializerContext);
+		return (MacroContext) beanFactory.getBean(ID, macroName, parameters, body, htmlSerializerContext, locale);
 	}
 }

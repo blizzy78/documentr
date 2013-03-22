@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,7 @@ class PageRenderer implements IPageRenderer {
 	private MarkdownProcessor markdownProcessor;
 
 	@Override
-	public String getHtml(String projectName, String branchName, String path, Authentication authentication,
+	public String getHtml(String projectName, String branchName, String path, Authentication authentication, Locale locale,
 			String contextPath) throws IOException {
 
 		if (log.isInfoEnabled()) {
@@ -49,11 +50,11 @@ class PageRenderer implements IPageRenderer {
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.markdownToHtml(markdown, projectName, branchName, path, authentication, locale, contextPath);
 	}
 
 	@Override
-	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication,
+	public String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication, Locale locale,
 			String contextPath) throws IOException {
 
 		if (log.isInfoEnabled()) {
@@ -63,6 +64,6 @@ class PageRenderer implements IPageRenderer {
 
 		Page page = pageStore.getPage(projectName, branchName, path, true);
 		String markdown = ((PageTextData) page.getData()).getText();
-		return markdownProcessor.headerMarkdownToHtml(markdown, projectName, branchName, path, authentication, contextPath);
+		return markdownProcessor.headerMarkdownToHtml(markdown, projectName, branchName, path, authentication, locale, contextPath);
 	}
 }

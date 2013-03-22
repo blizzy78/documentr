@@ -17,6 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.markdown.macro;
 
+import java.util.Locale;
+
+import org.springframework.context.MessageSource;
+
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.markdown.HtmlSerializerContext;
 import de.blizzy.documentr.page.IPageStore;
@@ -25,6 +29,8 @@ public interface IMacroContext {
 	String getMacroName();
 	String getParameters();
 	String getBody();
+	Locale getLocale();
+	MessageSource getMessageSource();
 	HtmlSerializerContext getHtmlSerializerContext();
 	IPageStore getPageStore();
 	DocumentrPermissionEvaluator getPermissionEvaluator();

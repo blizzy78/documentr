@@ -18,16 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 
 public interface IPageRenderer {
 	@Cacheable(value="page_html", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHtml(String projectName, String branchName, String path, Authentication authentication,
+	String getHtml(String projectName, String branchName, String path, Authentication authentication, Locale locale,
 			String contextPath) throws IOException;
 
 	@Cacheable(value="page_header_html", key="#projectName + '/' + #branchName + '/' + #path")
-	String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication,
+	String getHeaderHtml(String projectName, String branchName, String path, Authentication authentication, Locale locale,
 			String contextPath) throws IOException;
 }
