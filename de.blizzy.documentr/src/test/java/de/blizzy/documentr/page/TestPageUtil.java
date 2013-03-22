@@ -39,4 +39,8 @@ public final class TestPageUtil {
 	public static void setParentPagePath(Page page, String parentPagePath) {
 		page.setParentPagePath(parentPagePath);
 	}
+
+	public static void setPath(Page page, String path) {
+		page.setPath(path);
+	}
 }

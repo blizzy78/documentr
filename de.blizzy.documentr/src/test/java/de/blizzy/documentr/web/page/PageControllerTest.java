@@ -247,7 +247,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	public void savePage() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
@@ -263,7 +263,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	public void savePageWithViewRestrictionRole() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", "viewRole", null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
@@ -279,14 +279,14 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	public void savePageMustNotChangeExistingPath() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 
 		Page page = Page.fromText("title", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 		pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title2", "text2", null, null, //$NON-NLS-1$ //$NON-NLS-2$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
@@ -303,7 +303,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		String title = "title"; //$NON-NLS-1$
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, StringUtils.EMPTY, PARENT_PAGE, title, "text", null, null, //$NON-NLS-1$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
@@ -324,7 +324,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 		when(pageStore.getPage(PROJECT, BRANCH, PAGE_PATH, true)).thenReturn(page);
 
 		PageForm pageForm = new PageForm(PROJECT, BRANCH, PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 		pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);
 
@@ -336,7 +336,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	public void savePageButNonexistentBranch() throws IOException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.singletonList(BRANCH));
 		PageForm pageForm = new PageForm(PROJECT, "nonexistent", PAGE_PATH, PARENT_PAGE, "title", "text", null, null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			ArrayUtils.EMPTY_STRING_ARRAY);
+			ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		BindingResult bindingResult = new BeanPropertyBindingResult(pageForm, "pageForm"); //$NON-NLS-1$
 
 		String view = pageController.savePage(pageForm, bindingResult, model, authenticatedAuthentication);

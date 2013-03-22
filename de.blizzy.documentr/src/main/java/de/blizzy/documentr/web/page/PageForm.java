@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.web.page;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
@@ -25,6 +26,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.validation.annotation.BranchNameNotBlacklisted;
 import de.blizzy.documentr.validation.annotation.ProjectExists;
 import de.blizzy.documentr.validation.annotation.ProjectNameNotBlacklisted;
@@ -73,9 +75,13 @@ public class PageForm {
 	@Getter
 	@Setter
 	private Integer parentPageSplitRangeEnd;
+	@Getter
+	@Setter
+	@Min(DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED)
+	private int orderIndex;
 
 	PageForm(String projectName, String branchName, String path, String parentPagePath, String title, String text,
-			String viewRestrictionRole, String commit, String[] tags) {
+			String viewRestrictionRole, String commit, String[] tags, int orderIndex) {
 
 		this.projectName = projectName;
 		this.branchName = branchName;
@@ -86,6 +92,7 @@ public class PageForm {
 		this.viewRestrictionRole = viewRestrictionRole;
 		this.commit = commit;
 		this.tags = ArrayUtils.clone(tags);
+		this.orderIndex = orderIndex;
 	}
 
 	public String[] getTags() {

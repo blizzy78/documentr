@@ -95,6 +95,9 @@ public final class DocumentrConstants {
 	/** Timeout (in seconds) an interactive job must complete within. */
 	public static final int INTERACTIVE_TIMEOUT = 5; // seconds
 
+	/** Page order index to use for unordered pages. */
+	public static final int PAGE_ORDER_INDEX_UNORDERED = -1;
+
 	/** Default imports for Groovy scripts. */
 	@SuppressWarnings("nls")
 	public static final List<String> GROOVY_DEFAULT_IMPORTS = ImmutableList.of(

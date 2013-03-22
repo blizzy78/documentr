@@ -19,6 +19,7 @@ package de.blizzy.documentr.page;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,6 +60,8 @@ public interface IPageStore {
 	List<String> getBranchesPageIsSharedWith(String projectName, String branchName, String path) throws IOException;
 
 	List<String> listChildPagePaths(String projectName, String branchName, String path) throws IOException;
+
+	List<Page> listChildPagesOrdered(String projectName, String branchName, String path, Locale locale) throws IOException;
 
 	@Caching(evict={
 			@CacheEvict(value="page_html", key="#projectName + '/' + #branchName + '/' + #path"),
@@ -108,4 +111,9 @@ public interface IPageStore {
 			throws IOException;
 
 	List<String> listAllPagePaths(String projectName, String branchName) throws IOException;
+
+	void saveChildrenOrder(String projectName, String branchName, String path, List<String> childPagePathsOrdered,
+			User user) throws IOException;
+
+	void resetChildrenOrder(String projectName, String branchName, String path, User user) throws IOException;
 }

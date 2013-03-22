@@ -23,8 +23,8 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -81,6 +81,7 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	@Mock
 	private IMacroContext context;
+	private List<Page> pages = Lists.newArrayList();
 	private NeighborsMacro runnable;
 
 	@Before
@@ -98,36 +99,9 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 
 		when(context.getPageStore()).thenReturn(pageStore);
 		when(context.getPermissionEvaluator()).thenReturn(permissionEvaluator);
+		when(context.getLocale()).thenReturn(Locale.US);
 
 		runnable = new NeighborsMacro();
-	}
-
-	private void setupPages() throws IOException {
-		setupPages(PAGES);
-
-		for (String page : PAGES) {
-			List<String> childPages = Lists.newArrayList();
-			String childPagePrefix = page + "/"; //$NON-NLS-1$
-			for (String childPage : PAGES) {
-				if (childPage.startsWith(childPagePrefix)) {
-					String rest = StringUtils.substringAfter(childPage, childPagePrefix);
-					if (!rest.contains("/")) { //$NON-NLS-1$
-						childPages.add(childPage);
-					}
-				}
-			}
-			Collections.sort(childPages);
-			when(pageStore.listChildPagePaths(PROJECT, BRANCH, page)).thenReturn(childPages);
-		}
-	}
-
-	private void setupPagePermissions() {
-		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
-					eq(PROJECT), eq(BRANCH), notEq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
-				.thenReturn(true);
-		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
-					eq(PROJECT), eq(BRANCH), eq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
-				.thenReturn(false);
 	}
 
 	@Test
@@ -183,7 +157,7 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 		// this is the HTML for home/foo/bar
 		@SuppressWarnings("nls")
 		String html =
-				"<ul class=\"well well-small nav nav-list neighbors pull-right\">" +
+				"<span class=\"well well-small neighbors pull-right\"><ul class=\"nav nav-list\">" +
 					"<li>" +
 						"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "\">" + DocumentrConstants.HOME_PAGE_NAME + "</a>" +
 						"<ul class=\"nav nav-list\">" +
@@ -202,8 +176,35 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 							"</li>" +
 						"</ul>" +
 					"</li>" +
-				"</ul>";
+				"</ul></span>";
 		assertEquals(html, runnable.getHtml(context));
+	}
+
+	private void setupPages() throws IOException {
+		setupPages(PAGES);
+
+		for (Page page : pages) {
+			List<Page> childPages = Lists.newArrayList();
+			String childPagePrefix = page.getPath() + "/"; //$NON-NLS-1$
+			for (Page childPage : pages) {
+				if (childPage.getPath().startsWith(childPagePrefix)) {
+					String rest = StringUtils.substringAfter(childPage.getPath(), childPagePrefix);
+					if (!rest.contains("/")) { //$NON-NLS-1$
+						childPages.add(childPage);
+					}
+				}
+			}
+			when(pageStore.listChildPagesOrdered(PROJECT, BRANCH, page.getPath(), Locale.US)).thenReturn(childPages);
+		}
+	}
+
+	private void setupPagePermissions() {
+		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
+					eq(PROJECT), eq(BRANCH), notEq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
+				.thenReturn(true);
+		when(permissionEvaluator.hasPagePermission(Matchers.<Authentication>any(),
+					eq(PROJECT), eq(BRANCH), eq(INACCESSIBLE_PAGE_PATH), same(Permission.VIEW)))
+				.thenReturn(false);
 	}
 
 	private void setupPages(String... pagePaths) throws IOException {
@@ -218,6 +219,8 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 				null;
 		Page page = Page.fromText(pagePath, "text"); //$NON-NLS-1$
 		TestPageUtil.setParentPagePath(page, parentPagePath);
+		TestPageUtil.setPath(page, pagePath);
 		when(pageStore.getPage(PROJECT, BRANCH, pagePath, false)).thenReturn(page);
+		pages.add(page);
 	}
 }

@@ -30,7 +30,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
 
+import de.blizzy.documentr.DocumentrConstants;
+
 public class Page {
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
+	private String path;
 	@Getter
 	@Setter(AccessLevel.PACKAGE)
 	private String parentPagePath;
@@ -47,6 +52,9 @@ public class Page {
 	@Getter
 	@Setter
 	private PageData data;
+	@Getter
+	@Setter
+	private int orderIndex = DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED;
 
 	Page(String title, String contentType, PageData data) {
 		this.title = title;

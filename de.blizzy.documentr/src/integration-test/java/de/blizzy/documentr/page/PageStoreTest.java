@@ -36,6 +36,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gitective.core.CommitUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -505,6 +506,18 @@ public class PageStoreTest extends AbstractDocumentrTest {
 		assertEquals(3, versions.size());
 
 		assertClean(repo.r());
+	}
+
+	@Test
+	@Ignore
+	public void saveChildrenOrder() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void resetChildrenOrder() {
+		// TODO: implement test
 	}
 
 	private void assertPageVersion(RevCommit commit, PageVersion version) {

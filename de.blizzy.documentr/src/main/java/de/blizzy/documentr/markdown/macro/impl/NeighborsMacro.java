@@ -19,15 +19,21 @@ package de.blizzy.documentr.markdown.macro.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -45,13 +51,23 @@ public class NeighborsMacro implements IMacroRunnable {
 	private HtmlSerializerContext htmlSerializerContext;
 	private IPageStore pageStore;
 	private DocumentrPermissionEvaluator permissionEvaluator;
+	private Locale locale;
+	private MessageSource messageSource;
 	private String projectName;
 	private String branchName;
 	private String path;
 	private int maxChildren;
+	private boolean reorderAllowed;
+	private LoadingCache<String, Page> pageCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Page>() {
+		@Override
+		public Page load(String path) throws IOException {
+			return pageStore.getPage(projectName, branchName, path, false);
+		}
+	});
 
 	@Override
 	public String getHtml(IMacroContext macroContext) {
+
 		htmlSerializerContext = macroContext.getHtmlSerializerContext();
 		path = htmlSerializerContext.getPagePath();
 		if (path != null) {
@@ -70,20 +86,27 @@ public class NeighborsMacro implements IMacroRunnable {
 
 			pageStore = macroContext.getPageStore();
 			permissionEvaluator = macroContext.getPermissionEvaluator();
+			locale = macroContext.getLocale();
+			messageSource = macroContext.getMessageSource();
 			projectName = htmlSerializerContext.getProjectName();
 			branchName = htmlSerializerContext.getBranchName();
 
+			Authentication authentication = htmlSerializerContext.getAuthentication();
+			reorderAllowed = (locale != null) &&
+					permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, Permission.EDIT_PAGE);
+
 			if (log.isInfoEnabled()) {
 				log.info("rendering neighbors for page: {}/{}/{}, user: {}", //$NON-NLS-1$
-						projectName, branchName, Util.toUrlPagePath(path), htmlSerializerContext.getAuthentication().getName());
+						projectName, branchName, Util.toUrlPagePath(path), authentication.getName());
 			}
 
 			Stopwatch stopwatch = new Stopwatch().start();
 			try {
 				StringBuilder buf = new StringBuilder();
-				buf.append("<ul class=\"well well-small nav nav-list neighbors pull-right\">") //$NON-NLS-1$
-					.append(printParent(printLinkListItem(path, 1, maxChildren), path))
-					.append("</ul>"); //$NON-NLS-1$
+				Page page = getPage(path);
+				buf.append("<span class=\"well well-small neighbors pull-right\"><ul class=\"nav nav-list\">") //$NON-NLS-1$
+					.append(printParent(printLinkListItem(page, 1, maxChildren), path))
+					.append("</ul></span>"); //$NON-NLS-1$
 				return buf.toString();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -97,11 +120,11 @@ public class NeighborsMacro implements IMacroRunnable {
 
 	private CharSequence printParent(CharSequence inner, String path) throws IOException {
 		StringBuilder buf = new StringBuilder();
-		Page page = pageStore.getPage(projectName, branchName, path, false);
+		Page page = getPage(path);
 		if (page.getParentPagePath() != null) {
 			if (hasViewPermission(page.getParentPagePath())) {
 				StringBuilder parentBuf = new StringBuilder();
-				Page parentPage = pageStore.getPage(projectName, branchName, page.getParentPagePath(), false);
+				Page parentPage = getPage(page.getParentPagePath());
 				String uri = htmlSerializerContext.getPageUri(page.getParentPagePath());
 				parentBuf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(parentPage.getTitle())
@@ -109,12 +132,12 @@ public class NeighborsMacro implements IMacroRunnable {
 					.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
 
 				if (path.equals(this.path)) {
-					List<String> siblingPaths = pageStore.listChildPagePaths(
-							projectName, branchName, page.getParentPagePath());
-					for (String siblingPath : siblingPaths) {
-						parentBuf.append(siblingPath.equals(path) ?
+					List<Page> siblingPages = pageStore.listChildPagesOrdered(
+							projectName, branchName, page.getParentPagePath(), locale);
+					for (Page siblingPage : siblingPages) {
+						parentBuf.append(siblingPage.getPath().equals(path) ?
 								inner :
-								printLinkListItem(siblingPath, 1, 0));
+								printLinkListItem(siblingPage, 1, 0));
 					}
 				} else {
 					parentBuf.append(inner);
@@ -130,21 +153,46 @@ public class NeighborsMacro implements IMacroRunnable {
 		return buf;
 	}
 
-	private CharSequence printLinkListItem(String path, int childLevel, int maxChildren) throws IOException {
+	private Page getPage(String path) throws IOException {
+		try {
+			return pageCache.get(path);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof IOException) {
+				throw (IOException) cause;
+			} else {
+				throw new RuntimeException(cause);
+			}
+		}
+	}
+
+	private CharSequence printLinkListItem(Page page, int childLevel, int maxChildren) throws IOException {
 		StringBuilder buf = new StringBuilder();
-		Page page = pageStore.getPage(projectName, branchName, path, false);
-		String title = page.getTitle();
-		String uri = htmlSerializerContext.getPageUri(path);
-		boolean active = path.equals(this.path);
-		if (active || hasViewPermission(path)) {
+		String pagePath = page.getPath();
+		if (hasViewPermission(pagePath)) {
 			buf.append("<li"); //$NON-NLS-1$
+			if (reorderAllowed) {
+				buf.append(" data-path=\"").append(pagePath).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
+				if (page.getOrderIndex() >= 0) {
+					buf.append(" data-manual-order=\"true\""); //$NON-NLS-1$
+				}
+			}
+			boolean active = pagePath.equals(path);
 			if (active) {
 				buf.append(" class=\"active\""); //$NON-NLS-1$
 			}
+			String title = page.getTitle();
+			String uri = htmlSerializerContext.getPageUri(pagePath);
 			buf.append("><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(title)
-				.append("</a>") //$NON-NLS-1$
-				.append(printChildren(path, childLevel, maxChildren))
+				.append(title);
+			if (active && reorderAllowed) {
+				String buttonTitle = messageSource.getMessage("button.arrangePages", null, locale); //$NON-NLS-1$
+				buf.append("<span class=\"buttons pull-right\"><i class=\"icon-move icon-white pull-right\" title=\"") //$NON-NLS-1$
+					.append(buttonTitle)
+					.append("\" onclick=\"startNeighborsArrange(); return false;\"></i></span>"); //$NON-NLS-1$
+			}
+			buf.append("</a>"); //$NON-NLS-1$
+			buf.append(printChildren(pagePath, childLevel, maxChildren))
 				.append("</li>"); //$NON-NLS-1$
 		}
 		return buf;
@@ -153,11 +201,11 @@ public class NeighborsMacro implements IMacroRunnable {
 	private CharSequence printChildren(String path, int childLevel, int maxChildren) throws IOException {
 		if (childLevel <= maxChildren) {
 			StringBuilder buf = new StringBuilder();
-			List<String> childPaths = pageStore.listChildPagePaths(projectName, branchName, path);
-			if (!childPaths.isEmpty()) {
+			List<Page> childPages = pageStore.listChildPagesOrdered(projectName, branchName, path, locale);
+			if (!childPages.isEmpty()) {
 				buf.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
-				for (String childPath : childPaths) {
-					buf.append(printLinkListItem(childPath, childLevel + 1, maxChildren));
+				for (Page childPage : childPages) {
+					buf.append(printLinkListItem(childPage, childLevel + 1, maxChildren));
 				}
 				buf.append("</ul>"); //$NON-NLS-1$
 			}

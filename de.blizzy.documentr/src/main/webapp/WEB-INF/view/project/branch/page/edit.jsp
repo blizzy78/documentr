@@ -625,6 +625,7 @@ $(function() {
 		<form:hidden path="commit"/>
 		<form:hidden path="parentPageSplitRangeStart"/>
 		<form:hidden path="parentPageSplitRangeEnd"/>
+		<form:hidden path="orderIndex"/>
 		<input type="hidden" name="text"/>
 		
 		<c:set var="errorText"><form:errors path="title"/></c:set>

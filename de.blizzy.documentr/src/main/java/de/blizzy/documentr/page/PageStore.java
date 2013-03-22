@@ -20,11 +20,14 @@ package de.blizzy.documentr.page;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +61,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -84,6 +88,7 @@ class PageStore implements IPageStore {
 	private static final String VERSION_PREVIOUS = "previous"; //$NON-NLS-1$
 	private static final String TAGS = "tags"; //$NON-NLS-1$
 	private static final String VIEW_RESTRICTION_ROLE = "viewRestrictionRole"; //$NON-NLS-1$
+	private static final String ORDER_INDEX = "orderIndex"; //$NON-NLS-1$
 
 	@Autowired
 	private GlobalRepositoryManager globalRepositoryManager;
@@ -174,6 +179,9 @@ class PageStore implements IPageStore {
 			metaMap.put(TAGS, page.getTags());
 		}
 		metaMap.put(VIEW_RESTRICTION_ROLE, page.getViewRestrictionRole());
+		if (page.getOrderIndex() >= 0) {
+			metaMap.put(ORDER_INDEX, page.getOrderIndex());
+		}
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 		String json = gson.toJson(metaMap);
 		File workingDir = RepositoryUtil.getWorkingDir(repo.r());
@@ -233,10 +241,13 @@ class PageStore implements IPageStore {
 		}
 
 		if (push && (conflict == null)) {
+			Stopwatch stopwatch = new Stopwatch().start();
 			git.push().call();
+			log.trace("push took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 		}
 
 		page.setParentPagePath(getParentPagePath(path, repo.r()));
+		page.setPath(path);
 
 		if (conflict == null) {
 			PageUtil.updateProjectEditTime(projectName);
@@ -277,11 +288,15 @@ class PageStore implements IPageStore {
 			}
 			Set<String> tags = Sets.newHashSet(tagsList);
 			String viewRestrictionRole = (String) pageMap.get(VIEW_RESTRICTION_ROLE);
+			Double orderIndexDouble = (Double) pageMap.get(ORDER_INDEX);
+			int orderIndex = (orderIndexDouble != null) ? orderIndexDouble.intValue() : DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED;
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
 			Page page = new Page(title, contentType, pageData);
 			page.setParentPagePath(parentPagePath);
+			page.setPath(path);
 			page.setTags(tags);
 			page.setViewRestrictionRole(viewRestrictionRole);
+			page.setOrderIndex(orderIndex);
 			return page;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -373,6 +388,7 @@ class PageStore implements IPageStore {
 			PageData pageData = (PageData) pageMap.get(PAGE_DATA);
 			Page page = new Page(null, contentType, pageData);
 			page.setParentPagePath(parentPagePath);
+			page.setPath(pagePath);
 			return page;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -573,6 +589,69 @@ class PageStore implements IPageStore {
 			};
 			paths = Lists.transform(paths, function);
 			return paths;
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	@Override
+	public List<Page> listChildPagesOrdered(final String projectName, final String branchName, final String path,
+			final Locale locale) throws IOException {
+
+		Assert.hasLength(projectName);
+		Assert.hasLength(branchName);
+		Assert.hasLength(path);
+
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File pagesDir = Util.toFile(new File(workingDir, DocumentrConstants.PAGES_DIR_NAME), path);
+			List<String> paths = Lists.newArrayList(listPagePaths(pagesDir, false));
+			Function<String, String> pathFunction = new Function<String, String>() {
+				@Override
+				public String apply(String childName) {
+					return path + "/" + childName; //$NON-NLS-1$
+				}
+			};
+			paths = Lists.transform(paths, pathFunction);
+			Function<String, Page> pageFunction = new Function<String, Page>() {
+				@Override
+				public Page apply(String childPath) {
+					try {
+						return getPage(projectName, branchName, childPath, false);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			List<Page> pages = Lists.newArrayList(Lists.transform(paths, pageFunction));
+			Comparator<Page> comparator = new Comparator<Page>() {
+				@Override
+				public int compare(Page page1, Page page2) {
+					int idx1 = page1.getOrderIndex();
+					int idx2 = page2.getOrderIndex();
+					if ((idx1 >= 0) && (idx2 >= 0)) {
+						return Integer.valueOf(idx1).compareTo(idx2);
+					} else if ((idx1 < 0) && (idx2 < 0)) {
+						String title1 = page1.getTitle();
+						String title2 = page2.getTitle();
+						if (locale != null) {
+							return Collator.getInstance(locale).compare(title1, title2);
+						} else {
+							return title1.compareToIgnoreCase(title2);
+						}
+					} else if (idx1 >= 0) {
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+			};
+			Collections.sort(pages, comparator);
+			return pages;
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
@@ -1043,5 +1122,57 @@ class PageStore implements IPageStore {
 	@Override
 	public String getViewRestrictionRole(String projectName, String branchName, String path) throws IOException {
 		return getPage(projectName, branchName, path, false).getViewRestrictionRole();
+	}
+
+	@Override
+	public void saveChildrenOrder(String projectName, String branchName, String path, List<String> childPagePathsOrdered,
+			User user) throws IOException {
+
+		List<Page> childPages = Lists.newArrayList();
+		for (String childPath : childPagePathsOrdered) {
+			Page page = getPage(projectName, branchName, childPath, false);
+			childPages.add(page);
+		}
+
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
+			int idx = 0;
+			for (Page childPage : childPages) {
+				childPage.setOrderIndex(idx++);
+				savePageInternal(projectName, branchName, childPage.getPath(), DocumentrConstants.PAGE_SUFFIX, childPage,
+						null, DocumentrConstants.PAGES_DIR_NAME, user, repo, false);
+			}
+			Git.wrap(repo.r()).push().call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	@Override
+	public void resetChildrenOrder(String projectName, String branchName, String path, User user) throws IOException {
+		List<String> childPaths = listChildPagePaths(projectName, branchName, path);
+		Set<Page> childPages = Sets.newHashSet();
+		for (String childPath : childPaths) {
+			Page page = getPage(projectName, branchName, childPath, false);
+			childPages.add(page);
+		}
+
+		ILockedRepository repo = null;
+		try {
+			repo = globalRepositoryManager.getProjectBranchRepository(projectName, branchName);
+			for (Page childPage : childPages) {
+				childPage.setOrderIndex(DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
+				savePageInternal(projectName, branchName, childPage.getPath(), DocumentrConstants.PAGE_SUFFIX, childPage,
+						null, DocumentrConstants.PAGES_DIR_NAME, user, repo, false);
+			}
+			Git.wrap(repo.r()).push().call();
+		} catch (GitAPIException e) {
+			throw new IOException(e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
 	}
 }

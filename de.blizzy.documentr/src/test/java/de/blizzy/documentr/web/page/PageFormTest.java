@@ -24,6 +24,8 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.blizzy.documentr.DocumentrConstants;
+
 public class PageFormTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
 	private static final String BRANCH = "branch"; //$NON-NLS-1$
@@ -39,7 +41,7 @@ public class PageFormTest {
 
 	@Before
 	public void setUp() {
-		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE, COMMIT, TAGS);
+		form = new PageForm(PROJECT, BRANCH, PAGE, PARENT, TITLE, TEXT, VIEW_ROLE, COMMIT, TAGS, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 	}
 
 	@Test

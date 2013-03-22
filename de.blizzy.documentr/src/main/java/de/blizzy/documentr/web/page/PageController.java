@@ -149,7 +149,7 @@ public class PageController {
 
 		PageForm form = new PageForm(projectName, branchName, null,
 				Util.toRealPagePath(parentPagePath), null, null, StringUtils.EMPTY, null,
-				ArrayUtils.EMPTY_STRING_ARRAY);
+				ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
 	}
@@ -188,7 +188,7 @@ public class PageController {
 			Arrays.sort(tags);
 			PageForm form = new PageForm(projectName, branchName, path, page.getParentPagePath(),
 					page.getTitle(), text, (viewRestrictionRole != null) ? viewRestrictionRole : StringUtils.EMPTY,
-					commit, tags);
+					commit, tags, page.getOrderIndex());
 			model.addAttribute("pageForm", form); //$NON-NLS-1$
 			if (conflict != null) {
 				model.addAttribute("mergeConflict", Boolean.TRUE); //$NON-NLS-1$
@@ -230,6 +230,7 @@ public class PageController {
 		page.setTags(Sets.newHashSet(form.getTags()));
 		page.setViewRestrictionRole(StringUtils.isNotBlank(form.getViewRestrictionRole()) ?
 				form.getViewRestrictionRole() : null);
+		page.setOrderIndex(form.getOrderIndex());
 
 		Page oldPage = null;
 		try {
@@ -274,7 +275,8 @@ public class PageController {
 			@RequestParam(required=false) String title, @RequestParam(required=false) String text,
 			@RequestParam(required=false) String viewRestrictionRole,
 			@RequestParam(required=false) String commit,
-			@RequestParam(required=false) String[] tags) {
+			@RequestParam(required=false) String[] tags,
+			@RequestParam(required=false) Integer orderIndex) {
 
 		if (tags == null) {
 			tags = ArrayUtils.EMPTY_STRING_ARRAY;
@@ -282,7 +284,7 @@ public class PageController {
 		return ((path != null) && (title != null) && (text != null)) ?
 				new PageForm(projectName, branchName, path, parentPagePath, title, text,
 						StringUtils.isNotBlank(viewRestrictionRole) ? viewRestrictionRole : StringUtils.EMPTY,
-						Strings.emptyToNull(commit), tags) :
+						Strings.emptyToNull(commit), tags, orderIndex) :
 				null;
 	}
 
@@ -586,11 +588,45 @@ public class PageController {
 		String text = ((PageTextData) page.getData()).getText();
 		rangeEnd = Math.min(rangeEnd, text.length());
 		text = text.substring(rangeStart, rangeEnd).trim();
-		PageForm form = new PageForm(projectName, branchName, null, path,
-				null, text, StringUtils.EMPTY, null, ArrayUtils.EMPTY_STRING_ARRAY);
+		PageForm form = new PageForm(projectName, branchName, null, path, null, text, StringUtils.EMPTY, null,
+				ArrayUtils.EMPTY_STRING_ARRAY, DocumentrConstants.PAGE_ORDER_INDEX_UNORDERED);
 		form.setParentPageSplitRangeStart(rangeStart);
 		form.setParentPageSplitRangeEnd(rangeEnd);
 		model.addAttribute("pageForm", form); //$NON-NLS-1$
 		return "/project/branch/page/edit"; //$NON-NLS-1$
+	}
+
+	@RequestMapping(value="/saveChildrenOrder/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json", method=RequestMethod.POST)
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
+	@ResponseBody
+	public Map<String, Object> saveChildrenOrder(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, @RequestParam("childrenOrder[]") List<String> childrenOrder,
+			Authentication authentication) throws IOException {
+
+		log.info("saving children order for page {}/{}/{}", projectName, branchName, path); //$NON-NLS-1$
+		log.debug("new children order: {}", childrenOrder); //$NON-NLS-1$
+
+		User user = userStore.getUser(authentication.getName());
+		pageStore.saveChildrenOrder(projectName, branchName, path, childrenOrder, user);
+
+		return Collections.emptyMap();
+	}
+
+	@RequestMapping(value="/resetChildrenOrder/{projectName:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/" +
+			"{branchName:" + DocumentrConstants.BRANCH_NAME_PATTERN + "}/" +
+			"{path:" + DocumentrConstants.PAGE_PATH_URL_PATTERN + "}/json", method=RequestMethod.GET)
+	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
+	@ResponseBody
+	public Map<String, Object> resetChildrenOrder(@PathVariable String projectName, @PathVariable String branchName,
+			@PathVariable String path, Authentication authentication) throws IOException {
+
+		log.info("resetting children order for page {}/{}/{}", projectName, branchName, path); //$NON-NLS-1$
+
+		User user = userStore.getUser(authentication.getName());
+		pageStore.resetChildrenOrder(projectName, branchName, path, user);
+
+		return Collections.emptyMap();
 	}
 }

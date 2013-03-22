@@ -19,4 +19,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .neighbors {
 	margin-left: 25px;
 	margin-bottom: 25px;
+	
+	li {
+		&.arrangeable {
+			color: #0088cc;
+			/* same color as .well */
+			background-color: #f5f5f5;
+			background-color: rgba(245, 245, 245, 0.8);
+			border: 1px solid #aaa;
+			border-radius: 4px;
+			margin-top: 1px;
+			padding: 3px 6px;
+			cursor: move;
+		}
+		
+		&.automatic-order {
+			font-style: italic;
+		}
+		
+		&.drop-area {
+			border: 1px solid #0088cc;
+			border-radius: 4px;
+			margin-top: 1px;
+			padding: 3px 6px;
+		}
+	}
 }
