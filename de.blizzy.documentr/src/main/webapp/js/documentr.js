@@ -42,7 +42,7 @@ var documentr = {};
 			require(['slimbox'], function() {
 				// fix overlay for jQuery 1.9+
 				$('#lbOverlay').detach().insertBefore($('#lbCenter'));
-				$('<a id="lbCloseLink" href="#"/>').click(function() {
+				$('<a id="lbCloseLink" href="javascript:;"/>').click(function() {
 					$('#lbOverlay').click();
 				}).prependTo('#lbBottom');
 				
