@@ -22,8 +22,10 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Test.None;
@@ -103,5 +105,12 @@ public class UtilTest extends AbstractDocumentrTest {
 		File result = Util.toFile(dir, "x/y/z"); //$NON-NLS-1$
 		File expectedFile = new File(new File(new File(dir, "x"), "y"), "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals(expectedFile, result);
+	}
+
+	@Test
+	public void parseParameters() {
+		Map<String, String> params = Util.parseParameters("foo bar=baz"); //$NON-NLS-1$
+		assertTrue(StringUtils.isEmpty(params.get("foo"))); //$NON-NLS-1$
+		assertEquals("baz", params.get("bar")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

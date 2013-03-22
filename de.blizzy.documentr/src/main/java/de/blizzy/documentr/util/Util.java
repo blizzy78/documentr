@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import de.blizzy.documentr.validation.PagePathValidator;
 
@@ -138,5 +140,18 @@ public final class Util {
 				// ignore
 			}
 		}
+	}
+
+	public static Map<String, String> parseParameters(String params) {
+		Map<String, String> result = Maps.newHashMap();
+		params = StringUtils.defaultString(params);
+		String[] parts = StringUtils.splitByWholeSeparator(params, null);
+		for (String part : parts) {
+			String[] keyValue = StringUtils.split(part, "=", 2); //$NON-NLS-1$
+			String key = keyValue[0];
+			String value = keyValue.length > 1 ? keyValue[1] : StringUtils.EMPTY;
+			result.put(key, value);
+		}
+		return result;
 	}
 }

@@ -19,10 +19,15 @@ package de.blizzy.documentr.markdown.macro.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
+
+import com.google.common.base.Stopwatch;
 
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
@@ -43,15 +48,28 @@ public class NeighborsMacro implements IMacroRunnable {
 	private String projectName;
 	private String branchName;
 	private String path;
+	private int maxChildren;
 
 	@Override
 	public String getHtml(IMacroContext macroContext) {
 		htmlSerializerContext = macroContext.getHtmlSerializerContext();
-		pageStore = macroContext.getPageStore();
-		permissionEvaluator = macroContext.getPermissionEvaluator();
-
 		path = htmlSerializerContext.getPagePath();
 		if (path != null) {
+			Map<String, String> params = Util.parseParameters(macroContext.getParameters());
+			try {
+				String childrenStr = StringUtils.defaultIfBlank(params.get("children"), "1"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (childrenStr.equals("all")) { //$NON-NLS-1$
+					maxChildren = Integer.MAX_VALUE;
+				} else {
+					maxChildren = Integer.parseInt(childrenStr);
+					maxChildren = Math.max(maxChildren, 1);
+				}
+			} catch (NumberFormatException e) {
+				maxChildren = 1;
+			}
+
+			pageStore = macroContext.getPageStore();
+			permissionEvaluator = macroContext.getPermissionEvaluator();
 			projectName = htmlSerializerContext.getProjectName();
 			branchName = htmlSerializerContext.getBranchName();
 
@@ -60,14 +78,17 @@ public class NeighborsMacro implements IMacroRunnable {
 						projectName, branchName, Util.toUrlPagePath(path), htmlSerializerContext.getAuthentication().getName());
 			}
 
+			Stopwatch stopwatch = new Stopwatch().start();
 			try {
 				StringBuilder buf = new StringBuilder();
 				buf.append("<ul class=\"well well-small nav nav-list neighbors pull-right\">") //$NON-NLS-1$
-					.append(printParent(printLinkListItem(path), path))
+					.append(printParent(printLinkListItem(path, 1, maxChildren), path))
 					.append("</ul>"); //$NON-NLS-1$
 				return buf.toString();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
+			} finally {
+				log.trace("rendering neighbors took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 			}
 		} else {
 			return null;
@@ -93,7 +114,7 @@ public class NeighborsMacro implements IMacroRunnable {
 					for (String siblingPath : siblingPaths) {
 						parentBuf.append(siblingPath.equals(path) ?
 								inner :
-								printLinkListItem(siblingPath));
+								printLinkListItem(siblingPath, 1, 0));
 					}
 				} else {
 					parentBuf.append(inner);
@@ -109,51 +130,41 @@ public class NeighborsMacro implements IMacroRunnable {
 		return buf;
 	}
 
-	private CharSequence printLinkListItem(String path) throws IOException {
+	private CharSequence printLinkListItem(String path, int childLevel, int maxChildren) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		Page page = pageStore.getPage(projectName, branchName, path, false);
 		String title = page.getTitle();
-		if (path.equals(this.path)) {
-			buf.append(printActiveLinkListItem(path, title));
-		} else {
-			buf.append(printRegularLinkListItem(path, title));
-		}
-		return buf;
-	}
-
-	private CharSequence printActiveLinkListItem(String path, String title) throws IOException {
 		String uri = htmlSerializerContext.getPageUri(path);
-		StringBuilder buf = new StringBuilder();
-		buf.append("<li class=\"active\"><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-			.append(title)
-			.append("</a>") //$NON-NLS-1$
-			.append(printChildren(path))
-			.append("</li>"); //$NON-NLS-1$
-		return buf;
-	}
-
-	private CharSequence printRegularLinkListItem(String path, String title) {
-		StringBuilder buf = new StringBuilder();
-		if (hasViewPermission(path)) {
-			String uri = htmlSerializerContext.getPageUri(path);
-			buf.append("<li><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(title)
-				.append("</a></li>"); //$NON-NLS-1$
-		}
-		return buf;
-	}
-
-	private CharSequence printChildren(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		List<String> childPaths = pageStore.listChildPagePaths(projectName, branchName, path);
-		if (!childPaths.isEmpty()) {
-			buf.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
-			for (String childPath : childPaths) {
-				buf.append(printLinkListItem(childPath));
+		boolean active = path.equals(this.path);
+		if (active || hasViewPermission(path)) {
+			buf.append("<li"); //$NON-NLS-1$
+			if (active) {
+				buf.append(" class=\"active\""); //$NON-NLS-1$
 			}
-			buf.append("</ul>"); //$NON-NLS-1$
+			buf.append("><a href=\"").append(uri).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
+				.append(title)
+				.append("</a>") //$NON-NLS-1$
+				.append(printChildren(path, childLevel, maxChildren))
+				.append("</li>"); //$NON-NLS-1$
 		}
 		return buf;
+	}
+
+	private CharSequence printChildren(String path, int childLevel, int maxChildren) throws IOException {
+		if (childLevel <= maxChildren) {
+			StringBuilder buf = new StringBuilder();
+			List<String> childPaths = pageStore.listChildPagePaths(projectName, branchName, path);
+			if (!childPaths.isEmpty()) {
+				buf.append("<ul class=\"nav nav-list\">"); //$NON-NLS-1$
+				for (String childPath : childPaths) {
+					buf.append(printLinkListItem(childPath, childLevel + 1, maxChildren));
+				}
+				buf.append("</ul>"); //$NON-NLS-1$
+			}
+			return buf;
+		} else {
+			return StringUtils.EMPTY;
+		}
 	}
 
 	private boolean hasViewPermission(String path) {
