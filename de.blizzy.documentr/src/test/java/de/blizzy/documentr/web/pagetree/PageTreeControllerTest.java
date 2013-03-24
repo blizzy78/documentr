@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.web.pagetree;
 
 import static de.blizzy.documentr.DocumentrMatchers.*;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 

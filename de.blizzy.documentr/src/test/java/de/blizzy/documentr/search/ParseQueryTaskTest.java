@@ -35,7 +35,7 @@ public class ParseQueryTaskTest {
 
 	@Before
 	public void setUp() {
-		analyzer = new StandardAnalyzer(Version.LUCENE_41);
+		analyzer = new StandardAnalyzer(Version.LUCENE_42);
 	}
 
 	@Test

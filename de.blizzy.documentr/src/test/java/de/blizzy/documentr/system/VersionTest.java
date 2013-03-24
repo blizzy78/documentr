@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.system;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
