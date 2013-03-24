@@ -187,7 +187,7 @@ public class NeighborsMacro implements IMacroRunnable {
 				.append(title);
 			if (active && reorderAllowed) {
 				String buttonTitle = messageSource.getMessage("button.arrangePages", null, locale); //$NON-NLS-1$
-				buf.append("<span class=\"buttons pull-right\"><i class=\"icon-move icon-white pull-right\" title=\"") //$NON-NLS-1$
+				buf.append("<span class=\"buttons pull-right\"><i class=\"icon-move icon-white\" title=\"") //$NON-NLS-1$
 					.append(buttonTitle)
 					.append("\" onclick=\"startNeighborsArrange(); return false;\"></i></span>"); //$NON-NLS-1$
 			}
