@@ -602,10 +602,15 @@ public class PageController {
 	@PreAuthorize("hasBranchPermission(#projectName, #branchName, EDIT_PAGE)")
 	@ResponseBody
 	public Map<String, Object> saveChildrenOrder(@PathVariable String projectName, @PathVariable String branchName,
-			@PathVariable String path, @RequestParam("childrenOrder[]") List<String> childrenOrder,
+			@PathVariable String path, @RequestParam(value="childrenOrder[]", required=false) List<String> childrenOrder,
 			Authentication authentication) throws IOException {
 
 		log.info("saving children order for page {}/{}/{}", projectName, branchName, path); //$NON-NLS-1$
+
+		if (childrenOrder == null) {
+			childrenOrder = Collections.emptyList();
+		}
+
 		log.debug("new children order: {}", childrenOrder); //$NON-NLS-1$
 
 		User user = userStore.getUser(authentication.getName());
