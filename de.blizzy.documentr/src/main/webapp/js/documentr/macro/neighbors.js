@@ -29,7 +29,45 @@ define(['module'], function(module) {
 	var effectiveModuleOptions = $.extend({}, defaultModuleOptions, module.config());
 
 	function showBusy(buttonsEl) {
-		buttonsEl.empty().append($($.parseHTML('<i class="icon-time icon-white"></i>')));
+		buttonsEl.empty().append($.parseHTML('<i class="icon-time icon-white"></i>'));
+	}
+	
+	function save(activeEl, buttonsEl, projectName, branchName, pagePath) {
+		showBusy(buttonsEl);
+		
+		var paths = [];
+		activeEl.find('> ul > li').each(function() {
+			paths.push($(this).data('path'));
+		});
+		$.ajax({
+			url: effectiveModuleOptions.saveChildrenOrderUrl
+				.replace(/_PROJECTNAME_/, projectName)
+				.replace(/_BRANCHNAME_/, branchName)
+				.replace(/_PAGEPATH_/, pagePath),
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				childrenOrder: paths
+			},
+			success: function(result) {
+				window.location.reload();
+			}
+		});
+	}
+	
+	function reset(buttonsEl, projectName, branchName, pagePath) {
+		showBusy(buttonsEl);
+		$.ajax({
+			url: effectiveModuleOptions.resetChildrenOrderUrl
+				.replace(/_PROJECTNAME_/, projectName)
+				.replace(/_BRANCHNAME_/, branchName)
+				.replace(/_PAGEPATH_/, pagePath),
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				window.location.reload();
+			}
+		});
 	}
 	
 	return {
@@ -44,41 +82,11 @@ define(['module'], function(module) {
 
 			var saveButton = $($.parseHTML('<i class="icon-ok icon-white" title="' + effectiveModuleOptions.saveText + '"></i>'))
 				.click(function() {
-					showBusy(buttonsEl);
-					
-					var paths = [];
-					activeEl.find('> ul > li').each(function() {
-						paths.push($(this).data('path'));
-					});
-					$.ajax({
-						url: effectiveModuleOptions.saveChildrenOrderUrl
-							.replace(/_PROJECTNAME_/, projectName)
-							.replace(/_BRANCHNAME_/, branchName)
-							.replace(/_PAGEPATH_/, pagePath),
-						type: 'POST',
-						dataType: 'json',
-						data: {
-							childrenOrder: paths
-						},
-						success: function(result) {
-							window.location.reload();
-						}
-					});
+					save(activeEl, buttonsEl, projectName, branchName, pagePath);
 				});
 			var resetButton = $($.parseHTML('<i class="icon-arrow-down icon-white" title="' + effectiveModuleOptions.sortAlphabeticallyText + '"></i>'))
 				.click(function() {
-					showBusy(buttonsEl);
-					$.ajax({
-						url: effectiveModuleOptions.resetChildrenOrderUrl
-							.replace(/_PROJECTNAME_/, projectName)
-							.replace(/_BRANCHNAME_/, branchName)
-							.replace(/_PAGEPATH_/, pagePath),
-						type: 'GET',
-						dataType: 'json',
-						success: function(result) {
-							window.location.reload();
-						}
-					});
+					reset(buttonsEl, projectName, branchName, pagePath);
 				});
 			var cancelButton = $($.parseHTML('<i class="icon-off icon-white" title="' + effectiveModuleOptions.cancelText + '"></i>'))
 				.click(function() {
