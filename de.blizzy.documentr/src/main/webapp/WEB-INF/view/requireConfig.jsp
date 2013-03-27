@@ -67,6 +67,14 @@ var require = {
 					page: '<c:url value="/img/page.png"/>',
 					attachment: '<c:url value="/img/attachment.png"/>'
 				}
+			},
+			
+			'documentr/macro/neighbors': {
+				saveChildrenOrderUrl: '<c:url value="/page/saveChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
+				resetChildrenOrderUrl: '<c:url value="/page/resetChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
+				saveText: '<spring:message code="button.save"/>',
+				cancelText: '<spring:message code="button.cancel"/>',
+				sortAlphabeticallyText: '<spring:message code="button.sortAlphabetically"/>'
 			}
 		</sec:authorize>
 	}

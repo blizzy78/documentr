@@ -315,78 +315,8 @@ function hookupSplitCursor() {
 }
 
 function startNeighborsArrange() {
-	require(['jquery.ui']);
-
-	var activeEl = $('.neighbors li.active');
-	activeEl.find('i.icon-move').remove();
-
-	var aEl = activeEl.find('> a').setPreventClick(true);
-	var buttonsEl = aEl.find('.buttons');
-
-	var showBusy = function() {
-		buttonsEl.empty().append($($.parseHTML('<i class="icon-time icon-white"></i>')));
-	};
-
-	var saveButton = $($.parseHTML('<i class="icon-ok icon-white" title="<spring:message code="button.save"/>"></i>'))
-		.click(function() {
-			showBusy();
-			
-			var paths = [];
-			activeEl.find('> ul > li').each(function() {
-				paths.push($(this).data('path'));
-			});
-			$.ajax({
-				url: '<c:url value="/page/saveChildrenOrder/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
-				type: 'POST',
-				dataType: 'json',
-				data: {
-					childrenOrder: paths
-				},
-				success: function(result) {
-					window.location.reload();
-				}
-			});
-		});
-	var resetButton = $($.parseHTML('<i class="icon-arrow-down icon-white" title="<spring:message code="button.sortAlphabetically"/>"></i>'))
-		.click(function() {
-			showBusy();
-			$.ajax({
-				url: '<c:url value="/page/resetChildrenOrder/${projectName}/${branchName}/${d:toUrlPagePath(path)}/json"/>',
-				type: 'GET',
-				dataType: 'json',
-				success: function(result) {
-					window.location.reload();
-				}
-			});
-		});
-	var cancelButton = $($.parseHTML('<i class="icon-off icon-white" title="<spring:message code="button.cancel"/>"></i>'))
-		.click(function() {
-			window.location.reload();
-		});
-	buttonsEl.empty().append([saveButton, resetButton, cancelButton]);
-
-	activeEl.find('> ul > li').addClass('arrangeable').each(function() {
-		var liEl = $(this);
-		var manualOrder = liEl.data('manual-order');
-		if (!documentr.isSomething(manualOrder) || (manualOrder != true)) {
-			liEl.addClass('automatic-order');
-		}
-	});
-	activeEl.find('ul li').each(function() {
-		var liEl = $(this);
-		var aEl = liEl.find('> a');
-		var textEl = $.parseHTML(aEl.text());
-		aEl.remove();
-		liEl.prepend(textEl)
-	});
-
-	require(['jquery.ui'], function() {
-		activeEl.find('> ul')
-			.sortable({
-				placeholder: 'drop-area',
-				forcePlaceholderSize: true
-			})
-			.disableSelection();
+	require(['documentr/macro/neighbors'], function(neighbors) {
+		neighbors.startNeighborsArrange('<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>', '<c:out value="${d:toUrlPagePath(path)}"/>');
 	});
 }
 
