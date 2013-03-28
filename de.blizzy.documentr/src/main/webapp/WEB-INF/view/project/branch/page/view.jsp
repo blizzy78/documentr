@@ -174,144 +174,10 @@ function showRelocateDialog() {
 }
 
 function startPageSplit() {
-	toggleHideFloatingElements(true);
-	$('#pageText').data({
-		pageSplitMode: 'start',
-		pageSplitStart: null,
-		pageSplitEnd: null
+	require(['documentr/pageSplit'], function(pageSplit) {
+		pageSplit.start($('#pageText'), $('#splitCursor'), $('#splitCursorStart'), $('#splitBG'),
+			'<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>', '<c:out value="${d:toUrlPagePath(path)}"/>');
 	});
-	updatePageSplitRange();
-}
-
-function updatePageSplitRange() {
-	var pageText = $('#pageText');
-	var startEl = pageText.data('pageSplitStart');
-	var endEl = pageText.data('pageSplitEnd');
-	var inside = false;
-	if (!documentr.isSomething(startEl) && !documentr.isSomething(endEl)) {
-		inside = true;
-	}
-	$('#pageText > *[data-text-range]').each(function() {
-		var textEl = $(this);
-		var float = textEl.css('float');
-		if ((float !== 'left') && (float !== 'right')) {
-			var el = textEl[0];
-			if (documentr.isSomething(startEl) && (el === startEl)) {
-				inside = true;
-			}
-		
-			if (inside) {
-				textEl
-					.removeClass('page-split-outside')
-					.children()
-						.removeClass('page-split-outside');
-			} else {
-				textEl
-					.addClass('page-split-outside')
-					.children()
-						.addClass('page-split-outside');
-			}
-
-			if (documentr.isSomething(endEl) && (el === endEl)) {
-				inside = false;
-			}
-		}
-	});
-
-	var mode = $('#pageText').data('pageSplitMode');
-	var textEl = (mode === 'start') ? startEl : endEl;
-	var splitCursorEl = $('#splitCursor');
-	var splitCursorStartEl = $('#splitCursorStart');
-	var splitBGEl = $('#splitBG');
-	if (documentr.isSomething(textEl)) {
-		var wasHidden = $('#splitCursor:hidden').length > 0;
-	
-		textEl = $(textEl);
-		splitCursorEl.css({
-				left: textEl.offset().left,
-				top: (mode === 'start') ? (textEl.offset().top - splitCursorEl.outerHeight() - 3) : (textEl.offset().top + textEl.outerHeight() + 3),
-				width: textEl.outerWidth()
-			})
-			.show();
-
-		if (mode === 'start') {
-			splitCursorEl.find('.above').show();
-			splitCursorEl.find('.below').hide();
-			splitCursorStartEl.hide();
-			$('#splitBG').hide();
-		} else {
-			splitCursorEl.find('.above').hide();
-			splitCursorEl.find('.below').show();
-			splitCursorStartEl.show();
-			splitBGEl.css({
-				left: splitCursorStartEl.offset().left,
-				top: splitCursorStartEl.offset().top + splitCursorStartEl.outerHeight(),
-				<%-- minus 2 to account for border --%>
-				width: splitCursorStartEl.outerWidth() - 2,
-				height: splitCursorEl.offset().top - splitCursorStartEl.offset().top - splitCursorStartEl.outerHeight()
-			}).show();
-		}
-		
-		<%-- force another refresh if cursor was hidden before to set cursor top position correctly --%>
-		if (wasHidden) {
-			window.setTimeout(updatePageSplitRange, 1);
-		}
-	} else {
-		splitCursorEl.hide();
-		splitCursorStartEl.hide();
-		splitBGEl.hide();
-	}
-}
-
-function hookupSplitCursor() {
-	$('#pageText > *[data-text-range]')
-		.mouseenter(function() {
-			var mode = $('#pageText').data('pageSplitMode');
-			if ((mode === 'start') || (mode === 'end')) {
-				var textEl = $(this);
-				var float = textEl.css('float');
-				if ((float !== 'left') && (float !== 'right')) {
-					var ok = true;
-					if (mode === 'end') {
-						var els = $('#pageText > *[data-text-range]');
-						var startEl = $('#pageText').data('pageSplitStart');
-						var startIdx = els.index(startEl);
-						var endIdx = els.index(textEl[0]);
-						if (endIdx < startIdx) {
-							ok = false;
-						}
-					}
-
-					if (ok) {
-						$('#pageText').data((mode === 'start') ? 'pageSplitStart' : 'pageSplitEnd', textEl[0]);
-						updatePageSplitRange();
-					}
-				}
-			}
-		})
-		.click(function() {
-			var pageTextEl = $('#pageText');
-			var mode = pageTextEl.data('pageSplitMode');
-			if (mode === 'start') {
-				pageTextEl.data({
-					pageSplitEnd: $('#pageText').data('pageSplitStart'),
-					pageSplitMode: 'end'
-				});
-				var splitCursorEl = $('#splitCursor');
-				$('#splitCursorStart').css({
-					left: splitCursorEl.offset().left,
-					top: splitCursorEl.offset().top,
-					width: splitCursorEl.outerWidth()
-				});
-				updatePageSplitRange();
-			} else if (mode === 'end') {
-				var startEl = $(pageTextEl.data('pageSplitStart'));
-				var endEl = $(pageTextEl.data('pageSplitEnd'));
-				var start = startEl.attr('data-text-range').replace(/,.*/, '');
-				var end = endEl.attr('data-text-range').replace(/.*,/, '');
-				window.location.href = '<c:url value="/page/split/${projectName}/${branchName}/${d:toUrlPagePath(path)}/"/>' + start + ',' + end;
-			}
-		});
 }
 
 function startNeighborsArrange() {
@@ -673,7 +539,6 @@ function unsubscribe() {
 		
 		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
 			hookupInlineEditorToolbar();
-			hookupSplitCursor();
 		</sec:authorize>
 	});
 </sec:authorize>

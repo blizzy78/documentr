@@ -69,6 +69,10 @@ var require = {
 				}
 			},
 			
+			'documentr/pageSplit': {
+				pageSplitUrl: '<c:url value="/page/split/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/_START_,_END_"/>'
+			},
+			
 			'documentr/macro/neighbors': {
 				saveChildrenOrderUrl: '<c:url value="/page/saveChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
 				resetChildrenOrderUrl: '<c:url value="/page/resetChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
