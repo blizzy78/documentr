@@ -175,14 +175,15 @@ function showRelocateDialog() {
 
 function startPageSplit() {
 	require(['documentr/pageSplit'], function(pageSplit) {
-		pageSplit.start($('#pageText'), $('#splitCursor'), $('#splitCursorStart'), $('#splitBG'),
-			'<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>', '<c:out value="${d:toUrlPagePath(path)}"/>');
+		pageSplit.start($('#pageText'), '<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>',
+			'<c:out value="${d:toUrlPagePath(path)}"/>');
 	});
 }
 
 function startNeighborsArrange() {
 	require(['documentr/macro/neighbors'], function(neighbors) {
-		neighbors.startNeighborsArrange('<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>', '<c:out value="${d:toUrlPagePath(path)}"/>');
+		neighbors.startNeighborsArrange('<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>',
+			'<c:out value="${d:toUrlPagePath(path)}"/>');
 	});
 }
 
@@ -730,10 +731,6 @@ function unsubscribe() {
 </sec:authorize>
 
 <sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
-	<div id="splitCursor" class="page-split-cursor" style="display: none;"><div class="above"><i class="icon-chevron-down"></i> <spring:message code="title.pageSplitStart"/></div><div class="line"></div><div class="below"><i class="icon-chevron-up"></i> <spring:message code="title.pageSplitEnd"/></div></div>
-	<div id="splitCursorStart" class="page-split-cursor" style="display: none;"><div class="above"><i class="icon-chevron-down"></i> <spring:message code="title.pageSplitStart"/></div><div class="line"></div></div>
-	<div id="splitBG" class="page-split-background" style="display: none;"></div>
-
 	<div class="modal" id="relocate-dialog" style="display: none;">
 		<div class="modal-header">
 			<button class="close" onclick="$('#relocate-dialog').hideModal();">&#x00D7</button>

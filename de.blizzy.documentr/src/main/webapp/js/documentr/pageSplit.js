@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 define(['module'], function(module) {
 	"use strict";
 	
-	var effectiveModuleOptions = module.config();
+	var defaultModuleOptions = {
+		pageSplitStartText: 'Page Split Start',
+		pageSplitEndText: 'Page Split End'
+	};
+	var effectiveModuleOptions = $.extend({}, defaultModuleOptions, module.config());
 
 	var internal = {};
 	
@@ -60,7 +64,7 @@ define(['module'], function(module) {
 		var mode = internal.pageSplitMode;
 		var textEl = (mode === 'start') ? startEl : endEl;
 		if (documentr.isSomething(textEl)) {
-			var wasHidden = $('#splitCursor:hidden').length > 0;
+			var wasHidden = internal.splitCursorEl.css('display') === 'none';
 		
 			textEl = $(textEl);
 			internal.splitCursorEl.css({
@@ -76,7 +80,7 @@ define(['module'], function(module) {
 				internal.splitCursorEl.find('.above').show();
 				internal.splitCursorEl.find('.below').hide();
 				internal.splitCursorStartEl.hide();
-				$('#splitBG').hide();
+				internal.splitBGEl.hide();
 			} else {
 				internal.splitCursorEl.find('.above').hide();
 				internal.splitCursorEl.find('.below').show();
@@ -115,6 +119,25 @@ define(['module'], function(module) {
 		});
 	}
 
+	function createSplitCursor() {
+		if (!documentr.isSomething(internal.splitCursorEl)) {
+			var splitCursorEl = $.parseHTML('<div class="page-split-cursor" style="display: none;">' +
+				'<div class="above"><i class="icon-chevron-down"></i> ' + effectiveModuleOptions.pageSplitStartText + '</div>' +
+				'<div class="line"></div>' +
+				'<div class="below"><i class="icon-chevron-up"></i> ' + effectiveModuleOptions.pageSplitEndText + '</div>' +
+				'</div>');
+			var splitCursorStartEl = $.parseHTML('<div class="page-split-cursor" style="display: none;">' +
+				'<div class="above"><i class="icon-chevron-down"></i> ' + effectiveModuleOptions.pageSplitStartText + '</div>' +
+				'<div class="line"></div>' +
+				'</div>');
+			var splitBGEl = $.parseHTML('<div id="splitBG" class="page-split-background" style="display: none;"></div>');
+			internal.splitCursorEl = $(splitCursorEl);
+			internal.splitCursorStartEl = $(splitCursorStartEl);
+			internal.splitBGEl = $(splitBGEl);
+			$(document.body).append([internal.splitCursorEl, internal.splitCursorStartEl, internal.splitBGEl]);
+		}
+	}
+	
 	function hookupSplitCursor() {
 		internal.pageTextEl.find('> *[data-text-range]')
 			.mouseenter(function() {
@@ -180,15 +203,13 @@ define(['module'], function(module) {
 	}
 	
 	return {
-		start: function(pageTextEl, splitCursorEl, splitCursorStartEl, splitBGEl, projectName, branchName, pagePath) {
+		start: function(pageTextEl, projectName, branchName, pagePath) {
 			internal.pageTextEl = pageTextEl;
-			internal.splitCursorEl = splitCursorEl;
-			internal.splitCursorStartEl = splitCursorStartEl;
-			internal.splitBGEl = splitBGEl;
 			internal.projectName = projectName;
 			internal.branchName = branchName;
 			internal.pagePath = pagePath;
 
+			createSplitCursor();
 			hookupSplitCursor();
 			startSplit();
 		}

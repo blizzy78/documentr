@@ -70,6 +70,8 @@ var require = {
 			},
 			
 			'documentr/pageSplit': {
+				pageSplitStartText: '<spring:message code="title.pageSplitStart"/>',
+				pageSplitEndText: '<spring:message code="title.pageSplitEnd"/>',
 				pageSplitUrl: '<c:url value="/page/split/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/_START_,_END_"/>'
 			},
 			
