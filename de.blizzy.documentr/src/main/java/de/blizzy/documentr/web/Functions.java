@@ -56,7 +56,7 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageUtil;
 import de.blizzy.documentr.page.PageVersion;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.subscription.SubscriptionStore;
 import de.blizzy.documentr.system.SystemSettingsStore;
 import de.blizzy.documentr.system.UpdateChecker;
@@ -66,7 +66,7 @@ import de.blizzy.documentr.util.Util;
 @Component
 public final class Functions {
 	private static IPageStore pageStore;
-	private static GlobalRepositoryManager repoManager;
+	private static IGlobalRepositoryManager repoManager;
 	private static UserStore userStore;
 	private static IPageRenderer pageRenderer;
 	private static MarkdownProcessor markdownProcessor;
@@ -77,7 +77,7 @@ public final class Functions {
 	private static UpdateChecker updateChecker;
 
 	@Autowired
-	private GlobalRepositoryManager wiredRepoManager;
+	private IGlobalRepositoryManager wiredRepoManager;
 	@Autowired
 	private IPageStore wiredPageStore;
 	@Autowired
@@ -272,7 +272,7 @@ public final class Functions {
 		return macroFactory.listGroovyMacros();
 	}
 
-	static void setGlobalRepositoryManager(GlobalRepositoryManager repoManager) {
+	static void setGlobalRepositoryManager(IGlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}
 

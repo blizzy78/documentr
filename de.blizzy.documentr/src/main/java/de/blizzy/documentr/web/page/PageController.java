@@ -71,7 +71,7 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PageUtil;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 import de.blizzy.documentr.web.util.ErrorController;
 
@@ -84,7 +84,7 @@ public class PageController {
 	@Autowired
 	private ICherryPicker cherryPicker;
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private MarkdownProcessor markdownProcessor;
 	@Autowired

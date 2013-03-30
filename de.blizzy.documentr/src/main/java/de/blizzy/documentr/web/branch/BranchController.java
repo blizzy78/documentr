@@ -41,7 +41,7 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.util.Util;
 
@@ -49,7 +49,7 @@ import de.blizzy.documentr.util.Util;
 @RequestMapping("/branch")
 public class BranchController {
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired

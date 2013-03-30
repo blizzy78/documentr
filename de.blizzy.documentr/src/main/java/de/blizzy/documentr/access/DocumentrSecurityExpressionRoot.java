@@ -29,7 +29,7 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
 /** documentr's {@link SecurityExpressionRoot} for use in JSP and security annotations. */
@@ -44,7 +44,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	@Setter
 	public HttpServletRequest request;
 
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	private Object target;
 	@Getter
 	@Setter
@@ -54,7 +54,7 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 	private Object filterObject;
 	private DocumentrPermissionEvaluator permissionEvaluator;
 
-	public DocumentrSecurityExpressionRoot(Authentication authentication, GlobalRepositoryManager repoManager) {
+	public DocumentrSecurityExpressionRoot(Authentication authentication, IGlobalRepositoryManager repoManager) {
 		super(authentication);
 
 		this.repoManager = repoManager;

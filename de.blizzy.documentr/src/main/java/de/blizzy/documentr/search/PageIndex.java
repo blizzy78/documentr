@@ -77,7 +77,7 @@ import de.blizzy.documentr.page.PageChangedEvent;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PagesDeletedEvent;
 import de.blizzy.documentr.repository.BranchCreatedEvent;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.util.Util;
 
@@ -122,7 +122,7 @@ public class PageIndex {
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Autowired
 	private UserStore userStore;
 	@Autowired

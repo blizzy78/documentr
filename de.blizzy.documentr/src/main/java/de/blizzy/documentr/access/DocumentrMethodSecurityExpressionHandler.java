@@ -27,13 +27,13 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 /** documentr's security expression handler. */
 @Component("expressionHandler")
 public class DocumentrMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Autowired
 	private PermissionEvaluator permissionEvaluator;
 

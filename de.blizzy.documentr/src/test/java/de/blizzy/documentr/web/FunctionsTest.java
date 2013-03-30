@@ -61,7 +61,7 @@ import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageVersion;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 public class FunctionsTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -71,7 +71,7 @@ public class FunctionsTest extends AbstractDocumentrTest {
 	private static final Locale LOCALE = Locale.US;
 
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Mock
 	private IPageStore pageStore;
 	@Mock

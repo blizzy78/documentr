@@ -73,7 +73,7 @@ import de.blizzy.documentr.page.PageMetadata;
 import de.blizzy.documentr.page.PageNotFoundException;
 import de.blizzy.documentr.page.PageVersion;
 import de.blizzy.documentr.page.TestPageUtil;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
 public class PageControllerTest extends AbstractDocumentrTest {
@@ -92,7 +92,7 @@ public class PageControllerTest extends AbstractDocumentrTest {
 	@Mock
 	private ICherryPicker cherryPicker;
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Mock
 	private UserStore userStore;
 	@Mock

@@ -45,7 +45,7 @@ import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryNotFoundException;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -76,7 +76,7 @@ public class SystemSettingsStore implements Lifecycle {
 	private static final String MACRO_KEY_PREFIX = "macro."; //$NON-NLS-1$
 
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private UserStore userStore;
 	@Autowired

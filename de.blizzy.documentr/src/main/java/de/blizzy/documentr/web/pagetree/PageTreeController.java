@@ -39,14 +39,14 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
 @Controller
 @RequestMapping("/pageTree")
 public class PageTreeController {
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private IPageStore pageStore;
 	@Autowired

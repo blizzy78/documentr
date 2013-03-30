@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.util.Util;
 
@@ -48,7 +48,7 @@ import de.blizzy.documentr.util.Util;
 @RequestMapping("/project")
 public class ProjectController {
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private UserStore userStore;
 

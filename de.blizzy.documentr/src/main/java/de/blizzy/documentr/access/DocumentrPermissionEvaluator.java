@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.PageNotFoundException;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 /**
  * <p>documentr's {@link PermissionEvaluator}.</p>
@@ -64,7 +64,7 @@ public class DocumentrPermissionEvaluator implements PermissionEvaluator {
 	@Autowired
 	private UserStore userStore;
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Autowired
 	private LoginNameUserDetailsService userDetailsService;
 

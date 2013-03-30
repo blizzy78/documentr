@@ -23,12 +23,12 @@ import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.validation.annotation.ProjectDoesNotExist;
 
 public class ProjectDoesNotExistValidator implements ConstraintValidator<ProjectDoesNotExist, String> {
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 
 	@Override
 	public void initialize(ProjectDoesNotExist annotation) {

@@ -52,7 +52,7 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.page.PageChangedEvent;
 import de.blizzy.documentr.page.PagesDeletedEvent;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 public class PageIndexTest extends AbstractDocumentrTest {
 	private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -78,7 +78,7 @@ public class PageIndexTest extends AbstractDocumentrTest {
 	@SuppressWarnings("unused")
 	private EventBus eventBus;
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Mock
 	private UserStore userStore;
 	@InjectMocks

@@ -38,7 +38,7 @@ import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
 
 @Component
-public class GlobalRepositoryManager {
+public class GlobalRepositoryManager implements IGlobalRepositoryManager {
 	@Autowired
 	private Settings settings;
 	@Autowired
@@ -52,6 +52,7 @@ public class GlobalRepositoryManager {
 		reposDir = new File(settings.getDocumentrDataDir(), "repositories"); //$NON-NLS-1$
 	}
 
+	@Override
 	public ILockedRepository createProjectCentralRepository(String projectName, User user)
 			throws IOException, GitAPIException {
 
@@ -59,6 +60,7 @@ public class GlobalRepositoryManager {
 		return repoManager.createCentralRepository(user);
 	}
 
+	@Override
 	public ILockedRepository createProjectCentralRepository(String projectName, boolean bare, User user)
 			throws IOException, GitAPIException {
 
@@ -66,16 +68,19 @@ public class GlobalRepositoryManager {
 		return repoManager.createCentralRepository(bare, user);
 	}
 
+	@Override
 	public ILockedRepository getProjectCentralRepository(String projectName) throws IOException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository();
 	}
 
+	@Override
 	public ILockedRepository getProjectCentralRepository(String projectName, boolean bare) throws IOException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getCentralRepository(bare);
 	}
 
+	@Override
 	public ILockedRepository createProjectBranchRepository(String projectName, String branchName, String startingBranch)
 			throws IOException, GitAPIException {
 
@@ -85,16 +90,19 @@ public class GlobalRepositoryManager {
 		return repo;
 	}
 
+	@Override
 	public ILockedRepository getProjectBranchRepository(String projectName, String branchName) throws IOException, GitAPIException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.getBranchRepository(branchName);
 	}
 
+	@Override
 	public List<String> listProjectBranches(String projectName) throws IOException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		return repoManager.listBranches();
 	}
 
+	@Override
 	public List<String> listProjects() {
 		List<String> result = Collections.emptyList();
 		if (reposDir.isDirectory()) {
@@ -123,6 +131,7 @@ public class GlobalRepositoryManager {
 		return result;
 	}
 
+	@Override
 	public void importSampleContents(String projectName) throws IOException, GitAPIException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		repoManager.importSampleContents();

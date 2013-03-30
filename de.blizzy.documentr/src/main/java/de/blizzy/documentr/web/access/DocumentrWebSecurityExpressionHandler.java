@@ -28,12 +28,12 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
 import org.springframework.stereotype.Component;
 
 import de.blizzy.documentr.access.DocumentrSecurityExpressionRoot;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 @Component("webExpressionHandler")
 public class DocumentrWebSecurityExpressionHandler extends DefaultWebSecurityExpressionHandler {
 	@Autowired
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Autowired
 	private PermissionEvaluator permissionEvaluator;
 

@@ -49,7 +49,7 @@ import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
@@ -60,7 +60,7 @@ class CherryPicker implements ICherryPicker {
 			"^.*?[\\r\\n]<<<<<<< .*?[\\r\\n]=======.*?[\\r\\n]>>>>>>> .*$", Pattern.DOTALL + Pattern.MULTILINE); //$NON-NLS-1$
 
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private EventBus eventBus;
 	@Autowired

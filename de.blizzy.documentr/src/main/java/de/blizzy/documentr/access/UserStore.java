@@ -54,7 +54,7 @@ import com.google.gson.internal.StringMap;
 import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
@@ -72,7 +72,7 @@ public class UserStore {
 	private static final String AUTHORITIES_SUFFIX = ".authorities"; //$NON-NLS-1$
 
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 

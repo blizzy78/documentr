@@ -29,13 +29,13 @@ import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.DocumentrConstants;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 public class DocumentrSecurityExpressionRootTest extends AbstractDocumentrTest {
 	@Mock
 	private Authentication authentication;
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Mock
 	private DocumentrPermissionEvaluator permissionEvaluator;
 	@InjectMocks

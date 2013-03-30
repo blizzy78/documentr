@@ -28,11 +28,11 @@ import org.mockito.Mock;
 import com.google.common.collect.Lists;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 
 public class ProjectDoesNotExistValidatorTest extends AbstractDocumentrTest {
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@InjectMocks
 	private ProjectDoesNotExistValidator validator;
 

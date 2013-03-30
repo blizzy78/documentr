@@ -40,12 +40,12 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
 public class PageTreeControllerTest extends AbstractDocumentrTest {
 	@Mock
-	private GlobalRepositoryManager repoManager;
+	private IGlobalRepositoryManager repoManager;
 	@Mock
 	private IPageStore pageStore;
 	@Mock

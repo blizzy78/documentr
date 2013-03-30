@@ -72,7 +72,7 @@ import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.User;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
+import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
 import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
@@ -91,7 +91,7 @@ class PageStore implements IPageStore {
 	private static final String ORDER_INDEX = "orderIndex"; //$NON-NLS-1$
 
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	@Autowired
 	private EventBus eventBus;
 
