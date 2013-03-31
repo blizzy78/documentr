@@ -19,10 +19,12 @@ package de.blizzy.documentr.web.project;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,13 +58,22 @@ public class ProjectController {
 	@PreAuthorize("hasProjectPermission(#name, VIEW)")
 	public String getProject(@PathVariable String name, Model model) {
 		model.addAttribute("name", name); //$NON-NLS-1$
+		model.addAttribute("originalName", name); //$NON-NLS-1$
 		return "/project/view"; //$NON-NLS-1$
 	}
 
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	@PreAuthorize("hasApplicationPermission(EDIT_PROJECT)")
 	public String createProject(Model model) {
-		ProjectForm form = new ProjectForm(null);
+		ProjectForm form = new ProjectForm(null, null);
+		model.addAttribute("projectForm", form); //$NON-NLS-1$
+		return "/project/edit"; //$NON-NLS-1$
+	}
+
+	@RequestMapping(value="/edit/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("hasProjectPermission(#name, EDIT_PROJECT)")
+	public String editProject(@PathVariable String name, Model model) {
+		ProjectForm form = new ProjectForm(name, name);
 		model.addAttribute("projectForm", form); //$NON-NLS-1$
 		return "/project/edit"; //$NON-NLS-1$
 	}
@@ -74,18 +85,43 @@ public class ProjectController {
 	public String saveProject(@ModelAttribute @Valid ProjectForm form, BindingResult bindingResult,
 			Authentication authentication) throws IOException, GitAPIException {
 
+		String name = form.getName();
+		String originalName = form.getOriginalName();
+		List<String> projects = globalRepositoryManager.listProjects();
+		if (StringUtils.isNotBlank(originalName)) {
+			if (!projects.contains(originalName)) {
+				bindingResult.rejectValue("originalName", "project.name.nonexistent"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (!StringUtils.equals(name, originalName) &&
+				projects.contains(name)) {
+
+				bindingResult.rejectValue("name", "project.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		} else {
+			if (projects.contains(name)) {
+				bindingResult.rejectValue("name", "project.name.exists"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
 		if (bindingResult.hasErrors()) {
 			return "/project/edit"; //$NON-NLS-1$
 		}
 
-		ILockedRepository repo = null;
-		try {
-			User user = userStore.getUser(authentication.getName());
-			repo = globalRepositoryManager.createProjectCentralRepository(form.getName(), user);
-		} finally {
-			Util.closeQuietly(repo);
+		User user = userStore.getUser(authentication.getName());
+
+		if (StringUtils.isNotBlank(originalName) &&
+			!StringUtils.equals(name, originalName)) {
+
+			globalRepositoryManager.renameProject(originalName, name, user);
+		} else if (StringUtils.isBlank(originalName)) {
+			ILockedRepository repo = null;
+			try {
+				repo = globalRepositoryManager.createProjectCentralRepository(name, user);
+			} finally {
+				Util.closeQuietly(repo);
+			}
 		}
-		return "redirect:/project/" + form.getName(); //$NON-NLS-1$
+		return "redirect:/project/" + name; //$NON-NLS-1$
 	}
 
 	@RequestMapping(value="/importSample/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}/json", method=RequestMethod.GET)
@@ -96,8 +132,17 @@ public class ProjectController {
 		return Collections.emptyMap();
 	}
 
+	@RequestMapping(value="/delete/{name:" + DocumentrConstants.PROJECT_NAME_PATTERN + "}", method=RequestMethod.GET)
+	@PreAuthorize("hasApplicationPermission(EDIT_PROJECT)")
+	public String deleteProject(@PathVariable String name, Authentication authentication) throws IOException {
+		User user = userStore.getUser(authentication.getName());
+		globalRepositoryManager.deleteProject(name, user);
+		return "redirect:/projects"; //$NON-NLS-1$
+	}
+
 	@ModelAttribute
-	public ProjectForm createProjectForm(@RequestParam(required=false) String name) {
-		return (name != null) ? new ProjectForm(name) : null;
+	public ProjectForm createProjectForm(@RequestParam(required=false) String name,
+			@RequestParam(required=false) String originalName) {
+		return (name != null) ? new ProjectForm(name, originalName) : null;
 	}
 }

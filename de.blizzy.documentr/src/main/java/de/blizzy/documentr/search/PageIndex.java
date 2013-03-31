@@ -77,7 +77,10 @@ import de.blizzy.documentr.page.PageChangedEvent;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PagesDeletedEvent;
 import de.blizzy.documentr.repository.BranchCreatedEvent;
+import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
+import de.blizzy.documentr.repository.ProjectDeletedEvent;
+import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.util.Replacement;
 import de.blizzy.documentr.util.Util;
 
@@ -127,6 +130,8 @@ public class PageIndex {
 	private UserStore userStore;
 	@Autowired
 	private ListeningExecutorService taskExecutor;
+	@Autowired
+	private GlobalRepositoryManager globalRepositoryManager;
 	private Analyzer analyzer;
 	private Directory directory;
 	private IndexWriter writer;
@@ -184,10 +189,10 @@ public class PageIndex {
 		String projectName = event.getProjectName();
 		String branchName = event.getBranchName();
 		String path = event.getPath();
-		addPage(projectName, branchName, path);
+		submitAddPageTask(projectName, branchName, path);
 	}
 
-	private void addPage(final String projectName, final String branchName, final String path) {
+	private void submitAddPageTask(final String projectName, final String branchName, final String path) {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
@@ -217,8 +222,56 @@ public class PageIndex {
 	private void addPages(String projectName, String branchName) throws IOException {
 		List<String> paths = pageStore.listAllPagePaths(projectName, branchName);
 		for (String path : paths) {
-			addPage(projectName, branchName, path);
+			submitAddPageTask(projectName, branchName, path);
 		}
+	}
+
+	@Subscribe
+	public void renameProject(ProjectRenamedEvent event) {
+		String projectName = event.getProjectName();
+		String newProjectName = event.getNewProjectName();
+		try {
+			submitRenameProjectTask(projectName, newProjectName);
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void submitRenameProjectTask(final String projectName, final String newProjectName) throws IOException {
+		final Map<String, List<String>> branchPagePaths = Maps.newHashMap();
+		List<String> branches = globalRepositoryManager.listProjectBranches(newProjectName);
+		for (String branch : branches) {
+			List<String> pagePaths = pageStore.listAllPagePaths(newProjectName, branch);
+			branchPagePaths.put(branch, pagePaths);
+		}
+
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					renameProjectAsync(projectName, newProjectName, branchPagePaths);
+				} catch (IOException e) {
+					log.error(StringUtils.EMPTY, e);
+				} catch (RuntimeException e) {
+					log.error(StringUtils.EMPTY, e);
+				}
+			}
+		};
+		taskExecutor.submit(runnable);
+	}
+
+	private void renameProjectAsync(String projectName, String newProjectName, Map<String, List<String>> branchPagePaths)
+			throws IOException {
+
+		deleteProjectInternal(projectName);
+
+		for (Map.Entry<String, List<String>> entry : branchPagePaths.entrySet()) {
+			String branch = entry.getKey();
+			for (String pagePath : entry.getValue()) {
+				submitAddPageTask(newProjectName, branch, pagePath);
+			}
+		}
+
 	}
 
 	private void addPageAsync(String projectName, String branchName, String path) throws IOException {
@@ -307,7 +360,7 @@ public class PageIndex {
 		} catch (InterruptedException e) {
 			// ignore
 		} catch (ExecutionException e) {
-			// ignore
+			log.warn(StringUtils.EMPTY, e.getCause());
 		}
 	}
 
@@ -320,6 +373,41 @@ public class PageIndex {
 				writer.deleteDocuments(new Term(FULL_PATH, fullPath));
 				dirty = true;
 			}
+		} finally {
+			if (dirty) {
+				this.dirty.set(true);
+			}
+		}
+	}
+
+	@Subscribe
+	public void deleteProject(ProjectDeletedEvent event) {
+		String projectName = event.getProjectName();
+		submitDeleteProjectTask(projectName);
+	}
+
+	private void submitDeleteProjectTask(final String projectName) {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					deleteProjectInternal(projectName);
+				} catch (IOException e) {
+					log.error(StringUtils.EMPTY, e);
+				} catch (RuntimeException e) {
+					log.error(StringUtils.EMPTY, e);
+				}
+			}
+		};
+		taskExecutor.submit(runnable);
+	}
+
+	private void deleteProjectInternal(String projectName) throws IOException {
+		boolean dirty = false;
+		try {
+			log.info("deleting project {}", projectName); //$NON-NLS-1$
+			writer.deleteDocuments(new Term(PROJECT, projectName));
+			dirty = true;
 		} finally {
 			if (dirty) {
 				this.dirty.set(true);

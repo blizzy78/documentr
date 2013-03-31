@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
@@ -60,6 +61,26 @@ function importSampleContents() {
 </sec:authorize>
 </c:if>
 
+<sec:authorize access="hasApplicationPermission(EDIT_PROJECT)">
+function deleteProject() {
+	require(['documentr/dialog'], function(dialog) {
+		new dialog.Dialog()
+			.title('<spring:message code="title.deleteProject"/>')
+			<c:set var="text"><spring:message code="deleteProjectX.html" arguments="${name}"/></c:set>
+			.htmlMessage('<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>')
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.delete"/>')
+				.click(function(button, dlg) {
+					dlg.allButtonsDisabled(true);
+					window.location.href = '<c:url value="/project/delete/${name}"/>';
+				})
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
+	});
+}
+</sec:authorize>
+
 </dt:pageJS>
 
 <dt:breadcrumbs>
@@ -72,6 +93,25 @@ function importSampleContents() {
 <dt:page>
 
 <div class="page-header"><h1><spring:message code="title.projectX" arguments="${name}"/></h1></div>
+
+<c:set var="buttons">
+	<sec:authorize access="hasProjectPermission(#name, EDIT_PROJECT)">
+		<a href="<c:url value="/project/edit/${name}"/>" class="btn"><spring:message code="button.editProject"/></a>
+	</sec:authorize>
+	<sec:authorize access="hasApplicationPermission(EDIT_PROJECT)">
+		<a href="javascript:void(deleteProject());" class="btn btn-warning"><spring:message code="button.deleteProject"/></a>
+	</sec:authorize>
+	<c:if test="${empty branches}">
+		<sec:authorize access="hasProjectPermission(#name, ADMIN)">
+			<a href="javascript:void(importSampleContents());" class="btn"><i class="icon-download-alt"></i> <spring:message code="button.importSampleContents"/></a>
+		</sec:authorize>
+	</c:if>
+</c:set>
+<c:if test="${!empty buttons}">
+	<p>
+	<c:out value="${buttons}" escapeXml="false"/>
+	</p>
+</c:if>
 
 <h2><spring:message code="title.branches"/></h2>
 
@@ -89,11 +129,6 @@ function importSampleContents() {
 <sec:authorize access="hasProjectPermission(#name, EDIT_BRANCH)">
 	<p>
 	<a href="<c:url value="/branch/create/${name}"/>" class="btn"><i class="icon-plus"></i> <spring:message code="button.createBranch"/></a>
-	<c:if test="${empty branches}">
-		<sec:authorize access="hasProjectPermission(#name, ADMIN)">
-			<a href="javascript:void(importSampleContents());" class="btn"><i class="icon-download-alt"></i> <spring:message code="button.importSampleContents"/></a>
-		</sec:authorize>
-	</c:if>
 	</p>
 </sec:authorize>
 

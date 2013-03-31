@@ -39,6 +39,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -47,6 +48,8 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.ProjectDeletedEvent;
+import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.repository.RepositoryNotFoundException;
 import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
@@ -66,32 +69,10 @@ public class SubscriptionStore {
 		ILockedRepository repo = null;
 		try {
 			repo = getOrCreateRepository(user);
-			String loginName = user.getLoginName();
-			String json = BlobUtils.getHeadContent(repo.r(), loginName + SUBSCRIPTIONS_SUFFIX);
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			Set<Page> pages = Sets.newHashSet();
-			if (StringUtils.isNotBlank(json)) {
-				List<Page> pagesList = gson.fromJson(json, new TypeToken<List<Page>>() {}.getType());
-				pages = Sets.newHashSet(pagesList);
-			}
-
+			Set<Page> pages = getSubscriptions(user, repo);
 			Page page = new Page(projectName, branchName, path);
 			if (pages.add(page)) {
-				json = gson.toJson(pages);
-				File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-				File file = new File(workingDir, loginName + SUBSCRIPTIONS_SUFFIX);
-				FileUtils.writeStringToFile(file, json, Charsets.UTF_8);
-
-				Git git = Git.wrap(repo.r());
-				git.add()
-					.addFilepattern(loginName + SUBSCRIPTIONS_SUFFIX)
-					.call();
-				PersonIdent ident = new PersonIdent(loginName, user.getEmail());
-				git.commit()
-					.setAuthor(ident)
-					.setCommitter(ident)
-					.setMessage(loginName + SUBSCRIPTIONS_SUFFIX)
-					.call();
+				saveSubscriptions(user, pages, repo, true);
 			}
 		} catch (GitAPIException e) {
 			throw new IOException(e);
@@ -104,40 +85,53 @@ public class SubscriptionStore {
 		ILockedRepository repo = null;
 		try {
 			repo = getOrCreateRepository(user);
-			String json = BlobUtils.getHeadContent(repo.r(), user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
-			if (StringUtils.isNotBlank(json)) {
-				Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-				List<Page> pagesList = gson.fromJson(json, new TypeToken<List<Page>>() {}.getType());
-				Set<Page> pages = Sets.newHashSet(pagesList);
-				Page page = new Page(projectName, branchName, path);
-				if (pages.remove(page)) {
-					Git git = Git.wrap(repo.r());
-					if (!pages.isEmpty()) {
-						json = gson.toJson(pages);
-						File workingDir = RepositoryUtil.getWorkingDir(repo.r());
-						File file = new File(workingDir, user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
-						FileUtils.writeStringToFile(file, json, Charsets.UTF_8);
-						git.add()
-							.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
-							.call();
-					} else {
-						git.rm()
-							.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
-							.call();
-					}
-
-					PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
-					git.commit()
-						.setAuthor(ident)
-						.setCommitter(ident)
-						.setMessage(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
-						.call();
-				}
+			Set<Page> pages = getSubscriptions(user, repo);
+			Page page = new Page(projectName, branchName, path);
+			if (pages.remove(page)) {
+				saveSubscriptions(user, pages, repo, true);
 			}
 		} catch (GitAPIException e) {
 			throw new IOException(e);
 		} finally {
 			Util.closeQuietly(repo);
+		}
+	}
+
+	private Set<Page> getSubscriptions(User user, ILockedRepository repo) {
+		String json = BlobUtils.getHeadContent(repo.r(), user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
+		Set<Page> pages = Sets.newHashSet();
+		if (StringUtils.isNotBlank(json)) {
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			List<Page> pagesList = gson.fromJson(json, new TypeToken<List<Page>>() {}.getType());
+			pages.addAll(pagesList);
+		}
+		return pages;
+	}
+
+	private void saveSubscriptions(User user, Set<Page> pages, ILockedRepository repo, boolean commit) throws IOException, GitAPIException {
+		Git git = Git.wrap(repo.r());
+		if (!pages.isEmpty()) {
+			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+			String json = gson.toJson(pages);
+			File workingDir = RepositoryUtil.getWorkingDir(repo.r());
+			File file = new File(workingDir, user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
+			FileUtils.writeStringToFile(file, json, Charsets.UTF_8);
+			git.add()
+				.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
+				.call();
+		} else {
+			git.rm()
+				.addFilepattern(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
+				.call();
+		}
+
+		if (commit) {
+			PersonIdent ident = new PersonIdent(user.getLoginName(), user.getEmail());
+			git.commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage(user.getLoginName() + SUBSCRIPTIONS_SUFFIX)
+				.call();
 		}
 	}
 
@@ -154,15 +148,9 @@ public class SubscriptionStore {
 	}
 
 	private boolean isSubscribed(String projectName, String branchName, String path, User user, ILockedRepository repo) {
-		String json = BlobUtils.getHeadContent(repo.r(), user.getLoginName() + SUBSCRIPTIONS_SUFFIX);
-		if (StringUtils.isNotBlank(json)) {
-			Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-			List<Page> pagesList = gson.fromJson(json, new TypeToken<List<Page>>() {}.getType());
-			Page page = new Page(projectName, branchName, path);
-			return pagesList.contains(page);
-		} else {
-			return false;
-		}
+		Set<Page> pages = getSubscriptions(user, repo);
+		Page page = new Page(projectName, branchName, path);
+		return pages.contains(page);
 	}
 
 	public Set<String> getSubscriberEmails(String projectName, String branchName, String path) throws IOException {
@@ -204,6 +192,94 @@ public class SubscriptionStore {
 			return globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
 		} catch (RepositoryNotFoundException e) {
 			return globalRepositoryManager.createProjectCentralRepository(REPOSITORY_NAME, false, user);
+		}
+	}
+
+	@Subscribe
+	public void renameProject(ProjectRenamedEvent event) {
+		String projectName = event.getProjectName();
+		String newProjectName = event.getNewProjectName();
+		ILockedRepository repo = null;
+		try {
+			List<String> users = userStore.listUsers();
+			repo = getOrCreateRepository(event.getCurrentUser());
+			boolean anyChanged = false;
+			for (String loginName : users) {
+				User user = userStore.getUser(loginName);
+				Set<Page> pages = getSubscriptions(user, repo);
+				Set<Page> newPages = Sets.newHashSet();
+				for (Iterator<Page> iter = pages.iterator(); iter.hasNext();) {
+					Page page = iter.next();
+					String projName = page.getProjectName();
+					if (projName.equals(projectName)) {
+						iter.remove();
+						newPages.add(new Page(newProjectName, page.getBranchName(), page.getPath()));
+					}
+				}
+				if (!newPages.isEmpty()) {
+					pages.addAll(newPages);
+					saveSubscriptions(user, pages, repo, false);
+					anyChanged = true;
+				}
+			}
+
+			if (anyChanged) {
+				PersonIdent ident = new PersonIdent(event.getCurrentUser().getLoginName(), event.getCurrentUser().getEmail());
+				Git.wrap(repo.r()).commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("rename project " + projectName + " to " + newProjectName) //$NON-NLS-1$ //$NON-NLS-2$
+					.call();
+			}
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	@Subscribe
+	public void deleteProject(ProjectDeletedEvent event) {
+		String projectName = event.getProjectName();
+		ILockedRepository repo = null;
+		try {
+			List<String> users = userStore.listUsers();
+			repo = getOrCreateRepository(event.getCurrentUser());
+			boolean anyChanged = false;
+			for (String loginName : users) {
+				User user = userStore.getUser(loginName);
+				Set<Page> pages = getSubscriptions(user, repo);
+				boolean changed = false;
+				for (Iterator<Page> iter = pages.iterator(); iter.hasNext();) {
+					Page page = iter.next();
+					String projName = page.getProjectName();
+					if (projName.equals(projectName)) {
+						iter.remove();
+						changed = true;
+					}
+				}
+				if (changed) {
+					saveSubscriptions(user, pages, repo, false);
+					anyChanged = true;
+				}
+			}
+
+			if (anyChanged) {
+				PersonIdent ident = new PersonIdent(event.getCurrentUser().getLoginName(), event.getCurrentUser().getEmail());
+				Git.wrap(repo.r()).commit()
+				.setAuthor(ident)
+				.setCommitter(ident)
+				.setMessage("delete project " + projectName) //$NON-NLS-1$
+				.call();
+			}
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} finally {
+			Util.closeQuietly(repo);
 		}
 	}
 }

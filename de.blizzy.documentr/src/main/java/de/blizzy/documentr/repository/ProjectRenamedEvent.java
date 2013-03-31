@@ -15,31 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.project;
-
-import javax.validation.constraints.NotNull;
+package de.blizzy.documentr.repository;
 
 import lombok.Getter;
+import de.blizzy.documentr.access.User;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import de.blizzy.documentr.validation.annotation.ProjectNameNotBlacklisted;
-import de.blizzy.documentr.validation.annotation.ValidProjectName;
-
-public class ProjectForm {
-	@NotNull(message="{project.name.blank}")
-	@NotBlank(message="{project.name.blank}")
-	@ValidProjectName
-	@ProjectNameNotBlacklisted
+public class ProjectRenamedEvent {
 	@Getter
-	private String name;
-	@ValidProjectName
-	@ProjectNameNotBlacklisted
+	private String projectName;
 	@Getter
-	private String originalName;
+	private String newProjectName;
+	@Getter
+	private User currentUser;
 
-	ProjectForm(String name, String originalName) {
-		this.name = name;
-		this.originalName = originalName;
+	ProjectRenamedEvent(String projectName, String newProjectName, User currentUser) {
+		this.projectName = projectName;
+		this.newProjectName = newProjectName;
+		this.currentUser = currentUser;
 	}
 }

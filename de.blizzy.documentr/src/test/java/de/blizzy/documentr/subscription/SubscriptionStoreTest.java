@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -128,5 +129,17 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 		subscriptionStore.subscribe(PROJECT, BRANCH, PAGE, user2);
 
 		assertEquals(Sets.newHashSet(EMAIL, EMAIL_2), subscriptionStore.getSubscriberEmails(PROJECT, BRANCH, PAGE));
+	}
+
+	@Test
+	@Ignore
+	public void renameProject() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProject() {
+		// TODO: implement test
 	}
 }

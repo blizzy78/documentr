@@ -36,6 +36,7 @@ import com.google.common.eventbus.EventBus;
 
 import de.blizzy.documentr.Settings;
 import de.blizzy.documentr.access.User;
+import de.blizzy.documentr.util.Util;
 
 @Component
 public class GlobalRepositoryManager implements IGlobalRepositoryManager {
@@ -85,9 +86,7 @@ public class GlobalRepositoryManager implements IGlobalRepositoryManager {
 			throws IOException, GitAPIException {
 
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
-		ILockedRepository repo = repoManager.createBranchRepository(branchName, startingBranch);
-		eventBus.post(new BranchCreatedEvent(projectName, branchName));
-		return repo;
+		return repoManager.createBranchRepository(branchName, startingBranch);
 	}
 
 	@Override
@@ -135,5 +134,18 @@ public class GlobalRepositoryManager implements IGlobalRepositoryManager {
 	public void importSampleContents(String projectName) throws IOException, GitAPIException {
 		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
 		repoManager.importSampleContents();
+	}
+
+	@Override
+	public void renameProject(String projectName, String newProjectName, User user) throws IOException, GitAPIException {
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
+		repoManager.renameProject(newProjectName, user);
+	}
+
+	@Override
+	public void deleteProject(String projectName, User user) {
+		File repoDir = new File(reposDir, projectName);
+		Util.deleteQuietly(repoDir);
+		eventBus.post(new ProjectDeletedEvent(projectName, user));
 	}
 }

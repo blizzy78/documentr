@@ -30,6 +30,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gitective.core.CommitUtils;
 import org.gitective.core.RepositoryUtils;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -289,5 +290,11 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 		assertEquals(2, branches.size());
 		assertTrue(branches.contains("branch1")); //$NON-NLS-1$
 		assertTrue(branches.contains("branch2")); //$NON-NLS-1$
+	}
+
+	@Test
+	@Ignore
+	public void renameProject() {
+		// TODO: implement test
 	}
 }

@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.repository;
 
-import static de.blizzy.documentr.DocumentrMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -73,6 +72,7 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 
 		when(repoManagerFactory.getManager(allReposDir, PROJECT)).thenReturn(repoManager);
 
+		Whitebox.setInternalState(globalRepoManager, eventBus);
 		globalRepoManager.init();
 	}
 
@@ -98,8 +98,6 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 	public void createProjectBranchRepository() throws IOException, GitAPIException {
 		when(repoManager.createBranchRepository("branch", "startingBranch")).thenReturn(repo); //$NON-NLS-1$ //$NON-NLS-2$
 		assertSame(repo, globalRepoManager.createProjectBranchRepository(PROJECT, "branch", "startingBranch")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		verify(eventBus).post(eqReflection(new BranchCreatedEvent(PROJECT, "branch"))); //$NON-NLS-1$
 	}
 
 	@Test
@@ -114,16 +112,44 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 		File dataDir = tempDir.getRoot();
 		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
 		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
-		Whitebox.setInternalState(repoManagerFactory, lockManager);
+		Whitebox.setInternalState(repoManagerFactory, lockManager, eventBus);
 		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
-		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory);
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus);
 		globalRepoManager.init();
 		globalRepoManager.createProjectCentralRepository("project1", USER); //$NON-NLS-1$
 		globalRepoManager.createProjectCentralRepository("project2", USER); //$NON-NLS-1$
 
 		List<String> projects = globalRepoManager.listProjects();
-		assertEquals(2, projects.size());
-		assertTrue(projects.contains("project1")); //$NON-NLS-1$
-		assertTrue(projects.contains("project2")); //$NON-NLS-1$
+		assertEquals(Lists.newArrayList("project1", "project2"), projects); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Test
+	public void renameProject() throws IOException, GitAPIException {
+		File dataDir = tempDir.getRoot();
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
+		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
+		Whitebox.setInternalState(repoManagerFactory, lockManager, eventBus);
+		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus);
+		globalRepoManager.init();
+		globalRepoManager.createProjectCentralRepository("project1", USER); //$NON-NLS-1$
+
+		globalRepoManager.renameProject("project1", "project2", USER); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals(Lists.newArrayList("project2"), globalRepoManager.listProjects()); //$NON-NLS-1$
+	}
+
+	@Test
+	public void deleteProject() throws IOException, GitAPIException {
+		File dataDir = tempDir.getRoot();
+		when(settings.getDocumentrDataDir()).thenReturn(dataDir);
+		ProjectRepositoryManagerFactory repoManagerFactory = new ProjectRepositoryManagerFactory();
+		Whitebox.setInternalState(repoManagerFactory, lockManager, eventBus);
+		GlobalRepositoryManager globalRepoManager = new GlobalRepositoryManager();
+		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory, eventBus);
+		globalRepoManager.init();
+		globalRepoManager.createProjectCentralRepository("project", USER); //$NON-NLS-1$
+
+		globalRepoManager.deleteProject("project", USER); //$NON-NLS-1$
+		assertTrue(globalRepoManager.listProjects().isEmpty());
 	}
 }

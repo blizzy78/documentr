@@ -198,10 +198,22 @@ class ProjectRepositoryManager {
 			lockManager.unlock(lock);
 		}
 
-		return getBranchRepository(branchName);
+		ILockedRepository repo = null;
+		try {
+			repo = getBranchRepositoryInternal(branchName, false);
+			return repo;
+		} finally {
+			if (repo != null) {
+				eventBus.post(new BranchCreatedEvent(projectName, branchName));
+			}
+		}
 	}
 
 	ILockedRepository getBranchRepository(String branchName) throws IOException, GitAPIException {
+		return getBranchRepositoryInternal(branchName, true);
+	}
+
+	private ILockedRepository getBranchRepositoryInternal(String branchName, boolean pull) throws IOException, GitAPIException {
 		Assert.hasLength(branchName);
 
 		File repoDir = new File(reposDir, branchName);
@@ -211,7 +223,9 @@ class ProjectRepositoryManager {
 
 		LockedRepository lockedRepo = LockedRepository.lockProjectBranch(projectName, branchName, lockManager);
 		Repository repo = new RepositoryBuilder().findGitDir(repoDir).build();
-		Git.wrap(repo).pull().call();
+		if (pull) {
+			Git.wrap(repo).pull().call();
+		}
 		lockedRepo.setRepository(repo);
 		return lockedRepo;
 	}
@@ -293,5 +307,36 @@ class ProjectRepositoryManager {
 				eventBus.post(new BranchCreatedEvent(projectName, branch));
 			}
 		}
+	}
+
+	void renameProject(String newProjectName, User currentUser) throws IOException, GitAPIException {
+		File newReposDir = new File(reposDir.getParentFile(), newProjectName);
+		FileUtils.moveDirectory(reposDir, newReposDir);
+		reposDir = newReposDir;
+		centralRepoDir = new File(reposDir, CENTRAL_REPO_NAME);
+
+		Repository centralRepo = null;
+		File centralRepoGitDir;
+		try {
+			centralRepo = getCentralRepositoryInternal(true);
+			centralRepoGitDir = centralRepo.getDirectory();
+		} finally {
+			RepositoryUtil.closeQuietly(centralRepo);
+		}
+
+		List<String> branches = listBranches();
+		for (String branch : branches) {
+			ILockedRepository repo = null;
+			try {
+				repo = getBranchRepositoryInternal(branch, false);
+				StoredConfig config = repo.r().getConfig();
+				config.setString("remote", "origin", "url", centralRepoGitDir.toURI().toString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				config.save();
+			} finally {
+				Util.closeQuietly(repo);
+			}
+		}
+
+		eventBus.post(new ProjectRenamedEvent(projectName, newProjectName, currentUser));
 	}
 }

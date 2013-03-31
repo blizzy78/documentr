@@ -43,4 +43,8 @@ public interface IGlobalRepositoryManager {
 	List<String> listProjects();
 
 	void importSampleContents(String projectName) throws IOException, GitAPIException;
+
+	void renameProject(String projectName, String newProjectName, User user) throws IOException, GitAPIException;
+
+	void deleteProject(String projectName, User user);
 }

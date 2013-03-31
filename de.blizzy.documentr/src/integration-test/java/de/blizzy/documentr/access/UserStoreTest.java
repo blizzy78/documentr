@@ -305,4 +305,16 @@ public class UserStoreTest extends AbstractDocumentrTest {
 				new PermissionGrantedAuthority(rga.getTarget(), Permission.EDIT_PAGE));
 		assertEquals(expected, result);
 	}
+
+	@Test
+	@Ignore
+	public void renameProject() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProject() {
+		// TODO: implement test
+	}
 }

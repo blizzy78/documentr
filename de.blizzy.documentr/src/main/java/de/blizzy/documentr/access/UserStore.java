@@ -48,6 +48,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.StringMap;
@@ -56,6 +57,8 @@ import com.google.gson.reflect.TypeToken;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.ProjectDeletedEvent;
+import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.repository.RepositoryUtil;
 import de.blizzy.documentr.util.Util;
 
@@ -657,6 +660,143 @@ public class UserStore {
 				.call();
 		} catch (GitAPIException e) {
 			throw new IOException(e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	@Subscribe
+	public void renameProject(ProjectRenamedEvent event) {
+		String projectName = event.getProjectName();
+		String newProjectName = event.getNewProjectName();
+		User currentUser = event.getCurrentUser();
+		ILockedRepository repo = null;
+		try {
+			List<String> users = listUsers();
+			users.add(ANONYMOUS_USER_LOGIN_NAME);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			boolean anyChanged = false;
+			for (String loginName : users) {
+				List<RoleGrantedAuthority> authorities = getUserAuthorities(loginName, repo);
+				Set<RoleGrantedAuthority> newAuthorities = Sets.newHashSet();
+				boolean changed = false;
+				for (RoleGrantedAuthority authority : authorities) {
+					RoleGrantedAuthority newAuthority = renameProject(authority, projectName, newProjectName);
+					if (newAuthority != null) {
+						newAuthorities.add(newAuthority);
+						changed = true;
+					} else {
+						newAuthorities.add(authority);
+					}
+				}
+				if (changed) {
+					saveUserAuthorities(loginName, newAuthorities, repo, currentUser, false);
+					anyChanged = true;
+				}
+			}
+
+			if (anyChanged) {
+				PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+				Git.wrap(repo.r()).commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("rename project " + projectName + " to " + newProjectName) //$NON-NLS-1$ //$NON-NLS-2$
+					.call();
+			}
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	private RoleGrantedAuthority renameProject(RoleGrantedAuthority authority, String projectName, String newProjectName) {
+		GrantedAuthorityTarget target = authority.getTarget();
+		String targetId = target.getTargetId();
+		GrantedAuthorityTarget newTarget = null;
+		switch (target.getType()) {
+			case PROJECT:
+				{
+					String projName = targetId;
+					if (projName.equals(projectName)) {
+						newTarget = new GrantedAuthorityTarget(newProjectName, GrantedAuthorityTarget.Type.PROJECT);
+					}
+				}
+				break;
+
+			case BRANCH:
+				{
+					String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+					if (projName.equals(projectName)) {
+						String branchName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
+						String newTargetId = newProjectName + "/" + branchName; //$NON-NLS-1$
+						newTarget = new GrantedAuthorityTarget(newTargetId, GrantedAuthorityTarget.Type.BRANCH);
+					}
+				}
+				break;
+		}
+		return (newTarget != null) ? new RoleGrantedAuthority(newTarget, authority.getRoleName()) : null;
+	}
+
+	@Subscribe
+	public void deleteProject(ProjectDeletedEvent event) {
+		String projectName = event.getProjectName();
+		User currentUser = event.getCurrentUser();
+		ILockedRepository repo = null;
+		try {
+			List<String> users = listUsers();
+			users.add(ANONYMOUS_USER_LOGIN_NAME);
+			repo = globalRepositoryManager.getProjectCentralRepository(REPOSITORY_NAME, false);
+			boolean anyChanged = false;
+			for (String loginName : users) {
+				Set<RoleGrantedAuthority> authorities = Sets.newHashSet(getUserAuthorities(loginName, repo));
+				boolean changed = false;
+				for (Iterator<RoleGrantedAuthority> iter = authorities.iterator(); iter.hasNext();) {
+					RoleGrantedAuthority authority = iter.next();
+					GrantedAuthorityTarget target = authority.getTarget();
+					String targetId = target.getTargetId();
+					switch (target.getType()) {
+						case PROJECT:
+							{
+								String projName = targetId;
+								if (projName.equals(projectName)) {
+									iter.remove();
+									changed = true;
+								}
+							}
+							break;
+
+						case BRANCH:
+							{
+								String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+								if (projName.equals(projectName)) {
+									iter.remove();
+									changed = true;
+								}
+							}
+							break;
+					}
+				}
+				if (changed) {
+					saveUserAuthorities(loginName, authorities, repo, currentUser, false);
+					anyChanged = true;
+				}
+			}
+
+			if (anyChanged) {
+				PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
+				Git.wrap(repo.r()).commit()
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage("delete project " + projectName) //$NON-NLS-1$
+					.call();
+			}
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
 		} finally {
 			Util.closeQuietly(repo);
 		}

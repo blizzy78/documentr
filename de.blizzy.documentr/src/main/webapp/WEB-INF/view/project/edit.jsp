@@ -40,6 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <c:set var="action"><c:url value="/project/save"/></c:set>
 <form:form commandName="projectForm" action="${action}" method="POST" cssClass="well form-inline">
 	<fieldset>
+		<form:hidden path="originalName"/>
+	
 		<div class="control-group <spring:hasBindErrors name="projectForm">error</spring:hasBindErrors>">
 			<form:label path="name" cssClass="control-label"><spring:message code="label.name"/>:</form:label>
 			<form:input path="name" cssClass="input-xlarge"/>

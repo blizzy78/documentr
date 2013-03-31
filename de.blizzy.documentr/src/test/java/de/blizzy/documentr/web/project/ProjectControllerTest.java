@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -80,12 +81,24 @@ public class ProjectControllerTest extends AbstractDocumentrTest {
 
 	@Test
 	public void saveProject() throws IOException, GitAPIException {
-		ProjectForm projectForm = new ProjectForm(PROJECT);
+		ProjectForm projectForm = new ProjectForm(PROJECT, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(projectForm, "projectForm"); //$NON-NLS-1$
 		String view = projectController.saveProject(projectForm, bindingResult, authentication);
 		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
 
 		verify(repoManager).createProjectCentralRepository(PROJECT, USER);
+	}
+
+	@Test
+	@Ignore
+	public void saveProjectWithRename() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProject() {
+		// TODO: implement test
 	}
 }
