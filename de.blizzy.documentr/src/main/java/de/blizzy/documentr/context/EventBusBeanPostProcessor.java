@@ -28,6 +28,7 @@ import com.google.common.eventbus.EventBus;
 @Slf4j
 class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 	private BeanFactory beanFactory;
+	private EventBus eventBus;
 
 	EventBusBeanPostProcessor(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -36,7 +37,9 @@ class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		try {
-			EventBus eventBus = beanFactory.getBean(EventBus.class);
+			if (eventBus == null) {
+				eventBus = beanFactory.getBean(EventBus.class);
+			}
 			log.trace("registering potential event bus subscriber: {}", beanName); //$NON-NLS-1$
 			eventBus.register(bean);
 		} catch (BeanCurrentlyInCreationException e) {
@@ -52,7 +55,8 @@ class EventBusBeanPostProcessor implements DestructionAwareBeanPostProcessor {
 
 	@Override
 	public void postProcessBeforeDestruction(Object bean, String beanName) {
-		EventBus eventBus = beanFactory.getBean(EventBus.class);
-		eventBus.unregister(bean);
+		if (eventBus != null) {
+			eventBus.unregister(bean);
+		}
 	}
 }
