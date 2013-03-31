@@ -49,7 +49,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="<spring:message code="button.save"/>"/>
-			<a href="<c:url value="/"/>" class="btn"><spring:message code="button.cancel"/></a>
+			<c:choose>
+				<c:when test="${empty projectForm.originalName}">
+					<a href="<c:url value="/projects"/>" class="btn"><spring:message code="button.cancel"/></a>
+				</c:when>
+				<c:otherwise>
+					<a href="<c:url value="/project/${projectForm.originalName}"/>" class="btn"><spring:message code="button.cancel"/></a>
+				</c:otherwise>
+			</c:choose>
 		</div>
 	</fieldset>
 </form:form>
