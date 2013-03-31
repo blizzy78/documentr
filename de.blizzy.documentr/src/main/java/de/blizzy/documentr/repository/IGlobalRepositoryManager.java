@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import de.blizzy.documentr.access.User;
 
@@ -44,7 +46,35 @@ public interface IGlobalRepositoryManager {
 
 	void importSampleContents(String projectName) throws IOException, GitAPIException;
 
+	@Caching(evict={
+			@CacheEvict(value="page_html", allEntries=true),
+			@CacheEvict(value="page_header_html", allEntries=true),
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
+	})
 	void renameProject(String projectName, String newProjectName, User user) throws IOException, GitAPIException;
 
+	@Caching(evict={
+			@CacheEvict(value="page_html", allEntries=true),
+			@CacheEvict(value="page_header_html", allEntries=true),
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
+	})
 	void deleteProject(String projectName, User user);
+
+	@Caching(evict={
+			@CacheEvict(value="page_html", allEntries=true),
+			@CacheEvict(value="page_header_html", allEntries=true),
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
+	})
+	void renameProjectBranch(String projectName, String branchName, String newBranchName, User user) throws IOException, GitAPIException;
+
+	@Caching(evict={
+			@CacheEvict(value="page_html", allEntries=true),
+			@CacheEvict(value="page_header_html", allEntries=true),
+			@CacheEvict(value="page_view_restriction_role", allEntries=true),
+			@CacheEvict(value="page_metadata", allEntries=true)
+	})
+	void deleteProjectBranch(String projectName, String branchName, User user) throws IOException, GitAPIException;
 }

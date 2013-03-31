@@ -53,11 +53,11 @@ public final class DocumentrConstants {
 	public static final String ROLE_NAME_PATTERN = "[a-zA-Z0-9_\\- ]+"; //$NON-NLS-1$
 
 	/** Blacklist pattern a project name must not match against. */
-	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|importSample|_.*)"; //$NON-NLS-1$
+	public static final String PROJECT_NAMES_BLACKLIST_PATTERN = "(?:create|save|list|importSample|edit|delete|_.*)"; //$NON-NLS-1$
 
 	/** Blacklist pattern a branch name must not match against. */
 	public static final String BRANCH_NAMES_BLACKLIST_PATTERN =
-			"(?:create|save|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
+			"(?:create|save|edit|delete|" + Constants.MASTER + "|\\..*|_.*)"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/** Pattern a macro name must match against. */
 	public static final String MACRO_NAME_PATTERN = "[a-zA-Z0-9_\\-]+"; //$NON-NLS-1$

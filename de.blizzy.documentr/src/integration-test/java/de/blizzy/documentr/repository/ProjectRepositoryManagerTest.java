@@ -297,4 +297,10 @@ public class ProjectRepositoryManagerTest extends AbstractDocumentrTest {
 	public void renameProject() {
 		// TODO: implement test
 	}
+
+	@Test
+	@Ignore
+	public void renameProjectBranch() {
+		// TODO: implement test
+	}
 }

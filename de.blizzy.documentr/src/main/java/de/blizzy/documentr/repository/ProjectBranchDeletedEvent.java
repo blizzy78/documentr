@@ -15,44 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.subscription;
+package de.blizzy.documentr.repository;
 
-import lombok.AccessLevel;
 import lombok.Getter;
+import de.blizzy.documentr.access.User;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
-class Page {
-	@Getter(AccessLevel.PACKAGE)
+public class ProjectBranchDeletedEvent {
+	@Getter
 	private String projectName;
-	@Getter(AccessLevel.PACKAGE)
+	@Getter
 	private String branchName;
-	@Getter(AccessLevel.PACKAGE)
-	private String path;
+	@Getter
+	private User currentUser;
 
-	Page(String projectName, String branchName, String path) {
+	ProjectBranchDeletedEvent(String projectName, String branchName, User currentUser) {
 		this.projectName = projectName;
 		this.branchName = branchName;
-		this.path = path;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
-			return true;
-		} else if ((o != null) && o.getClass().equals(getClass())) {
-			Page other = (Page) o;
-			return new EqualsBuilder()
-				.append(projectName, other.projectName)
-				.append(branchName, other.branchName)
-				.append(path, other.path)
-				.isEquals();
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return projectName.hashCode() ^ branchName.hashCode() ^ path.hashCode();
+		this.currentUser = currentUser;
 	}
 }

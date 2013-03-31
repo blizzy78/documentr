@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.access;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.Getter;
@@ -102,6 +104,16 @@ public class DocumentrSecurityExpressionRoot extends SecurityExpressionRoot impl
 
 	public boolean projectExists(String projectName) {
 		return repoManager.listProjects().contains(StringUtils.defaultString(projectName));
+	}
+
+	public boolean branchExists(String projectName, String branchName) {
+		try {
+			return projectExists(projectName) ?
+					repoManager.listProjectBranches(projectName).contains(StringUtils.defaultString(branchName)) :
+					false;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	void setThis(Object target) {

@@ -81,6 +81,26 @@ function deleteProject() {
 }
 </sec:authorize>
 
+<sec:authorize access="hasProjectPermission(#name, EDIT_BRANCH)">
+function deleteBranch(branch) {
+	require(['documentr/dialog'], function(dialog) {
+		new dialog.Dialog()
+			.title('<spring:message code="title.deleteBranch"/>')
+			<c:set var="text"><spring:message code="deleteBranchX.html" arguments="__BRANCHNAME__"/></c:set>
+			.htmlMessage('<c:out value="${fn:replace(text, &quot;'&quot;, &quot;\\\\'&quot;)}" escapeXml="false"/>'.replace(/__BRANCHNAME__/, branch))
+			.button(new dialog.DialogButton()
+				.text('<spring:message code="button.delete"/>')
+				.click(function(button, dlg) {
+					dlg.allButtonsDisabled(true);
+					window.location.href = '<c:url value="/branch/delete/${name}/"/>' + branch;
+				})
+				.danger())
+			.button(new dialog.DialogButton().cancel())
+			.show();
+	});
+}
+</sec:authorize>
+
 </dt:pageJS>
 
 <dt:breadcrumbs>
@@ -119,7 +139,20 @@ function deleteProject() {
 	<c:when test="${!empty branches}">
 		<ul>
 		<c:forEach var="branch" items="${branches}">
-			<li><a href="<c:url value="/page/${name}/${branch}/home"/>"><c:out value="${branch}"/></a></li>
+			<c:set var="buttons">
+				<sec:authorize access="hasBranchPermission(#name, #branch, EDIT_BRANCH)">
+					<a href="<c:url value="/branch/edit/${name}/${branch}"/>"><spring:message code="button.edit"/></a>,
+				</sec:authorize>
+				<sec:authorize access="hasProjectPermission(#name, EDIT_BRANCH)">
+					<a href="javascript:void(deleteBranch('${branch}'));"><spring:message code="button.delete"/></a>,
+				</sec:authorize>
+			</c:set>
+			<li>
+				<a href="<c:url value="/page/${name}/${branch}/home"/>"><c:out value="${branch}"/></a>
+				<c:if test="${!empty buttons}">
+					(<c:out value="${fn:trim(d:substringBeforeLast(fn:trim(buttons), ','))}" escapeXml="false"/>)
+				</c:if>
+			</li>
 		</c:forEach>
 		</ul>
 	</c:when>

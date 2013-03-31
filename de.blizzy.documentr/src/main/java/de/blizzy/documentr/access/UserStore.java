@@ -46,6 +46,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
@@ -57,6 +58,8 @@ import com.google.gson.reflect.TypeToken;
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.ProjectBranchDeletedEvent;
+import de.blizzy.documentr.repository.ProjectBranchRenamedEvent;
 import de.blizzy.documentr.repository.ProjectDeletedEvent;
 import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.repository.RepositoryUtil;
@@ -667,9 +670,28 @@ public class UserStore {
 
 	@Subscribe
 	public void renameProject(ProjectRenamedEvent event) {
-		String projectName = event.getProjectName();
-		String newProjectName = event.getNewProjectName();
-		User currentUser = event.getCurrentUser();
+		final String projectName = event.getProjectName();
+		final String newProjectName = event.getNewProjectName();
+		Function<RoleGrantedAuthority, RoleGrantedAuthority> function = new Function<RoleGrantedAuthority, RoleGrantedAuthority>() {
+			@Override
+			public RoleGrantedAuthority apply(RoleGrantedAuthority authority) {
+				RoleGrantedAuthority newAuthority = renameProject(authority, projectName, newProjectName);
+				return (newAuthority != null) ? newAuthority : authority;
+			}
+		};
+		try {
+			transformAllAuthorities(function, "rename project " + projectName + " to " + newProjectName, //$NON-NLS-1$ //$NON-NLS-2$
+					event.getCurrentUser());
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void transformAllAuthorities(Function<RoleGrantedAuthority, RoleGrantedAuthority> function,
+			String commitMessage, User currentUser) throws IOException, GitAPIException {
+
 		ILockedRepository repo = null;
 		try {
 			List<String> users = listUsers();
@@ -678,19 +700,9 @@ public class UserStore {
 			boolean anyChanged = false;
 			for (String loginName : users) {
 				List<RoleGrantedAuthority> authorities = getUserAuthorities(loginName, repo);
-				Set<RoleGrantedAuthority> newAuthorities = Sets.newHashSet();
-				boolean changed = false;
-				for (RoleGrantedAuthority authority : authorities) {
-					RoleGrantedAuthority newAuthority = renameProject(authority, projectName, newProjectName);
-					if (newAuthority != null) {
-						newAuthorities.add(newAuthority);
-						changed = true;
-					} else {
-						newAuthorities.add(authority);
-					}
-				}
-				if (changed) {
-					saveUserAuthorities(loginName, newAuthorities, repo, currentUser, false);
+				List<RoleGrantedAuthority> newAuthorities = Lists.newArrayList(Lists.transform(authorities, function));
+				if (!newAuthorities.equals(authorities)) {
+					saveUserAuthorities(loginName, Sets.newHashSet(newAuthorities), repo, currentUser, false);
 					anyChanged = true;
 				}
 			}
@@ -700,13 +712,9 @@ public class UserStore {
 				Git.wrap(repo.r()).commit()
 					.setAuthor(ident)
 					.setCommitter(ident)
-					.setMessage("rename project " + projectName + " to " + newProjectName) //$NON-NLS-1$ //$NON-NLS-2$
+					.setMessage(commitMessage)
 					.call();
 			}
-		} catch (IOException e) {
-			log.error(StringUtils.EMPTY, e);
-		} catch (GitAPIException e) {
-			log.error(StringUtils.EMPTY, e);
 		} finally {
 			Util.closeQuietly(repo);
 		}
@@ -742,8 +750,40 @@ public class UserStore {
 
 	@Subscribe
 	public void deleteProject(ProjectDeletedEvent event) {
-		String projectName = event.getProjectName();
-		User currentUser = event.getCurrentUser();
+		final String projectName = event.getProjectName();
+		Predicate<RoleGrantedAuthority> predicate = new Predicate<RoleGrantedAuthority>() {
+			@Override
+			public boolean apply(RoleGrantedAuthority authority) {
+				GrantedAuthorityTarget target = authority.getTarget();
+				String targetId = target.getTargetId();
+				switch (target.getType()) {
+					case PROJECT:
+						{
+							String projName = targetId;
+							return !projName.equals(projectName);
+						}
+
+					case BRANCH:
+						{
+							String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+							return !projName.equals(projectName);
+						}
+				}
+				return true;
+			}
+		};
+		try {
+			deleteFromAllAuthorities(predicate, "delete project " + projectName, event.getCurrentUser()); //$NON-NLS-1$
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void deleteFromAllAuthorities(Predicate<RoleGrantedAuthority> predicate, String commitMessage, User currentUser)
+			throws IOException, GitAPIException {
+
 		ILockedRepository repo = null;
 		try {
 			List<String> users = listUsers();
@@ -752,35 +792,9 @@ public class UserStore {
 			boolean anyChanged = false;
 			for (String loginName : users) {
 				Set<RoleGrantedAuthority> authorities = Sets.newHashSet(getUserAuthorities(loginName, repo));
-				boolean changed = false;
-				for (Iterator<RoleGrantedAuthority> iter = authorities.iterator(); iter.hasNext();) {
-					RoleGrantedAuthority authority = iter.next();
-					GrantedAuthorityTarget target = authority.getTarget();
-					String targetId = target.getTargetId();
-					switch (target.getType()) {
-						case PROJECT:
-							{
-								String projName = targetId;
-								if (projName.equals(projectName)) {
-									iter.remove();
-									changed = true;
-								}
-							}
-							break;
-
-						case BRANCH:
-							{
-								String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
-								if (projName.equals(projectName)) {
-									iter.remove();
-									changed = true;
-								}
-							}
-							break;
-					}
-				}
-				if (changed) {
-					saveUserAuthorities(loginName, authorities, repo, currentUser, false);
+				Set<RoleGrantedAuthority> newAuthorities = Sets.newHashSet(Sets.filter(authorities, predicate));
+				if (!newAuthorities.equals(authorities)) {
+					saveUserAuthorities(loginName, newAuthorities, repo, currentUser, false);
 					anyChanged = true;
 				}
 			}
@@ -790,15 +804,85 @@ public class UserStore {
 				Git.wrap(repo.r()).commit()
 					.setAuthor(ident)
 					.setCommitter(ident)
-					.setMessage("delete project " + projectName) //$NON-NLS-1$
+					.setMessage(commitMessage)
 					.call();
 			}
+		} finally {
+			Util.closeQuietly(repo);
+		}
+	}
+
+	@Subscribe
+	public void deleteProjectBranch(ProjectBranchDeletedEvent event) {
+		final String projectName = event.getProjectName();
+		final String branchName = event.getBranchName();
+		Predicate<RoleGrantedAuthority> predicate = new Predicate<RoleGrantedAuthority>() {
+			@Override
+			public boolean apply(RoleGrantedAuthority authority) {
+				GrantedAuthorityTarget target = authority.getTarget();
+				String targetId = target.getTargetId();
+				switch (target.getType()) {
+					case BRANCH:
+						{
+							String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+							String braName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
+							return !projName.equals(projectName) || !braName.equals(branchName);
+						}
+				}
+				return true;
+			}
+		};
+		try {
+			deleteFromAllAuthorities(predicate, "delete branch " + projectName + "/" + branchName, //$NON-NLS-1$ //$NON-NLS-2$
+					event.getCurrentUser());
 		} catch (IOException e) {
 			log.error(StringUtils.EMPTY, e);
 		} catch (GitAPIException e) {
 			log.error(StringUtils.EMPTY, e);
-		} finally {
-			Util.closeQuietly(repo);
 		}
+	}
+
+	@Subscribe
+	public void renameProjectBranch(ProjectBranchRenamedEvent event) {
+		final String projectName = event.getProjectName();
+		final String branchName = event.getBranchName();
+		final String newBranchName = event.getNewBranchName();
+		Function<RoleGrantedAuthority, RoleGrantedAuthority> function = new Function<RoleGrantedAuthority, RoleGrantedAuthority>() {
+			@Override
+			public RoleGrantedAuthority apply(RoleGrantedAuthority authority) {
+				RoleGrantedAuthority newAuthority = renameProjectBranch(authority, projectName, branchName, newBranchName);
+				return (newAuthority != null) ? newAuthority : authority;
+			}
+		};
+		try {
+			transformAllAuthorities(function,
+					"rename branch " + projectName + "/" + branchName + " to " + projectName + "/" + newBranchName, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					event.getCurrentUser());
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private RoleGrantedAuthority renameProjectBranch(RoleGrantedAuthority authority, String projectName, String branchName,
+			String newBranchName) {
+
+		GrantedAuthorityTarget target = authority.getTarget();
+		String targetId = target.getTargetId();
+		GrantedAuthorityTarget newTarget = null;
+		switch (target.getType()) {
+			case BRANCH:
+				{
+					String projName = StringUtils.substringBefore(targetId, "/"); //$NON-NLS-1$
+					String braName = StringUtils.substringAfter(targetId, "/"); //$NON-NLS-1$
+					if (projName.equals(projectName) && braName.equals(branchName)) {
+						String newTargetId = projectName + "/" + newBranchName; //$NON-NLS-1$
+						newTarget = new GrantedAuthorityTarget(newTargetId, GrantedAuthorityTarget.Type.BRANCH);
+					}
+				}
+				break;
+		}
+		return (newTarget != null) ? new RoleGrantedAuthority(newTarget, authority.getRoleName()) : null;
 	}
 }

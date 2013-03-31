@@ -46,11 +46,16 @@ public class BranchForm {
 	@ValidBranchName
 	@BranchNameNotBlacklisted
 	@Getter
+	private String originalName;
+	@ValidBranchName
+	@BranchNameNotBlacklisted
+	@Getter
 	private String startingBranch;
 
-	BranchForm(String projectName, String name, String startingBranch) {
+	BranchForm(String projectName, String name, String originalName, String startingBranch) {
 		this.projectName = projectName;
 		this.name = name;
+		this.originalName = originalName;
 		this.startingBranch = startingBranch;
 	}
 }

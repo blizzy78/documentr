@@ -28,6 +28,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -192,5 +193,30 @@ public class PageIndexTest extends AbstractDocumentrTest {
 		assertEquals(2, pageIndex.getNumDocuments());
 
 		assertEquals(Sets.newHashSet("tag"), pageIndex.getAllTags(authentication)); //$NON-NLS-1$
+	}
+
+
+	@Test
+	@Ignore
+	public void renameProject() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProject() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void renameProjectBranch() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProjectBranch() {
+		// TODO: implement test
 	}
 }

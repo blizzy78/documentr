@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -151,5 +152,17 @@ public class GlobalRepositoryManagerTest extends AbstractDocumentrTest {
 
 		globalRepoManager.deleteProject("project", USER); //$NON-NLS-1$
 		assertTrue(globalRepoManager.listProjects().isEmpty());
+	}
+
+	@Test
+	@Ignore
+	public void renameProjectBranch() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProjectBranch() {
+		// TODO: implement test
 	}
 }

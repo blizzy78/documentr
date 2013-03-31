@@ -29,6 +29,7 @@ import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -84,7 +85,7 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 	public void saveFirstBranch() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Collections.<String>emptyList());
 
-		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null);
+		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
 		assertEquals("/page/edit/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -100,10 +101,10 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 	public void saveBranch() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList("old_branch")); //$NON-NLS-1$
 
-		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
+		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, null, "old_branch"); //$NON-NLS-1$
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
-		assertEquals("/page/" + PROJECT + "/" + BRANCH + "/" + DocumentrConstants.HOME_PAGE_NAME, removeViewPrefix(view)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 
@@ -114,11 +115,19 @@ public class BranchControllerTest extends AbstractDocumentrTest {
 	public void saveBranchButExists() throws IOException, GitAPIException {
 		when(repoManager.listProjectBranches(PROJECT)).thenReturn(Lists.newArrayList(BRANCH));
 
-		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, "old_branch"); //$NON-NLS-1$
+		BranchForm branchForm = new BranchForm(PROJECT, BRANCH, BRANCH, null);
 		BindingResult bindingResult = new BeanPropertyBindingResult(branchForm, "branchForm"); //$NON-NLS-1$
 		String view = branchController.saveBranch(branchForm, bindingResult, authentication);
-		assertEquals("/project/branch/edit", view); //$NON-NLS-1$
-		assertTrue(bindingResult.hasErrors());
-		assertTrue(bindingResult.hasFieldErrors("name")); //$NON-NLS-1$
+		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
+		assertFalse(bindingResult.hasErrors());
+
+		verify(repoManager, never()).createProjectBranchRepository(anyString(), anyString(), anyString());
+	}
+
+	@Test
+	@Ignore
+	public void saveBranchWithRename() {
+		// TODO: implement test
 	}
 }

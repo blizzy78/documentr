@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
@@ -48,6 +49,8 @@ import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.repository.ILockedRepository;
+import de.blizzy.documentr.repository.ProjectBranchDeletedEvent;
+import de.blizzy.documentr.repository.ProjectBranchRenamedEvent;
 import de.blizzy.documentr.repository.ProjectDeletedEvent;
 import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.repository.RepositoryNotFoundException;
@@ -197,44 +200,53 @@ public class SubscriptionStore {
 
 	@Subscribe
 	public void renameProject(ProjectRenamedEvent event) {
-		String projectName = event.getProjectName();
-		String newProjectName = event.getNewProjectName();
+		final String projectName = event.getProjectName();
+		final String newProjectName = event.getNewProjectName();
+		Function<Page, Page> function = new Function<Page, Page>() {
+			@Override
+			public Page apply(Page page) {
+				return page.getProjectName().equals(projectName) ?
+						new Page(newProjectName, page.getBranchName(), page.getPath()) :
+						page;
+			}
+		};
+
+		try {
+			transformAllSubscriptions(function, "rename project " + projectName + " to " + newProjectName, //$NON-NLS-1$ //$NON-NLS-2$
+					event.getCurrentUser());
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void transformAllSubscriptions(Function<Page, Page> function, String commitMessage, User currentUser)
+			throws IOException, GitAPIException {
+
 		ILockedRepository repo = null;
 		try {
 			List<String> users = userStore.listUsers();
-			repo = getOrCreateRepository(event.getCurrentUser());
+			repo = getOrCreateRepository(currentUser);
 			boolean anyChanged = false;
 			for (String loginName : users) {
 				User user = userStore.getUser(loginName);
-				Set<Page> pages = getSubscriptions(user, repo);
-				Set<Page> newPages = Sets.newHashSet();
-				for (Iterator<Page> iter = pages.iterator(); iter.hasNext();) {
-					Page page = iter.next();
-					String projName = page.getProjectName();
-					if (projName.equals(projectName)) {
-						iter.remove();
-						newPages.add(new Page(newProjectName, page.getBranchName(), page.getPath()));
-					}
-				}
-				if (!newPages.isEmpty()) {
-					pages.addAll(newPages);
-					saveSubscriptions(user, pages, repo, false);
+				List<Page> pages = Lists.newArrayList(getSubscriptions(user, repo));
+				List<Page> newPages = Lists.newArrayList(Lists.transform(pages, function));
+				if (!newPages.equals(pages)) {
+					saveSubscriptions(user, Sets.newHashSet(newPages), repo, false);
 					anyChanged = true;
 				}
 			}
 
 			if (anyChanged) {
-				PersonIdent ident = new PersonIdent(event.getCurrentUser().getLoginName(), event.getCurrentUser().getEmail());
+				PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
 				Git.wrap(repo.r()).commit()
 					.setAuthor(ident)
 					.setCommitter(ident)
-					.setMessage("rename project " + projectName + " to " + newProjectName) //$NON-NLS-1$ //$NON-NLS-2$
+					.setMessage(commitMessage)
 					.call();
 			}
-		} catch (GitAPIException e) {
-			log.error(StringUtils.EMPTY, e);
-		} catch (IOException e) {
-			log.error(StringUtils.EMPTY, e);
 		} finally {
 			Util.closeQuietly(repo);
 		}
@@ -242,44 +254,95 @@ public class SubscriptionStore {
 
 	@Subscribe
 	public void deleteProject(ProjectDeletedEvent event) {
-		String projectName = event.getProjectName();
+		final String projectName = event.getProjectName();
+		Predicate<Page> predicate = new Predicate<Page>() {
+			@Override
+			public boolean apply(Page page) {
+				return !page.getProjectName().equals(projectName);
+			}
+		};
+		try {
+			deleteFromAllSubscriptions(predicate, "delete project " + projectName, event.getCurrentUser()); //$NON-NLS-1$
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void deleteFromAllSubscriptions(Predicate<Page> predicate, String commitMessage, User currentUser)
+			throws IOException, GitAPIException {
+
 		ILockedRepository repo = null;
 		try {
 			List<String> users = userStore.listUsers();
-			repo = getOrCreateRepository(event.getCurrentUser());
+			repo = getOrCreateRepository(currentUser);
 			boolean anyChanged = false;
 			for (String loginName : users) {
 				User user = userStore.getUser(loginName);
 				Set<Page> pages = getSubscriptions(user, repo);
-				boolean changed = false;
-				for (Iterator<Page> iter = pages.iterator(); iter.hasNext();) {
-					Page page = iter.next();
-					String projName = page.getProjectName();
-					if (projName.equals(projectName)) {
-						iter.remove();
-						changed = true;
-					}
-				}
-				if (changed) {
-					saveSubscriptions(user, pages, repo, false);
+				Set<Page> newPages = Sets.newHashSet(Sets.filter(pages, predicate));
+				if (!newPages.equals(pages)) {
+					saveSubscriptions(user, newPages, repo, false);
 					anyChanged = true;
 				}
 			}
 
 			if (anyChanged) {
-				PersonIdent ident = new PersonIdent(event.getCurrentUser().getLoginName(), event.getCurrentUser().getEmail());
+				PersonIdent ident = new PersonIdent(currentUser.getLoginName(), currentUser.getEmail());
 				Git.wrap(repo.r()).commit()
-				.setAuthor(ident)
-				.setCommitter(ident)
-				.setMessage("delete project " + projectName) //$NON-NLS-1$
-				.call();
+					.setAuthor(ident)
+					.setCommitter(ident)
+					.setMessage(commitMessage)
+					.call();
 			}
-		} catch (GitAPIException e) {
-			log.error(StringUtils.EMPTY, e);
-		} catch (IOException e) {
-			log.error(StringUtils.EMPTY, e);
 		} finally {
 			Util.closeQuietly(repo);
+		}
+	}
+
+	@Subscribe
+	public void deleteProjectBranch(ProjectBranchDeletedEvent event) {
+		final String projectName = event.getProjectName();
+		final String branchName = event.getBranchName();
+		Predicate<Page> predicate = new Predicate<Page>() {
+			@Override
+			public boolean apply(Page page) {
+				return !page.getProjectName().equals(projectName) || !page.getBranchName().equals(branchName);
+			}
+		};
+		try {
+			deleteFromAllSubscriptions(predicate, "delete branch " + projectName + "/" + branchName, //$NON-NLS-1$ //$NON-NLS-2$
+					event.getCurrentUser());
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	@Subscribe
+	public void renameProjectBranch(ProjectBranchRenamedEvent event) {
+		final String projectName = event.getProjectName();
+		final String branchName = event.getBranchName();
+		final String newBranchName = event.getNewBranchName();
+		Function<Page, Page> function = new Function<Page, Page>() {
+			@Override
+			public Page apply(Page page) {
+				return page.getProjectName().equals(projectName) && page.getBranchName().equals(branchName) ?
+						new Page(projectName, newBranchName, page.getPath()) :
+						page;
+			}
+		};
+
+		try {
+			transformAllSubscriptions(function,
+					"rename branch " + projectName + "/" + branchName + " to " + projectName + "/" + newBranchName, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					event.getCurrentUser());
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		} catch (GitAPIException e) {
+			log.error(StringUtils.EMPTY, e);
 		}
 	}
 }

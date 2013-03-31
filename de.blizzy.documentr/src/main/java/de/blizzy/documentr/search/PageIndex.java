@@ -50,7 +50,10 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -77,8 +80,9 @@ import de.blizzy.documentr.page.PageChangedEvent;
 import de.blizzy.documentr.page.PageTextData;
 import de.blizzy.documentr.page.PagesDeletedEvent;
 import de.blizzy.documentr.repository.BranchCreatedEvent;
-import de.blizzy.documentr.repository.GlobalRepositoryManager;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
+import de.blizzy.documentr.repository.ProjectBranchDeletedEvent;
+import de.blizzy.documentr.repository.ProjectBranchRenamedEvent;
 import de.blizzy.documentr.repository.ProjectDeletedEvent;
 import de.blizzy.documentr.repository.ProjectRenamedEvent;
 import de.blizzy.documentr.util.Replacement;
@@ -131,7 +135,7 @@ public class PageIndex {
 	@Autowired
 	private ListeningExecutorService taskExecutor;
 	@Autowired
-	private GlobalRepositoryManager globalRepositoryManager;
+	private IGlobalRepositoryManager globalRepositoryManager;
 	private Analyzer analyzer;
 	private Directory directory;
 	private IndexWriter writer;
@@ -412,6 +416,86 @@ public class PageIndex {
 			if (dirty) {
 				this.dirty.set(true);
 			}
+		}
+	}
+
+	@Subscribe
+	public void deleteProjectBranch(ProjectBranchDeletedEvent event) {
+		String projectName = event.getProjectName();
+		String branchName = event.getBranchName();
+		submitDeleteProjectBranchTask(projectName, branchName);
+	}
+
+	private void submitDeleteProjectBranchTask(final String projectName, final String branchName) {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					deleteProjectBranchInternal(projectName, branchName);
+				} catch (IOException e) {
+					log.error(StringUtils.EMPTY, e);
+				} catch (RuntimeException e) {
+					log.error(StringUtils.EMPTY, e);
+				}
+			}
+		};
+		taskExecutor.submit(runnable);
+	}
+
+	private void deleteProjectBranchInternal(String projectName, String branchName) throws IOException {
+		boolean dirty = false;
+		try {
+			log.info("deleting branch {}/{}", projectName, branchName); //$NON-NLS-1$
+			BooleanQuery bq = new BooleanQuery();
+			bq.add(new TermQuery(new Term(PROJECT, projectName)), BooleanClause.Occur.MUST);
+			bq.add(new TermQuery(new Term(BRANCH, branchName)), BooleanClause.Occur.MUST);
+			writer.deleteDocuments(bq);
+			dirty = true;
+		} finally {
+			if (dirty) {
+				this.dirty.set(true);
+			}
+		}
+	}
+
+	@Subscribe
+	public void renameProjectBranch(ProjectBranchRenamedEvent event) {
+		String projectName = event.getProjectName();
+		String branchName = event.getBranchName();
+		String newBranchName = event.getNewBranchName();
+		try {
+			submitRenameProjectBranchTask(projectName, branchName, newBranchName);
+		} catch (IOException e) {
+			log.error(StringUtils.EMPTY, e);
+		}
+	}
+
+	private void submitRenameProjectBranchTask(final String projectName, final String branchName, final String newBranchName)
+			throws IOException {
+
+		final List<String> paths = pageStore.listAllPagePaths(projectName, newBranchName);
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					renameProjectBranchAsync(projectName, branchName, newBranchName, paths);
+				} catch (IOException e) {
+					log.error(StringUtils.EMPTY, e);
+				} catch (RuntimeException e) {
+					log.error(StringUtils.EMPTY, e);
+				}
+			}
+		};
+		taskExecutor.submit(runnable);
+	}
+
+	private void renameProjectBranchAsync(String projectName, String branchName, String newBranchName, List<String> newPagePaths)
+			throws IOException {
+
+		deleteProjectBranchInternal(projectName, branchName);
+
+		for (String pagePath : newPagePaths) {
+			submitAddPageTask(projectName, newBranchName, pagePath);
 		}
 	}
 

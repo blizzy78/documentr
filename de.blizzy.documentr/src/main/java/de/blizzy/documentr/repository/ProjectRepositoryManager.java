@@ -293,8 +293,13 @@ class ProjectRepositoryManager {
 						Git git = Git.wrap(repo);
 						RefSpec refSpec = new RefSpec("refs/heads/" + branchName + ":refs/remotes/origin/" + branchName); //$NON-NLS-1$ //$NON-NLS-2$
 						git.fetch().setRemote("origin").setRefSpecs(refSpec).call();  //$NON-NLS-1$
-						git.branchCreate().setName(branchName).setStartPoint("origin/" + branchName).call(); //$NON-NLS-1$
-						git.checkout().setName(branchName).call();
+						git.branchCreate()
+							.setName(branchName)
+							.setStartPoint("origin/" + branchName) //$NON-NLS-1$
+							.call();
+						git.checkout()
+							.setName(branchName)
+							.call();
 					} finally {
 						RepositoryUtil.closeQuietly(repo);
 					}
@@ -338,5 +343,50 @@ class ProjectRepositoryManager {
 		}
 
 		eventBus.post(new ProjectRenamedEvent(projectName, newProjectName, currentUser));
+	}
+
+	void renameProjectBranch(String branchName, String newBranchName, User currentUser) throws IOException, GitAPIException {
+		File branchDir = new File(reposDir, branchName);
+		File newBranchDir = new File(reposDir, newBranchName);
+		FileUtils.moveDirectory(branchDir, newBranchDir);
+
+		ILockedRepository repo = null;
+		try {
+			repo = getCentralRepository(false);
+			Git.wrap(repo.r()).branchRename()
+				.setOldName(branchName)
+				.setNewName(newBranchName)
+				.call();
+		} finally {
+			Util.closeQuietly(repo);
+		}
+
+		try {
+			repo = getBranchRepositoryInternal(newBranchName, false);
+			StoredConfig config = repo.r().getConfig();
+			config.unsetSection("branch", branchName); //$NON-NLS-1$
+			config.save();
+			Git git = Git.wrap(repo.r());
+			git.checkout()
+				.setName(Constants.MASTER)
+				.call();
+			git.branchDelete()
+				.setBranchNames(branchName, "origin/" + branchName) //$NON-NLS-1$
+				.setForce(true)
+				.call();
+			RefSpec refSpec = new RefSpec("refs/heads/" + newBranchName + ":refs/remotes/origin/" + newBranchName); //$NON-NLS-1$ //$NON-NLS-2$
+			git.fetch().setRemote("origin").setRefSpecs(refSpec).call();  //$NON-NLS-1$
+			git.branchCreate()
+				.setName(newBranchName)
+				.setStartPoint("origin/" + newBranchName) //$NON-NLS-1$
+				.call();
+			git.checkout()
+				.setName(newBranchName)
+				.call();
+		} finally {
+			Util.closeQuietly(repo);
+		}
+
+		eventBus.post(new ProjectBranchRenamedEvent(projectName, branchName, newBranchName, currentUser));
 	}
 }

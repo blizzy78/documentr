@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -147,5 +148,33 @@ public class GlobalRepositoryManager implements IGlobalRepositoryManager {
 		File repoDir = new File(reposDir, projectName);
 		Util.deleteQuietly(repoDir);
 		eventBus.post(new ProjectDeletedEvent(projectName, user));
+	}
+
+	@Override
+	public void renameProjectBranch(String projectName, String branchName, String newBranchName, User user)
+			throws IOException, GitAPIException {
+
+		ProjectRepositoryManager repoManager = repositoryManagerFactory.getManager(reposDir, projectName);
+		repoManager.renameProjectBranch(branchName, newBranchName, user);
+	}
+
+	@Override
+	public void deleteProjectBranch(String projectName, String branchName, User user) throws IOException, GitAPIException {
+		File repoDir = new File(reposDir, projectName);
+		File branchDir = new File(repoDir, branchName);
+		Util.deleteQuietly(branchDir);
+
+		ILockedRepository repo = null;
+		try {
+			repo = getProjectCentralRepository(projectName, false);
+			Git.wrap(repo.r()).branchDelete()
+				.setBranchNames(branchName)
+				.setForce(true)
+				.call();
+		} finally {
+			Util.closeQuietly(repo);
+		}
+
+		eventBus.post(new ProjectBranchDeletedEvent(projectName, branchName, user));
 	}
 }

@@ -142,4 +142,16 @@ public class SubscriptionStoreTest extends AbstractDocumentrTest {
 	public void deleteProject() {
 		// TODO: implement test
 	}
+
+	@Test
+	@Ignore
+	public void renameProjectBranch() {
+		// TODO: implement test
+	}
+
+	@Test
+	@Ignore
+	public void deleteProjectBranch() {
+		// TODO: implement test
+	}
 }

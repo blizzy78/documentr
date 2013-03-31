@@ -36,6 +36,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import com.google.common.collect.Lists;
+
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
 import de.blizzy.documentr.access.UserStore;
@@ -88,6 +90,19 @@ public class ProjectControllerTest extends AbstractDocumentrTest {
 		assertRedirect(view);
 
 		verify(repoManager).createProjectCentralRepository(PROJECT, USER);
+	}
+
+	@Test
+	public void saveProjectButExists() throws IOException, GitAPIException {
+		when(repoManager.listProjects()).thenReturn(Lists.newArrayList(PROJECT));
+
+		ProjectForm projectForm = new ProjectForm(PROJECT, PROJECT);
+		BindingResult bindingResult = new BeanPropertyBindingResult(projectForm, "projectForm"); //$NON-NLS-1$
+		String view = projectController.saveProject(projectForm, bindingResult, authentication);
+		assertEquals("/project/" + PROJECT, removeViewPrefix(view)); //$NON-NLS-1$
+		assertRedirect(view);
+
+		verify(repoManager, never()).createProjectCentralRepository(anyString(), any(User.class));
 	}
 
 	@Test

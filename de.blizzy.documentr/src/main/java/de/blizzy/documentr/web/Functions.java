@@ -272,6 +272,10 @@ public final class Functions {
 		return macroFactory.listGroovyMacros();
 	}
 
+	public static String substringBeforeLast(String s, String separator) {
+		return StringUtils.substringBeforeLast(s, separator);
+	}
+
 	static void setGlobalRepositoryManager(IGlobalRepositoryManager repoManager) {
 		Functions.repoManager = repoManager;
 	}

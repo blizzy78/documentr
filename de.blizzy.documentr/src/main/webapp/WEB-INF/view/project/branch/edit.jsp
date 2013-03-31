@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib prefix="d" uri="http://documentr.org/tld/documentr" %>
 <%@ taglib prefix="dt" tagdir="/WEB-INF/tags" %>
 
-<sec:authorize access="(#branchForm.name == null) ?
-	hasProjectPermission(#branchForm.projectName, EDIT_BRANCH) :
-	hasBranchPermission(#branchForm.projectName, #branchForm.name, EDIT_BRANCH)">
+<sec:authorize access="branchExists(#branchForm.projectName, #branchForm.name) ?
+	hasBranchPermission(#branchForm.projectName, #branchForm.name, EDIT_BRANCH) :
+	hasProjectPermission(#branchForm.projectName, EDIT_BRANCH)">
 
 <dt:breadcrumbs>
 	<li><a href="<c:url value="/projects"/>"><spring:message code="title.projects"/></a> <span class="divider">/</span></li>
@@ -47,12 +47,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 </c:choose>
 <form:form commandName="branchForm" action="${action}" method="POST" cssClass="well ${cssClass}">
 	<fieldset>
+		<form:hidden path="originalName"/>
+	
 		<div class="control-group <spring:hasBindErrors name="branchForm">error</spring:hasBindErrors>">
 			<form:label path="name" cssClass="control-label"><spring:message code="label.name"/>:</form:label>
 			<form:input path="name" cssClass="input-xlarge"/>
 			<spring:hasBindErrors name="branchForm"><span class="help-inline"><form:errors path="name"/></span></spring:hasBindErrors>
 		</div>
-		<c:if test="${!empty branches}">
+		<c:if test="${(!empty branches) and (empty branchForm.originalName)}">
 			<div class="control-group">
 				<form:label path="startingBranch" cssClass="control-label"><spring:message code="label.branchFrom"/>:</form:label>
 				<form:select path="startingBranch">
