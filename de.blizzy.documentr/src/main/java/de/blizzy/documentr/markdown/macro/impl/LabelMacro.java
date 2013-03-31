@@ -24,7 +24,7 @@ import de.blizzy.documentr.markdown.macro.IMacroContext;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
 import de.blizzy.documentr.markdown.macro.Macro;
 
-@Macro(name="label", insertText="{{label [TYPE] TEXT/}}")
+@Macro(name="label", insertText="{{label TYPE [TEXT]/}}")
 public class LabelMacro implements IMacroRunnable {
 	@Override
 	public String getHtml(IMacroContext macroContext) {

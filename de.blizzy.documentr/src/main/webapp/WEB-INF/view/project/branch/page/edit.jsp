@@ -189,14 +189,14 @@ function insertMacro(insertText) {
 	if (selectedText === '') {
 		selectedText = insertText.substring(selectionStart, selectionEnd);
 	}
-	var newText = insertText.substring(0, selectionStart) + selectedText + insertText.substring(selectionEnd);
+	var prefix = insertText.substring(0, selectionStart);
+	var newText = prefix + selectedText + insertText.substring(selectionEnd);
 	editor.session.replace(editor.getSelectionRange(), newText);
-	editor.selection.setSelectionRange(range);
-	editor.selection.shiftSelection(selectionStart);
-	if (editor.selection.isEmpty()) {
-		for (var i = 0; i < selectedText.length; i++) {
-			editor.selection.selectRight();
-		}
+	editor.selection.clearSelection();
+	editor.selection.moveCursorTo(range.start.row, range.start.column);
+	moveCursor(prefix.length);
+	for (var i = 0; i < selectedText.length; i++) {
+		editor.selection.selectRight();
 	}
 	editor.focus();
 }
