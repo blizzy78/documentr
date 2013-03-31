@@ -53,9 +53,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<c:otherwise>
 		<div class="row">
 			<div class="hero-unit span8 offset2 hero-single">
-				<h1>documentr</h1>
+				<h1><img src="<c:url value="/img/documentr_title.png"/>" alt="documentr"/></h1>
 				<p><spring:message code="welcomeToDocumentr" htmlEscape="false"/></p>
-				<p>
+				<p class="buttons">
 					<sec:authorize access="isAnonymous()">
 						<a href="<c:url value="/access/login"/>" class="btn btn-primary btn-large"><spring:message code="button.login"/></a>
 					</sec:authorize>
