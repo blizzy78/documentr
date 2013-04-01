@@ -639,9 +639,6 @@ function unsubscribe() {
 					<c:if test="${path ne 'home'}">
 						<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 							<li><a href="javascript:void(showRelocateDialog());"><i class="icon-arrow-right"></i> <spring:message code="button.relocate"/>...</a></li>
-						</sec:authorize>
-						<%-- "home" page must not be deleted --%>
-						<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 							<li><a href="javascript:void(showDeleteDialog());"><i class="icon-trash"></i> <spring:message code="button.delete"/>...</a></li>
 						</sec:authorize>
 					</c:if>
