@@ -631,13 +631,12 @@ function unsubscribe() {
 				</dt:dropdownEntry>
 
 				<dt:dropdownEntry divider="true">
+					<sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
+						<c:if test="${fn:length(branches) ge 2}">
+							<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
+						</c:if>
+					</sec:authorize>
 					<c:if test="${path ne 'home'}">
-						<sec:authorize access="hasAnyBranchPermission(#projectName, EDIT_PAGE)">
-							<c:if test="${fn:length(branches) ge 2}">
-								<%-- doesn't work correctly for "home" page --%>
-								<li><a href="javascript:void(showCopyToBranchDialog());"><i class="icon-share-alt"></i> <spring:message code="button.copyToBranch"/>...</a></li>
-							</c:if>
-						</sec:authorize>
 						<sec:authorize access="hasBranchPermission(#projectName, #branchName, EDIT_PAGE)">
 							<li><a href="javascript:void(showRelocateDialog());"><i class="icon-arrow-right"></i> <spring:message code="button.relocate"/>...</a></li>
 						</sec:authorize>
