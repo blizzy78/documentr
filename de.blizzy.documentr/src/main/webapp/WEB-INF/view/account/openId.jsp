@@ -63,7 +63,7 @@ function showRemoveDialog(openId) {
 	<li class="active"><a href="<c:url value="/account/openId"/>"><spring:message code="title.openId"/></a></li>
 </ul>
 
-<h2><spring:message code="title.linkedOpenIds"/></h2>
+<h3><spring:message code="title.linkedOpenIds"/></h3>
 
 <c:set var="openIds" value="${d:listMyOpenIds()}"/>
 <c:choose>

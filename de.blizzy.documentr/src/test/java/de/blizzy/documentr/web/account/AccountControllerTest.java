@@ -24,11 +24,13 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
 import de.blizzy.documentr.access.User;
@@ -41,12 +43,14 @@ public class AccountControllerTest extends AbstractDocumentrTest {
 	private User user;
 	@Mock
 	private Authentication authentication;
+	@Mock
+	private Model model;
 	@InjectMocks
 	private AccountController accountController;
 
 	@Test
 	public void getMyAccount() {
-		assertEquals("/account/index", accountController.getMyAccount()); //$NON-NLS-1$
+		assertEquals("/account/index", accountController.getMyAccount(model)); //$NON-NLS-1$
 	}
 
 	@Test
@@ -67,5 +71,11 @@ public class AccountControllerTest extends AbstractDocumentrTest {
 		InOrder inOrder = inOrder(user, userStore);
 		inOrder.verify(user).removeOpenId("openId"); //$NON-NLS-1$
 		inOrder.verify(userStore).saveUser(same(user), same(user));
+	}
+
+	@Test
+	@Ignore
+	public void saveMyAccount() {
+		// TODO: implement test
 	}
 }
