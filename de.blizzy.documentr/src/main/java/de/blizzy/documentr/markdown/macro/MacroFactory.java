@@ -29,12 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.Lifecycle;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import de.blizzy.documentr.data.IDataHandler;
 
 @Component
 @Slf4j
@@ -143,5 +146,22 @@ public class MacroFactory implements Lifecycle {
 	public void deleteGroovyMacro(String name) throws IOException {
 		groovyMacroScanner.deleteMacro(name);
 		rescanAllMacros();
+	}
+
+	public Object getData(String macroName, String request, Map<String, String[]> parameterMap, Authentication authentication) {
+		IMacro macro = get(macroName);
+		if (macro == null) {
+			throw new IllegalArgumentException("unknown macro: " + macroName); //$NON-NLS-1$
+		}
+		Class<? extends IDataHandler> dataHandlerClass = macro.getDescriptor().getDataHandlerClass();
+		if (dataHandlerClass == null) {
+			throw new IllegalArgumentException("macro does not have an associated data handler: " + macroName); //$NON-NLS-1$
+		}
+		try {
+			IDataHandler dataHandler = dataHandlerClass.newInstance();
+			return dataHandler.getData(request, parameterMap, authentication);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

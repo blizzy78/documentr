@@ -20,6 +20,8 @@ package de.blizzy.documentr.markdown.macro;
 import java.util.Locale;
 import java.util.Set;
 
+import de.blizzy.documentr.data.IDataHandler;
+
 public interface IMacroDescriptor {
 	String getMacroName();
 	String getInsertText();
@@ -27,4 +29,5 @@ public interface IMacroDescriptor {
 	String getDescription(Locale locale);
 	boolean isCacheable();
 	Set<MacroSetting> getSettings();
+	Class<? extends IDataHandler> getDataHandlerClass();
 }

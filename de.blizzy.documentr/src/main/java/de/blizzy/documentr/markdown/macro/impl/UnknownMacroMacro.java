@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import de.blizzy.documentr.data.IDataHandler;
 import de.blizzy.documentr.markdown.macro.IMacro;
 import de.blizzy.documentr.markdown.macro.IMacroDescriptor;
 import de.blizzy.documentr.markdown.macro.IMacroRunnable;
@@ -63,6 +64,11 @@ public class UnknownMacroMacro implements IMacro {
 			@Override
 			public Set<MacroSetting> getSettings() {
 				return Collections.emptySet();
+			}
+
+			@Override
+			public Class<? extends IDataHandler> getDataHandlerClass() {
+				return null;
 			}
 		};
 	}

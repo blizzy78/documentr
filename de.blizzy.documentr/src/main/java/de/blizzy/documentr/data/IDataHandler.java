@@ -15,27 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.markdown.macro;
+package de.blizzy.documentr.data;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Map;
 
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.data.IDataHandler;
-import de.blizzy.documentr.data.NullDataHandler;
+import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
+import de.blizzy.documentr.access.UserStore;
+import de.blizzy.documentr.page.IPageStore;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Component
-public @interface Macro {
-	String name();
-	String insertText();
-	boolean cacheable() default true;
-	MacroSetting[] settings() default {};
-	Class<? extends IDataHandler> dataHandler() default NullDataHandler.class;
+public interface IDataHandler {
+	Object getData(String request, Map<String, String[]> parameterMap, Authentication authentication);
+	void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator);
+	void setUserStore(UserStore userStore);
+	void setPageStore(IPageStore pageStore);
 }

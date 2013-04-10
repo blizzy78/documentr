@@ -35,6 +35,8 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableSet;
 
+import de.blizzy.documentr.data.IDataHandler;
+
 @Component(MessageSourceMacroDescriptor.ID)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 class MessageSourceMacroDescriptor implements IMacroDescriptor {
@@ -50,6 +52,8 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 	private boolean cacheable = true;
 	@Getter
 	private Set<MacroSetting> settings = Collections.emptySet();
+	@Getter
+	private Class<? extends IDataHandler> dataHandlerClass;
 
 	MessageSourceMacroDescriptor(String macroName) {
 		Assert.hasLength(macroName);
@@ -92,6 +96,11 @@ class MessageSourceMacroDescriptor implements IMacroDescriptor {
 
 	MessageSourceMacroDescriptor settings(Set<MacroSetting> settings) {
 		this.settings = ImmutableSet.copyOf(settings);
+		return this;
+	}
+
+	MessageSourceMacroDescriptor dataHandlerClass(Class<? extends IDataHandler> dataHandlerClass) {
+		this.dataHandlerClass = dataHandlerClass;
 		return this;
 	}
 }

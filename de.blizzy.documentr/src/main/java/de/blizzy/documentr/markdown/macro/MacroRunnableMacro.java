@@ -48,7 +48,8 @@ class MacroRunnableMacro implements IMacro {
 		return MessageSourceMacroDescriptor.create(annotation.name(), beanFactory)
 				.insertText(annotation.insertText())
 				.cacheable(annotation.cacheable())
-				.settings(settings != null ? Sets.newHashSet(settings) : Collections.<MacroSetting>emptySet());
+				.settings(settings != null ? Sets.newHashSet(settings) : Collections.<MacroSetting>emptySet())
+				.dataHandlerClass(annotation.dataHandler());
 	}
 
 	@Override
