@@ -48,11 +48,6 @@ var require = {
 		}
 	},
 	config: {
-		'documentr/dialog': {
-			cancelText: '<spring:message code="button.cancel"/>',
-			closeText: '<spring:message code="button.close"/>'
-		},
-		
 		<sec:authorize access="isAuthenticated()">
 			'documentr/pageTree': {
 				applicationUrl: '<c:url value="/pageTree/application/json"/>',
@@ -74,15 +69,28 @@ var require = {
 				pageSplitEndText: '<spring:message code="title.pageSplitEnd"/>',
 				pageSplitUrl: '<c:url value="/page/split/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/_START_,_END_"/>'
 			},
-			
-			'documentr/macro/neighbors': {
+		</sec:authorize>
+
+		'documentr/dialog': {
+			cancelText: '<spring:message code="button.cancel"/>',
+			closeText: '<spring:message code="button.close"/>'
+		},
+		
+		'documentr/macro/neighbors': {
+			<sec:authorize access="isAuthenticated()">
 				saveChildrenOrderUrl: '<c:url value="/page/saveChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
 				resetChildrenOrderUrl: '<c:url value="/page/resetChildrenOrder/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_/json"/>',
 				saveText: '<spring:message code="button.save"/>',
 				cancelText: '<spring:message code="button.cancel"/>',
-				sortAlphabeticallyText: '<spring:message code="button.sortAlphabetically"/>'
-			}
-		</sec:authorize>
+				sortAlphabeticallyText: '<spring:message code="button.sortAlphabetically"/>',
+			</sec:authorize>
+			pageChildrenDataUrl: '<c:url value="/data/macro/neighbors/pageChildren">
+					<c:param name="project" value="_PROJECTNAME_"/>
+					<c:param name="branch" value="_BRANCHNAME_"/>
+					<c:param name="path" value="_PAGEPATH_"/>
+				</c:url>',
+			pageUrl: '<c:url value="/page/_PROJECTNAME_/_BRANCHNAME_/_PAGEPATH_"/>'
+		}
 	}
 };
 </script>

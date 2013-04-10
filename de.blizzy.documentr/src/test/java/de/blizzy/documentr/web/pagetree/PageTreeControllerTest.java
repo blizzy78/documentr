@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.reflect.Whitebox;
 import org.springframework.security.core.Authentication;
 
 import com.google.common.base.Function;
@@ -40,6 +42,11 @@ import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
+import de.blizzy.documentr.page.pagetree.AbstractTreeNode;
+import de.blizzy.documentr.page.pagetree.BranchTreeNode;
+import de.blizzy.documentr.page.pagetree.PageTreeNode;
+import de.blizzy.documentr.page.pagetree.PageTreeNodesProvider;
+import de.blizzy.documentr.page.pagetree.ProjectTreeNode;
 import de.blizzy.documentr.repository.IGlobalRepositoryManager;
 import de.blizzy.documentr.util.Util;
 
@@ -53,13 +60,21 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 	@Mock
 	private Authentication authentication;
 	@InjectMocks
+	private PageTreeNodesProvider nodesProvider;
+	@InjectMocks
 	private PageTreeController pageTreeController;
 
+	@Before
+	public void setUp() {
+		Whitebox.setInternalState(pageTreeController, nodesProvider);
+	}
+
 	@Test
-	public void getApplicationChildren() {
+	public void getApplicationChildren() throws IOException {
 		when(repoManager.listProjects()).thenReturn(
 				Lists.newArrayList("project1", "project2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		when(permissionEvaluator.hasAnyProjectPermission(authentication, Permission.VIEW)).thenReturn(true);
 		when(permissionEvaluator.hasProjectPermission(
 					same(authentication), notEq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$
 				.thenReturn(true);
@@ -83,6 +98,7 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		when(repoManager.listProjectBranches("project")).thenReturn( //$NON-NLS-1$
 				Lists.newArrayList("branch1", "branch2", "inaccessible")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		when(permissionEvaluator.hasAnyBranchPermission(authentication, "project", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$
 		when(permissionEvaluator.hasBranchPermission(
 					same(authentication), eq("project"), notEq("inaccessible"), same(Permission.VIEW))) //$NON-NLS-1$ //$NON-NLS-2$
 				.thenReturn(true);
@@ -111,6 +127,7 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		when(pageStore.getPage("project", "branch", "home", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title", "text")); //$NON-NLS-1$ //$NON-NLS-2$
 
+		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$ //$NON-NLS-2$
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
 
@@ -143,6 +160,7 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		when(pageStore.getPage("project", "branch", "home/foo/page2", false)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			.thenReturn(Page.fromText("title2", "text2")); //$NON-NLS-1$ //$NON-NLS-2$
 
+		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$ //$NON-NLS-2$
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
 

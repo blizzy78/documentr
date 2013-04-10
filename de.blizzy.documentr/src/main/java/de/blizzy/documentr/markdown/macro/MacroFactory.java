@@ -159,6 +159,7 @@ public class MacroFactory implements Lifecycle {
 		}
 		try {
 			IDataHandler dataHandler = dataHandlerClass.newInstance();
+			dataHandler.setBeanFactory(beanFactory);
 			return dataHandler.getData(request, parameterMap, authentication);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);

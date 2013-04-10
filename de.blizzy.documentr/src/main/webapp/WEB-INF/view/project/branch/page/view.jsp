@@ -527,22 +527,22 @@ function unsubscribe() {
 
 </sec:authorize>
 
-<sec:authorize access="isAuthenticated() or
-	hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
+$(function() {
+	<sec:authorize access="isAuthenticated()">
+		<%-- subscription mails entry point --%>
+		if (window.location.hash === '#changes') {
+			showChangesDialog();
+		}
+	</sec:authorize>
+	
+	<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
+		hookupInlineEditorToolbar();
+	</sec:authorize>
 
-	$(function() {
-		<sec:authorize access="isAuthenticated()">
-			<%-- subscription mails entry point --%>
-			if (window.location.hash === '#changes') {
-				showChangesDialog();
-			}
-		</sec:authorize>
-		
-		<sec:authorize access="hasPagePermission(#projectName, #branchName, #path, EDIT_PAGE)">
-			hookupInlineEditorToolbar();
-		</sec:authorize>
+	require(['documentr/macro/neighbors'], function(neighbors) {
+		neighbors.hookExpandHovers('<c:out value="${projectName}"/>', '<c:out value="${branchName}"/>');
 	});
-</sec:authorize>
+});
 
 </dt:pageJS>
 

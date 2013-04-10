@@ -15,31 +15,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.pagetree;
+package de.blizzy.documentr.data;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PageTreeNode extends AbstractTreeNode {
-	@Getter
-	private String projectName;
-	@Getter
-	private String branchName;
-	@Getter
-	private String path;
-	@Getter
-	private String title;
-	@Getter
-	@Setter(AccessLevel.PACKAGE)
-	private boolean hasBranchPermissions;
+import org.springframework.beans.factory.ListableBeanFactory;
 
-	PageTreeNode(String projectName, String branchName, String path, String title) {
-		super(Type.PAGE);
-
-		this.projectName = projectName;
-		this.branchName = branchName;
-		this.path = path;
-		this.title = title;
-	}
+public abstract class AbstractDataHandler implements IDataHandler {
+	@Getter(AccessLevel.PROTECTED)
+	@Setter
+	private ListableBeanFactory beanFactory;
 }

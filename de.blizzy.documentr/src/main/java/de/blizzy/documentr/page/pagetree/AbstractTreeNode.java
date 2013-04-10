@@ -15,20 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.web.pagetree;
+package de.blizzy.documentr.page.pagetree;
 
 import lombok.Getter;
 
-public class BranchTreeNode extends AbstractTreeNode {
-	@Getter
-	private String projectName;
-	@Getter
-	private String name;
+public abstract class AbstractTreeNode {
+	public static enum Type {
+		PROJECT, BRANCH, PAGE, ATTACHMENT;
+	}
 
-	BranchTreeNode(String projectName, String name) {
-		super(Type.BRANCH);
+	@Getter
+	private Type type;
 
-		this.projectName = projectName;
-		this.name = name;
+	AbstractTreeNode(Type type) {
+		this.type = type;
 	}
 }

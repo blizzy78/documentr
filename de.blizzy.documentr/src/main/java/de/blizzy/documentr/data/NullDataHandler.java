@@ -21,25 +21,9 @@ import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 
-import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
-import de.blizzy.documentr.access.UserStore;
-import de.blizzy.documentr.page.IPageStore;
-
-public class NullDataHandler implements IDataHandler {
+public class NullDataHandler extends AbstractDataHandler {
 	@Override
 	public Object getData(String request, Map<String, String[]> parameterMap, Authentication authentication) {
 		return null;
-	}
-
-	@Override
-	public void setPermissionEvaluator(DocumentrPermissionEvaluator permissionEvaluator) {
-	}
-
-	@Override
-	public void setUserStore(UserStore userStore) {
-	}
-
-	@Override
-	public void setPageStore(IPageStore pageStore) {
 	}
 }

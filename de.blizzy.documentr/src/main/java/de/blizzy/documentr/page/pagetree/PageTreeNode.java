@@ -15,15 +15,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.blizzy.documentr.data;
+package de.blizzy.documentr.page.pagetree;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.security.core.Authentication;
+public class PageTreeNode extends AbstractTreeNode {
+	@Getter
+	private String projectName;
+	@Getter
+	private String branchName;
+	@Getter
+	private String path;
+	@Getter
+	private String title;
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
+	private boolean hasBranchPermissions;
 
-public interface IDataHandler {
-	Object getData(String request, Map<String, String[]> parameterMap, Authentication authentication) throws InvocationTargetException;
-	void setBeanFactory(ListableBeanFactory beanFactory);
+	PageTreeNode(String projectName, String branchName, String path, String title) {
+		super(Type.PAGE);
+
+		this.projectName = projectName;
+		this.branchName = branchName;
+		this.path = path;
+		this.title = title;
+	}
 }

@@ -45,7 +45,7 @@ import de.blizzy.documentr.page.IPageStore;
 import de.blizzy.documentr.page.Page;
 import de.blizzy.documentr.util.Util;
 
-@Macro(name="neighbors", insertText="{{neighbors/}}", cacheable=false)
+@Macro(name="neighbors", insertText="{{neighbors/}}", cacheable=false, dataHandler=NeighborsMacroDataHandler.class)
 @Slf4j
 public class NeighborsMacro implements IMacroRunnable {
 	private HtmlSerializerContext htmlSerializerContext;
@@ -92,7 +92,7 @@ public class NeighborsMacro implements IMacroRunnable {
 			branchName = htmlSerializerContext.getBranchName();
 
 			Authentication authentication = htmlSerializerContext.getAuthentication();
-			reorderAllowed = (locale != null) &&
+			reorderAllowed = (locale != null) && (messageSource != null) &&
 					permissionEvaluator.hasBranchPermission(authentication, projectName, branchName, Permission.EDIT_PAGE);
 
 			if (log.isInfoEnabled()) {
@@ -105,8 +105,12 @@ public class NeighborsMacro implements IMacroRunnable {
 				StringBuilder buf = new StringBuilder();
 				Page page = getPage(path);
 				buf.append("<span class=\"well well-small neighbors pull-right\"><ul class=\"nav nav-list\">") //$NON-NLS-1$
-					.append(printParent(printLinkListItem(page, 1, maxChildren), path))
-					.append("</ul></span>"); //$NON-NLS-1$
+					.append(printParent(printLinkListItem(page, 1, maxChildren), path));
+				if ((locale != null) && (messageSource != null)) {
+					String hoverInfoText = messageSource.getMessage("neighborsItemsHoverExpandHelp", null, locale); //$NON-NLS-1$
+					buf.append("<div class=\"hover-help\">").append(hoverInfoText).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				buf.append("</ul></span>"); //$NON-NLS-1$
 				return buf.toString();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
