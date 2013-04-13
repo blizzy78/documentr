@@ -52,7 +52,6 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.StringMap;
 import com.google.gson.reflect.TypeToken;
 
 import de.blizzy.documentr.access.GrantedAuthorityTarget.Type;
@@ -194,12 +193,12 @@ public class UserStore {
 		String email = (String) userMap.get("email"); //$NON-NLS-1$
 		boolean disabled = ((Boolean) userMap.get("disabled")).booleanValue(); //$NON-NLS-1$
 		@SuppressWarnings("unchecked")
-		List<StringMap<String>> openIds = (List<StringMap<String>>) userMap.get("openIds"); //$NON-NLS-1$
+		List<Map<String, String>> openIds = (List<Map<String, String>>) userMap.get("openIds"); //$NON-NLS-1$
 		if (openIds == null) {
 			openIds = Lists.newArrayList();
 		}
 		User user = new User(loginName, password, email, disabled);
-		for (StringMap<String> map : openIds) {
+		for (Map<String, String> map : openIds) {
 			OpenId openId = new OpenId(map.get("delegateId"), map.get("realId")); //$NON-NLS-1$ //$NON-NLS-2$
 			user.addOpenId(openId);
 		}
