@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.blizzy.documentr.markdown.macro;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -161,8 +162,16 @@ public class MacroFactory implements Lifecycle {
 			IDataHandler dataHandler = dataHandlerClass.newInstance();
 			dataHandler.setBeanFactory(beanFactory);
 			return dataHandler.getData(request, parameterMap, authentication);
-		} catch (ReflectiveOperationException e) {
+		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			}
+			throw new RuntimeException(cause);
 		}
 	}
 }
