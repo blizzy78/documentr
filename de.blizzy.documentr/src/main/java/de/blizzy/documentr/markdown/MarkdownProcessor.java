@@ -123,7 +123,9 @@ public class MarkdownProcessor {
 		HtmlSerializer serializer = new HtmlSerializer(context);
 		String html = serializer.toHtml(rootNode);
 
-		List<MacroInvocation> macroInvocations = context.getMacroInvocations();
+		List<MacroInvocation> macroInvocations = Lists.newArrayList(context.getMacroInvocations());
+		// reverse order so that inner invocations will be processed before outer
+		Collections.reverse(macroInvocations);
 		int nonCacheableMacroIdx = 1;
 		for (MacroInvocation invocation : macroInvocations) {
 			IMacro macro = macroFactory.get(invocation.getMacroName());

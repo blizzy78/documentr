@@ -113,4 +113,16 @@ public class UtilTest extends AbstractDocumentrTest {
 		assertTrue(StringUtils.isEmpty(params.get("foo"))); //$NON-NLS-1$
 		assertEquals("baz", params.get("bar")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	@Test
+	public void serialize() {
+		String serialized = Util.serialize(Long.valueOf(123));
+		assertEquals("rO0ABXNyAA5qYXZhLmxhbmcuTG9uZzuL5JDMjyPfAgABSgAFdmFsdWV4cgAQamF2YS5sYW5nLk51bWJlcoaslR0LlOCLAgAAeHAAAAAAAAAAew==", serialized); //$NON-NLS-1$
+	}
+
+	@Test
+	public void deserialize() {
+		Long l = Util.deserialize("rO0ABXNyAA5qYXZhLmxhbmcuTG9uZzuL5JDMjyPfAgABSgAFdmFsdWV4cgAQamF2YS5sYW5nLk51bWJlcoaslR0LlOCLAgAAeHAAAAAAAAAAew==", Long.class); //$NON-NLS-1$
+		assertEquals(Long.valueOf(123), l);
+	}
 }

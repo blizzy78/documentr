@@ -17,16 +17,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package de.blizzy.documentr.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -153,5 +160,36 @@ public final class Util {
 			result.put(key, value);
 		}
 		return result;
+	}
+
+	public static String serialize(Serializable s) {
+		byte[] data;
+		ObjectOutputStream objOut = null;
+		try {
+			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+			objOut = new ObjectOutputStream(byteOut);
+			objOut.writeObject(s);
+			objOut.flush();
+			data = byteOut.toByteArray();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			IOUtils.closeQuietly(objOut);
+		}
+		return Base64.encodeBase64String(data).replaceAll("[\\r\\n]", StringUtils.EMPTY); //$NON-NLS-1$
+	}
+
+	public static <T> T deserialize(String s, Class<T> clazz) {
+		ObjectInputStream in;
+		try {
+			byte[] data = Base64.decodeBase64(s);
+			in = new ObjectInputStream(new ByteArrayInputStream(data));
+			Object o = in.readObject();
+			return clazz.cast(o);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
