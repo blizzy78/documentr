@@ -247,6 +247,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses />.
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.7</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
