@@ -174,9 +174,8 @@ public class NeighborsMacro implements IMacroRunnable {
 		StringBuilder buf = new StringBuilder();
 		String pagePath = page.getPath();
 		if (hasViewPermission(pagePath)) {
-			buf.append("<li"); //$NON-NLS-1$
+			buf.append("<li data-path=\"").append(pagePath).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 			if (reorderAllowed) {
-				buf.append(" data-path=\"").append(pagePath).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 				if (page.getOrderIndex() >= 0) {
 					buf.append(" data-manual-order=\"true\""); //$NON-NLS-1$
 				}

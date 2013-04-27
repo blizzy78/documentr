@@ -107,40 +107,40 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 	@Test
 	public void getHtmlWithDefaultChildren() {
 		String childrenHtml =
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertHtml(childrenHtml, null);
 	}
 
 	@Test
 	public void getHtmlWith1Child() {
 		String childrenHtml =
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a></li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		assertHtml(childrenHtml, "children=1"); //$NON-NLS-1$
 	}
 
 	@Test
 	public void getHtmlWith2Children() {
 		String childrenHtml =
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"<ul class=\"nav nav-list\">" + //$NON-NLS-1$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/x/x2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"</ul>" + //$NON-NLS-1$
 				"</li>" + //$NON-NLS-1$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"<ul class=\"nav nav-list\">" + //$NON-NLS-1$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/y/y2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"</ul>" + //$NON-NLS-1$
 				"</li>" + //$NON-NLS-1$
-				"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z</a>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"<ul class=\"nav nav-list\">" + //$NON-NLS-1$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z1</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar/z/z2</a></li>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					"</ul>" + //$NON-NLS-1$
 				"</li>"; //$NON-NLS-1$
 		assertHtml(childrenHtml, "children=2"); //$NON-NLS-1$
@@ -164,14 +164,14 @@ public class NeighborsMacroTest extends AbstractDocumentrTest {
 							"<li>" +
 								"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo</a>" +
 								"<ul class=\"nav nav-list\">" +
-									"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa</a></li>" +
-									"<li class=\"active\">" +
+									"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/aaa</a></li>" +
+									"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar\" class=\"active\">" +
 										"<a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bar</a>" +
 										"<ul class=\"nav nav-list\">" +
 											childrenHtml +
 										"</ul>" +
 									"</li>" +
-									"<li><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb</a></li>" +
+									"<li data-path=\"" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\"><a href=\"/" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb\">" + DocumentrConstants.HOME_PAGE_NAME + "/foo/bbb</a></li>" +
 								"</ul>" +
 							"</li>" +
 						"</ul>" +
