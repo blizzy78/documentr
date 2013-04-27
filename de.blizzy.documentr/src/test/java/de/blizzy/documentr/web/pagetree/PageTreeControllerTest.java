@@ -38,6 +38,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import de.blizzy.documentr.AbstractDocumentrTest;
+import de.blizzy.documentr.DocumentrConstants;
 import de.blizzy.documentr.access.DocumentrPermissionEvaluator;
 import de.blizzy.documentr.access.Permission;
 import de.blizzy.documentr.page.IPageStore;
@@ -130,6 +131,8 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$ //$NON-NLS-2$
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
+		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", DocumentrConstants.HOME_PAGE_NAME, Permission.VIEW)) //$NON-NLS-1$ //$NON-NLS-2$
+			.thenReturn(true);
 
 		List<PageTreeNode> result = pageTreeController.getBranchChildren(
 				"project", "branch", Sets.newHashSet(Permission.EDIT_PAGE.name()), authentication); //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,6 +166,10 @@ public class PageTreeControllerTest extends AbstractDocumentrTest {
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.VIEW)).thenReturn(true); //$NON-NLS-1$ //$NON-NLS-2$
 		when(permissionEvaluator.hasBranchPermission(authentication, "project", "branch", Permission.EDIT_PAGE)) //$NON-NLS-1$ //$NON-NLS-2$
 			.thenReturn(hasBranchPermission);
+		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", "home/foo/page1", Permission.VIEW)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			.thenReturn(true);
+		when(permissionEvaluator.hasPagePermission(authentication, "project", "branch", "home/foo/page2", Permission.VIEW)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			.thenReturn(true);
 
 		List<AbstractTreeNode> result = pageTreeController.getPageChildren(
 				"project", "branch", "home/foo", Sets.newHashSet(Permission.EDIT_PAGE.name()), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

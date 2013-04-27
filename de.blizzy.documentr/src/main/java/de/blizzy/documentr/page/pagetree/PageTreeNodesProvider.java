@@ -74,7 +74,9 @@ public class PageTreeNodesProvider {
 	public List<PageTreeNode> getBranchChildren(String projectName, String name, Set<String> checkBranchPermissions,
 			Authentication authentication) throws IOException {
 
-		if (permissionEvaluator.hasBranchPermission(authentication, projectName, name, Permission.VIEW)) {
+		if (permissionEvaluator.hasBranchPermission(authentication, projectName, name, Permission.VIEW) &&
+			permissionEvaluator.hasPagePermission(authentication, projectName, name, DocumentrConstants.HOME_PAGE_NAME, Permission.VIEW)) {
+
 			Page page = pageStore.getPage(projectName, name, DocumentrConstants.HOME_PAGE_NAME, false);
 			PageTreeNode node = new PageTreeNode(projectName, name, DocumentrConstants.HOME_PAGE_NAME, page.getTitle());
 			node.setHasBranchPermissions(hasBranchPermissions(authentication, projectName, name,
@@ -110,11 +112,13 @@ public class PageTreeNodesProvider {
 			if (pages) {
 				List<String> childPagePaths = pageStore.listChildPagePaths(projectName, branchName, Util.toRealPagePath(path));
 				for (String childPagePath : childPagePaths) {
-					Page page = pageStore.getPage(projectName, branchName, childPagePath, false);
-					PageTreeNode node = new PageTreeNode(projectName, branchName, childPagePath, page.getTitle());
-					node.setHasBranchPermissions(hasBranchPermissions(authentication, projectName, branchName,
-							checkBranchPermissions));
-					result.add(node);
+					if (permissionEvaluator.hasPagePermission(authentication, projectName, branchName, childPagePath, Permission.VIEW)) {
+						Page page = pageStore.getPage(projectName, branchName, childPagePath, false);
+						PageTreeNode node = new PageTreeNode(projectName, branchName, childPagePath, page.getTitle());
+						node.setHasBranchPermissions(hasBranchPermissions(authentication, projectName, branchName,
+								checkBranchPermissions));
+						result.add(node);
+					}
 				}
 			}
 
