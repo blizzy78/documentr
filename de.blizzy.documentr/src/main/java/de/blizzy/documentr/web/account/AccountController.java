@@ -24,8 +24,8 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -79,7 +79,7 @@ public class AccountController {
 			User user = userStore.getUser(authentication.getName());
 			if (StringUtils.isBlank(form.getPassword())) {
 				bindingResult.rejectValue("password", "user.password.blank"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else if (!passwordEncoder.isPasswordValid(user.getPassword(), form.getPassword(), user.getLoginName())) {
+			} else if (!passwordEncoder.matches(form.getPassword(), user.getPassword())) {
 				bindingResult.rejectValue("password", "user.password.wrong"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (!StringUtils.equals(form.getNewPassword1(), form.getNewPassword2())) {
@@ -87,7 +87,7 @@ public class AccountController {
 			}
 
 			if (!bindingResult.hasErrors()) {
-				String encodedPassword = passwordEncoder.encodePassword(form.getNewPassword1(), user.getLoginName());
+				String encodedPassword = passwordEncoder.encode(form.getNewPassword1());
 				User newUser = new User(user.getLoginName(), encodedPassword, user.getEmail(), user.isDisabled());
 				for (OpenId openId : user.getOpenIds()) {
 					newUser.addOpenId(openId);

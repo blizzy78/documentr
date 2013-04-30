@@ -25,8 +25,8 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -138,7 +138,7 @@ public class UserController {
 			}
 
 			if (StringUtils.isNotBlank(form.getPassword1())) {
-				password = passwordEncoder.encodePassword(form.getPassword1(), form.getLoginName());
+				password = passwordEncoder.encode(form.getPassword1());
 			}
 
 			if (StringUtils.isBlank(password)) {

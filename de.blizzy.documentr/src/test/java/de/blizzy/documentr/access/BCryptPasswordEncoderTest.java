@@ -20,9 +20,6 @@ package de.blizzy.documentr.access;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.security.SecureRandom;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,35 +39,24 @@ public class BCryptPasswordEncoderTest extends AbstractDocumentrTest {
 	private EventBus eventBus;
 	@InjectMocks
 	private BCryptPasswordEncoder passwordEncoder;
-	private SecureRandom ignoredRandom;
-
-	@Before
-	public void setUp() {
-		ignoredRandom = new SecureRandom();
-		ignoredRandom.setSeed(System.currentTimeMillis());
-	}
 
 	@Test
 	public void encodeAndCheckPassword() {
 		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
 		passwordEncoder.init();
 
-		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
-		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
+		String encPass = passwordEncoder.encode(PASSWORD);
+		assertTrue(passwordEncoder.matches(PASSWORD, encPass));
 	}
 
 	@Test
 	public void isPasswordValidMustUseIterationsFromEncodedPassword() {
 		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
 		passwordEncoder.init();
-		String encPass = passwordEncoder.encodePassword(PASSWORD, salt());
+		String encPass = passwordEncoder.encode(PASSWORD);
 
-		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("4"); //$NON-NLS-1$
+		when(systemSettingsStore.getSetting(SystemSettingsStore.BCRYPT_ROUNDS)).thenReturn("5"); //$NON-NLS-1$
 		passwordEncoder.init();
-		assertTrue(passwordEncoder.isPasswordValid(encPass, PASSWORD, salt()));
-	}
-
-	private Long salt() {
-		return ignoredRandom.nextLong();
+		assertTrue(passwordEncoder.matches(PASSWORD, encPass));
 	}
 }

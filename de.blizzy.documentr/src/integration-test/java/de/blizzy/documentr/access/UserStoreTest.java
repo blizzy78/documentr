@@ -37,7 +37,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.collect.Sets;
 
@@ -61,11 +61,10 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	@Mock
 	@SuppressWarnings("unused")
 	private LockManager lockManager;
-	private UserStore userStore;
-	@InjectMocks
-	private ShaPasswordEncoder passwordEncoder;
 	@InjectMocks
 	private ProjectRepositoryManagerFactory repoManagerFactory;
+	private UserStore userStore;
+	private PasswordEncoder passwordEncoder;
 
 	@Before
 	public void setUp() throws IOException, GitAPIException {
@@ -77,6 +76,18 @@ public class UserStoreTest extends AbstractDocumentrTest {
 		Whitebox.setInternalState(globalRepoManager, settings, repoManagerFactory);
 		globalRepoManager.init();
 
+		passwordEncoder = new PasswordEncoder() {
+			@Override
+			public String encode(CharSequence rawPassword) {
+				return "*" + rawPassword + "*"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				return encodedPassword.equals("*" + rawPassword + "*"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		};
+
 		userStore = new UserStore();
 		Whitebox.setInternalState(userStore, globalRepoManager, passwordEncoder);
 		userStore.init();
@@ -86,7 +97,7 @@ public class UserStoreTest extends AbstractDocumentrTest {
 	public void createInitialAdmin() throws IOException {
 		User user = userStore.getUser("admin"); //$NON-NLS-1$
 		assertEquals("admin", user.getLoginName()); //$NON-NLS-1$
-		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
+		String passwordHash = passwordEncoder.encode("admin"); //$NON-NLS-1$
 		assertEquals(passwordHash, user.getPassword());
 		assertFalse(user.isDisabled());
 	}

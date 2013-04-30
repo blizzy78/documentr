@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
@@ -52,25 +52,21 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 	}
 
 	@Override
-	public String encodePassword(String rawPass, Object salt) {
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.start();
-		String encPass = encoder.encode(rawPass);
-		stopwatch.stop();
+	public String encode(CharSequence rawPassword) {
+		Stopwatch stopwatch = new Stopwatch().start();
+		String encPass = encoder.encode(rawPassword);
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to encode password: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
+			log.trace("time taken to encode password: {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 		}
 		return encPass;
 	}
 
 	@Override
-	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.start();
-		boolean valid = encoder.matches(rawPass, encPass);
-		stopwatch.stop();
+	public boolean matches(CharSequence rawPassword, String encodedPassword) {
+		Stopwatch stopwatch = new Stopwatch().start();
+		boolean valid = encoder.matches(rawPassword, encodedPassword);
 		if (log.isTraceEnabled()) {
-			log.trace("time taken to verify password: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
+			log.trace("time taken to verify password: {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)); //$NON-NLS-1$
 		}
 		return valid;
 	}

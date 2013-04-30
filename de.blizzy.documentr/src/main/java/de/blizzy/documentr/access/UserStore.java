@@ -40,7 +40,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.gitective.core.BlobUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -83,7 +83,7 @@ public class UserStore {
 
 	@PostConstruct
 	public void init() throws IOException, GitAPIException {
-		String passwordHash = passwordEncoder.encodePassword("admin", "admin"); //$NON-NLS-1$ //$NON-NLS-2$
+		String passwordHash = passwordEncoder.encode("admin"); //$NON-NLS-1$
 		User adminUser = new User("admin", passwordHash, "admin@example.com", false); //$NON-NLS-1$ //$NON-NLS-2$
 
 		ILockedRepository repo = null;

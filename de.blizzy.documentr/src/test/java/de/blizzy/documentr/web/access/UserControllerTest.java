@@ -32,9 +32,8 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 
@@ -55,15 +54,25 @@ public class UserControllerTest extends AbstractDocumentrTest {
 	private Authentication authentication;
 	@Mock
 	private Model model;
-	private PasswordEncoder passwordEncoder;
 	@InjectMocks
 	private UserController userController;
+	private PasswordEncoder passwordEncoder;
 
 	@Before
 	public void setUp() throws IOException {
 		when(userStore.getUser(USER.getLoginName())).thenReturn(USER);
 
-		passwordEncoder = new ShaPasswordEncoder();
+		passwordEncoder = new PasswordEncoder() {
+			@Override
+			public String encode(CharSequence rawPassword) {
+				return "*" + rawPassword + "*"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				return encodedPassword.equals("*" + rawPassword + "*"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		};
 
 		Whitebox.setInternalState(userController, passwordEncoder);
 
@@ -90,7 +99,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 
-		String passwordHash = passwordEncoder.encodePassword("pw", "user"); //$NON-NLS-1$ //$NON-NLS-2$
+		String passwordHash = passwordEncoder.encode("pw"); //$NON-NLS-1$
 		verify(userStore).saveUser(argUser("user", passwordHash, "email", true), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -113,7 +122,7 @@ public class UserControllerTest extends AbstractDocumentrTest {
 		assertRedirect(view);
 		assertFalse(bindingResult.hasErrors());
 
-		String passwordHash = passwordEncoder.encodePassword("newPW", "user"); //$NON-NLS-1$ //$NON-NLS-2$
+		String passwordHash = passwordEncoder.encode("newPW"); //$NON-NLS-1$
 		verify(userStore).saveUser(argUser("user", passwordHash, "email", true, openIds), same(USER)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
