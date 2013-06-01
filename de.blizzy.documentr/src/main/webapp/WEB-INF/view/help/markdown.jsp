@@ -34,9 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <link rel="stylesheet" href="<c:url value="/css/documentr.css"/>" media="all"/>
 
-<script type="text/javascript" src="<c:url value="/js/require-2.1.5.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-1.9.1.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bootstrap-2.3.1.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/require-2.1.6.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-1.10.1.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bootstrap-2.3.2.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/documentr.js"/>"></script>
 
 <body id="#top" class="markdown-help">

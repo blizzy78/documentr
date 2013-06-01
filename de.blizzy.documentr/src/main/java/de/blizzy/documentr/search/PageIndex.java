@@ -151,12 +151,12 @@ public class PageIndex {
 
 		directory = FSDirectory.open(pageIndexDir);
 
-		Analyzer defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_42);
+		Analyzer defaultAnalyzer = new EnglishAnalyzer(Version.LUCENE_43);
 		Map<String, Analyzer> fieldAnalyzers = Maps.newHashMap();
-		fieldAnalyzers.put(ALL_TEXT_SUGGESTIONS, new StandardAnalyzer(Version.LUCENE_42));
+		fieldAnalyzers.put(ALL_TEXT_SUGGESTIONS, new StandardAnalyzer(Version.LUCENE_43));
 		analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, fieldAnalyzers);
 
-		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_42, analyzer);
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, analyzer);
 		config.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		writer = new IndexWriter(directory, config);
 		writer.commit();

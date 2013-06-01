@@ -40,12 +40,6 @@ var documentr = {};
 		var images = $('img[data-lightbox="lightbox"]');
 		if (images.length > 0) {
 			require(['slimbox'], function() {
-				// fix overlay for jQuery 1.9+
-				$('#lbOverlay').detach().insertBefore($('#lbCenter'));
-				$('<a id="lbCloseLink" href="javascript:;"/>').click(function() {
-					$('#lbOverlay').click();
-				}).prependTo('#lbBottom');
-				
 				images.slimbox(null, function(el) {
 					return [el.parentElement.href, $(el).attr('data-title')];
 				}, null);

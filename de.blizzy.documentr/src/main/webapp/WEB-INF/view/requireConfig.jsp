@@ -28,7 +28,7 @@ var require = {
 			diff_match_patch: 'diff_match_patch-20120106',
 			'jquery.fileupload': 'jquery-file-upload-20121221/jquery.fileupload',
 			'jquery.ui.widget': 'jquery-file-upload-20121221/vendor/jquery.ui.widget',
-			slimbox: 'slimbox-2.04',
+			slimbox: 'slimbox-2.05',
 			'jquery.jstree': 'jquery.jstree-pre-1.0-fix-2/jquery.jstree',
 			ace: 'ace-20130207/ace',
 			zxcvbn: 'zxcvbn-20130122',
