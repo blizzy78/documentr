@@ -90,7 +90,7 @@ public class MarkdownProcessorTest extends AbstractDocumentrTest {
 
 		when(macroFactory.get(MACRO)).thenReturn(macro);
 
-		String markdown = "{{:header:}}*header*{{:/header:}}**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
+		String markdown = "{{:header:}}*header*{{:/header:}}\n**foo**\n\n{{" + MACRO + "/}}\n\nbar\n"; //$NON-NLS-1$ //$NON-NLS-2$
 		String result = markdownProcessor.markdownToHtml(markdown, "project", "branch", //$NON-NLS-1$ //$NON-NLS-2$
 				DocumentrConstants.HOME_PAGE_NAME + "/bar", authentication, Locale.US, CONTEXT); //$NON-NLS-1$
 

@@ -66,6 +66,7 @@ public class MarkdownProcessor {
 			Replacement.dotAllNoCase("<p( " + TEXT_RANGE_RE + ")?><span(.*?)><pre(.*?</pre>.*?</span>)</p>", "<span$2><pre$1$3"),
 
 			Replacement.dotAllNoCase("<p[^>]*>[ \\t\\r\\n]*</p>", StringUtils.EMPTY),
+			Replacement.dotAllNoCase("(<p[^>]*>)(?:<br/>)+", "$1"),
 			Replacement.dotAllNoCase("(?:<br/>)+</p>", "</p>"),
 
 			Replacement.dotAllNoCase(
