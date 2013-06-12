@@ -139,21 +139,29 @@ public class SubscriptionStore {
 	}
 
 	public boolean isSubscribed(String projectName, String branchName, String path, User user) throws IOException {
-		ILockedRepository repo = null;
-		try {
-			repo = getOrCreateRepository(user);
-			return isSubscribed(projectName, branchName, path, user, repo);
-		} catch (GitAPIException e) {
-			throw new IOException(e);
-		} finally {
-			Util.closeQuietly(repo);
+		if (!user.isDisabled()) {
+			ILockedRepository repo = null;
+			try {
+				repo = getOrCreateRepository(user);
+				return isSubscribed(projectName, branchName, path, user, repo);
+			} catch (GitAPIException e) {
+				throw new IOException(e);
+			} finally {
+				Util.closeQuietly(repo);
+			}
+		} else {
+			return false;
 		}
 	}
 
 	private boolean isSubscribed(String projectName, String branchName, String path, User user, ILockedRepository repo) {
-		Set<Page> pages = getSubscriptions(user, repo);
-		Page page = new Page(projectName, branchName, path);
-		return pages.contains(page);
+		if (!user.isDisabled()) {
+			Set<Page> pages = getSubscriptions(user, repo);
+			Page page = new Page(projectName, branchName, path);
+			return pages.contains(page);
+		} else {
+			return false;
+		}
 	}
 
 	public Set<String> getSubscriberEmails(String projectName, String branchName, String path) throws IOException {
